@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.yahoo;
+package com.hungle.tools.moneyutils.yahoo;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -27,53 +27,88 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GetHistoricalQuotesDialog.
+ */
 public class GetHistoricalQuotesDialog extends JDialog {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(GetHistoricalQuotesDialog.class);
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(GetHistoricalQuotesDialog.class);
 
+    /** The content panel. */
     private final JPanel contentPanel = new JPanel();
     // private JTextField textField;
     // private JTextField textField_1;
 
+    /** The from date. */
     private Date fromDate;
+    
+    /** The to date. */
     private Date toDate;
+    
+    /** The days. */
     private int days = -30;
+    
+    /** The limit to friday. */
     private Boolean limitToFriday = false;
+    
+    /** The limit to EOM. */
     private Boolean limitToEOM = false;
     
+    /** The from date picker. */
     private JXDatePicker fromDatePicker;
 
+    /** The to date picker. */
     private JXDatePicker toDatePicker;
+    
+    /** The limit to friday 1. */
     private JCheckBox limitToFriday_1;
+    
+    /** The limit to EO M 1. */
     private JCheckBox limitToEOM_1;
 
     /**
      * Launch the application.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         try {
             GetHistoricalQuotesDialog dialog = new GetHistoricalQuotesDialog();
             dialog.showDialog();
-            log.info("isCanceled=" + dialog.isCanceled());
-            log.info("fromDate=" + dialog.getFromDate());
-            log.info("toDate=" + dialog.getToDate());
+            LOGGER.info("isCanceled=" + dialog.isCanceled());
+            LOGGER.info("fromDate=" + dialog.getFromDate());
+            LOGGER.info("toDate=" + dialog.getToDate());
         } catch (Exception e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         }
     }
 
+    /**
+     * Checks if is canceled.
+     *
+     * @return true, if is canceled
+     */
     public boolean isCanceled() {
         return (getFromDate() == null) || (getToDate() == null);
     }
 
+    /**
+     * Show dialog.
+     */
     public void showDialog() {
         showDialog(null);
     }
 
+    /**
+     * Show dialog.
+     *
+     * @param relativeComponent the relative component
+     */
     public void showDialog(Component relativeComponent) {
         this.setModalityType(ModalityType.APPLICATION_MODAL);
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -84,6 +119,10 @@ public class GetHistoricalQuotesDialog extends JDialog {
 
     /**
      * Create the dialog.
+     *
+     * @param fromDate the from date
+     * @param toDate the to date
+     * @param symbol the symbol
      */
     public GetHistoricalQuotesDialog(Date fromDate, Date toDate, String symbol) {
         if (toDate == null) {
@@ -132,7 +171,7 @@ public class GetHistoricalQuotesDialog extends JDialog {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     Date date = fromDatePicker.getDate();
-                    log.info("fromDate=" + date);
+                    LOGGER.info("fromDate=" + date);
                     setFromDate(date);
                 }
             };
@@ -155,7 +194,7 @@ public class GetHistoricalQuotesDialog extends JDialog {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     Date date = toDatePicker.getDate();
-                    log.info("toDate=" + date);
+                    LOGGER.info("toDate=" + date);
                     setToDate(date);
                 }
             };
@@ -197,7 +236,7 @@ public class GetHistoricalQuotesDialog extends JDialog {
                             setLimitToFriday(limitToFriday_1.isSelected());
                             setLimitToEOM(limitToEOM_1.isSelected());
                         } catch (ParseException e1) {
-                            log.warn(e);
+                            LOGGER.warn(e);
                         }
                         dispose();
                     }
@@ -223,45 +262,97 @@ public class GetHistoricalQuotesDialog extends JDialog {
         initDataBindings();
     }
 
+    /**
+     * Instantiates a new gets the historical quotes dialog.
+     *
+     * @param symbol the symbol
+     */
     public GetHistoricalQuotesDialog(String symbol) {
         this(null, new Date(), symbol);
     }
 
+    /**
+     * Instantiates a new gets the historical quotes dialog.
+     */
     public GetHistoricalQuotesDialog() {
         this(null);
     }
 
+    /**
+     * Gets the from date.
+     *
+     * @return the from date
+     */
     public Date getFromDate() {
         return fromDate;
     }
 
+    /**
+     * Sets the from date.
+     *
+     * @param fromDate the new from date
+     */
     public void setFromDate(Date fromDate) {
         this.fromDate = fromDate;
     }
 
+    /**
+     * Gets the to date.
+     *
+     * @return the to date
+     */
     public Date getToDate() {
         return toDate;
     }
 
+    /**
+     * Sets the to date.
+     *
+     * @param toDate the new to date
+     */
     public void setToDate(Date toDate) {
         this.toDate = toDate;
     }
 
+    /**
+     * Gets the limit to friday.
+     *
+     * @return the limit to friday
+     */
     public Boolean getLimitToFriday() {
         return limitToFriday;
     }
 
+    /**
+     * Sets the limit to friday.
+     *
+     * @param limitToFriday the new limit to friday
+     */
     public void setLimitToFriday(Boolean limitToFriday) {
         this.limitToFriday = limitToFriday;
     }
 
+    /**
+     * Gets the limit to EOM.
+     *
+     * @return the limit to EOM
+     */
     public Boolean getLimitToEOM() {
         return limitToEOM;
     }
 
+    /**
+     * Sets the limit to EOM.
+     *
+     * @param limitToEOM the new limit to EOM
+     */
     public void setLimitToEOM(Boolean limitToEOM) {
         this.limitToEOM = limitToEOM;
     }
+    
+    /**
+     * Inits the data bindings.
+     */
     protected void initDataBindings() {
     }
 }

@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes.net;
+package com.hungle.tools.moneyutils.ofx.quotes.net;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,9 +26,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.le.tools.moneyutils.fi.UpdateFiDir;
-import com.le.tools.moneyutils.fi.VelocityUtils;
-import com.le.tools.moneyutils.fi.props.OFX;
+import com.hungle.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.VelocityUtils;
+import com.hungle.tools.moneyutils.fi.props.OFX;
 
 public class CheckOfxVersion {
     private static final Logger log = Logger.getLogger(CheckOfxVersion.class);

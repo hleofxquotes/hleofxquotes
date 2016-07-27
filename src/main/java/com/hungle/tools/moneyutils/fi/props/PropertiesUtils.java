@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.fi.props;
+package com.hungle.tools.moneyutils.fi.props;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,17 +21,33 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
 
-import com.le.tools.moneyutils.fi.Utils;
-import com.le.tools.moneyutils.scrubber.IngDirectScrubber;
-import com.le.tools.moneyutils.scrubber.OfxScrubber;
-import com.le.tools.moneyutils.scrubber.ResponseFilter;
+import com.hungle.tools.moneyutils.fi.Utils;
+import com.hungle.tools.moneyutils.scrubber.IngDirectScrubber;
+import com.hungle.tools.moneyutils.scrubber.OfxScrubber;
+import com.hungle.tools.moneyutils.scrubber.ResponseFilter;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PropertiesUtils.
+ */
 public class PropertiesUtils {
-    private static final Logger log = Logger.getLogger(PropertiesUtils.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(PropertiesUtils.class);
 
+    /** The Constant DEFAULT_APP_VER. */
     private static final String DEFAULT_APP_VER = "1900";
+    
+    /** The Constant DEFAULT_APP_ID. */
     private static final String DEFAULT_APP_ID = "QWIN";
 
+    /**
+     * Creates the velocity context.
+     *
+     * @param propsFile the props file
+     * @return the velocity context
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static VelocityContext createVelocityContext(File propsFile) throws IOException {
         VelocityContext context = new VelocityContext();
 
@@ -41,16 +57,16 @@ public class PropertiesUtils {
 
         // FI
         FIBean fi = FIBean.parseFI(props, beanUtilsBean);
-        if (log.isDebugEnabled()) {
-            log.debug("fi=" + fi);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("fi=" + fi);
         }
         context.put("fi", fi);
 
         // OFX
         OFX ofx = OFX.parseOFX(props, beanUtilsBean);
-        if (log.isDebugEnabled()) {
-            log.debug("ofx=" + ofx);
-            log.debug("ofx.version=" + ofx.getVersion());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("ofx=" + ofx);
+            LOGGER.debug("ofx.version=" + ofx.getVersion());
         }
         context.put("ofx", ofx);
 
@@ -60,15 +76,15 @@ public class PropertiesUtils {
         if (!isNull(property)) {
             requestType = property;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("requestType=" + requestType);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("requestType=" + requestType);
         }
         context.put("requestType", requestType);
 
         // startDate
         String startDate = parseStartDate(props);
-        if (log.isDebugEnabled()) {
-            log.debug("startDate=" + startDate);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("startDate=" + startDate);
         }
         context.put("startDate", startDate);
         fi.setStartDate(startDate);
@@ -89,8 +105,8 @@ public class PropertiesUtils {
 
         // Authentication
         Authentication auth = Authentication.parseAuthentication(props, beanUtilsBean);
-        if (log.isDebugEnabled()) {
-            log.debug("auth=" + auth);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("auth=" + auth);
         }
         context.put("auth", auth);
 
@@ -100,15 +116,15 @@ public class PropertiesUtils {
 
         // Accounts
         List<Account> accounts = Account.parseAccounts(props, beanUtilsBean);
-        if (log.isDebugEnabled()) {
-            log.debug("accounts=" + accounts);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("accounts=" + accounts);
         }
         context.put("accounts", accounts);
 
         // Http connection
         HttpProperties httpProperties = HttpProperties.parseHttpProperties(props, beanUtilsBean);
-        if (log.isDebugEnabled()) {
-            log.debug("httpProperties=" + httpProperties);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("httpProperties=" + httpProperties);
         }
         context.put("httpProperties", httpProperties);
 
@@ -118,6 +134,12 @@ public class PropertiesUtils {
         return context;
     }
 
+    /**
+     * Parses the start date.
+     *
+     * @param props the props
+     * @return the string
+     */
     private static String parseStartDate(Properties props) {
         String startDate = null;
         String property = props.getProperty("startDate");
@@ -128,7 +150,7 @@ public class PropertiesUtils {
                     Long offset = Long.valueOf(property);
                     startDate = parseStartDate(offset);
                 } catch (NumberFormatException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 }
             } else {
                 startDate = property;
@@ -137,6 +159,11 @@ public class PropertiesUtils {
         return startDate;
     }
 
+    /**
+     * Creates the default response filters.
+     *
+     * @return the list
+     */
     private static List<ResponseFilter> createDefaultResponseFilters() {
         List<ResponseFilter> responseFilters = new ArrayList<ResponseFilter>();
         ResponseFilter responseFilter = createDefaultResponseFilter();
@@ -144,6 +171,11 @@ public class PropertiesUtils {
         return responseFilters;
     }
 
+    /**
+     * Creates the default response filter.
+     *
+     * @return the response filter
+     */
     private static ResponseFilter createDefaultResponseFilter() {
         ResponseFilter responseFilter;
         responseFilter = new ResponseFilter() {
@@ -185,7 +217,7 @@ public class PropertiesUtils {
                 if (!respFile.exists()) {
                     return;
                 }
-                log.info("> ResponseFilter: " + "url=" + fi.getUrl() + "ofx.version=" + ofx.getVersion() + ", respFile=" + respFile);
+                LOGGER.info("> ResponseFilter: " + "url=" + fi.getUrl() + "ofx.version=" + ofx.getVersion() + ", respFile=" + respFile);
                 OfxScrubber scrubber = new IngDirectScrubber();
                 File outFile = new File(respFile.getAbsoluteFile().getParentFile(), respFile.getName() + "-scrubbed.txt");
                 File backupFile = new File(respFile.getAbsoluteFile().getParentFile(), respFile.getName() + "-bak.txt");
@@ -194,17 +226,23 @@ public class PropertiesUtils {
                     copyFile(respFile, backupFile);
                     copyFile(outFile, respFile);
                 } catch (IOException e) {
-                    log.error(e, e);
+                    LOGGER.error(e, e);
                 }
             }
 
             private void copyFile(File srcFile, File destFile) throws IOException {
-                com.le.tools.moneyutils.ofx.quotes.Utils.copyFile(srcFile, destFile);
+                com.hungle.tools.moneyutils.ofx.quotes.Utils.copyFile(srcFile, destFile);
             }
         };
         return responseFilter;
     }
 
+    /**
+     * Parses the start date.
+     *
+     * @param offset the offset
+     * @return the string
+     */
     public static String parseStartDate(Long offset) {
         String startDate;
         offset = offset * (1000L * 60 * 60 * 24);
@@ -217,6 +255,12 @@ public class PropertiesUtils {
         return startDate;
     }
 
+    /**
+     * Checks if is null.
+     *
+     * @param property the property
+     * @return true, if is null
+     */
     public static boolean isNull(String property) {
         if (property == null) {
             return true;
@@ -229,6 +273,15 @@ public class PropertiesUtils {
         return false;
     }
 
+    /**
+     * Sets the properties.
+     *
+     * @param beanUtilsBean the bean utils bean
+     * @param bean the bean
+     * @param prefix the prefix
+     * @param keys the keys
+     * @param props the props
+     */
     public static void setProperties(BeanUtilsBean beanUtilsBean, Object bean, String prefix, Collection<String> keys, Properties props) {
         for (String key : keys) {
             String property = props.getProperty(prefix + "." + key);
@@ -237,19 +290,26 @@ public class PropertiesUtils {
                     property = property.trim();
                     beanUtilsBean.setProperty(bean, key, property);
                 } catch (IllegalAccessException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } catch (InvocationTargetException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 }
             }
         }
     }
 
+    /**
+     * Load properties.
+     *
+     * @param file the file
+     * @return the properties
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     // TODO_ENCRYPTION
     private static Properties loadProperties(File file) throws IOException {
         Properties props = new Properties();
-        if (log.isDebugEnabled()) {
-            log.debug("file=" + file);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("file=" + file);
         }
         Reader reader = null;
         try {
@@ -260,7 +320,7 @@ public class PropertiesUtils {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }

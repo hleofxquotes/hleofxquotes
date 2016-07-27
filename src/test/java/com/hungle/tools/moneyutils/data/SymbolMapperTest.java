@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.data;
+package com.hungle.tools.moneyutils.data;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,9 +11,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.csvreader.CsvReader;
+import com.hungle.tools.moneyutils.data.SymbolMapper;
 
 public class SymbolMapperTest {
-    private static final Logger log = Logger.getLogger(SymbolMapperTest.class);
+    private static final Logger LOGGER = Logger.getLogger(SymbolMapperTest.class);
 
     private SymbolMapper mapper;
 
@@ -29,7 +30,7 @@ public class SymbolMapperTest {
         String[] tokens = getClass().getName().split("\\.");
 
         String resourceName = tokens[tokens.length - 1] + "-mapper" + id + ".csv";
-        log.info("resourceName=" + resourceName);
+        LOGGER.info("resourceName=" + resourceName);
         in = getClass().getResourceAsStream(resourceName);
         Assert.assertNotNull(in);
 
@@ -50,7 +51,7 @@ public class SymbolMapperTest {
             try {
                 in.close();
             } catch (IOException e) {
-                log.warn(e);
+                LOGGER.warn(e);
             }
         }
     }

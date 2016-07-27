@@ -4,14 +4,20 @@ import java.awt.Dialog;
 
 import javax.swing.WindowConstants;
 
-import com.le.tools.moneyutils.beansbinding.FiInfoDialog;
-import com.le.tools.moneyutils.fi.VelocityUtils;
-import com.le.tools.moneyutils.fi.model.bean.FiInfoBean;
+import com.hungle.tools.moneyutils.beansbinding.FiInfoDialog;
+import com.hungle.tools.moneyutils.fi.VelocityUtils;
+import com.hungle.tools.moneyutils.fi.model.bean.FiInfoBean;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class FiInfoDialogCmd.
+ */
 public class FiInfoDialogCmd {
 
     /**
      * Launch the application.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         VelocityUtils.initVelocity();

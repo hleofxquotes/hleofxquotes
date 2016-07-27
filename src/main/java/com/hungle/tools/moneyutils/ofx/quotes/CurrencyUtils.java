@@ -1,9 +1,15 @@
-package com.le.tools.moneyutils.yahoo;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.util.Map;
 import java.util.TreeMap;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CurrencyUtils.
+ */
 public class CurrencyUtils {
+    
+    /** The Constant CURRENCIES. */
     public static final Map<String, String> CURRENCIES = new TreeMap<String, String>();
 
     static {

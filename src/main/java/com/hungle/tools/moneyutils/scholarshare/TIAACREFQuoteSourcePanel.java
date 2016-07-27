@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.scholarshare;
+package com.hungle.tools.moneyutils.scholarshare;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -17,28 +17,44 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.ofx.quotes.GUI;
-import com.le.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.le.tools.moneyutils.stockprice.Price;
-import com.le.tools.moneyutils.stockprice.StockPrice;
-import com.le.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel;
+import com.hungle.tools.moneyutils.ofx.quotes.GUI;
+import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.stockprice.Price;
+import com.hungle.tools.moneyutils.stockprice.StockPrice;
+import com.hungle.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TIAACREFQuoteSourcePanel.
+ */
 public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
-    private static final Logger log = Logger.getLogger(TIAACREFQuoteSourcePanel.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(TIAACREFQuoteSourcePanel.class);
+    
+    /** The scrapper. */
     private TIAACREFScreenScrapSource scrapper;
 
+    /** The date formatter. */
     // December 9, 2011
     private SimpleDateFormat dateFormatter = new SimpleDateFormat(OfxPriceInfo.DEFAULT_LAST_TRADE_DATE_PATTERN);
 
+    /**
+     * Instantiates a new TIAACREF quote source panel.
+     *
+     * @param gui the gui
+     */
     public TIAACREFQuoteSourcePanel(GUI gui) {
         super(gui, "TIAACREFStockSymbols");
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel#addPrice(java.lang.String, java.util.List)
+     */
     @Override
     protected void addPrice(String symbol, List<AbstractStockPrice> stockPrices) throws IOException {
         String price = scrapper.getPrice(symbol);
@@ -49,7 +65,7 @@ public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
         bean.setStockSymbol(symbol);
         bean.setStockName(symbol);
         String currency = scrapper.getCurrency();
-        log.info(symbol + ", " + price + ", " + currency);
+        LOGGER.info(symbol + ", " + price + ", " + currency);
         if (currency != null) {
             bean.setCurrency(currency);
         }
@@ -63,8 +79,8 @@ public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
         Number number = null;
         try {
             number = formatter.parse(price);
-            if (log.isDebugEnabled()) {
-                log.debug("price number=" + number);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("price number=" + number);
             }
             Price lastPrice = new Price(number.doubleValue());
             if (currency != null) {
@@ -89,6 +105,9 @@ public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
         }
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel#getStockQuotes(java.util.List)
+     */
     @Override
     protected List<AbstractStockPrice> getStockQuotes(final List<String> stockSymbols) throws IOException {
         scrapper = new TIAACREFScreenScrapSource();
@@ -101,6 +120,9 @@ public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
         return super.getStockQuotes(stockSymbols);
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.yahoo.YahooQuoteSourcePanel#addPopupMenu(javax.swing.JTextArea)
+     */
     @Override
     protected JPopupMenu addPopupMenu(JTextArea textArea) {
         JPopupMenu popup = super.addPopupMenu(textArea);
@@ -127,11 +149,11 @@ public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
                         System.out.println(price);
                     }
                 } catch (IOException e) {
-                    log.error(e, e);
+                    LOGGER.error(e, e);
                 } catch (XPathExpressionException e) {
-                    log.error(e, e);
+                    LOGGER.error(e, e);
                 } finally {
-                    log.info("< DONE");
+                    LOGGER.info("< DONE");
                 }
             }
         });

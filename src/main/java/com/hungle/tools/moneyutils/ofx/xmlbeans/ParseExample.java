@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.xmlbeans;
+package com.hungle.tools.moneyutils.ofx.xmlbeans;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,11 +11,19 @@ import org.apache.xmlbeans.XmlOptions;
 
 import net.ofx.types.x2003.x04.OFXDocument;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ParseExample.
+ */
 public class ParseExample {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(ParseExample.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         File file = new File("example1.xml");

@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.misc;
+package com.hungle.tools.moneyutils.misc;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,9 +23,22 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class InvestingInBonds.
+ */
 public class InvestingInBonds {
-    private static final Logger log = Logger.getLogger(InvestingInBonds.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(InvestingInBonds.class);
 
+    /**
+     * Gets the price.
+     *
+     * @param cusip the cusip
+     * @return the price
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void getPrice(String cusip) throws IOException {
         URL url = null;
 
@@ -39,7 +52,7 @@ public class InvestingInBonds {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
             String line = null;
             while ((line = reader.readLine()) != null) {
-                log.info(line);
+                LOGGER.info(line);
             }
             Document document = createDocument(stream);
             printDocument(document, System.out);
@@ -52,7 +65,7 @@ public class InvestingInBonds {
                 try {
                     stream.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     stream = null;
                 }
@@ -61,6 +74,13 @@ public class InvestingInBonds {
 
     }
 
+    /**
+     * Creates the document.
+     *
+     * @param stream the stream
+     * @return the document
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private Document createDocument(InputStream stream) throws IOException {
         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
@@ -77,6 +97,14 @@ public class InvestingInBonds {
         return document;
     }
 
+    /**
+     * Prints the document.
+     *
+     * @param doc the doc
+     * @param out the out
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws TransformerException the transformer exception
+     */
     private static void printDocument(Document doc, OutputStream out) throws IOException, TransformerException {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
@@ -90,7 +118,9 @@ public class InvestingInBonds {
     }
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         // http://www.investinginbonds.com/CorporateBonds/(lhihtg4525aiueu4cdx3fvml)/Disclaimer.aspx?ReturnUrl=%2fcorporatebonds%2fcusip.aspx%3faction%3dall%26cusip%3d25746RAE6&action=all&cusip=25746RAE6&CheckBox1=on&__VIEWSTATE=dDwzMTA3NDEwMjM7O2w8Q2hlY2tCb3gxOz4%2BzrrFMWXev264rmMzyiwn6sz0nYM%3D&btnContinue=Continue
@@ -124,7 +154,7 @@ public class InvestingInBonds {
         try {
             i.getPrice(cusip);
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         }
     }
 

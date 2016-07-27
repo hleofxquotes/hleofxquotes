@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -84,26 +84,26 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.bloomberg.BloombergQuoteSourcePanel;
-import com.le.tools.moneyutils.data.SymbolMapper;
-import com.le.tools.moneyutils.fi.UpdateFiDir;
-import com.le.tools.moneyutils.fi.VelocityUtils;
-import com.le.tools.moneyutils.ft.FtDotComQuoteSourcePanel;
-import com.le.tools.moneyutils.fx.UpdateFx;
-import com.le.tools.moneyutils.jna.ImportDialogAutoClickService;
-import com.le.tools.moneyutils.misc.BuildNumber;
-import com.le.tools.moneyutils.ofx.statement.StatementPanel;
-import com.le.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
-import com.le.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
-import com.le.tools.moneyutils.scholarshare.TIAACREFQuoteSourcePanel;
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.le.tools.moneyutils.stockprice.Price;
-import com.le.tools.moneyutils.stockprice.StockPrice;
-import com.le.tools.moneyutils.yahoo.CurrencyUtils;
-import com.le.tools.moneyutils.yahoo.GetYahooQuotes;
-import com.le.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel;
-import com.le.tools.moneyutils.yahoo.YahooHistoricalSourcePanel;
-import com.le.tools.moneyutils.yahoo.YahooQuoteSourcePanel;
+import com.hungle.tools.moneyutils.bloomberg.BloombergQuoteSourcePanel;
+import com.hungle.tools.moneyutils.data.SymbolMapper;
+import com.hungle.tools.moneyutils.data.SymbolMapperEntry;
+import com.hungle.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.VelocityUtils;
+import com.hungle.tools.moneyutils.ft.FtDotComQuoteSourcePanel;
+import com.hungle.tools.moneyutils.fx.UpdateFx;
+import com.hungle.tools.moneyutils.jna.ImportDialogAutoClickService;
+import com.hungle.tools.moneyutils.misc.BuildNumber;
+import com.hungle.tools.moneyutils.ofx.statement.StatementPanel;
+import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
+import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
+import com.hungle.tools.moneyutils.scholarshare.TIAACREFQuoteSourcePanel;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.stockprice.Price;
+import com.hungle.tools.moneyutils.stockprice.StockPrice;
+import com.hungle.tools.moneyutils.yahoo.GetYahooQuotes;
+import com.hungle.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel;
+import com.hungle.tools.moneyutils.yahoo.YahooHistoricalSourcePanel;
+import com.hungle.tools.moneyutils.yahoo.YahooQuoteSourcePanel;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -120,133 +120,206 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 import net.ofx.types.x2003.x04.CurrencyEnum;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GUI.
+ */
 public class GUI extends JFrame {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /** The Constant prefs. */
     // TODO: le.com.tools.moneyutils.ofx.quotes.GUI
     private static final Preferences prefs = Preferences
             .userNodeForPackage(le.com.tools.moneyutils.ofx.quotes.GUI.class);
 
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(GUI.class);
 
+    /** The Constant VERSION_PREFIX. */
     private static final String VERSION_PREFIX = "Build";
     // private static final String VERSION_PREFIX = "SNAPSHOT";
 
+    /** The Constant VERSION_SUFFIX. */
     private static final String VERSION_SUFFIX = "01";
 
+    /** The version. */
     // Build_20110706_31
     public static String VERSION = VERSION_PREFIX + "_" + "20111104" + "_" + VERSION_SUFFIX;
 
+    /** The Constant PREF_DEFAULT_CURRENCY. */
     private static final String PREF_DEFAULT_CURRENCY = "defaultCurrency";
+    
+    /** The Constant PREF_LAST_KNOWN_IMPORT_STRING. */
     private static final String PREF_LAST_KNOWN_IMPORT_STRING = "lastKnownImportString";
 
+    /** The Constant PREF_RANDOMIZE_SHARE_COUNT. */
     private static final String PREF_RANDOMIZE_SHARE_COUNT = "randomizeShareCount";
 
+    /** The Constant PREF_FORCE_GENERATING_INVTRANLIST. */
     private static final String PREF_FORCE_GENERATING_INVTRANLIST = "forceGeneratingINVTRANLIST";
 
+    /** The Constant HOME_PAGE. */
     protected static final String HOME_PAGE = "http://code.google.com/p/hle-ofx-quotes/";
 
+    /** The Constant PREF_DATE_OFFSET. */
     private static final String PREF_DATE_OFFSET = "dateOffset";
 
+    /** The Constant PREF_SUSPICIOUS_PRICE. */
     private static final String PREF_SUSPICIOUS_PRICE = "suspiciousPrice";
 
+    /** The Constant PREF_INCREMENTALLY_INCREASED_SHARE_COUNT. */
     private static final String PREF_INCREMENTALLY_INCREASED_SHARE_COUNT = "incrementallyIncreasedShareCount";
 
+    /** The Constant PREF_INCREMENTALLY_INCREASED_SHARE_COUNT_VALUE. */
     private static final String PREF_INCREMENTALLY_INCREASED_SHARE_COUNT_VALUE = "incrementallyIncreasedShareCountValue";
 
+    /** The Constant PREF_ACCOUNT_ID. */
     private static final String PREF_ACCOUNT_ID = "accountId";
 
+    /** The Constant PREF_IMPORT_DIALOG_AUTO_CLICK. */
     private static final String PREF_IMPORT_DIALOG_AUTO_CLICK = "importDialogAutoClick";
 
+    /** The thread pool. */
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
+    /** The output files. */
     private List<File> outputFiles;
 
+    /** The result view. */
     private JTextPane resultView;
 
+    /** The price list. */
     private EventList<AbstractStockPrice> priceList = new BasicEventList<AbstractStockPrice>();
+    
+    /** The exchange rates. */
     private EventList<AbstractStockPrice> exchangeRates = new BasicEventList<AbstractStockPrice>();
+    
+    /** The mapper. */
     private EventList<SymbolMapperEntry> mapper = new BasicEventList<SymbolMapperEntry>();
 
+    /** The price filter edit. */
     private JTextField priceFilterEdit;
 
+    /** The defaul currency label. */
     private JLabel defaulCurrencyLabel;
+    
+    /** The clock label. */
     private JLabel clockLabel;
 
+    /** The clock formatters. */
     private SimpleDateFormat[] clockFormatters;
 
+    /** The import to money button. */
     private JButton importToMoneyButton;
 
+    /** The last known import. */
     private JLabel lastKnownImport;
 
+    /** The last known import string. */
     private String lastKnownImportString;
 
+    /** The update exchange rate button. */
     private JButton updateExchangeRateButton;
 
+    /** The save ofx button. */
     private JButton saveOfxButton;
 
+    /** The default currency. */
     private String defaultCurrency = prefs.get(PREF_DEFAULT_CURRENCY, CurrencyEnum.USD.toString());
 
+    /** The randomize share count. */
     private Boolean randomizeShareCount = Boolean.valueOf(prefs.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
+    
+    /** The random. */
     private Random random = new Random();
 
+    /** The incrementally increased share count. */
     private Boolean incrementallyIncreasedShareCount = Boolean
             .valueOf(prefs.get(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT, "False"));
 
+    /** The bottom tabs. */
     private JTabbedPane bottomTabs;
 
+    /** The yahoo quote source view. */
     private YahooQuoteSourcePanel yahooQuoteSourceView;
 
+    /** The yahoo api quote source panel. */
     private YahooApiQuoteSourcePanel yahooApiQuoteSourcePanel;
 
+    /** The ft dot com quote source panel. */
     private FtDotComQuoteSourcePanel ftDotComQuoteSourcePanel;
 
+    /** The yahoo historical quote source view. */
     private YahooQuoteSourcePanel yahooHistoricalQuoteSourceView;
 
+    /** The quote source listener. */
     private QuoteSourceListener quoteSourceListener;
 
+    /** The force generating INVTRANLIST. */
     private Boolean forceGeneratingINVTRANLIST = Boolean.valueOf(prefs.get(PREF_FORCE_GENERATING_INVTRANLIST, "False"));
 
+    /** The date offset. */
     private Integer dateOffset = Integer.valueOf(prefs.get(PREF_DATE_OFFSET, "0"));
 
+    /** The suspicious price. */
     private Integer suspiciousPrice = Integer.valueOf(prefs.get(PREF_SUSPICIOUS_PRICE, "10000"));
 
+    /** The account id. */
     private String accountId = prefs.get(PREF_ACCOUNT_ID, OfxPriceInfo.DEFAULT_ACCOUNT_ID);
 
+    /** The account id label. */
     private JLabel accountIdLabel;
 
+    /** The download view. */
     private StatementPanel downloadView;
 
+    /** The main tabbed. */
     private JTabbedPane mainTabbed;
 
+    /** The selected quote source. */
     private int selectedQuoteSource;
 
+    /** The import dialog auto click service. */
     private ImportDialogAutoClickService importDialogAutoClickService;
 
+    /** The price formatter. */
     private NumberFormat priceFormatter;
 
+    /** The bloomberg quote source panel. */
     private YahooApiQuoteSourcePanel bloombergQuoteSourcePanel;
 
+    /** The t IAACREF quote source panel. */
     private TIAACREFQuoteSourcePanel tIAACREFQuoteSourcePanel;
 
+    /** The backup view. */
     private BackupPanel backupView;
 
+    /** The fi dir. */
     // TODO_FI
     private File fiDir = new File("fi");
 
+    /**
+     * The Class EditRandomizeShareCountAction.
+     */
     private final class EditRandomizeShareCountAction extends AbstractAction {
-        /**
-         * 
-         */
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new edits the randomize share count action.
+         *
+         * @param name the name
+         */
         private EditRandomizeShareCountAction(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             String[] possibilities = { "true", "false" };
@@ -272,16 +345,26 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * The Class EditWarnSuspiciousPriceAction.
+     */
     private final class EditWarnSuspiciousPriceAction extends AbstractAction {
-        /**
-         * 
-         */
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new edits the warn suspicious price action.
+         *
+         * @param name the name
+         */
         private EditWarnSuspiciousPriceAction(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             String[] possibilities = null;
@@ -313,16 +396,26 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * The Class EditOFXAccountIdAction.
+     */
     private final class EditOFXAccountIdAction extends AbstractAction {
-        /**
-         * 
-         */
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new edits the OFX account id action.
+         *
+         * @param name the name
+         */
         private EditOFXAccountIdAction(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             String[] possibilities = null;
@@ -340,16 +433,26 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * The Class EditCurrencyAction.
+     */
     private final class EditCurrencyAction extends AbstractAction {
-        /**
-         * 
-         */
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new edits the currency action.
+         *
+         * @param name the name
+         */
         private EditCurrencyAction(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             Set<String> keys = CurrencyUtils.CURRENCIES.keySet();
@@ -372,16 +475,26 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * The Class UpdateMnyExchangeRatesTask.
+     */
     private final class UpdateMnyExchangeRatesTask extends AbstractAction {
-        /**
-         * 
-         */
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new update mny exchange rates task.
+         *
+         * @param name the name
+         */
         private UpdateMnyExchangeRatesTask(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             // JOptionPane.showMessageDialog(GUI.this,
@@ -408,6 +521,12 @@ public class GUI extends JFrame {
             }
         }
 
+        /**
+         * Gets the jar file.
+         *
+         * @param event the event
+         * @return the jar file
+         */
         private void getJarFile(final ActionEvent event) {
             final ProgressMonitor progressMonitor = new ProgressMonitor(GUI.this, "Downloading sunriise plugin ...", "",
                     0, 100);
@@ -454,6 +573,15 @@ public class GUI extends JFrame {
             Future<String> future = threadPool.submit(task);
         }
 
+        /**
+         * Gets the jar file.
+         *
+         * @param uri the uri
+         * @param toJarFile the to jar file
+         * @param progressMonitor the progress monitor
+         * @return the jar file
+         * @throws IOException Signals that an I/O exception has occurred.
+         */
         private boolean getJarFile(String uri, File toJarFile, final ProgressMonitor progressMonitor)
                 throws IOException {
             boolean canceled = false;
@@ -565,6 +693,13 @@ public class GUI extends JFrame {
             return !canceled;
         }
 
+        /**
+         * Update progress monitor.
+         *
+         * @param percentageDone the percentage done
+         * @param progressMonitor the progress monitor
+         * @return the string
+         */
         private String updateProgressMonitor(long percentageDone, final ProgressMonitor progressMonitor) {
             final String message = String.format("Completed %d%%.\n", percentageDone);
             final int progress = (int) percentageDone;
@@ -579,6 +714,13 @@ public class GUI extends JFrame {
             return message;
         }
 
+        /**
+         * Notify canceled.
+         *
+         * @param httpGet the http get
+         * @param entity the entity
+         * @param progressMonitor the progress monitor
+         */
         private void notifyCanceled(HttpGet httpGet, HttpEntity entity, final ProgressMonitor progressMonitor) {
             log.warn("progressMonitor.isCanceled()=" + progressMonitor.isCanceled());
             if (httpGet != null) {
@@ -603,23 +745,50 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * The listener interface for receiving closingWindow events.
+     * The class that is interested in processing a closingWindow
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addClosingWindowListener<code> method. When
+     * the closingWindow event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see ClosingWindowEvent
+     */
     private final class ClosingWindowListener implements WindowListener {
+        
+        /* (non-Javadoc)
+         * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+         */
         @Override
         public void windowOpened(WindowEvent e) {
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+         */
         @Override
         public void windowIconified(WindowEvent e) {
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+         */
         @Override
         public void windowDeiconified(WindowEvent e) {
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+         */
         @Override
         public void windowDeactivated(WindowEvent e) {
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+         */
         @Override
         public void windowClosing(WindowEvent event) {
             log.info("> windowClosing");
@@ -632,6 +801,9 @@ public class GUI extends JFrame {
             }
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+         */
         @Override
         public void windowClosed(WindowEvent event) {
             log.info("> windowClosed");
@@ -644,6 +816,9 @@ public class GUI extends JFrame {
             }
         }
 
+        /**
+         * Shutdown.
+         */
         private void shutdown() {
             if (threadPool != null) {
                 List<Runnable> tasks = threadPool.shutdownNow();
@@ -667,19 +842,47 @@ public class GUI extends JFrame {
             }
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+         */
         @Override
         public void windowActivated(WindowEvent e) {
         }
     }
 
+    /**
+     * The Class StockPricesReceivedTask.
+     */
     private final class StockPricesReceivedTask implements Runnable {
+        
+        /** The beans. */
         private final List<AbstractStockPrice> beans;
+        
+        /** The bad price. */
         private final Double badPrice;
+        
+        /** The fx table. */
         private final FxTable fxTable;
+        
+        /** The has wrapped share count. */
         private final boolean hasWrappedShareCount;
+        
+        /** The symbol mapper. */
         private final SymbolMapper symbolMapper;
+        
+        /** The quote source. */
         private final QuoteSource quoteSource;
 
+        /**
+         * Instantiates a new stock prices received task.
+         *
+         * @param beans the beans
+         * @param badPrice the bad price
+         * @param fxTable the fx table
+         * @param hasWrappedShareCount the has wrapped share count
+         * @param symbolMapper the symbol mapper
+         * @param quoteSource the quote source
+         */
         private StockPricesReceivedTask(List<AbstractStockPrice> beans, Double badPrice, FxTable fxTable,
                 boolean hasWrappedShareCount, SymbolMapper symbolMapper, QuoteSource quoteSource) {
             this.beans = beans;
@@ -690,6 +893,9 @@ public class GUI extends JFrame {
             this.quoteSource = quoteSource;
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
         @Override
         public void run() {
             if (log.isDebugEnabled()) {
@@ -789,16 +995,26 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * The Class CreateNewFi.
+     */
     private final class CreateNewFi extends AbstractAction {
-        /**
-         * 
-         */
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new creates the new fi.
+         *
+         * @param name the name
+         */
         private CreateNewFi(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             String fiName = JOptionPane.showInputDialog(GUI.this, "Enter a new 'Financial Institution' name");
@@ -861,18 +1077,31 @@ public class GUI extends JFrame {
 
     }
 
+    /**
+     * The Class ProfileSelectedAction.
+     */
     private final class ProfileSelectedAction extends AbstractAction {
-        /**
-         * 
-         */
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
+        
+        /** The props. */
         private Properties props;
 
+        /**
+         * Instantiates a new profile selected action.
+         *
+         * @param name the name
+         * @param props the props
+         */
         private ProfileSelectedAction(String name, Properties props) {
             super(name);
             this.props = props;
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if (props == null) {
@@ -890,16 +1119,26 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * The Class ExitAction.
+     */
     private final class ExitAction extends AbstractAction {
-        /**
-         * 
-         */
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new exit action.
+         *
+         * @param name the name
+         */
         private ExitAction(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             log.info("> ExitAction.actionPerformed");
@@ -931,7 +1170,14 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * The Class UpdateResultViewTask.
+     */
     private final class UpdateResultViewTask implements Runnable {
+        
+        /* (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
         @Override
         public void run() {
             if (resultView == null) {
@@ -972,17 +1218,26 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * The Class ImportAction.
+     */
     private final class ImportAction extends AbstractAction {
 
-        /**
-         * 
-         */
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new import action.
+         *
+         * @param name the name
+         */
         private ImportAction(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             log.info("> Import action");
@@ -1012,6 +1267,9 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Clear price table.
+     */
     protected void clearPriceTable() {
         priceList.clear();
         exchangeRates.clear();
@@ -1020,10 +1278,19 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Clear mapper table.
+     */
     protected void clearMapperTable() {
         mapper.clear();
     }
 
+    /**
+     * Stock prices received.
+     *
+     * @param quoteSource the quote source
+     * @param stockPrices the stock prices
+     */
     private void stockPricesReceived(final QuoteSource quoteSource, List<AbstractStockPrice> stockPrices) {
         SymbolMapper symbolMapper = SymbolMapper.createDefaultSymbolMapper();
 
@@ -1100,6 +1367,16 @@ public class GUI extends JFrame {
         SwingUtilities.invokeLater(stockPricesReceivedTask);
     }
 
+    /**
+     * Save to OFX.
+     *
+     * @param stockPrices the stock prices
+     * @param symbolMapper the symbol mapper
+     * @param fxTable the fx table
+     * @param onePerFile the one per file
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private List<File> saveToOFX(final List<AbstractStockPrice> stockPrices, SymbolMapper symbolMapper, FxTable fxTable,
             boolean onePerFile) throws IOException {
         // cleanup
@@ -1127,6 +1404,15 @@ public class GUI extends JFrame {
         return files;
     }
 
+    /**
+     * Save to OFX.
+     *
+     * @param stockPrices the stock prices
+     * @param symbolMapper the symbol mapper
+     * @param fxTable the fx table
+     * @return the file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private File saveToOFX(final List<AbstractStockPrice> stockPrices, SymbolMapper symbolMapper, FxTable fxTable)
             throws IOException {
         File outputFile = File.createTempFile("quotes", ".ofx");
@@ -1145,6 +1431,13 @@ public class GUI extends JFrame {
         return outputFile;
     }
 
+    /**
+     * Save to csv.
+     *
+     * @param beans the beans
+     * @return the file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private File saveToCsv(List<AbstractStockPrice> beans) throws IOException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
         File outFile = null;
@@ -1194,6 +1487,14 @@ public class GUI extends JFrame {
         return outFile;
     }
 
+    /**
+     * Gets the mapper currency.
+     *
+     * @param symbol the symbol
+     * @param mapper the mapper
+     * @param defaultValue the default value
+     * @return the mapper currency
+     */
     private String getMapperCurrency(String symbol, SymbolMapper mapper, String defaultValue) {
         String quoteSourceSymbol = null;
         String currency = defaultValue;
@@ -1219,6 +1520,13 @@ public class GUI extends JFrame {
         return currency;
     }
 
+    /**
+     * Update last price currency.
+     *
+     * @param stockPrices the stock prices
+     * @param defaultCurrency the default currency
+     * @param symbolMapper the symbol mapper
+     */
     private void updateLastPriceCurrency(List<AbstractStockPrice> stockPrices, String defaultCurrency,
             SymbolMapper symbolMapper) {
         for (AbstractStockPrice stockPrice : stockPrices) {
@@ -1242,10 +1550,20 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Gets the save ofx button.
+     *
+     * @return the save ofx button
+     */
     public JButton getSaveOfxButton() {
         return saveOfxButton;
     }
 
+    /**
+     * Instantiates a new gui.
+     *
+     * @param title the title
+     */
     public GUI(String title) {
         super(title);
 
@@ -1285,6 +1603,11 @@ public class GUI extends JFrame {
         addWindowListener(windowListener);
     }
 
+    /**
+     * Stock prices lookup started.
+     *
+     * @param quoteSource the quote source
+     */
     protected void stockPricesLookupStarted(QuoteSource quoteSource) {
         Runnable doRun = new Runnable() {
             @Override
@@ -1296,6 +1619,9 @@ public class GUI extends JFrame {
         SwingUtilities.invokeLater(doRun);
     }
 
+    /**
+     * Update main menu.
+     */
     private void updateMainMenu() {
         JMenuBar menubar = new JMenuBar();
 
@@ -1310,6 +1636,11 @@ public class GUI extends JFrame {
         setJMenuBar(menubar);
     }
 
+    /**
+     * Adds the tools menu.
+     *
+     * @param menubar the menubar
+     */
     private void addToolsMenu(JMenuBar menubar) {
         JMenu menu = null;
         // JMenuItem menuItem = null;
@@ -1342,6 +1673,11 @@ public class GUI extends JFrame {
         menubar.add(menu);
     }
 
+    /**
+     * Adds the help menu.
+     *
+     * @param menubar the menubar
+     */
     private void addHelpMenu(JMenuBar menubar) {
         JMenu menu = null;
         JMenuItem menuItem = null;
@@ -1474,6 +1810,11 @@ public class GUI extends JFrame {
         menubar.add(menu);
     }
 
+    /**
+     * Adds the file menu.
+     *
+     * @param menubar the menubar
+     */
     private void addFileMenu(JMenuBar menubar) {
         JMenu menu;
         JMenuItem menuItem;
@@ -1495,6 +1836,11 @@ public class GUI extends JFrame {
         menu.add(menuItem);
     }
 
+    /**
+     * Adds the profiles to menu.
+     *
+     * @param profilesMenu the profiles menu
+     */
     private void addProfilesToMenu(JMenu profilesMenu) {
         File dir = new File("profiles");
         if (!dir.isDirectory()) {
@@ -1515,6 +1861,12 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Adds the profile to menu.
+     *
+     * @param profilesMenu the profiles menu
+     * @param file the file
+     */
     private void addProfileToMenu(JMenu profilesMenu, File file) {
         Properties props = new Properties();
         Reader reader = null;
@@ -1542,6 +1894,11 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Adds the edit menu.
+     *
+     * @param menubar the menubar
+     */
     private void addEditMenu(JMenuBar menubar) {
         JMenu menu;
         JMenuItem menuItem;
@@ -1673,6 +2030,11 @@ public class GUI extends JFrame {
         menu.add(menuItem);
     }
 
+    /**
+     * Creates the main view.
+     *
+     * @return the component
+     */
     private Component createMainView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -1705,6 +2067,12 @@ public class GUI extends JFrame {
         return view;
     }
 
+    /**
+     * Checks if is null.
+     *
+     * @param str the str
+     * @return true, if is null
+     */
     public static final boolean isNull(String str) {
         if (str == null) {
             return true;
@@ -1717,6 +2085,11 @@ public class GUI extends JFrame {
         return false;
     }
 
+    /**
+     * Creates the quotes view.
+     *
+     * @return the component
+     */
     private Component createQuotesView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -1736,6 +2109,11 @@ public class GUI extends JFrame {
         return view;
     }
 
+    /**
+     * Creates the quotes source tab view.
+     *
+     * @return the component
+     */
     private Component createQuotesSourceTabView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -1756,6 +2134,11 @@ public class GUI extends JFrame {
         return view;
     }
 
+    /**
+     * Creates the quote source tabs X.
+     *
+     * @return the j tabbed pane
+     */
     private JTabbedPane createQuoteSourceTabsX() {
         final JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(new ChangeListener() {
@@ -1822,42 +2205,77 @@ public class GUI extends JFrame {
         return tabbedPane;
     }
 
+    /**
+     * Creates the yahoo source view.
+     *
+     * @return the component
+     */
     private Component createYahooSourceView() {
         final YahooQuoteSourcePanel view = new YahooQuoteSourcePanel(this);
         this.yahooQuoteSourceView = view;
         return view;
     }
 
+    /**
+     * Creates the yahoo api source view.
+     *
+     * @return the component
+     */
     private Component createYahooApiSourceView() {
         final YahooApiQuoteSourcePanel view = new YahooApiQuoteSourcePanel(this);
         this.yahooApiQuoteSourcePanel = view;
         return view;
     }
 
+    /**
+     * Creates the ft dot com source view.
+     *
+     * @return the component
+     */
     private Component createFtDotComSourceView() {
         final FtDotComQuoteSourcePanel view = new FtDotComQuoteSourcePanel(this);
         this.ftDotComQuoteSourcePanel = view;
         return view;
     }
 
+    /**
+     * Creates the yahoo historical source view.
+     *
+     * @return the component
+     */
     private Component createYahooHistoricalSourceView() {
         final YahooQuoteSourcePanel view = new YahooHistoricalSourcePanel(this, "yahooHistoricalStockSymbols");
         this.yahooHistoricalQuoteSourceView = view;
         return view;
     }
 
+    /**
+     * Creates the bloomberg source view.
+     *
+     * @return the component
+     */
     private Component createBloombergSourceView() {
         final YahooApiQuoteSourcePanel view = new BloombergQuoteSourcePanel(this);
         this.bloombergQuoteSourcePanel = view;
         return view;
     }
 
+    /**
+     * Creates the TIAACREF quote source view.
+     *
+     * @return the component
+     */
     private Component createTIAACREFQuoteSourceView() {
         final TIAACREFQuoteSourcePanel view = new TIAACREFQuoteSourcePanel(this);
         this.tIAACREFQuoteSourcePanel = view;
         return view;
     }
 
+    /**
+     * Creates the result top view.
+     *
+     * @return the component
+     */
     private Component createResultTopView() {
         JPanel view = new JPanel();
         view.setLayout(new BoxLayout(view, BoxLayout.PAGE_AXIS));
@@ -1866,6 +2284,11 @@ public class GUI extends JFrame {
         return view;
     }
 
+    /**
+     * Creates the result top view row 2.
+     *
+     * @return the component
+     */
     private Component createResultTopViewRow2() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -1875,6 +2298,11 @@ public class GUI extends JFrame {
         return view;
     }
 
+    /**
+     * Creates the result top view row 1.
+     *
+     * @return the component
+     */
     private Component createResultTopViewRow1() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -1900,6 +2328,9 @@ public class GUI extends JFrame {
         return view;
     }
 
+    /**
+     * Schedule clock update.
+     */
     private void scheduleClockUpdate() {
         Timer timer = new Timer();
         long delay = 1000L;
@@ -1914,6 +2345,9 @@ public class GUI extends JFrame {
         timer.scheduleAtFixedRate(task, delay, period);
     }
 
+    /**
+     * Update clock display.
+     */
     private void updateClockDisplay() {
         if (clockLabel == null) {
             return;
@@ -1928,6 +2362,11 @@ public class GUI extends JFrame {
         SwingUtilities.invokeLater(doRun);
     }
 
+    /**
+     * Creates the result view.
+     *
+     * @return the component
+     */
     private Component createResultView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -1972,6 +2411,11 @@ public class GUI extends JFrame {
         return view;
     }
 
+    /**
+     * Creates the prices view.
+     *
+     * @return the component
+     */
     private Component createPricesView() {
         if (log.isDebugEnabled()) {
             log.debug("> createPricesView");
@@ -2092,6 +2536,11 @@ public class GUI extends JFrame {
         return view;
     }
 
+    /**
+     * Creates the exchange rates view.
+     *
+     * @return the component
+     */
     private Component createExchangeRatesView() {
         if (log.isDebugEnabled()) {
             log.debug("> createExchangeRatesView");
@@ -2143,6 +2592,11 @@ public class GUI extends JFrame {
 
     }
 
+    /**
+     * Creates the mapper view.
+     *
+     * @return the component
+     */
     private Component createMapperView() {
         if (log.isDebugEnabled()) {
             log.debug("> createMapperView");
@@ -2157,6 +2611,12 @@ public class GUI extends JFrame {
         return view;
     }
 
+    /**
+     * Creates the scrolled mapper table.
+     *
+     * @param filterEdit the filter edit
+     * @return the j scroll pane
+     */
     private JScrollPane createScrolledMapperTable(JTextField filterEdit) {
         Comparator<? super SymbolMapperEntry> comparator = new Comparator<SymbolMapperEntry>() {
             @Override
@@ -2183,6 +2643,16 @@ public class GUI extends JFrame {
         return scrolledPane;
     }
 
+    /**
+     * Creates the mapper table.
+     *
+     * @param mapper the mapper
+     * @param comparator the comparator
+     * @param filterEdit the filter edit
+     * @param filter the filter
+     * @param addStripe the add stripe
+     * @return the j table
+     */
     private JTable createMapperTable(EventList<SymbolMapperEntry> mapper,
             Comparator<? super SymbolMapperEntry> comparator, JTextField filterEdit,
             TextFilterator<SymbolMapperEntry> filter, boolean addStripe) {
@@ -2243,6 +2713,16 @@ public class GUI extends JFrame {
         return table;
     }
 
+    /**
+     * Creates the price table.
+     *
+     * @param priceList the price list
+     * @param comparator the comparator
+     * @param filterEdit the filter edit
+     * @param filter the filter
+     * @param addStripe the add stripe
+     * @return the j table
+     */
     private static JTable createPriceTable(EventList<AbstractStockPrice> priceList,
             Comparator<? super AbstractStockPrice> comparator, JTextField filterEdit,
             TextFilterator<AbstractStockPrice> filter, boolean addStripe) {
@@ -2344,16 +2824,29 @@ public class GUI extends JFrame {
         return table;
     }
 
+    /**
+     * Show main frame.
+     */
     protected void showMainFrame() {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
     }
 
+    /**
+     * Gets the output files.
+     *
+     * @return the output files
+     */
     public List<File> getOutputFiles() {
         return outputFiles;
     }
 
+    /**
+     * Sets the output files.
+     *
+     * @param outputFiles the new output files
+     */
     public void setOutputFiles(List<File> outputFiles) {
         this.outputFiles = outputFiles;
         if (outputFiles != null) {
@@ -2375,6 +2868,11 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Delete output file.
+     *
+     * @param outputFile the output file
+     */
     private void deleteOutputFile(File outputFile) {
         if ((outputFile != null) && (outputFile.exists())) {
             if (!outputFile.delete()) {
@@ -2383,6 +2881,12 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Stock symbols string received.
+     *
+     * @param quoteSource the quote source
+     * @param stockSymbolsString the stock symbols string
+     */
     public void stockSymbolsStringReceived(QuoteSource quoteSource, String stockSymbolsString) {
         clearPriceTable();
         clearMapperTable();
@@ -2393,10 +2897,20 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Gets the thread pool.
+     *
+     * @return the thread pool
+     */
     public ExecutorService getThreadPool() {
         return threadPool;
     }
 
+    /**
+     * Gets the clock display string.
+     *
+     * @return the clock display string
+     */
     private String getClockDisplayString() {
         Date date = new Date();
         long time = date.getTime();
@@ -2410,10 +2924,20 @@ public class GUI extends JFrame {
         return str;
     }
 
+    /**
+     * Gets the current working directory.
+     *
+     * @return the current working directory
+     */
     public static String getCurrentWorkingDirectory() {
         return new File(".").getAbsoluteFile().getAbsolutePath();
     }
 
+    /**
+     * Gets the yahoo quote server.
+     *
+     * @return the yahoo quote server
+     */
     private String getYahooQuoteServer() {
         String yahooQuoteServer = null;
         YahooQuoteSourcePanel quoteSourceView = getYahooQuoteSourceView();
@@ -2425,42 +2949,92 @@ public class GUI extends JFrame {
         return yahooQuoteServer;
     }
 
+    /**
+     * Gets the yahoo quote source view.
+     *
+     * @return the yahoo quote source view
+     */
     public YahooQuoteSourcePanel getYahooQuoteSourceView() {
         return yahooQuoteSourceView;
     }
 
+    /**
+     * Gets the prefs.
+     *
+     * @return the prefs
+     */
     public static Preferences getPrefs() {
         return prefs;
     }
 
+    /**
+     * Gets the quote source listener.
+     *
+     * @return the quote source listener
+     */
     public QuoteSourceListener getQuoteSourceListener() {
         return quoteSourceListener;
     }
 
+    /**
+     * Gets the date offset.
+     *
+     * @return the date offset
+     */
     public Integer getDateOffset() {
         return dateOffset;
     }
 
+    /**
+     * Gets the force generating INVTRANLIST.
+     *
+     * @return the force generating INVTRANLIST
+     */
     public Boolean getForceGeneratingINVTRANLIST() {
         return forceGeneratingINVTRANLIST;
     }
 
+    /**
+     * Gets the randomize share count.
+     *
+     * @return the randomize share count
+     */
     public Boolean getRandomizeShareCount() {
         return randomizeShareCount;
     }
 
+    /**
+     * Gets the suspicious price.
+     *
+     * @return the suspicious price
+     */
     public Integer getSuspiciousPrice() {
         return suspiciousPrice;
     }
 
+    /**
+     * Gets the incrementally increased share count.
+     *
+     * @return the incrementally increased share count
+     */
     public Boolean getIncrementallyIncreasedShareCount() {
         return incrementallyIncreasedShareCount;
     }
 
+    /**
+     * Sets the incrementally increased share count.
+     *
+     * @param incrementallyIncreasedShareCount the new incrementally increased share count
+     */
     public void setIncrementallyIncreasedShareCount(Boolean incrementallyIncreasedShareCount) {
         this.incrementallyIncreasedShareCount = incrementallyIncreasedShareCount;
     }
 
+    /**
+     * Select new currency.
+     *
+     * @param value the value
+     */
     private void selectNewCurrency(String value) {
         log.info("Selected new currency: " + value);
         String newValue = value;
@@ -2474,6 +3048,11 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Select new account id.
+     *
+     * @param value the value
+     */
     private void selectNewAccountId(String value) {
         log.info("Selected new 'OFX Account Id': " + value);
         String newValue = value;
@@ -2488,7 +3067,9 @@ public class GUI extends JFrame {
     }
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         VelocityUtils.initVelocity();
@@ -2522,10 +3103,20 @@ public class GUI extends JFrame {
         SwingUtilities.invokeLater(doRun);
     }
 
+    /**
+     * Gets the fi dir.
+     *
+     * @return the fi dir
+     */
     public File getFiDir() {
         return fiDir;
     }
 
+    /**
+     * Sets the fi dir.
+     *
+     * @param fiDir the new fi dir
+     */
     public void setFiDir(File fiDir) {
         this.fiDir = fiDir;
     }

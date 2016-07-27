@@ -5,13 +5,21 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.data.SymbolMapper;
+import com.hungle.tools.moneyutils.data.SymbolMapper;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SymbolMapperCmd.
+ */
 public class SymbolMapperCmd {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(SymbolMapperCmd.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         File file = new File("mapper.csv");

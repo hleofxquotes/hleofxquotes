@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.fi;
+package com.hungle.tools.moneyutils.fi;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.fi.props.PropertiesFIContext;
+import com.hungle.tools.moneyutils.fi.props.PropertiesFIContext;
 
 public class OfxPostClientCmd {
     private static final Logger log = Logger.getLogger(OfxPostClientCmd.class);

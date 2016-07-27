@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.misc;
+package com.hungle.tools.moneyutils.misc;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,11 +10,19 @@ import java.io.PrintWriter;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SymbolDescription.
+ */
 public class SymbolDescription {
-    private static final Logger log = Logger.getLogger(SymbolDescription.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(SymbolDescription.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         String inFileName = null;
@@ -28,25 +36,39 @@ public class SymbolDescription {
             System.exit(1);
         }
 
-        log.info("> START");
-        log.info("inFileName=" + inFileName);
-        log.info("outFileName=" + outFileName);
+        LOGGER.info("> START");
+        LOGGER.info("inFileName=" + inFileName);
+        LOGGER.info("outFileName=" + outFileName);
         SymbolDescription symbolDescription = new SymbolDescription();
         try {
             symbolDescription.parse(inFileName, outFileName);
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } finally {
-            log.info("< DONE");
+            LOGGER.info("< DONE");
         }
     }
 
+    /**
+     * Parses the.
+     *
+     * @param inFileName the in file name
+     * @param outFileName the out file name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void parse(String inFileName, String outFileName) throws IOException {
         File inFile = new File(inFileName);
         File outFile = new File(outFileName);
         parse(inFile, outFile);
     }
 
+    /**
+     * Parses the.
+     *
+     * @param inFile the in file
+     * @param outFile the out file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void parse(File inFile, File outFile) throws IOException {
         BufferedReader reader = null;
         PrintWriter writer = null;
@@ -59,7 +81,7 @@ public class SymbolDescription {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
@@ -75,6 +97,13 @@ public class SymbolDescription {
 
     }
 
+    /**
+     * Parses the.
+     *
+     * @param reader the reader
+     * @param writer the writer
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void parse(BufferedReader reader, PrintWriter writer) throws IOException {
         String line = null;
         int lineNumber = 0;
@@ -95,7 +124,7 @@ public class SymbolDescription {
             if (index <= 0) {
                 index = line.indexOf(' ');
                 if (index <= 0) {
-                    log.warn("Bad format - lineNumber=" + lineNumber + ", str=" + line);
+                    LOGGER.warn("Bad format - lineNumber=" + lineNumber + ", str=" + line);
                     continue;
                 }
             }

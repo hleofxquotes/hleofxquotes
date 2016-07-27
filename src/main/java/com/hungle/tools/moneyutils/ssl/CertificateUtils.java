@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ssl;
+package com.hungle.tools.moneyutils.ssl;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -19,7 +19,7 @@ import javax.security.cert.CertificateEncodingException;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.ofx.quotes.Utils;
+import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 
 public class CertificateUtils {
     private static final Logger log = Logger.getLogger(CertificateUtils.class);

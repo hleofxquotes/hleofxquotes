@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.fx;
+package com.hungle.tools.moneyutils.fx;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,26 +11,51 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class UpdateFx.
+ */
 public class UpdateFx {
-    private static final Logger log = Logger.getLogger(UpdateFx.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(UpdateFx.class);
+
+    private static final String DEFAULT_CLASSNAME = "app.UpdateExchangeRatesGui";
+
+    private static final String DEFAULT_PLUGINS_DIR = "plugins";
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
 
         try {
             invoke(args);
         } catch (Exception e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         }
     }
 
+    /**
+     * Invoke.
+     *
+     * @param args the args
+     * @throws Exception the exception
+     */
     public static void invoke(String[] args) throws Exception {
-        String className = "app.UpdateExchangeRatesGui";
+        String className = DEFAULT_CLASSNAME;
         invoke(className, args);
     }
 
+    /**
+     * Invoke.
+     *
+     * @param className the class name
+     * @param args the args
+     * @throws Exception the exception
+     */
     public static void invoke(String className, String[] args) throws Exception {
         List<URL> urls = new ArrayList<URL>();
         if (args != null) {
@@ -39,7 +64,7 @@ public class UpdateFx {
             }
         }
         if (urls.size() <= 0) {
-            addDir("plugins", urls);
+            addDir(DEFAULT_PLUGINS_DIR, urls);
         }
 
         if (urls.size() <= 0) {
@@ -50,9 +75,9 @@ public class UpdateFx {
         URLClassLoader classLoader = null;
         try {
             urlArray = urls.toArray(urlArray);
-            log.info(urlArray.length);
+            LOGGER.info(urlArray.length);
             classLoader = new URLClassLoader(urlArray);
-            Class clz = Class.forName(className, true, classLoader);
+            Class<?> clz = Class.forName(className, true, classLoader);
             Method method = clz.getMethod("main", new Class[] { String[].class });
             String mainArgs[] = {};
             method.invoke(null, new Object[] { mainArgs });
@@ -61,20 +86,31 @@ public class UpdateFx {
         }
     }
 
+    /**
+     * Invoke.
+     *
+     * @throws Exception the exception
+     */
     public static void invoke() throws Exception {
         String[] args = null;
         invoke(args);
     }
 
+    /**
+     * Adds the dir.
+     *
+     * @param dirName the dir name
+     * @param urls the urls
+     */
     private static void addDir(String dirName, List<URL> urls) {
-        log.info("Adding dirName=" + dirName);
+        LOGGER.info("Adding dirName=" + dirName);
 
-        File d = new File(dirName);
-        if (!d.isDirectory()) {
-            log.warn("SKIP, not a directory=" + dirName);
+        File dir = new File(dirName);
+        if (!dir.isDirectory()) {
+            LOGGER.warn("SKIP, not a directory=" + dirName);
         }
 
-        File[] files = d.listFiles();
+        File[] files = dir.listFiles();
         if (files != null) {
             for (File file : files) {
                 String name = file.getName();
@@ -90,9 +126,9 @@ public class UpdateFx {
                 try {
                     URL url = file.toURI().toURL();
                     urls.add(url);
-                    log.info("Added url=" + url);
+                    LOGGER.info("Added url=" + url);
                 } catch (MalformedURLException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 }
             }
         }

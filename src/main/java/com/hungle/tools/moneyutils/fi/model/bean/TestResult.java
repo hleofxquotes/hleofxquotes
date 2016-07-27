@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.le.tools.moneyutils.fi.model.bean;
+package com.hungle.tools.moneyutils.fi.model.bean;
 
 public class TestResult {
     private String v1 = "v1: NOT_TESTED";

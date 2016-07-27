@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.jna;
+package com.hungle.tools.moneyutils.jna;
 
 import org.apache.log4j.Logger;
 
@@ -9,14 +9,29 @@ import com.sun.jna.platform.win32.WinDef.LPARAM;
 import com.sun.jna.platform.win32.WinDef.WPARAM;
 import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ImportDialogAutoClickTask.
+ */
 class ImportDialogAutoClickTask implements Runnable {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(ImportDialogAutoClickTask.class);
 
+    /** The serivce. */
     private final ImportDialogAutoClickService serivce;
 
+    /**
+     * The Class CountChildWindows.
+     */
     private final class CountChildWindows implements WNDENUMPROC {
+        
+        /** The count. */
         private int count = 0;
 
+        /* (non-Javadoc)
+         * @see com.sun.jna.platform.win32.WinUser.WNDENUMPROC#callback(com.sun.jna.platform.win32.WinDef.HWND, com.sun.jna.Pointer)
+         */
         @Override
         public boolean callback(HWND hwnd, Pointer pointer) {
             if (log.isDebugEnabled()) {
@@ -26,18 +41,28 @@ class ImportDialogAutoClickTask implements Runnable {
             return true;
         }
 
+        /**
+         * Gets the count.
+         *
+         * @return the count
+         */
         public int getCount() {
             return count;
         }
     }
 
     /**
-     * @param importDialogAutoClickService
+     * Instantiates a new import dialog auto click task.
+     *
+     * @param importDialogAutoClickService the import dialog auto click service
      */
     ImportDialogAutoClickTask(ImportDialogAutoClickService importDialogAutoClickService) {
         this.serivce = importDialogAutoClickService;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Runnable#run()
+     */
     @Override
     public void run() {
         try {
@@ -64,6 +89,9 @@ class ImportDialogAutoClickTask implements Runnable {
         }
     }
 
+    /**
+     * Autoclick.
+     */
     private void autoclick() {
         User32 user32 = User32.INSTANCE;
         String className = null;
@@ -122,6 +150,13 @@ class ImportDialogAutoClickTask implements Runnable {
 
     }
 
+    /**
+     * Gets the child windows count.
+     *
+     * @param user32 the user 32
+     * @param hWnd the h wnd
+     * @return the child windows count
+     */
     private int getChildWindowsCount(User32 user32, HWND hWnd) {
         int count = 0;
         if (hWnd == null) {

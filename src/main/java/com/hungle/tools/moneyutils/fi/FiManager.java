@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.fi;
+package com.hungle.tools.moneyutils.fi;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -34,9 +34,9 @@ import org.jdesktop.swingbinding.JListBinding;
 import org.jdesktop.swingbinding.JTableBinding;
 import org.jdesktop.swingbinding.SwingBindings;
 
-import com.le.tools.moneyutils.fi.model.Account;
-import com.le.tools.moneyutils.fi.model.AccountGroup;
-import com.le.tools.moneyutils.fi.model.AccountGroups;
+import com.hungle.tools.moneyutils.fi.model.Account;
+import com.hungle.tools.moneyutils.fi.model.AccountGroup;
+import com.hungle.tools.moneyutils.fi.model.AccountGroups;
 
 /**
  * @author lobas_av

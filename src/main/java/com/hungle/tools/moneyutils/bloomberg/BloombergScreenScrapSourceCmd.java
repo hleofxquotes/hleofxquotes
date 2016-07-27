@@ -1,14 +1,22 @@
-package com.le.tools.moneyutils.bloomberg;
+package com.hungle.tools.moneyutils.bloomberg;
 
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class BloombergScreenScrapSourceCmd.
+ */
 public class BloombergScreenScrapSourceCmd {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(BloombergScreenScrapSourceCmd.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         BloombergScreenScrapSource screenScrapper = new BloombergScreenScrapSource();

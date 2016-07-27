@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.fi.model.bean;
+package com.hungle.tools.moneyutils.fi.model.bean;
 
 import org.apache.log4j.Logger;
 

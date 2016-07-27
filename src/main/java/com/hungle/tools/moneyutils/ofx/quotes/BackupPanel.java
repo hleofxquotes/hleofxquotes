@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -12,13 +12,24 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class BackupPanel.
+ */
 public class BackupPanel extends JPanel {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The text field. */
     private JTextField textField;
+    
+    /** The text field 1. */
     private JTextField textField_1;
+    
+    /**
+     * Instantiates a new backup panel.
+     */
     public BackupPanel() {
         setLayout(new FormLayout(new ColumnSpec[] {
                 FormFactory.RELATED_GAP_COLSPEC,

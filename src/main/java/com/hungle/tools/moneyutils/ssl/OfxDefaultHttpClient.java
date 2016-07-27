@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ssl;
+package com.hungle.tools.moneyutils.ssl;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -24,7 +24,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.fi.OfxPostClientParams;
+import com.hungle.tools.moneyutils.fi.OfxPostClientParams;
 
 public class OfxDefaultHttpClient extends DefaultHttpClient {
     private static final Logger log = Logger.getLogger(OfxDefaultHttpClient.class);

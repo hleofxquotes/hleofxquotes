@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.fi.props;
+package com.hungle.tools.moneyutils.fi.props;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
@@ -8,12 +8,25 @@ import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.fi.AbstractFiContext;
+import com.hungle.tools.moneyutils.fi.AbstractFiContext;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PropertiesFIContext.
+ */
 public class PropertiesFIContext extends AbstractFiContext {
-    private static final Logger log = Logger.getLogger(PropertiesFIContext.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(PropertiesFIContext.class);
+    
+    /** The bean utils bean. */
     private BeanUtilsBean beanUtilsBean;
 
+    /**
+     * Instantiates a new properties FI context.
+     *
+     * @param props the props
+     */
     public PropertiesFIContext(Properties props) {
         super();
         ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
@@ -36,9 +49,9 @@ public class PropertiesFIContext extends AbstractFiContext {
             try {
                 beanUtilsBean.setProperty(this, name, value);
             } catch (IllegalAccessException e) {
-                log.warn(e);
+                LOGGER.warn(e);
             } catch (InvocationTargetException e) {
-                log.warn(e);
+                LOGGER.warn(e);
             }
         }
     }

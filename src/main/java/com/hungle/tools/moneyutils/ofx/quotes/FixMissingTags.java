@@ -1,17 +1,25 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.UpdateFiDir;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class FixMissingTags.
+ */
 public class FixMissingTags {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(FixMissingTags.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         FixMissingTags fixMissingTags = new FixMissingTags();

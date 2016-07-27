@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.yahoo;
+package com.hungle.tools.moneyutils.yahoo;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -24,25 +24,49 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
-import com.le.tools.moneyutils.ofx.quotes.HttpUtils;
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.le.tools.moneyutils.stockprice.Price;
-import com.le.tools.moneyutils.stockprice.StockPrice;
+import com.hungle.tools.moneyutils.ofx.quotes.HttpUtils;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.stockprice.Price;
+import com.hungle.tools.moneyutils.stockprice.StockPrice;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GetYahooHistoricalQuotes.
+ */
 public class GetYahooHistoricalQuotes extends GetYahooQuotes {
-    private static final Logger log = Logger.getLogger(GetYahooHistoricalQuotes.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(GetYahooHistoricalQuotes.class);
 
+    /** The from date. */
     private Date fromDate = null;
+    
+    /** The to date. */
     private Date toDate = null;
+    
+    /** The limit to friday. */
     private Boolean limitToFriday = false;
+    
+    /** The limit to EOM. */
     private Boolean limitToEOM = false;
 
+    /** The symbol. */
     private String symbol;
 
+    /** The price info last trade date formatter. */
     private SimpleDateFormat priceInfoLastTradeDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
 
+    /** The last trade date formatter. */
     private SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
+    /**
+     * Instantiates a new gets the yahoo historical quotes.
+     *
+     * @param fromDate the from date
+     * @param toDate the to date
+     * @param limitToFriday the limit to friday
+     * @param limitToEOM the limit to EOM
+     */
     public GetYahooHistoricalQuotes(Date fromDate, Date toDate, Boolean limitToFriday, Boolean limitToEOM) {
         super();
         setFxFileName(null);
@@ -62,17 +86,23 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
         this.setLimitToFriday(limitToFriday);
         this.setLimitToEOM(limitToEOM);
 
-        log.info("fromDate=" + getFromDate());
-        log.info("toDate=" + getToDate());
-        log.info("limitToFriday=" + getLimitToFriday());
-        log.info("limitToEOM=" + getLimitToEOM());
+        LOGGER.info("fromDate=" + getFromDate());
+        LOGGER.info("toDate=" + getToDate());
+        LOGGER.info("limitToFriday=" + getLimitToFriday());
+        LOGGER.info("limitToEOM=" + getLimitToEOM());
 
     }
 
+    /**
+     * Instantiates a new gets the yahoo historical quotes.
+     */
     public GetYahooHistoricalQuotes() {
         this(null, null, false, false);
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.yahoo.GetYahooQuotes#createURI(java.util.List, java.lang.String)
+     */
     // http://ichart.finance.yahoo.com/table.csv?s=CSCO&d=9&e=30&f=2011&g=d&a=2&b=26&c=1990&ignore=.csv
     @Override
     protected URI createURI(List<String> stocks, String format) throws URISyntaxException {
@@ -84,6 +114,12 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
         return URIUtils.createURI(scheme, host, port, path, queries, null);
     }
 
+    /**
+     * Creates the queries.
+     *
+     * @param stocks the stocks
+     * @return the string
+     */
     private String createQueries(List<String> stocks) {
         List<NameValuePair> qParams = new ArrayList<NameValuePair>();
         symbol = stocks.get(0);
@@ -91,9 +127,9 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
 
         Calendar cal = Calendar.getInstance();
 
-        log.info("Getting historical quotes for symbol=" + symbol);
-        log.info("    fromDate=" + getFromDate());
-        log.info("    toDate=" + getToDate());
+        LOGGER.info("Getting historical quotes for symbol=" + symbol);
+        LOGGER.info("    fromDate=" + getFromDate());
+        LOGGER.info("    toDate=" + getToDate());
 
         cal.setTime(getFromDate());
         qParams.add(new BasicNameValuePair("a", "" + cal.get(Calendar.MONTH)));
@@ -114,6 +150,9 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
         return urlString;
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.yahoo.GetYahooQuotes#httpEntityToStockPriceBean(org.apache.http.HttpEntity, boolean)
+     */
     @Override
     public List<AbstractStockPrice> httpEntityToStockPriceBean(HttpEntity entity, boolean skipIfNoPrice) throws IOException {
         List<AbstractStockPrice> beans = null;
@@ -138,6 +177,14 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
         return beans;
     }
 
+    /**
+     * To stock prices.
+     *
+     * @param reader the reader
+     * @param skipIfNoPrice the skip if no price
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private List<AbstractStockPrice> toStockPrices(Reader reader, boolean skipIfNoPrice) throws IOException {
         List<AbstractStockPrice> stockPrices = null;
 
@@ -157,19 +204,27 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
         return stockPrices;
     }
 
+    /**
+     * To stock price beans.
+     *
+     * @param reader the reader
+     * @param skipIfNoPrice the skip if no price
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private List<AbstractStockPrice> toStockPriceBeans(CsvReader reader, boolean skipIfNoPrice) throws IOException {
         List<AbstractStockPrice> beans = new ArrayList<AbstractStockPrice>();
         reader.readHeaders();
         while (reader.readRecord()) {
             String line = reader.getRawRecord();
-            if (log.isDebugEnabled()) {
-                log.debug(line);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(line);
             }
             AbstractStockPrice bean = parseCurrentRecord(reader);
             if (bean != null) {
                 if ((bean.getLastPrice().getPrice() <= 0.0) && (skipIfNoPrice)) {
-                    if (log.isDebugEnabled()) {
-                        log.warn("SKIP: " + line);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.warn("SKIP: " + line);
                     }
                 } else {
                     if (beans != null) {
@@ -179,7 +234,7 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
                     }
                 }
             } else {
-                log.warn("Cannot parse line=" + line);
+                LOGGER.warn("Cannot parse line=" + line);
             }
         }
 
@@ -196,6 +251,12 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
         return beans;
     }
 
+    /**
+     * Accept bean.
+     *
+     * @param bean the bean
+     * @return true, if successful
+     */
     private boolean acceptBean(AbstractStockPrice bean) {
         boolean rv = true;
 
@@ -234,13 +295,20 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
         return rv;
     }
 
+    /**
+     * Parses the current record.
+     *
+     * @param reader the reader
+     * @return the abstract stock price
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private AbstractStockPrice parseCurrentRecord(final CsvReader reader) throws IOException {
-        if (log.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             int count = reader.getColumnCount();
-            log.debug("");
+            LOGGER.debug("");
             for (int i = 0; i < count; i++) {
                 String value = reader.get(i);
-                log.debug("i=" + i + ", value=" + value);
+                LOGGER.debug("i=" + i + ", value=" + value);
             }
         }
 
@@ -261,7 +329,7 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
             try {
                 price = Double.valueOf(val);
             } catch (NumberFormatException e) {
-                log.warn(e);
+                LOGGER.warn(e);
                 price = 0;
             }
         }
@@ -275,7 +343,7 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
             try {
                 lastTrade = lastTradeDateFormatter.parse(val);
             } catch (ParseException e) {
-                log.warn(e);
+                LOGGER.warn(e);
                 lastTrade = new Date();
             }
         }
@@ -291,6 +359,9 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
         return bean;
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.yahoo.GetYahooQuotes#httpGet(java.util.List, java.lang.String)
+     */
     @Override
     public HttpResponse httpGet(List<String> stocks, String format) throws URISyntaxException, IOException, ClientProtocolException {
         // Calendar cal = Calendar.getInstance();
@@ -300,34 +371,74 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
         return super.httpGet(stocks, format);
     }
 
+    /**
+     * Gets the from date.
+     *
+     * @return the from date
+     */
     public Date getFromDate() {
         return fromDate;
     }
 
+    /**
+     * Sets the from date.
+     *
+     * @param fromDate the new from date
+     */
     public void setFromDate(Date fromDate) {
         this.fromDate = fromDate;
     }
 
+    /**
+     * Gets the to date.
+     *
+     * @return the to date
+     */
     public Date getToDate() {
         return toDate;
     }
 
+    /**
+     * Sets the to date.
+     *
+     * @param toDate the new to date
+     */
     public void setToDate(Date toDate) {
         this.toDate = toDate;
     }
 
+    /**
+     * Gets the limit to friday.
+     *
+     * @return the limit to friday
+     */
     public Boolean getLimitToFriday() {
         return limitToFriday;
     }
 
+    /**
+     * Sets the limit to friday.
+     *
+     * @param limitToFriday the new limit to friday
+     */
     public void setLimitToFriday(Boolean limitToFriday) {
         this.limitToFriday = limitToFriday;
     }
 
+    /**
+     * Gets the limit to EOM.
+     *
+     * @return the limit to EOM
+     */
     public Boolean getLimitToEOM() {
         return limitToEOM;
     }
 
+    /**
+     * Sets the limit to EOM.
+     *
+     * @param limitToEOM the new limit to EOM
+     */
     public void setLimitToEOM(Boolean limitToEOM) {
         this.limitToEOM = limitToEOM;
     }

@@ -1,15 +1,23 @@
-package com.le.tools.moneyutils.backup;
+package com.hungle.tools.moneyutils.backup;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SaveBackupsCmd.
+ */
 public class SaveBackupsCmd {
-    private static final Logger log = Logger.getLogger(SaveBackupsCmd.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(SaveBackupsCmd.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         File inDir = null;
@@ -30,18 +38,18 @@ public class SaveBackupsCmd {
             System.exit(1);
         }
 
-        log.info("inDir=" + inDir);
-        log.info("outDir=" + outDir);
-        log.info("password=" + (password != null));
+        LOGGER.info("inDir=" + inDir);
+        LOGGER.info("outDir=" + outDir);
+        LOGGER.info("password=" + (password != null));
 
         try {
             SaveBackups cmd = new SaveBackups();
-            log.info("> START");
+            LOGGER.info("> START");
             cmd.saveBackups(inDir, outDir, password);
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } finally {
-            log.info("< DONE");
+            LOGGER.info("< DONE");
         }
     }
 }

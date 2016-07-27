@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.fi.model.aspect;
+package com.hungle.tools.moneyutils.fi.model.aspect;
 
 public interface BeanSupport {
 

@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -18,19 +18,40 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AboutDialog.
+ */
 public class AboutDialog extends JDialog implements ActionListener {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The dialog. */
     private static AboutDialog dialog;
 
+    /**
+     * Show dialog.
+     *
+     * @param frameComp the frame comp
+     * @param locationComp the location comp
+     * @param title the title
+     * @param info the info
+     */
     public static void showDialog(Component frameComp, Component locationComp, String title, String info) {
         Frame frame = JOptionPane.getFrameForComponent(frameComp);
         dialog = new AboutDialog(frame, locationComp, title, info);
         dialog.setVisible(true);
     }
 
+    /**
+     * Instantiates a new about dialog.
+     *
+     * @param frame the frame
+     * @param locationComp the location comp
+     * @param title the title
+     * @param info the info
+     */
     private AboutDialog(Frame frame, Component locationComp, String title, String info) {
         super(frame, title, true);
 
@@ -73,6 +94,9 @@ public class AboutDialog extends JDialog implements ActionListener {
 
     // Handle clicks on the OK button.
 
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         AboutDialog.dialog.setVisible(false);

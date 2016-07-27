@@ -1,13 +1,13 @@
-package com.le.tools.moneyutils.fi;
+package com.hungle.tools.moneyutils.fi;
 
 import java.io.File;
 
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.encryption.EncryptionHelper;
-import com.le.tools.moneyutils.fi.props.HttpProperties;
-import com.le.tools.moneyutils.ssl.CertificatesChanges;
+import com.hungle.tools.moneyutils.encryption.EncryptionHelper;
+import com.hungle.tools.moneyutils.fi.props.HttpProperties;
+import com.hungle.tools.moneyutils.ssl.CertificatesChanges;
 
 public class OfxPostClientParams {
     private static final Logger log = Logger.getLogger(OfxPostClientParams.class);

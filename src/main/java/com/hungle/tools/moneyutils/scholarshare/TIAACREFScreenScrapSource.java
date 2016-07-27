@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.scholarshare;
+package com.hungle.tools.moneyutils.scholarshare;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,37 +31,59 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TIAACREFScreenScrapSource.
+ */
 public class TIAACREFScreenScrapSource {
-    private static final Logger log = Logger.getLogger(TIAACREFScreenScrapSource.class);
+    
+    private static final String DEFAULT_URL = "https://www.scholarshare.com/research/daily.shtml";
 
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(TIAACREFScreenScrapSource.class);
+
+    /** The Constant DEFAULT_ENCODING. */
     private static final String DEFAULT_ENCODING = "UTF-8";
 
+    /** The Constant DEFAULT_YAHOOAPIS_SERVER. */
     // http://developer.yahoo.com/yql/console/
     private static final String DEFAULT_YAHOOAPIS_SERVER = "query.yahooapis.com";
 
+    /** The yahoo apis server. */
     private String yahooApisServer = DEFAULT_YAHOOAPIS_SERVER;
 
+    /** The enc. */
     private String enc = DEFAULT_ENCODING;
 
+    /** The document. */
     private Document document;
 
+    /** The current porfolio name. */
     private String currentPorfolioName;
 
+    /** The prices. */
     private List<TIAACREFPriceInfo> prices;
 
+    /** The date. */
     private Date date;
 
+    /** The currency. */
     private String currency;
 
+    /**
+     * Query.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void query() throws IOException {
-        log.info("> query");
+        LOGGER.info("> query");
         
         InputStream stream = null;
         try {
             URL url = createUrl();
 
-            if (log.isDebugEnabled()) {
-                log.debug("url=" + url);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("url=" + url);
             }
 
             stream = url.openStream();
@@ -72,7 +94,7 @@ public class TIAACREFScreenScrapSource {
                 try {
                     stream.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     stream = null;
                 }
@@ -80,8 +102,14 @@ public class TIAACREFScreenScrapSource {
         }
     }
 
+    /**
+     * Query.
+     *
+     * @param fileName the file name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void query(String fileName) throws IOException {
-        log.info("fileName=" + fileName);
+        LOGGER.info("fileName=" + fileName);
 
         InputStream stream = null;
         try {
@@ -93,7 +121,7 @@ public class TIAACREFScreenScrapSource {
                 try {
                     stream.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     stream = null;
                 }
@@ -101,6 +129,12 @@ public class TIAACREFScreenScrapSource {
         }
     }
 
+    /**
+     * Parses the.
+     *
+     * @throws XPathExpressionException the x path expression exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void parse() throws XPathExpressionException, IOException {
         this.prices = new ArrayList<TIAACREFPriceInfo>();
 
@@ -130,24 +164,30 @@ public class TIAACREFScreenScrapSource {
 
     }
 
+    /**
+     * Parses the date.
+     *
+     * @param dateString the date string
+     * @return the date
+     */
     private Date parseDate(String dateString) {
         Date date = null;
         // for the Period Ending December 2, 2011
-        log.info("dateString=" + dateString);
+        LOGGER.info("dateString=" + dateString);
         Pattern p = Pattern.compile("(.*) for the Period Ending (.*)$");
         Matcher matcher = p.matcher(dateString);
         if ((matcher != null) && (matcher.matches())) {
             // December 2, 2011
             SimpleDateFormat format = new SimpleDateFormat("MMMMM d, yyyy");
             String source = matcher.group(2);
-            log.info(source);
+            LOGGER.info(source);
             try {
                 date = format.parse(source);
             } catch (ParseException e) {
-                log.warn(e);
+                LOGGER.warn(e);
             }
         } else {
-            log.warn("Cannot parse date string=" + dateString);
+            LOGGER.warn("Cannot parse date string=" + dateString);
         }
         if (date == null) {
             date = new Date();
@@ -155,6 +195,11 @@ public class TIAACREFScreenScrapSource {
         return date;
     }
 
+    /**
+     * Calculate symbol name.
+     *
+     * @param price the price
+     */
     private void calculateSymbolName(TIAACREFPriceInfo price) {
         StringBuilder sb = new StringBuilder();
         String[] tokens = null;
@@ -185,6 +230,13 @@ public class TIAACREFScreenScrapSource {
         price.setSymbol(sb.toString());
     }
 
+    /**
+     * Parses the row.
+     *
+     * @param xpath the xpath
+     * @param rowNode the row node
+     * @throws XPathExpressionException the x path expression exception
+     */
     private void parseRow(XPath xpath, Node rowNode) throws XPathExpressionException {
         String classValue = null;
         NamedNodeMap attributes = rowNode.getAttributes();
@@ -207,20 +259,28 @@ public class TIAACREFScreenScrapSource {
             if (priceInfo != null) {
                 priceInfo.setPortfolioName(currentPorfolioName);
             }
-            if (log.isDebugEnabled()) {
-                log.debug("priceInfo=" + priceInfo);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("priceInfo=" + priceInfo);
             }
             if (priceInfo != null) {
                 prices.add(priceInfo);
             }
         } else if (classValue.compareToIgnoreCase("rowbanner") == 0) {
             currentPorfolioName = parseRowBanner(xpath, rowNode);
-            if (log.isDebugEnabled()) {
-                log.debug("currentPorfolioName=" + currentPorfolioName);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("currentPorfolioName=" + currentPorfolioName);
             }
         }
     }
 
+    /**
+     * Parses the row banner.
+     *
+     * @param xpath the xpath
+     * @param rowNode the row node
+     * @return the string
+     * @throws XPathExpressionException the x path expression exception
+     */
     private String parseRowBanner(XPath xpath, Node rowNode) throws XPathExpressionException {
         String expression;
         expression = "./td/p/text()";
@@ -228,6 +288,14 @@ public class TIAACREFScreenScrapSource {
         return bannerText;
     }
 
+    /**
+     * Parses the row data.
+     *
+     * @param xpath the xpath
+     * @param rowNode the row node
+     * @return the TIAACREF price info
+     * @throws XPathExpressionException the x path expression exception
+     */
     private TIAACREFPriceInfo parseRowData(XPath xpath, Node rowNode) throws XPathExpressionException {
         TIAACREFPriceInfo priceInfo = new TIAACREFPriceInfo();
         priceInfo.setDate(date);
@@ -235,8 +303,8 @@ public class TIAACREFScreenScrapSource {
         String expression;
         expression = "./th/p/text()";
         String fundName = (String) xpath.evaluate(expression, rowNode, XPathConstants.STRING);
-        if (log.isDebugEnabled()) {
-            log.debug("fundName=" + fundName);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("fundName=" + fundName);
         }
         priceInfo.setFundName(fundName);
 
@@ -245,8 +313,8 @@ public class TIAACREFScreenScrapSource {
         if ((nodeList != null) && (nodeList.getLength() > 0)) {
             Node node = nodeList.item(0);
             String priceString = (String) xpath.evaluate("text()", node, XPathConstants.STRING);
-            if (log.isDebugEnabled()) {
-                log.debug("priceString=" + priceString);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("priceString=" + priceString);
             }
             if (priceString != null) {
                 priceString = priceString.trim();
@@ -256,13 +324,20 @@ public class TIAACREFScreenScrapSource {
                     price = Double.valueOf(priceString);
                     priceInfo.setPrice(price);
                 } catch (NumberFormatException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 }
             }
         }
         return priceInfo;
     }
 
+    /**
+     * Creates the document.
+     *
+     * @param stream the stream
+     * @return the document
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private Document createDocument(InputStream stream) throws IOException {
         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
@@ -279,13 +354,18 @@ public class TIAACREFScreenScrapSource {
         return document;
     }
 
+    /**
+     * Creates the url.
+     *
+     * @return the url
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws MalformedURLException the malformed URL exception
+     */
     private URL createUrl() throws UnsupportedEncodingException, MalformedURLException {
         // http://www.scholarshare.com/performance/fundperformance.shtml
         // http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D'http%3A%2F%2Fwww.scholarshare.com%2Fperformance%2Ffundperformance.shtml'%20and%20xpath%3D%22%2F%2Ftable%5B%40id%3D'realtimechart'%5D%22%0A&diagnostics=true
-        String selectUrl = "url=" + "\"" + "http://www.scholarshare.com/performance/fundperformance.shtml" + "\"";
-        if (log.isDebugEnabled()) {
-            log.debug("selectUrl=" + selectUrl);
-        }
+        String selectUrl = "url=" + "\"" + DEFAULT_URL + "\"";
+        LOGGER.info("selectUrl=" + selectUrl);
         String selectXPath = "xpath=" + "\"" + "//table[@id='realtimechart']" + "\"";
         String selectStatement = "select * from html" + " where " + selectUrl + " and " + selectXPath;
         selectStatement = URLEncoder.encode(selectStatement, enc);
@@ -293,14 +373,30 @@ public class TIAACREFScreenScrapSource {
         return url;
     }
 
+    /**
+     * Gets the prices.
+     *
+     * @return the prices
+     */
     public List<TIAACREFPriceInfo> getPrices() {
         return prices;
     }
 
+    /**
+     * Sets the prices.
+     *
+     * @param prices the new prices
+     */
     public void setPrices(List<TIAACREFPriceInfo> prices) {
         this.prices = prices;
     }
 
+    /**
+     * Gets the price.
+     *
+     * @param symbol the symbol
+     * @return the price
+     */
     public String getPrice(String symbol) {
         TIAACREFPriceInfo price = getPriceBySymbol(symbol);
         if (price == null) {
@@ -309,14 +405,30 @@ public class TIAACREFScreenScrapSource {
         return "" + price.getPrice();
     }
 
+    /**
+     * Gets the currency.
+     *
+     * @return the currency
+     */
     public String getCurrency() {
         return currency;
     }
 
+    /**
+     * Sets the currency.
+     *
+     * @param currency the new currency
+     */
     public void setCurrency(String currency) {
         this.currency = currency;
     }
 
+    /**
+     * Gets the name.
+     *
+     * @param symbol the symbol
+     * @return the name
+     */
     public String getName(String symbol) {
         TIAACREFPriceInfo price = getPriceBySymbol(symbol);
         if (price == null) {
@@ -325,6 +437,12 @@ public class TIAACREFScreenScrapSource {
         return price.getFundName() + " - " + price.getPortfolioName();
     }
 
+    /**
+     * Gets the date.
+     *
+     * @param symbol the symbol
+     * @return the date
+     */
     public Date getDate(String symbol) {
         TIAACREFPriceInfo price = getPriceBySymbol(symbol);
         if (price == null) {
@@ -333,6 +451,12 @@ public class TIAACREFScreenScrapSource {
         return price.getDate();
     }
     
+    /**
+     * Gets the price by symbol.
+     *
+     * @param symbol the symbol
+     * @return the price by symbol
+     */
     private TIAACREFPriceInfo getPriceBySymbol(String symbol) {
         for (TIAACREFPriceInfo price : prices) {
             if (price.getSymbol().compareToIgnoreCase(symbol) == 0) {

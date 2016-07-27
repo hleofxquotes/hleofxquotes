@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,6 +8,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 
 public class SplitToSubListsTest {
     private static final Logger log = Logger.getLogger(SplitToSubListsTest.class);

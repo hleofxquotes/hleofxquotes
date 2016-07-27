@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ft;
+package com.hungle.tools.moneyutils.csv2ofx;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,17 +15,17 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
-import com.le.tools.moneyutils.data.SymbolMapper;
-import com.le.tools.moneyutils.ofx.quotes.FxTable;
-import com.le.tools.moneyutils.ofx.xmlbeans.CurrencyUtils;
-import com.le.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
-import com.le.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.le.tools.moneyutils.stockprice.Price;
-import com.le.tools.moneyutils.stockprice.StockPrice;
+import com.hungle.tools.moneyutils.data.SymbolMapper;
+import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
+import com.hungle.tools.moneyutils.ofx.xmlbeans.CurrencyUtils;
+import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
+import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.stockprice.Price;
+import com.hungle.tools.moneyutils.stockprice.StockPrice;
 
 public abstract class AbstractCsvConverter implements CsvConverter {
-    private static final Logger log = Logger.getLogger(AbstractCsvConverter.class);
+    private static final Logger LOGGER = Logger.getLogger(AbstractCsvConverter.class);
 
     private SymbolMapper symbolMapper = new SymbolMapper();
 
@@ -55,12 +55,12 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         try {
             reader = new BufferedReader(new FileReader(inFile));
             csvReader = new CsvReader(reader);
-            log.info("Reading from inFile=" + inFile);
+            LOGGER.info("Reading from inFile=" + inFile);
             csvReader.readHeaders();
             while (csvReader.readRecord()) {
-                if (log.isDebugEnabled()) {
+                if (LOGGER.isDebugEnabled()) {
                     String line = csvReader.getRawRecord();
-                    log.debug(line);
+                    LOGGER.debug(line);
                 }
                 StockPrice bean = null;
                 try {
@@ -69,11 +69,11 @@ public abstract class AbstractCsvConverter implements CsvConverter {
                         beans.add(bean);
                     }
                 } catch (Exception e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 }
             }
             if (outFile != null) {
-                log.info("Writing to outFile=" + outFile);
+                LOGGER.info("Writing to outFile=" + outFile);
                 String defaultCurrency = CurrencyUtils.getDefaultCurrency();
                 OfxSaveParameter params = new OfxSaveParameter();
                 params.setDefaultCurrency(defaultCurrency);
@@ -142,8 +142,8 @@ public abstract class AbstractCsvConverter implements CsvConverter {
 
     protected void setStockName(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
         String stockName = csvReader.get(columnName);
-        if (log.isDebugEnabled()) {
-            log.debug(columnName + ": " + stockName);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(columnName + ": " + stockName);
         }
         if (isNull(stockName)) {
             throw new IOException("SKIP: invalid name=" + stockName);
@@ -153,8 +153,8 @@ public abstract class AbstractCsvConverter implements CsvConverter {
 
     protected void setStockSymbol(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
         String stockSymbol = csvReader.get(columnName);
-        if (log.isDebugEnabled()) {
-            log.debug(columnName + ": " + stockSymbol);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(columnName + ": " + stockSymbol);
         }
         if (isNull(stockSymbol)) {
             throw new IOException("SKIP: invalid symbolExchange=" + stockSymbol + ", name=" + stockPrice.getStockName());
@@ -164,8 +164,8 @@ public abstract class AbstractCsvConverter implements CsvConverter {
 
     protected void setLastPrice(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
         String lastPrice = csvReader.get(columnName);
-        if (log.isDebugEnabled()) {
-            log.debug(columnName + ": " + lastPrice);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(columnName + ": " + lastPrice);
         }
         if (isNull(lastPrice)) {
             throw new IOException("SKIP: no price for " + stockPrice.getStockSymbol());
@@ -179,8 +179,8 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         Number number = null;
         try {
             number = formatter.parse(lastPrice);
-            if (log.isDebugEnabled()) {
-                log.debug("lastPrice number=" + number);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("lastPrice number=" + number);
             }
         } catch (ParseException e) {
             throw new IOException(e);
@@ -191,8 +191,8 @@ public abstract class AbstractCsvConverter implements CsvConverter {
 
     protected void setLastTrade(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
         String quoteDateAndTime = csvReader.get(columnName);
-        if (log.isDebugEnabled()) {
-            log.debug(columnName + ": " + quoteDateAndTime);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(columnName + ": " + quoteDateAndTime);
         }
         if (!isNull(quoteDateAndTime)) {
             try {
@@ -201,7 +201,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
                 stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(date));
                 stockPrice.setLastTrade(date);
             } catch (ParseException e) {
-                log.warn(e);
+                LOGGER.warn(e);
             }
         }
 
@@ -209,8 +209,8 @@ public abstract class AbstractCsvConverter implements CsvConverter {
 
     protected void setCurrency(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
         String currency = csvReader.get(columnName);
-        if (log.isDebugEnabled()) {
-            log.debug(columnName + ": " + currency);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(columnName + ": " + currency);
         }
         stockPrice.setCurrency(currency);
     }
@@ -218,8 +218,8 @@ public abstract class AbstractCsvConverter implements CsvConverter {
     protected void setUnits(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
         if (useQuoteSourceShareCount) {
             String quantity = csvReader.get(columnName);
-            if (log.isDebugEnabled()) {
-                log.debug(columnName + ": " + quantity);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(columnName + ": " + quantity);
             }
             if (!isNull(quantity)) {
                 Double units;
@@ -227,7 +227,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
                     units = Double.valueOf(quantity);
                     stockPrice.setUnits(units);
                 } catch (NumberFormatException e) {
-                    log.warn("Cannot convert quantity=" + quantity);
+                    LOGGER.warn("Cannot convert quantity=" + quantity);
                 }
             }
         } else {

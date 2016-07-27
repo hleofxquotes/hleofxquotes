@@ -5,13 +5,21 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.ofx.quotes.FxTable;
+import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class FxTableCmd.
+ */
 public class FxTableCmd {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(FxTableCmd.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         File file = null;

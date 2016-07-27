@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.encryption;
+package com.hungle.tools.moneyutils.encryption;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.apache.xmlbeans.impl.common.ReaderInputStream;
 
 public class EncryptionHelper {
-    private static final Logger log = Logger.getLogger(EncryptionHelper.class);
+    private static final Logger LOGGER = Logger.getLogger(EncryptionHelper.class);
 
     private static final String ENCRYPTED_SUFFIX = "-enc";
 
@@ -102,9 +102,9 @@ public class EncryptionHelper {
             encryptionHelper = new EncryptionHelper();
             encryptionHelper.processFile(inFile);
         } catch (EncryptionHelperException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } finally {
-            log.info("< DONE");
+            LOGGER.info("< DONE");
         }
     }
 
@@ -114,10 +114,10 @@ public class EncryptionHelper {
         try {
             key = getKey(inFile);
 
-            if (log.isDebugEnabled()) {
-                log.debug("key=" + key.getAlgorithm() + "/" + key.getFormat());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("key=" + key.getAlgorithm() + "/" + key.getFormat());
             }
-            log.info("inFile=" + inFile);
+            LOGGER.info("inFile=" + inFile);
             if (isEncryptedFile(inFile)) {
                 decryptFile(inFile, key);
             } else {
@@ -187,10 +187,10 @@ public class EncryptionHelper {
 
                 return key;
             } catch (InvalidKeyException e) {
-                log.warn("Cannot generate a key, keyAlgorithm=" + keyAlgorithm + ", keySize=" + keySize + " ...");
+                LOGGER.warn("Cannot generate a key, keyAlgorithm=" + keyAlgorithm + ", keySize=" + keySize + " ...");
 
-                if (log.isDebugEnabled()) {
-                    log.warn(e);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.warn(e);
                 }
             }
         }
@@ -200,8 +200,8 @@ public class EncryptionHelper {
     private SecretKey readKey(File keyFile) throws IOException {
         SecretKey secretKey = null;
 
-        if (log.isDebugEnabled()) {
-            log.debug("read key from keyFile=" + keyFile);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("read key from keyFile=" + keyFile);
         }
 
         BufferedInputStream in = null;
@@ -228,7 +228,7 @@ public class EncryptionHelper {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     in = null;
                 }
@@ -242,8 +242,8 @@ public class EncryptionHelper {
     }
 
     private void writeKey(SecretKey secretKey, File keyFile) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug("write key to keyFile=" + keyFile);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("write key to keyFile=" + keyFile);
         }
 
         BufferedOutputStream out = null;
@@ -268,7 +268,7 @@ public class EncryptionHelper {
                 try {
                     out.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     out = null;
                 }
@@ -282,7 +282,7 @@ public class EncryptionHelper {
     }
 
     private static SecretKeySpec generatingSecretKeySpec(final String keyAlgorithm, int keySize) throws NoSuchAlgorithmException, IOException {
-        log.info("> generating key, keyAlgorithm=" + keyAlgorithm + ", keySize=" + keySize + " ...");
+        LOGGER.info("> generating key, keyAlgorithm=" + keyAlgorithm + ", keySize=" + keySize + " ...");
 
         final SecretKey secretKey = generatingSecretKey(keyAlgorithm, keySize);
 
@@ -310,12 +310,12 @@ public class EncryptionHelper {
 
     private static void decryptFile(File inFile, Cipher cipher) throws IOException {
         File outFile = getDecryptedFile(inFile);
-        log.info("outFile=" + outFile);
+        LOGGER.info("outFile=" + outFile);
         decryptFile(inFile, outFile, cipher);
     }
 
     private static void decryptFile(File inFile, File outFile, Cipher cipher) throws IOException {
-        log.info("> decryptFile");
+        LOGGER.info("> decryptFile");
         InputStream in = null;
         OutputStream out = null;
         try {
@@ -323,17 +323,17 @@ public class EncryptionHelper {
             out = new BufferedOutputStream(new FileOutputStream(outFile));
             long bytes = 0;
             try {
-                log.info("> START copying ...");
+                LOGGER.info("> START copying ...");
                 bytes = copyStreams(in, out);
             } finally {
-                log.info("< DONE copying, bytes=" + bytes);
+                LOGGER.info("< DONE copying, bytes=" + bytes);
             }
         } finally {
             if (out != null) {
                 try {
                     out.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     out = null;
                 }
@@ -343,7 +343,7 @@ public class EncryptionHelper {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     in = null;
                 }
@@ -365,7 +365,7 @@ public class EncryptionHelper {
 
     private static File encryptFile(File inFile, Cipher cipher) throws IOException {
         File outFile = getEncryptedFile(inFile);
-        log.info("outFile=" + outFile);
+        LOGGER.info("outFile=" + outFile);
 
         encryptFile(inFile, outFile, cipher);
         return outFile;
@@ -383,9 +383,9 @@ public class EncryptionHelper {
     }
 
     public static void encryptFile(File inFile, File outFile, Cipher cipher) throws IOException {
-        log.info("> encryptFile");
-        log.info("  cipher=" + cipher.getAlgorithm());
-        log.info("  outFile=" + outFile);
+        LOGGER.info("> encryptFile");
+        LOGGER.info("  cipher=" + cipher.getAlgorithm());
+        LOGGER.info("  outFile=" + outFile);
 
         InputStream in = null;
         OutputStream out = null;
@@ -394,17 +394,17 @@ public class EncryptionHelper {
             out = new CipherOutputStream(new FileOutputStream(outFile), cipher);
             long bytes = 0;
             try {
-                log.info("> START copying ...");
+                LOGGER.info("> START copying ...");
                 bytes = copyStreams(in, out);
             } finally {
-                log.info("< DONE copying, bytes=" + bytes);
+                LOGGER.info("< DONE copying, bytes=" + bytes);
             }
         } finally {
             if (out != null) {
                 try {
                     out.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     out = null;
                 }
@@ -414,7 +414,7 @@ public class EncryptionHelper {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     in = null;
                 }
@@ -438,7 +438,7 @@ public class EncryptionHelper {
         try {
             int encryptMode = Cipher.ENCRYPT_MODE;
             cipher.init(encryptMode, key, salt);
-            log.info("> encrypt");
+            LOGGER.info("> encrypt");
 
             InputStream in = null;
             OutputStream out = null;
@@ -448,17 +448,17 @@ public class EncryptionHelper {
                 out = new CipherOutputStream(new FileOutputStream(outFile), cipher);
                 long bytes = 0;
                 try {
-                    log.info("> START copying ...");
+                    LOGGER.info("> START copying ...");
                     copyStreams(in, out);
                 } finally {
-                    log.info("< DONE copying, bytes=" + bytes);
+                    LOGGER.info("< DONE copying, bytes=" + bytes);
                 }
             } finally {
                 if (out != null) {
                     try {
                         out.close();
                     } catch (IOException e) {
-                        log.warn(e);
+                        LOGGER.warn(e);
                     } finally {
                         out = null;
                     }
@@ -467,7 +467,7 @@ public class EncryptionHelper {
                     try {
                         in.close();
                     } catch (IOException e) {
-                        log.warn(e);
+                        LOGGER.warn(e);
                     } finally {
                         in = null;
                     }

@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ft;
+package com.hungle.tools.moneyutils.ft;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -27,16 +27,17 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.ofx.quotes.DefaultQuoteSource;
-import com.le.tools.moneyutils.ofx.quotes.GUI;
-import com.le.tools.moneyutils.ofx.quotes.QuoteSource;
-import com.le.tools.moneyutils.ofx.quotes.QuoteSourceListener;
-import com.le.tools.moneyutils.ofx.quotes.ShowDialogTask;
-import com.le.tools.moneyutils.ofx.quotes.StopWatch;
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.csv2ofx.AbstractCsvConverter;
+import com.hungle.tools.moneyutils.ofx.quotes.DefaultQuoteSource;
+import com.hungle.tools.moneyutils.ofx.quotes.GUI;
+import com.hungle.tools.moneyutils.ofx.quotes.QuoteSource;
+import com.hungle.tools.moneyutils.ofx.quotes.QuoteSourceListener;
+import com.hungle.tools.moneyutils.ofx.quotes.ShowDialogTask;
+import com.hungle.tools.moneyutils.ofx.quotes.StopWatch;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
 public class FtDotComQuoteSourcePanel extends JPanel {
-    private static final Logger log = Logger.getLogger(FtDotComQuoteSourcePanel.class);
+    private static final Logger LOGGER = Logger.getLogger(FtDotComQuoteSourcePanel.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -63,9 +64,9 @@ public class FtDotComQuoteSourcePanel extends JPanel {
 
         private void initFileChooser() {
             String dir = prefs.get(FtDotComQuoteSourcePanel.PREF_IMPORT_FT_COM_CSV_DIR, ".");
-            log.info("> pre creating JFileChooser");
+            LOGGER.info("> pre creating JFileChooser");
             this.fc = new JFileChooser(dir);
-            log.info("> post creating JFileChooser");
+            LOGGER.info("> post creating JFileChooser");
             FileFilter filter = new FileFilter() {
 
                 @Override
@@ -107,11 +108,11 @@ public class FtDotComQuoteSourcePanel extends JPanel {
                 stopWatch.click();
                 stockPrices = ftCsv.convert(fromFile);
             } catch (IOException e) {
-                log.error(e, e);
+                LOGGER.error(e, e);
                 exception = e;
             } finally {
                 long delta = stopWatch.click();
-                log.info("ft.com CSV conversion took " + delta + "ms");
+                LOGGER.info("ft.com CSV conversion took " + delta + "ms");
                 stockPricesReceived(quoteSource, stockPrices);
             }
 
@@ -167,8 +168,8 @@ public class FtDotComQuoteSourcePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 AbstractButton button = (AbstractButton) e.getSource();
                 boolean selected = button.getModel().isSelected();
-                if (log.isDebugEnabled()) {
-                    log.debug("useQuoteSourceShareCount=" + selected);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("useQuoteSourceShareCount=" + selected);
                 }
                 prefs.put(PREF_FT_COM_USE_SOURCE_SHARE_COUNT, Boolean.valueOf(selected).toString());
                 // TODO: kind of a hack right now. We need to clear the price

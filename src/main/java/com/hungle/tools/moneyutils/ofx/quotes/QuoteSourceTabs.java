@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.awt.Component;
 
@@ -8,18 +8,29 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class QuoteSourceTabs.
+ */
 public class QuoteSourceTabs extends JTabbedPane {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(QuoteSourceTabs.class);
 
+    /**
+     * Instantiates a new quote source tabs.
+     */
     public QuoteSourceTabs() {
         super();
         initView();
     }
 
+    /**
+     * Inits the view.
+     */
     private void initView() {
         this.addChangeListener(new ChangeListener() {
             @Override

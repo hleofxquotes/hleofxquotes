@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.scholarshare;
+package com.hungle.tools.moneyutils.scholarshare;
 
 import java.io.IOException;
 import java.util.List;
@@ -7,11 +7,19 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TIAACREFScreenScrapSourceCmd.
+ */
 public class TIAACREFScreenScrapSourceCmd {
-    private static final Logger log = Logger.getLogger(TIAACREFScreenScrapSourceCmd.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(TIAACREFScreenScrapSourceCmd.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         String fileName = null;
@@ -36,15 +44,14 @@ public class TIAACREFScreenScrapSourceCmd {
             screenScrapper.parse();
             List<TIAACREFPriceInfo> prices = screenScrapper.getPrices();
             for (TIAACREFPriceInfo price : prices) {
-//                log.info(price);
                 System.out.println(price);
             }
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } catch (XPathExpressionException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } finally {
-            log.info("< DONE");
+            LOGGER.info("< DONE");
         }
     }
 

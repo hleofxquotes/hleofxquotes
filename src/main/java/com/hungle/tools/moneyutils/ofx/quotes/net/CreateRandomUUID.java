@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes.net;
+package com.hungle.tools.moneyutils.ofx.quotes.net;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.csv2ofx;
+package com.hungle.tools.moneyutils.csv2ofx;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -31,50 +31,97 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
 import com.csvreader.CsvReader;
-import com.le.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Csv2Ofx.
+ */
 public class Csv2Ofx {
-    private static final Logger log = Logger.getLogger(Csv2Ofx.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(Csv2Ofx.class);
 
+    /** The Constant DEFAULT_ENCODING. */
     private static final String DEFAULT_ENCODING = "UTF-8";
 
+    /** The Constant COLUMN_MEMO. */
     private static final String COLUMN_MEMO = "column.MEMO";
+    
+    /** The Constant COLUMN_NAME. */
     private static final String COLUMN_NAME = "column.NAME";
+    
+    /** The Constant COLUMN_FITID. */
     private static final String COLUMN_FITID = "column.FITID";
+    
+    /** The Constant COLUMN_TRNAMT. */
     private static final String COLUMN_TRNAMT = "column.TRNAMT";
+    
+    /** The Constant COLUMN_DTUSER. */
     private static final String COLUMN_DTUSER = "column.DTUSER";
+    
+    /** The Constant COLUMN_DTPOSTED. */
     private static final String COLUMN_DTPOSTED = "column.DTPOSTED";
+    
+    /** The Constant COLUMN_TRNTYPE. */
     private static final String COLUMN_TRNTYPE = "column.TRNTYPE";
 
+    /** The Constant DEFAULT_TEMPLATE. */
     private static final String DEFAULT_TEMPLATE = "/templates/csv2ofx.vm";
+    
+    /** The Constant DEFAULT_MAP_FILE. */
     private static final String DEFAULT_MAP_FILE = "samples/csv2ofx.props";
 
+    /** The Constant DEFAULT_CSV_DATE_FORMAT_STRING. */
     private static final String DEFAULT_CSV_DATE_FORMAT_STRING = "MM/dd/yyyy";
 
+    /** The transactions. */
     private List<STMTTRN> transactions;
 
+    /** The ledger balance. */
     private LEDGERBAL ledgerBalance = new LEDGERBAL();
 
+    /** The csv date format. */
     private SimpleDateFormat csvDateFormat = new SimpleDateFormat(DEFAULT_CSV_DATE_FORMAT_STRING);
 
+    /** The ofx date format. */
     private SimpleDateFormat ofxDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
+    /** The calendar. */
     private Calendar calendar;
 
+    /** The dt start. */
     private Date dtStart = null;
+    
+    /** The dt end. */
     private Date dtEnd = null;
 
+    /** The mapper. */
     private Map<String, String> mapper;
 
+    /** The max name length. */
     private int maxNameLength = 32;
 
+    /** The max memo length. */
     private int maxMemoLength = 255;
 
+    /**
+     * Instantiates a new csv 2 ofx.
+     */
     public Csv2Ofx() {
         calendar = Calendar.getInstance(new SimpleTimeZone(0, "GMT"));
         ofxDateFormat.setCalendar(calendar);
     }
 
+    /**
+     * Convert.
+     *
+     * @param csvFile the csv file
+     * @param ofxFile the ofx file
+     * @param mapFile the map file
+     * @return the int
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public int convert(File csvFile, File ofxFile, File mapFile) throws IOException {
         int count = 0;
         PrintWriter writer = null;
@@ -117,6 +164,14 @@ public class Csv2Ofx {
         return count;
     }
 
+    /**
+     * Creates the transactions.
+     *
+     * @param csvFile the csv file
+     * @param mapFile the map file
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private List<STMTTRN> createTransactions(File csvFile, File mapFile) throws IOException {
         List<STMTTRN> transactions = null;
 
@@ -144,7 +199,7 @@ public class Csv2Ofx {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e, e);
+                    LOGGER.warn(e, e);
                 } finally {
                     reader = null;
                 }
@@ -154,13 +209,28 @@ public class Csv2Ofx {
         return transactions;
     }
 
+    /**
+     * Creates the transactions.
+     *
+     * @param csvReader the csv reader
+     * @param mapper the mapper
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private List<STMTTRN> createTransactions(CsvReader csvReader, Map<String, String> mapper) throws IOException {
         boolean hasHeader = true;
         return createTransactions(csvReader, mapper, hasHeader);
     }
 
+    /**
+     * Creates the mapper.
+     *
+     * @param mapFile the map file
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private Map<String, String> createMapper(File mapFile) throws IOException {
-        log.info("mapFile=" + mapFile);
+        LOGGER.info("mapFile=" + mapFile);
         Map<String, String> mapper = new HashMap<String, String>();
         Properties props = new Properties();
         Reader reader = null;
@@ -168,7 +238,7 @@ public class Csv2Ofx {
             if (mapFile == null) {
                 String resourceName = DEFAULT_MAP_FILE;
                 URL url = OfxUtils.getResource(resourceName);
-                log.info("url=" + url);
+                LOGGER.info("url=" + url);
                 if (url == null) {
                     throw new IOException("Cannot find resource=" + resourceName);
                 }
@@ -182,8 +252,8 @@ public class Csv2Ofx {
                 String key = (String) keys.nextElement();
 
                 String value = props.getProperty(key);
-                if (log.isDebugEnabled()) {
-                    log.debug(key + ", " + value);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(key + ", " + value);
                 }
 
                 mapper.put(key, value);
@@ -193,7 +263,7 @@ public class Csv2Ofx {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
@@ -202,6 +272,11 @@ public class Csv2Ofx {
         return mapper;
     }
 
+    /**
+     * Creates the default mapper.
+     *
+     * @return the map
+     */
     private Map<String, String> createDefaultMapper() {
         // Date,Transaction Type,Check Number,Description,Amount
 
@@ -218,6 +293,11 @@ public class Csv2Ofx {
         return mapper;
     }
 
+    /**
+     * Creates the default mapper 2.
+     *
+     * @return the map
+     */
     private Map<String, String> createDefaultMapper2() {
         Map<String, String> mapper = new HashMap<String, String>();
 
@@ -232,6 +312,15 @@ public class Csv2Ofx {
         return mapper;
     }
 
+    /**
+     * Creates the transactions.
+     *
+     * @param csvReader the csv reader
+     * @param mapper the mapper
+     * @param hasHeader the has header
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private List<STMTTRN> createTransactions(CsvReader csvReader, Map<String, String> mapper, boolean hasHeader) throws IOException {
         List<STMTTRN> transactions = new ArrayList<STMTTRN>();
         if (hasHeader) {
@@ -246,18 +335,32 @@ public class Csv2Ofx {
                     transactions.add(transaction);
                 }
             } catch (IOException e) {
-                log.warn(e);
+                LOGGER.warn(e);
             }
         }
 
         return transactions;
     }
 
+    /**
+     * To ofx date string.
+     *
+     * @param dateString the date string
+     * @return the string
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private String toOfxDateString(String dateString) throws IOException {
         Date date = toOfxDate(dateString);
         return toOfxDateString(date);
     }
 
+    /**
+     * To ofx date.
+     *
+     * @param dateString the date string
+     * @return the date
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private Date toOfxDate(String dateString) throws IOException {
         Date date = null;
         try {
@@ -272,6 +375,12 @@ public class Csv2Ofx {
         return date;
     }
 
+    /**
+     * To ofx date string.
+     *
+     * @param date the date
+     * @return the string
+     */
     private String toOfxDateString(Date date) {
         if (date == null) {
             date = new Date();
@@ -279,6 +388,14 @@ public class Csv2Ofx {
         return ofxDateFormat.format(date);
     }
 
+    /**
+     * Creates the transaction.
+     *
+     * @param csvReader the csv reader
+     * @param mapper the mapper
+     * @return the stmttrn
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private STMTTRN createTransaction(CsvReader csvReader, Map<String, String> mapper) throws IOException {
         STMTTRN transaction = new STMTTRN();
         String header = null;
@@ -318,8 +435,8 @@ public class Csv2Ofx {
 
         // <TRNTYPE> - MUST
         value = csvReader.get(mapper.get(COLUMN_TRNTYPE));
-        if (log.isDebugEnabled()) {
-            log.debug(COLUMN_TRNTYPE + ", " + value);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(COLUMN_TRNTYPE + ", " + value);
         }
         if ((value != null) && (value.length() > 0)) {
             // OK - user specified
@@ -347,7 +464,7 @@ public class Csv2Ofx {
         // <NAME> - optional
         value = csvReader.get(mapper.get(COLUMN_NAME));
         if ((maxNameLength > 0) && (value.length() >= maxNameLength)) {
-            log.warn("Truncate NAME to first " + maxNameLength + " chars: " + value);
+            LOGGER.warn("Truncate NAME to first " + maxNameLength + " chars: " + value);
             value = value.substring(0, maxNameLength);
         }
         value = StringEscapeUtils.escapeHtml(value);
@@ -362,7 +479,7 @@ public class Csv2Ofx {
             ledgerBalance.setBALAMT(transaction.getTRNAMT());
             ledgerBalance.setDTASOF(transaction.getDTPOSTED());
 
-            log.info("Found ledger balance value: " + ledgerBalance.getBALAMT() + ", " +
+            LOGGER.info("Found ledger balance value: " + ledgerBalance.getBALAMT() + ", " +
                     ledgerBalance.getDTASOF());
             // this is not a real transaction
             return null;
@@ -370,7 +487,7 @@ public class Csv2Ofx {
 
         value = csvReader.get(mapper.get(COLUMN_MEMO));
         if ((maxMemoLength > 0) && (value.length() >= maxMemoLength)) {
-            log.warn("Truncate MEMO to first " + maxNameLength + " chars: " + value);
+            LOGGER.warn("Truncate MEMO to first " + maxNameLength + " chars: " + value);
             value = value.substring(0, maxMemoLength);
         }
         value = StringEscapeUtils.escapeHtml(value);
@@ -384,6 +501,13 @@ public class Csv2Ofx {
         return transaction;
     }
 
+    /**
+     * Calculate dt end.
+     *
+     * @param dtEnd the dt end
+     * @param date the date
+     * @return the date
+     */
     private Date calculateDtEnd(Date dtEnd, Date date) {
         if (dtEnd == null) {
             return date;
@@ -396,6 +520,13 @@ public class Csv2Ofx {
         return dtEnd;
     }
 
+    /**
+     * Calculate dt start.
+     *
+     * @param dtStart the dt start
+     * @param date the date
+     * @return the date
+     */
     private Date calculateDtStart(Date dtStart, Date date) {
         if (dtStart == null) {
             return date;
@@ -408,24 +539,50 @@ public class Csv2Ofx {
         return dtStart;
     }
 
+    /**
+     * Convert.
+     *
+     * @param context the context
+     * @param writer the writer
+     */
     private void convert(VelocityContext context, PrintWriter writer) {
         String template = DEFAULT_TEMPLATE;
         String encoding = DEFAULT_ENCODING;
         Velocity.mergeTemplate(template, encoding, context, writer);
     }
 
+    /**
+     * Gets the max name length.
+     *
+     * @return the max name length
+     */
     public int getMaxNameLength() {
         return maxNameLength;
     }
 
+    /**
+     * Sets the max name length.
+     *
+     * @param maxNameLength the new max name length
+     */
     public void setMaxNameLength(int maxNameLength) {
         this.maxNameLength = maxNameLength;
     }
 
+    /**
+     * Gets the max memo length.
+     *
+     * @return the max memo length
+     */
     public int getMaxMemoLength() {
         return maxMemoLength;
     }
 
+    /**
+     * Sets the max memo length.
+     *
+     * @param maxMemoLength the new max memo length
+     */
     public void setMaxMemoLength(int maxMemoLength) {
         this.maxMemoLength = maxMemoLength;
     }

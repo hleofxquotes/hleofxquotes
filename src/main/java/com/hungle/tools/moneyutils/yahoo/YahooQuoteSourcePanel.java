@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.yahoo;
+package com.hungle.tools.moneyutils.yahoo;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -43,55 +43,77 @@ import javax.swing.SwingUtilities;
 import org.apache.http.HttpEntity;
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.ofx.quotes.AbstractLoadStockSymbolsTask;
-import com.le.tools.moneyutils.ofx.quotes.DefaultQuoteSource;
-import com.le.tools.moneyutils.ofx.quotes.GUI;
-import com.le.tools.moneyutils.ofx.quotes.GetQuotesListener;
-import com.le.tools.moneyutils.ofx.quotes.OfxUtils;
-import com.le.tools.moneyutils.ofx.quotes.PopupListener;
-import com.le.tools.moneyutils.ofx.quotes.QuoteSource;
-import com.le.tools.moneyutils.ofx.quotes.QuoteSourceListener;
-import com.le.tools.moneyutils.ofx.quotes.ShowDialogTask;
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.ofx.quotes.AbstractLoadStockSymbolsTask;
+import com.hungle.tools.moneyutils.ofx.quotes.DefaultQuoteSource;
+import com.hungle.tools.moneyutils.ofx.quotes.GUI;
+import com.hungle.tools.moneyutils.ofx.quotes.GetQuotesListener;
+import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.PopupListener;
+import com.hungle.tools.moneyutils.ofx.quotes.QuoteSource;
+import com.hungle.tools.moneyutils.ofx.quotes.QuoteSourceListener;
+import com.hungle.tools.moneyutils.ofx.quotes.ShowDialogTask;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class YahooQuoteSourcePanel.
+ */
 public class YahooQuoteSourcePanel extends JPanel {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(YahooQuoteSourcePanel.class);
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(YahooQuoteSourcePanel.class);
 
+    /** The Constant PREF_YAHOO_QUOTE_SERVER. */
     private static final String PREF_YAHOO_QUOTE_SERVER = "yahooQuoteServer";
 
+    /** The prefs. */
     private final Preferences prefs;
 
+    /** The parent quote source listener. */
     private final QuoteSourceListener parentQuoteSourceListener;
 
+    /** The thread pool. */
     private final ExecutorService threadPool;
 
+    /** The set tool tip text. */
     private boolean setToolTipText = false;
 
+    /** The stock symbols view. */
     private JTextArea stockSymbolsView;
 
+    /** The listener. */
     protected GetQuotesProgressMonitor listener;
 
+    /** The progress bar. */
     private JProgressBar progressBar;
 
+    /** The quote server. */
     protected String quoteServer;
 
+    /** The update button. */
     private JButton updateButton;
 
+    /** The quote source listener. */
     private QuoteSourceListener quoteSourceListener;
 
+    /** The stock symbols pref key. */
     private String stockSymbolsPrefKey = null;
 
+    /** The fx symbols. */
     protected List<AbstractStockPrice> fxSymbols;
 
+    /** The quote source. */
     private final DefaultQuoteSource quoteSource = new DefaultYahooQuoteSource();
 
     /**
-     * @wbp.parser.constructor
+     * Instantiates a new yahoo quote source panel.
+     *
+     * @param gui the gui
+     * @param stockSymbolsPrefKey the stock symbols pref key
+     * @wbp.parser.constructor 
      */
     public YahooQuoteSourcePanel(GUI gui, String stockSymbolsPrefKey) {
         super();
@@ -99,7 +121,7 @@ public class YahooQuoteSourcePanel extends JPanel {
         this.threadPool = gui.getThreadPool();
         this.parentQuoteSourceListener = gui.getQuoteSourceListener();
         if (this.threadPool == null) {
-            log.warn("YahooQuoteSourcePanel is constructed with this.threadPool=null");
+            LOGGER.warn("YahooQuoteSourcePanel is constructed with this.threadPool=null");
         }
         this.quoteServer = prefs.get(YahooQuoteSourcePanel.PREF_YAHOO_QUOTE_SERVER, GetYahooQuotes.DEFAULT_HOST);
         quoteSourceListener = new QuoteSourceListener() {
@@ -131,13 +153,21 @@ public class YahooQuoteSourcePanel extends JPanel {
         createView();
     }
 
+    /**
+     * Instantiates a new yahoo quote source panel.
+     *
+     * @param gui the gui
+     */
     public YahooQuoteSourcePanel(GUI gui) {
         this(gui, null);
     }
 
+    /**
+     * Creates the view.
+     */
     private void createView() {
-        if (log.isDebugEnabled()) {
-            log.debug("> createView()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> createView()");
         }
 
         JPanel view = this;
@@ -166,6 +196,11 @@ public class YahooQuoteSourcePanel extends JPanel {
         view.add(createCommandView(), BorderLayout.SOUTH);
     }
 
+    /**
+     * Creates the samples menu.
+     *
+     * @return the j menu
+     */
     private JMenu createSamplesMenu() {
         JMenu menu;
         JMenuItem menuItem;
@@ -230,9 +265,14 @@ public class YahooQuoteSourcePanel extends JPanel {
         return menu;
     }
 
+    /**
+     * Creates the bookmarks menu.
+     *
+     * @return the j menu
+     */
     private JMenu createBookmarksMenu() {
-        if (log.isDebugEnabled()) {
-            log.debug("> createBookmarksMenu()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> createBookmarksMenu()");
         }
 
         File dir = new File("bookmarks");
@@ -260,9 +300,15 @@ public class YahooQuoteSourcePanel extends JPanel {
         return menu;
     }
 
+    /**
+     * Adds the popup menu.
+     *
+     * @param textArea the text area
+     * @return the j popup menu
+     */
     protected JPopupMenu addPopupMenu(final JTextArea textArea) {
-        if (log.isDebugEnabled()) {
-            log.debug("> addPopupMenu()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> addPopupMenu()");
         }
 
         JPopupMenu popup = new JPopupMenu();
@@ -278,8 +324,8 @@ public class YahooQuoteSourcePanel extends JPanel {
         menu.add(menuItem);
         popup.add(menu);
 
-        if (log.isDebugEnabled()) {
-            log.debug("> EditYahoServerAction");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> EditYahoServerAction");
         }
         menu = new JMenu("Edit");
         menuItem = new JMenuItem(new AbstractAction("Cut") {
@@ -334,9 +380,14 @@ public class YahooQuoteSourcePanel extends JPanel {
         return popup;
     }
 
+    /**
+     * Creates the command view.
+     *
+     * @return the component
+     */
     private Component createCommandView() {
-        if (log.isDebugEnabled()) {
-            log.debug("> createCommandView()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> createCommandView()");
         }
 
         JPanel view = new JPanel();
@@ -366,33 +417,60 @@ public class YahooQuoteSourcePanel extends JPanel {
         return view;
     }
 
+    /**
+     * The Class DefaultYahooQuoteSource.
+     */
     protected class DefaultYahooQuoteSource extends DefaultQuoteSource {
+        
+        /* (non-Javadoc)
+         * @see com.le.tools.moneyutils.ofx.quotes.DefaultQuoteSource#getExchangeRates()
+         */
         @Override
         public List<AbstractStockPrice> getExchangeRates() {
             return fxSymbols;
         }
     }
 
+    /**
+     * The Class GetQuotesProgressMonitor.
+     */
     protected final class GetQuotesProgressMonitor implements GetQuotesListener {
+        
+        /** The sub task size. */
         private AtomicInteger subTaskSize = new AtomicInteger(0);
+        
+        /** The completed tasks. */
         private AtomicInteger completedTasks = new AtomicInteger(0);
+        
+        /** The progress bar. */
         private JProgressBar progressBar = null;
 
+        /**
+         * Instantiates a new gets the quotes progress monitor.
+         *
+         * @param progressBar the progress bar
+         */
         public GetQuotesProgressMonitor(JProgressBar progressBar) {
             this.progressBar = progressBar;
         }
 
+        /* (non-Javadoc)
+         * @see com.le.tools.moneyutils.ofx.quotes.GetQuotesListener#started(java.util.List)
+         */
         @Override
         public void started(List<String> stocks) {
-            if (log.isDebugEnabled()) {
-                log.debug("> STARTED stocks=" + stocks);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("> STARTED stocks=" + stocks);
             }
         }
 
+        /* (non-Javadoc)
+         * @see com.le.tools.moneyutils.ofx.quotes.GetQuotesListener#ended(java.util.List, java.util.List, long)
+         */
         @Override
         public void ended(List<String> stocks, List<AbstractStockPrice> beans, long delta) {
-            if (log.isDebugEnabled()) {
-                log.debug("> ENDED stocks=" + stocks + ", delta=" + delta);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("> ENDED stocks=" + stocks + ", delta=" + delta);
             }
             completedTasks.getAndIncrement();
 
@@ -401,8 +479,8 @@ public class YahooQuoteSourcePanel extends JPanel {
                 @Override
                 public void run() {
                     int percentage = (completedTasks.get() * 100) / subTaskSize.get();
-                    if (log.isDebugEnabled()) {
-                        log.debug("  progressBar % " + percentage);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("  progressBar % " + percentage);
                     }
                     if (progressBar != null) {
                         progressBar.setValue(percentage);
@@ -412,15 +490,21 @@ public class YahooQuoteSourcePanel extends JPanel {
             SwingUtilities.invokeLater(doRun);
         }
 
+        /* (non-Javadoc)
+         * @see com.le.tools.moneyutils.ofx.quotes.GetQuotesListener#setSubTaskSize(int)
+         */
         @Override
         public void setSubTaskSize(int size) {
-            if (log.isDebugEnabled()) {
-                log.debug("setSubTaskSize=" + size);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("setSubTaskSize=" + size);
             }
             this.subTaskSize.set(size);
             this.completedTasks.set(0);
         }
 
+        /* (non-Javadoc)
+         * @see com.le.tools.moneyutils.ofx.quotes.GetQuotesListener#httpEntityReceived(org.apache.http.HttpEntity)
+         */
         @Override
         public void httpEntityReceived(HttpEntity entity) {
             // TODO Auto-generated method stub
@@ -428,26 +512,47 @@ public class YahooQuoteSourcePanel extends JPanel {
         }
     }
 
+    /**
+     * The Class OpenAction.
+     */
     private final class OpenAction extends AbstractLoadStockSymbolsTask {
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /** The fc. */
         private JFileChooser fc = null;
+        
+        /** The stocks. */
         private List<String> stocks = null;
 
+        /**
+         * Instantiates a new open action.
+         *
+         * @param name the name
+         * @param listener the listener
+         * @param threadPool the thread pool
+         */
         public OpenAction(String name, QuoteSourceListener listener, ExecutorService threadPool) {
             super(name, listener, threadPool);
         }
 
+        /**
+         * Inits the file chooser.
+         */
         private void initFileChooser() {
-            if (log.isDebugEnabled()) {
-                log.debug("> pre creating JFileChooser");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("> pre creating JFileChooser");
             }
             this.fc = new JFileChooser(".");
-            if (log.isDebugEnabled()) {
-                log.debug("> post creating JFileChooser");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("> post creating JFileChooser");
             }
         }
 
+        /* (non-Javadoc)
+         * @see com.le.tools.moneyutils.ofx.quotes.AbstractLoadStockSymbolsTask#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             if (fc == null) {
@@ -461,39 +566,59 @@ public class YahooQuoteSourcePanel extends JPanel {
             try {
                 OfxUtils.addToList(inFile.toURI().toURL(), stocks);
             } catch (MalformedURLException e) {
-                log.error(e);
+                LOGGER.error(e);
             } catch (IOException e) {
-                log.error(e);
+                LOGGER.error(e);
             }
 
             super.actionPerformed(event);
         }
 
+        /* (non-Javadoc)
+         * @see com.le.tools.moneyutils.ofx.quotes.AbstractLoadStockSymbolsTask#getStocks()
+         */
         @Override
         protected List<String> getStocks() throws IOException {
             return stocks;
         }
     }
 
+    /**
+     * The Class SaveAsAction.
+     */
     private final class SaveAsAction extends AbstractAction {
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /** The fc. */
         private JFileChooser fc = null;
 
+        /**
+         * Instantiates a new save as action.
+         *
+         * @param name the name
+         */
         public SaveAsAction(String name) {
             super(name);
         }
 
+        /**
+         * Inits the file chooser.
+         */
         private void initFileChooser() {
-            if (log.isDebugEnabled()) {
-                log.debug("> pre creating JFileChooser");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("> pre creating JFileChooser");
             }
             this.fc = new JFileChooser(".");
-            if (log.isDebugEnabled()) {
-                log.debug("> post creating JFileChooser");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("> post creating JFileChooser");
             }
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             if (fc == null) {
@@ -507,10 +632,10 @@ public class YahooQuoteSourcePanel extends JPanel {
             try {
                 writer = new PrintWriter(new FileWriter(outFile));
                 writer.write(stockSymbolsView.getText());
-                log.info("Save stock symbols to file=" + outFile);
+                LOGGER.info("Save stock symbols to file=" + outFile);
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(YahooQuoteSourcePanel.this, e.getMessage(), "Failed To Save To File", JOptionPane.ERROR_MESSAGE);
-                log.error(e);
+                LOGGER.error(e);
             } finally {
                 if (writer != null) {
                     try {
@@ -523,13 +648,26 @@ public class YahooQuoteSourcePanel extends JPanel {
         }
     }
 
+    /**
+     * The Class EditYahoServerAction.
+     */
     private final class EditYahoServerAction extends AbstractAction {
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new edits the yaho server action.
+         *
+         * @param name the name
+         */
         public EditYahoServerAction(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             Set<String> keys = GetYahooQuotes.QUOTE_HOSTS.keySet();
@@ -545,7 +683,7 @@ public class YahooQuoteSourcePanel extends JPanel {
             // If a string was returned, say so.
             if ((s != null) && (s.length() > 0)) {
                 String value = GetYahooQuotes.QUOTE_HOSTS.get(s);
-                log.info("Selected new Yahoo Quote Server: " + value);
+                LOGGER.info("Selected new Yahoo Quote Server: " + value);
                 quoteServer = value;
                 prefs.put(YahooQuoteSourcePanel.PREF_YAHOO_QUOTE_SERVER, quoteServer);
             } else {
@@ -554,16 +692,32 @@ public class YahooQuoteSourcePanel extends JPanel {
         }
     }
 
+    /**
+     * The Class LoadBookmarkAction.
+     */
     private final class LoadBookmarkAction extends AbstractLoadStockSymbolsTask {
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /** The file. */
         private File file;
 
+        /**
+         * Instantiates a new load bookmark action.
+         *
+         * @param file the file
+         * @param listener the listener
+         * @param threadPool the thread pool
+         */
         public LoadBookmarkAction(File file, QuoteSourceListener listener, ExecutorService threadPool) {
             super(file.getName(), listener, threadPool);
             this.file = file;
         }
 
+        /* (non-Javadoc)
+         * @see com.le.tools.moneyutils.ofx.quotes.AbstractLoadStockSymbolsTask#getStocks()
+         */
         @Override
         protected List<String> getStocks() throws IOException {
             List<String> stocks = new ArrayList<String>();
@@ -573,44 +727,81 @@ public class YahooQuoteSourcePanel extends JPanel {
 
     }
 
+    /**
+     * The Class GetQuotesAction.
+     */
     private final class GetQuotesAction extends AbstractAction {
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new gets the quotes action.
+         *
+         * @param name the name
+         */
         GetQuotesAction(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(final ActionEvent event) {
             getQuotes();
         }
     }
 
+    /**
+     * Notify no stock request.
+     */
     private void notifyNoStockRequest() {
-        log.warn("No stocks requested.");
+        LOGGER.warn("No stocks requested.");
         JOptionPane.showMessageDialog(YahooQuoteSourcePanel.this, "Please enter stock symbols.", "Missing input", JOptionPane.WARNING_MESSAGE);
         updateButton.setEnabled(true);
         progressBar.setValue(100);
         setCursor(null);
     }
 
+    /**
+     * Stock prices lookup started.
+     */
     private void stockPricesLookupStarted() {
         if (quoteSourceListener != null) {
             quoteSourceListener.stockPricesLookupStarted(quoteSource);
         }
     }
 
+    /**
+     * Stock prices received.
+     *
+     * @param stockPrices the stock prices
+     */
     private void stockPricesReceived(List<AbstractStockPrice> stockPrices) {
-        if (log.isDebugEnabled()) {
-            log.debug("> stockPricesReceived");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> stockPricesReceived");
         }
         this.quoteSourceListener.stockPricesReceived(quoteSource, stockPrices);
     }
 
+    /**
+     * Gets the quote server.
+     *
+     * @return the quote server
+     */
     public String getQuoteServer() {
         return quoteServer;
     }
 
+    /**
+     * Gets the stock quotes and notify.
+     *
+     * @param stockSymbols the stock symbols
+     * @param stocksString the stocks string
+     * @return the stock quotes and notify
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void getStockQuotesAndNotify(final List<String> stockSymbols, final String stocksString) throws IOException {
         stockPricesLookupStarted();
         List<AbstractStockPrice> stockPrices = null;
@@ -622,6 +813,13 @@ public class YahooQuoteSourcePanel extends JPanel {
         }
     }
 
+    /**
+     * Gets the stock quotes.
+     *
+     * @param stockSymbols the stock symbols
+     * @return the stock quotes
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected List<AbstractStockPrice> getStockQuotes(final List<String> stockSymbols) throws IOException {
         List<AbstractStockPrice> stockPrices;
         GetYahooQuotes quoteGetter = new GetYahooQuotes();
@@ -637,6 +835,13 @@ public class YahooQuoteSourcePanel extends JPanel {
         return stockPrices;
     }
 
+    /**
+     * To stock symbols.
+     *
+     * @param stocksString the stocks string
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private List<String> toStockSymbols(String stocksString) throws IOException {
         List<String> stocks = new ArrayList<String>();
         BufferedReader reader = null;
@@ -648,7 +853,7 @@ public class YahooQuoteSourcePanel extends JPanel {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
@@ -657,16 +862,31 @@ public class YahooQuoteSourcePanel extends JPanel {
         return stocks;
     }
 
+    /**
+     * Gets the fx symbols.
+     *
+     * @return the fx symbols
+     */
     public List<AbstractStockPrice> getFxSymbols() {
         return fxSymbols;
     }
 
+    /**
+     * Gets the quote source.
+     *
+     * @return the quote source
+     */
     public DefaultQuoteSource getQuoteSource() {
         return quoteSource;
     }
 
+    /**
+     * Gets the quotes.
+     *
+     * @return the quotes
+     */
     protected void getQuotes() {
-        log.info("> getQuotes");
+        LOGGER.info("> getQuotes");
         
         updateButton.setEnabled(false);
         progressBar.setValue(0);
@@ -680,8 +900,8 @@ public class YahooQuoteSourcePanel extends JPanel {
         }
 
         text = text.trim();
-        if (log.isDebugEnabled()) {
-            log.debug("stocks=" + text);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("stocks=" + text);
         }
         if (text.length() <= 0) {
             notifyNoStockRequest();
@@ -717,7 +937,7 @@ public class YahooQuoteSourcePanel extends JPanel {
                     try {
                         getStockQuotesAndNotify(stockSymbols2, stocksString);
                     } catch (IOException e) {
-                        log.warn(e);
+                        LOGGER.warn(e);
                         exception = e;
                     }
 

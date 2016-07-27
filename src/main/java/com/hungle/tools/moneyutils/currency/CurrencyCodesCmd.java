@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.currency;
+package com.hungle.tools.moneyutils.currency;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,11 +14,19 @@ import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CurrencyCodesCmd.
+ */
 public class CurrencyCodesCmd {
-    private static final Logger log = Logger.getLogger(CurrencyCodesCmd.class);
+    
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = Logger.getLogger(CurrencyCodesCmd.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         File inFile = null;
@@ -32,8 +40,8 @@ public class CurrencyCodesCmd {
             System.out.println("Usage: java " + clz.getName() + "currencyCodes.csv currencyCodes.txt");
             System.exit(1);
         }
-        log.info("inFile=" + inFile);
-        log.info("outFile=" + outFile);
+        LOGGER.info("inFile=" + inFile);
+        LOGGER.info("outFile=" + outFile);
         CsvReader reader = null;
         PrintWriter writer = null;
         try {
@@ -65,9 +73,9 @@ public class CurrencyCodesCmd {
                 }
             }
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } finally {
-            log.info("< DONE");
+            LOGGER.info("< DONE");
             if (reader != null) {
                 try {
                     reader.close();

@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.io.IOException;
 import java.util.List;
@@ -8,8 +8,10 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
+
 public class OfxUtilsTest {
-    private static final Logger log = Logger.getLogger(OfxUtilsTest.class);
+    private static final Logger LOGGER = Logger.getLogger(OfxUtilsTest.class);
 
     @Test
     public void testNyseListConversion() throws IOException {

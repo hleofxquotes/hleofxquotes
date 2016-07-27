@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.backup;
+package com.hungle.tools.moneyutils.backup;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,18 +23,38 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.encryption.EncryptionHelper;
-import com.le.tools.moneyutils.encryption.EncryptionHelperException;
-import com.le.tools.moneyutils.ofx.quotes.StopWatch;
+import com.hungle.tools.moneyutils.encryption.EncryptionHelper;
+import com.hungle.tools.moneyutils.encryption.EncryptionHelperException;
+import com.hungle.tools.moneyutils.ofx.quotes.StopWatch;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SaveBackups.
+ */
 public class SaveBackups {
-    private static final Logger log = Logger.getLogger(SaveBackups.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(SaveBackups.class);
 
+    /**
+     * The Class BackupFile.
+     */
     private class BackupFile {
+        
+        /** The file. */
         private final File file;
+        
+        /** The last modified. */
         private final long lastModified;
+        
+        /** The calendar. */
         private final Calendar calendar;
 
+        /**
+         * Instantiates a new backup file.
+         *
+         * @param file the file
+         */
         public BackupFile(File file) {
             this.file = file;
             this.lastModified = file.lastModified();
@@ -51,25 +71,50 @@ public class SaveBackups {
             calendar.set(Calendar.DAY_OF_MONTH, day);
         }
 
+        /**
+         * Gets the file.
+         *
+         * @return the file
+         */
         public File getFile() {
             return file;
         }
 
+        /**
+         * Gets the last modified.
+         *
+         * @return the last modified
+         */
         public long getLastModified() {
             return lastModified;
         }
 
+        /**
+         * Gets the calendar.
+         *
+         * @return the calendar
+         */
         public Calendar getCalendar() {
             return calendar;
         }
 
     }
 
+    /** The backup files. */
     private Map<Calendar, BackupFile> backupFiles = new TreeMap<Calendar, BackupFile>();
     // To use 256 bit keys, you need the "unlimited strength" encryption policy
+    /** The number of bits. */
     // files from Sun.
     private int numberOfBits = 128;
 
+    /**
+     * Save backups.
+     *
+     * @param inDir the in dir
+     * @param outDir the out dir
+     * @param password the password
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void saveBackups(File inDir, File outDir, String password) throws IOException {
         File[] files = inDir.listFiles();
         for (File file : files) {
@@ -77,17 +122,17 @@ public class SaveBackups {
             Calendar calendar = backupFile.getCalendar();
             BackupFile currentBackupFile = backupFiles.get(calendar);
             if (currentBackupFile == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("New file for cal=" + calendar.getTime());
-                    log.debug("    > " + backupFile.getFile());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("New file for cal=" + calendar.getTime());
+                    LOGGER.debug("    > " + backupFile.getFile());
                 }
                 backupFiles.put(calendar, backupFile);
             } else {
                 if (backupFile.getLastModified() > currentBackupFile.getLastModified()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Newer file for cal=" + calendar.getTime());
-                        log.debug("    < " + currentBackupFile.getFile());
-                        log.debug("    > " + backupFile.getFile());
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Newer file for cal=" + calendar.getTime());
+                        LOGGER.debug("    < " + currentBackupFile.getFile());
+                        LOGGER.debug("    > " + backupFile.getFile());
                     }
                     backupFiles.put(calendar, backupFile);
                 }
@@ -97,8 +142,8 @@ public class SaveBackups {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
         for (BackupFile backupFile : backupFiles.values()) {
             String dateString = formatter.format(backupFile.getCalendar().getTime());
-            log.info("###");
-            log.info("> date=" + dateString);
+            LOGGER.info("###");
+            LOGGER.info("> date=" + dateString);
             File dir = new File(outDir, dateString);
             if (!dir.exists()) {
                 dir.mkdirs();
@@ -107,15 +152,23 @@ public class SaveBackups {
         }
     }
 
+    /**
+     * Copy file to dir.
+     *
+     * @param fromFile the from file
+     * @param toDir the to dir
+     * @param password the password
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void copyFileToDir(File fromFile, File toDir, String password) throws IOException {
         File latestFile = getLatestFile(toDir);
         if (latestFile != null) {
             BackupFile currentBackupFile = new BackupFile(latestFile);
             BackupFile backupFile = new BackupFile(fromFile);
             if (backupFile.getLastModified() <= currentBackupFile.getLastModified()) {
-                log.info("Already has latest backup file for toDir=" + toDir);
-                log.info("  currentBackupFile=" + currentBackupFile.getFile());
-                log.info("  backupFile=" + backupFile.getFile());
+                LOGGER.info("Already has latest backup file for toDir=" + toDir);
+                LOGGER.info("  currentBackupFile=" + currentBackupFile.getFile());
+                LOGGER.info("  backupFile=" + backupFile.getFile());
                 return;
             }
         }
@@ -124,16 +177,24 @@ public class SaveBackups {
         StopWatch stopWatch = new StopWatch();
 
         try {
-            log.info("> Copying");
-            log.info("  fromFile=" + fromFile);
-            log.info("  toFile=" + toFile);
+            LOGGER.info("> Copying");
+            LOGGER.info("  fromFile=" + fromFile);
+            LOGGER.info("  toFile=" + toFile);
             copyFile(fromFile, toFile, password);
         } finally {
             long delta = stopWatch.click();
-            log.info("< DONE, delta=" + delta);
+            LOGGER.info("< DONE, delta=" + delta);
         }
     }
 
+    /**
+     * Copy file.
+     *
+     * @param fromFile the from file
+     * @param toFile the to file
+     * @param password the password
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void copyFile(File fromFile, File toFile, String password) throws IOException {
         if (password == null) {
             copyFile(fromFile, toFile);
@@ -162,21 +223,44 @@ public class SaveBackups {
         }
     }
 
+    /**
+     * Compute key.
+     *
+     * @param password the password
+     * @return the secret key
+     * @throws InvalidKeySpecException the invalid key spec exception
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     */
     private SecretKey computeKey(String password) throws InvalidKeySpecException, NoSuchAlgorithmException {
         return computeKey(password, EncryptionHelper.DEFAULT_SALT_BYTES);
     }
 
+    /**
+     * Compute key.
+     *
+     * @param password the password
+     * @param salt the salt
+     * @return the secret key
+     * @throws InvalidKeySpecException the invalid key spec exception
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     */
     private SecretKey computeKey(String password, byte[] salt) throws InvalidKeySpecException, NoSuchAlgorithmException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         int iterationCount = 2048;
         int keyLength = 128;
-        log.info("keySize=" + keyLength);
+        LOGGER.info("keySize=" + keyLength);
         KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterationCount, keyLength);
         SecretKey tmp = factory.generateSecret(spec);
         SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
         return secret;
     }
 
+    /**
+     * Gets the latest file.
+     *
+     * @param toDir the to dir
+     * @return the latest file
+     */
     private File getLatestFile(File toDir) {
         File latestFile = null;
 
@@ -196,6 +280,13 @@ public class SaveBackups {
         return latestFile;
     }
 
+    /**
+     * Copy file.
+     *
+     * @param fromFile the from file
+     * @param toFile the to file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void copyFile(File fromFile, File toFile) throws IOException {
         FileChannel in = null;
         FileChannel out = null;
@@ -208,7 +299,7 @@ public class SaveBackups {
                 try {
                     out.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     out = null;
                 }
@@ -217,7 +308,7 @@ public class SaveBackups {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     in = null;
                 }

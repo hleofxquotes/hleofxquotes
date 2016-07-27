@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.stockprice;
+package com.hungle.tools.moneyutils.stockprice;
 
 import java.io.File;
 import java.io.FileReader;
@@ -12,12 +12,19 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.stockprice.CsvRow;
+import com.hungle.tools.moneyutils.stockprice.StockPriceCsvUtils;
+import com.hungle.tools.moneyutils.stockprice.FieldInfo;
+import com.hungle.tools.moneyutils.stockprice.Price;
+import com.hungle.tools.moneyutils.stockprice.StockPrice;
+
 public class StockPriceTest {
     @Test
     public void parseFromCsvFile() throws Exception {
         Reader reader = null;
         reader = new FileReader(new File("src/test/data/quotes_001.csv"));
-        List<AbstractStockPrice> stockPrices = CsvUtils.toStockPrices(reader);
+        List<AbstractStockPrice> stockPrices = StockPriceCsvUtils.toStockPrices(reader);
 
         Assert.assertNotNull(stockPrices);
         Assert.assertEquals(1, stockPrices.size());

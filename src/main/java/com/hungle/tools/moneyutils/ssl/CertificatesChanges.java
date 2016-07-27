@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ssl;
+package com.hungle.tools.moneyutils.ssl;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.security.cert.X509Certificate;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.ofx.quotes.Utils;
+import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 
 public final class CertificatesChanges implements TrustStrategy {
     private static final Logger log = Logger.getLogger(CertificatesChanges.class);

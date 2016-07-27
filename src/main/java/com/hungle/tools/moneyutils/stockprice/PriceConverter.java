@@ -1,17 +1,29 @@
-package com.le.tools.moneyutils.stockprice;
+package com.hungle.tools.moneyutils.stockprice;
 
 import org.apache.commons.beanutils.converters.AbstractConverter;
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PriceConverter.
+ */
 public class PriceConverter extends AbstractConverter {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(PriceConverter.class);
 
+    /**
+     * Instantiates a new price converter.
+     */
     public PriceConverter() {
         super(new Price(0.0));
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.commons.beanutils.converters.AbstractConverter#convertToType(java.lang.Class, java.lang.Object)
+     */
     @Override
     protected Object convertToType(@SuppressWarnings("rawtypes") Class targetType, Object value) throws Throwable {
         if (log.isDebugEnabled()) {
@@ -41,6 +53,9 @@ public class PriceConverter extends AbstractConverter {
 
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.commons.beanutils.converters.AbstractConverter#getDefaultType()
+     */
     @SuppressWarnings("rawtypes")
     @Override
     protected Class getDefaultType() {

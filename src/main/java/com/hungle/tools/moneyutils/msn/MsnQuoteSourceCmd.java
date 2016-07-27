@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.msn;
+package com.hungle.tools.moneyutils.msn;
 
 public class MsnQuoteSourceCmd {
 

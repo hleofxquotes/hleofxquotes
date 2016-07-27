@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.fi;
+package com.hungle.tools.moneyutils.fi;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -22,7 +22,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.jdesktop.swingbinding.JComboBoxBinding;
 import org.jdesktop.swingbinding.SwingBindings;
 
-import com.le.tools.moneyutils.fi.model.AccountGroup;
+import com.hungle.tools.moneyutils.fi.model.AccountGroup;
 
 /**
  * @author lobas_av
@@ -30,13 +30,13 @@ import com.le.tools.moneyutils.fi.model.AccountGroup;
  */
 public class FinancialInstitutionDialog extends JDialog {
     private static final long serialVersionUID = 1L;
-    private final com.le.tools.moneyutils.fi.model.AccountGroup m_phoneGroup;
+    private final com.hungle.tools.moneyutils.fi.model.AccountGroup m_phoneGroup;
     private final List<String> m_names;
     private JPanel m_contentPane;
     private JButton m_buttonOk;
     private JComboBox m_comboBox;
 
-    public FinancialInstitutionDialog(List<String> names, com.le.tools.moneyutils.fi.model.AccountGroup phoneGroup) {
+    public FinancialInstitutionDialog(List<String> names, com.hungle.tools.moneyutils.fi.model.AccountGroup phoneGroup) {
         m_names = names;
         m_phoneGroup = phoneGroup;
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.beansbinding;
+package com.hungle.tools.moneyutils.beansbinding;
 
 import org.apache.log4j.Logger;
 

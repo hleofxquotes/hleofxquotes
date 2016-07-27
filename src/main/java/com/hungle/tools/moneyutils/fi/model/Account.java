@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.fi.model;
+package com.hungle.tools.moneyutils.fi.model;
 
 /**
  * @author lobas_av

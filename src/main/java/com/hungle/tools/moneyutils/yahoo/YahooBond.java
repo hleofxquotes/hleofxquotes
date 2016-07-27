@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.yahoo;
+package com.hungle.tools.moneyutils.yahoo;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,9 +33,23 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class YahooBond.
+ */
 public class YahooBond {
-    private static final Logger log = Logger.getLogger(YahooBond.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(YahooBond.class);
 
+    /**
+     * Prints the document.
+     *
+     * @param doc the doc
+     * @param out the out
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws TransformerException the transformer exception
+     */
     private static void printDocument(Document doc, OutputStream out) throws IOException, TransformerException {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
@@ -48,17 +62,24 @@ public class YahooBond {
         transformer.transform(new DOMSource(doc), new StreamResult(new OutputStreamWriter(out, "UTF-8")));
     }
 
+    /**
+     * Gets the price.
+     *
+     * @param token the token
+     * @return the price
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     String getPrice(String token) throws IOException {
         String priceString = null;
 
         InputStream stream = null;
         try {
             URL url = createUrl(token);
-            log.info("url=" + url);
+            LOGGER.info("url=" + url);
             stream = url.openStream();
 
             Document document = createDocument(stream);
-            if (log.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 try {
                     printDocument(document, System.out);
                 } catch (TransformerException e1) {
@@ -78,7 +99,7 @@ public class YahooBond {
                 try {
                     stream.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     stream = null;
                 }
@@ -87,6 +108,13 @@ public class YahooBond {
         return priceString;
     }
 
+    /**
+     * Gets the price.
+     *
+     * @param document the document
+     * @return the price
+     * @throws XPathExpressionException the x path expression exception
+     */
     private String getPrice(Document document) throws XPathExpressionException {
         XPath xpath = XPathFactory.newInstance().newXPath();
 
@@ -99,8 +127,8 @@ public class YahooBond {
         nodeList = (NodeList) xpath.evaluate(expression, document, XPathConstants.NODESET);
         length = nodeList.getLength();
         List<String> keys = new ArrayList<String>();
-        if (log.isDebugEnabled()) {
-            log.debug("length=" + length);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("length=" + length);
         }
         for (int i = 0; i < length; i++) {
             Element element = (Element) nodeList.item(i);
@@ -113,8 +141,8 @@ public class YahooBond {
         nodeList = (NodeList) xpath.evaluate(expression, document, XPathConstants.NODESET);
         length = nodeList.getLength();
         List<String> values = new ArrayList<String>();
-        if (log.isDebugEnabled()) {
-            log.debug("length=" + length);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("length=" + length);
         }
         for (int i = 0; i < length; i++) {
             Element element = (Element) nodeList.item(i);
@@ -130,6 +158,13 @@ public class YahooBond {
         return price;
     }
 
+    /**
+     * Creates the document.
+     *
+     * @param stream the stream
+     * @return the document
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private Document createDocument(InputStream stream) throws IOException {
         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
@@ -146,6 +181,14 @@ public class YahooBond {
         return document;
     }
 
+    /**
+     * Creates the url.
+     *
+     * @param token the token
+     * @return the url
+     * @throws MalformedURLException the malformed URL exception
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     */
     private URL createUrl(String token) throws MalformedURLException, UnsupportedEncodingException {
         String sourceUrlString = token;
         sourceUrlString = URLEncoder.encode(sourceUrlString, "UTF-8");

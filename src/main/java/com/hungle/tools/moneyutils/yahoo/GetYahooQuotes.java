@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.yahoo;
+package com.hungle.tools.moneyutils.yahoo;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,24 +30,41 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.ofx.quotes.GetQuotesListener;
-import com.le.tools.moneyutils.ofx.quotes.GetQuotesTask;
-import com.le.tools.moneyutils.ofx.quotes.HttpUtils;
-import com.le.tools.moneyutils.ofx.quotes.OfxUtils;
-import com.le.tools.moneyutils.ofx.quotes.StopWatch;
-import com.le.tools.moneyutils.ofx.quotes.Utils;
-import com.le.tools.moneyutils.ofx.quotes.net.HttpQuoteGetter;
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.le.tools.moneyutils.stockprice.FxSymbol;
+import com.hungle.tools.moneyutils.ofx.quotes.GetQuotesListener;
+import com.hungle.tools.moneyutils.ofx.quotes.GetQuotesTask;
+import com.hungle.tools.moneyutils.ofx.quotes.HttpUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.StopWatch;
+import com.hungle.tools.moneyutils.ofx.quotes.Utils;
+import com.hungle.tools.moneyutils.ofx.quotes.net.HttpQuoteGetter;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.stockprice.FxSymbol;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GetYahooQuotes.
+ */
 public class GetYahooQuotes implements HttpQuoteGetter {
-    private static final Logger log = Logger.getLogger(GetYahooQuotes.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(GetYahooQuotes.class);
+    
+    /** The Constant DEFAULT_TIMEOUT. */
     private static final long DEFAULT_TIMEOUT = 120L;
+    
+    /** The Constant DEFAULT_BUCKET_SIZE. */
     private static final int DEFAULT_BUCKET_SIZE = 25;
+    
+    /** The Constant threadPool. */
     private static final ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
+    /** The Constant DEFAULT_SCHEME. */
     private static final String DEFAULT_SCHEME = "http";
+    
+    /** The Constant DEFAULT_HOST. */
     public static final String DEFAULT_HOST = "download.finance.yahoo.com";
+    
+    /** The Constant QUOTE_HOSTS. */
     public static final Map<String, String> QUOTE_HOSTS = new TreeMap<String, String>();
     static {
         QUOTE_HOSTS.put("US", "download.finance.yahoo.com");
@@ -73,54 +90,112 @@ public class GetYahooQuotes implements HttpQuoteGetter {
         QUOTE_HOSTS.put("UK & Ireland", "uk.finance.yahoo.com");
     }
 
+    /** The Constant DEFAULT_PORT. */
     private static final int DEFAULT_PORT = -1;
+    
+    /** The Constant DEFAULT_PATH. */
     private static final String DEFAULT_PATH = "/d/quotes.csv";
 
+    /** The scheme. */
     private String scheme = DEFAULT_SCHEME;
+    
+    /** The host. */
     private String host = DEFAULT_HOST;
+    
+    /** The port. */
     private int port = DEFAULT_PORT;
+    
+    /** The path. */
     private String path = DEFAULT_PATH;
 
+    /** The bucket size. */
     private int bucketSize = DEFAULT_BUCKET_SIZE;
+    
+    /** The time out unit. */
     private TimeUnit timeOutUnit = TimeUnit.SECONDS;
+    
+    /** The timeout. */
     private long timeout = DEFAULT_TIMEOUT;
 
+    /** The filter fx quotes. */
     private boolean filterFxQuotes = true;
+    
+    /** The fx symbols. */
     private List<AbstractStockPrice> fxSymbols;
+    
+    /** The fx file name. */
     private String fxFileName = "fx.csv";
+    
+    /** The keep fx symbols. */
     private boolean keepFxSymbols = true;
 
+    /* (non-Javadoc)
+     * @see com.le.tools.moneyutils.ofx.quotes.net.HttpQuoteGetter#httpGet(java.util.List, java.lang.String)
+     */
     @Override
     public HttpResponse httpGet(List<String> stocks, String format) throws URISyntaxException, IOException, ClientProtocolException {
         URI uri = createURI(stocks, format);
         HttpGet httpGet = new HttpGet(uri);
-        if (log.isDebugEnabled()) {
-            log.debug("uri=" + uri);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("uri=" + uri);
         }
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(httpGet);
         return response;
     }
 
+    /* (non-Javadoc)
+     * @see com.le.tools.moneyutils.ofx.quotes.net.HttpQuoteGetter#httpEntityToStockPriceBean(org.apache.http.HttpEntity, boolean)
+     */
     @Override
     public List<AbstractStockPrice> httpEntityToStockPriceBean(HttpEntity entity, boolean skipIfNoPrice) throws IOException {
         return HttpUtils.toStockPriceBean(entity, skipIfNoPrice);
     }
 
+    /**
+     * Gets the quotes.
+     *
+     * @param stocks the stocks
+     * @return the quotes
+     * @throws ClientProtocolException the client protocol exception
+     * @throws URISyntaxException the URI syntax exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public List<AbstractStockPrice> getQuotes(List<String> stocks) throws ClientProtocolException, URISyntaxException, IOException {
         GetQuotesListener listener = null;
         List<AbstractStockPrice> quotes = getQuotes(stocks, listener, true);
         return quotes;
     }
 
+    /**
+     * Gets the quotes.
+     *
+     * @param stocks the stocks
+     * @param listener the listener
+     * @return the quotes
+     * @throws ClientProtocolException the client protocol exception
+     * @throws URISyntaxException the URI syntax exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener) throws ClientProtocolException, URISyntaxException, IOException {
         List<AbstractStockPrice> quotes = getQuotes(stocks, listener, true);
         return quotes;
     }
 
+    /**
+     * Gets the quotes.
+     *
+     * @param stocks the stocks
+     * @param listener the listener
+     * @param skipNoPrice the skip no price
+     * @return the quotes
+     * @throws URISyntaxException the URI syntax exception
+     * @throws ClientProtocolException the client protocol exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener, boolean skipNoPrice) throws URISyntaxException,
             ClientProtocolException, IOException {
-        log.info("> getQuotes");
+        LOGGER.info("> getQuotes");
 
         fxSymbols = new ArrayList<AbstractStockPrice>();
 
@@ -131,7 +206,7 @@ public class GetYahooQuotes implements HttpQuoteGetter {
                 return beans;
             }
 
-            log.info("stocks.size=" + stocks.size());
+            LOGGER.info("stocks.size=" + stocks.size());
 
             if (stocks.size() <= 0) {
                 return beans;
@@ -152,26 +227,26 @@ public class GetYahooQuotes implements HttpQuoteGetter {
             try {
                 futures = threadPool.invokeAll(subTasks, timeout, timeOutUnit);
             } catch (InterruptedException e) {
-                log.error(e);
+                LOGGER.error(e);
             }
 
             if (futures == null) {
-                log.warn("Failed to invokeAll");
+                LOGGER.warn("Failed to invokeAll");
                 return beans;
             }
 
             for (Future<List<AbstractStockPrice>> future : futures) {
                 if (future.isCancelled()) {
-                    log.warn("One of the tasks was timeout.");
+                    LOGGER.warn("One of the tasks was timeout.");
                     continue;
                 }
                 try {
                     List<AbstractStockPrice> receivedFromQuoteSource = future.get();
                     addBeans(beans, receivedFromQuoteSource);
                 } catch (InterruptedException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } catch (ExecutionException e) {
-                    log.warn(e, e);
+                    LOGGER.warn(e, e);
                 }
             }
 
@@ -180,12 +255,18 @@ public class GetYahooQuotes implements HttpQuoteGetter {
             }
         } finally {
             long delta = stopWatch.click();
-            log.info("< getQuotes, delta=" + delta);
+            LOGGER.info("< getQuotes, delta=" + delta);
         }
 
         return beans;
     }
 
+    /**
+     * Adds the beans.
+     *
+     * @param beans the beans
+     * @param receivedFromQuoteSource the received from quote source
+     */
     protected void addBeans(List<AbstractStockPrice> beans, List<AbstractStockPrice> receivedFromQuoteSource) {
         List<AbstractStockPrice> filtered = receivedFromQuoteSource;
         if (filterFxQuotes) {
@@ -205,10 +286,25 @@ public class GetYahooQuotes implements HttpQuoteGetter {
         beans.addAll(filtered);
     }
 
+    /**
+     * Creates the URI.
+     *
+     * @param stocks the stocks
+     * @param format the format
+     * @return the uri
+     * @throws URISyntaxException the URI syntax exception
+     */
     protected URI createURI(List<String> stocks, String format) throws URISyntaxException {
         return URIUtils.createURI(getScheme(), getHost(), getPort(), getPath(), createQueries(stocks, format), null);
     }
 
+    /**
+     * Creates the queries.
+     *
+     * @param stocks the stocks
+     * @param format the format
+     * @return the string
+     */
     private static String createQueries(List<String> stocks, String format) {
         // http://download.finance.yahoo.com/d/quotes.csv?s=IBM&f=sl1d1t1c1ohgv&e=.csv
         // http://download.finance.yahoo.com/d/quotes.csv?s=EDL.L&f=sl1d1t1c1ohgv&e=.csv
@@ -222,38 +318,83 @@ public class GetYahooQuotes implements HttpQuoteGetter {
         return URLEncodedUtils.format(qParams, "UTF-8");
     }
 
+    /**
+     * Gets the scheme.
+     *
+     * @return the scheme
+     */
     public String getScheme() {
         return scheme;
     }
 
+    /**
+     * Gets the host.
+     *
+     * @return the host
+     */
     public String getHost() {
         return host;
     }
 
+    /**
+     * Sets the host.
+     *
+     * @param host the new host
+     */
     public void setHost(String host) {
         this.host = host;
     }
 
+    /**
+     * Gets the port.
+     *
+     * @return the port
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * Gets the path.
+     *
+     * @return the path
+     */
     public String getPath() {
         return path;
     }
 
+    /**
+     * Shutdown.
+     */
     public void shutdown() {
         threadPool.shutdown();
     }
 
+    /**
+     * Checks if is filter fx quotes.
+     *
+     * @return true, if is filter fx quotes
+     */
     public boolean isFilterFxQuotes() {
         return filterFxQuotes;
     }
 
+    /**
+     * Sets the filter fx quotes.
+     *
+     * @param filterFxQuotes the new filter fx quotes
+     */
     public void setFilterFxQuotes(boolean filterFxQuotes) {
         this.filterFxQuotes = filterFxQuotes;
     }
 
+    /**
+     * Write fx file.
+     *
+     * @param fxStockPrices the fx stock prices
+     * @param fileName the file name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void writeFxFile(List<AbstractStockPrice> fxStockPrices, String fileName) throws IOException {
         if (fxStockPrices == null) {
             return;
@@ -271,18 +412,18 @@ public class GetYahooQuotes implements HttpQuoteGetter {
         File backupFile = new File(fileName + ".bak");
         if (backupFile.exists()) {
             if (!backupFile.delete()) {
-                log.warn("Cannot delete file=" + backupFile);
+                LOGGER.warn("Cannot delete file=" + backupFile);
             }
         }
 
         File file = new File("fx.csv");
         if (file.exists()) {
             if (!file.renameTo(backupFile)) {
-                log.warn("Cannot rename from " + file + " to " + backupFile);
+                LOGGER.warn("Cannot rename from " + file + " to " + backupFile);
             }
         }
 
-        log.info("Writing fx rates to " + file);
+        LOGGER.info("Writing fx rates to " + file);
 
         PrintWriter writer = null;
         try {
@@ -309,26 +450,58 @@ public class GetYahooQuotes implements HttpQuoteGetter {
         }
     }
 
+    /**
+     * Write fx csv entry.
+     *
+     * @param writer the writer
+     * @param fxSymbol the fx symbol
+     * @param now the now
+     */
     protected void writeFxCsvEntry(PrintWriter writer, FxSymbol fxSymbol, Date now) {
         writer.println(fxSymbol.getFromCurrency() + ", " + fxSymbol.getToCurrency() + ", " + fxSymbol.getRate() + ", " + now);
     }
 
+    /**
+     * Gets the fx symbols.
+     *
+     * @return the fx symbols
+     */
     public List<AbstractStockPrice> getFxSymbols() {
         return fxSymbols;
     }
 
+    /**
+     * Gets the fx file name.
+     *
+     * @return the fx file name
+     */
     public String getFxFileName() {
         return fxFileName;
     }
 
+    /**
+     * Sets the fx file name.
+     *
+     * @param fxFileName the new fx file name
+     */
     public void setFxFileName(String fxFileName) {
         this.fxFileName = fxFileName;
     }
 
+    /**
+     * Checks if is keep fx symbols.
+     *
+     * @return true, if is keep fx symbols
+     */
     public boolean isKeepFxSymbols() {
         return keepFxSymbols;
     }
 
+    /**
+     * Sets the keep fx symbols.
+     *
+     * @param keepFxSymbols the new keep fx symbols
+     */
     public void setKeepFxSymbols(boolean keepFxSymbols) {
         this.keepFxSymbols = keepFxSymbols;
     }

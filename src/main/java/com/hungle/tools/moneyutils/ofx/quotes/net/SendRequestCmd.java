@@ -1,12 +1,12 @@
-package com.le.tools.moneyutils.ofx.quotes.net;
+package com.hungle.tools.moneyutils.ofx.quotes.net;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.fi.OfxPostClient;
-import com.le.tools.moneyutils.fi.OfxPostClientParams;
+import com.hungle.tools.moneyutils.fi.OfxPostClient;
+import com.hungle.tools.moneyutils.fi.OfxPostClientParams;
 
 public class SendRequestCmd {
     private static final Logger log = Logger.getLogger(SendRequestCmd.class);

@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.browser;
+package com.hungle.tools.moneyutils.browser;
 
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
 public class BrowserLauncher {
-    private static final Logger log = Logger.getLogger(BrowserLauncher.class);
+    private static final Logger LOGGER = Logger.getLogger(BrowserLauncher.class);
 
     private static final String[] browsers = { "google-chrome", "firefox", "opera", "epiphany", "konqueror", "conkeror", "midori", "kazehakase", "mozilla" };
     private static final String errMsg = "Error attempting to launch web browser";
@@ -61,7 +61,7 @@ public class BrowserLauncher {
                 }
             }
         } catch (Exception e) {
-            log.warn(e);
+            LOGGER.warn(e);
         }
 
         return rv;

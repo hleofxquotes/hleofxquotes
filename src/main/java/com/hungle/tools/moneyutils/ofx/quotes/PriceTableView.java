@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.awt.event.MouseListener;
 import java.util.Comparator;
@@ -11,8 +11,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.le.tools.moneyutils.stockprice.StockPrice;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.stockprice.StockPrice;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
@@ -27,19 +27,37 @@ import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PriceTableView.
+ */
 public class PriceTableView extends JScrollPane {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The popup menu. */
     private final JPopupMenu popupMenu;
 
+    /**
+     * Instantiates a new price table view.
+     *
+     * @param filterEdit the filter edit
+     * @param priceList the price list
+     */
     public PriceTableView(JTextField filterEdit, EventList<AbstractStockPrice> priceList) {
         super();
         popupMenu = new JPopupMenu();
         setViewportView(createViewportView(filterEdit, priceList));
     }
 
+    /**
+     * Creates the viewport view.
+     *
+     * @param filterEdit the filter edit
+     * @param priceList the price list
+     * @return the j table
+     */
     private JTable createViewportView(JTextField filterEdit, EventList<AbstractStockPrice> priceList) {
         Comparator<? super AbstractStockPrice> comparator = new Comparator<AbstractStockPrice>() {
             @Override
@@ -74,6 +92,16 @@ public class PriceTableView extends JScrollPane {
         // return scrolledPane;
     }
 
+    /**
+     * Creates the price table.
+     *
+     * @param priceList the price list
+     * @param comparator the comparator
+     * @param filterEdit the filter edit
+     * @param filter the filter
+     * @param addStripe the add stripe
+     * @return the j table
+     */
     private JTable createPriceTable(EventList<AbstractStockPrice> priceList, Comparator<? super AbstractStockPrice> comparator, JTextField filterEdit,
             TextFilterator<AbstractStockPrice> filter, boolean addStripe) {
         EventList<AbstractStockPrice> source = priceList;
@@ -172,6 +200,11 @@ public class PriceTableView extends JScrollPane {
         return table;
     }
 
+    /**
+     * Gets the popup menu.
+     *
+     * @return the popup menu
+     */
     public JPopupMenu getPopupMenu() {
         return popupMenu;
     }

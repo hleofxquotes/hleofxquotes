@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.beansbinding;
+package com.hungle.tools.moneyutils.beansbinding;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -33,20 +33,20 @@ import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Bindings;
 
+import com.hungle.tools.moneyutils.fi.OfxPostClient;
+import com.hungle.tools.moneyutils.fi.OfxPostClientParams;
+import com.hungle.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.Utils;
+import com.hungle.tools.moneyutils.fi.VelocityUtils;
+import com.hungle.tools.moneyutils.fi.model.bean.FiInfoBean;
+import com.hungle.tools.moneyutils.fi.model.bean.TestResult;
+import com.hungle.tools.moneyutils.fi.props.Authentication;
+import com.hungle.tools.moneyutils.fi.props.OFX;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
-import com.le.tools.moneyutils.fi.OfxPostClient;
-import com.le.tools.moneyutils.fi.OfxPostClientParams;
-import com.le.tools.moneyutils.fi.UpdateFiDir;
-import com.le.tools.moneyutils.fi.Utils;
-import com.le.tools.moneyutils.fi.VelocityUtils;
-import com.le.tools.moneyutils.fi.model.bean.FiInfoBean;
-import com.le.tools.moneyutils.fi.model.bean.TestResult;
-import com.le.tools.moneyutils.fi.props.Authentication;
-import com.le.tools.moneyutils.fi.props.OFX;
-import com.le.tools.moneyutils.fi.props.PropertiesUtils;
 
 public class FiInfoDialog extends JDialog {
     private static final long serialVersionUID = 1L;

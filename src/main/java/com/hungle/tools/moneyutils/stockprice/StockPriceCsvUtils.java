@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.stockprice;
+package com.hungle.tools.moneyutils.stockprice;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -9,16 +9,29 @@ import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
 
-public class CsvUtils {
-    private static final Logger log = Logger.getLogger(CsvUtils.class);
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CsvUtils.
+ */
+public class StockPriceCsvUtils {
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(StockPriceCsvUtils.class);
 
+    /**
+     * Parses the current record.
+     *
+     * @param reader the reader
+     * @return the abstract stock price
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static AbstractStockPrice parseCurrentRecord(final CsvReader reader) throws IOException {
-        if (log.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             int count = reader.getColumnCount();
-            log.debug("");
+            LOGGER.debug("");
             for (int i = 0; i < count; i++) {
                 String value = reader.get(i);
-                log.debug("i=" + i + ", value=" + value);
+                LOGGER.debug("i=" + i + ", value=" + value);
             }
         }
 
@@ -40,19 +53,27 @@ public class CsvUtils {
         return stockPrice;
     }
 
+    /**
+     * To stock price beans.
+     *
+     * @param reader the reader
+     * @param skipIfNoPrice the skip if no price
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static List<AbstractStockPrice> toStockPriceBeans(CsvReader reader, boolean skipIfNoPrice) throws IOException {
         List<AbstractStockPrice> beans = new ArrayList<AbstractStockPrice>();
         // reader.readHeaders();
         while (reader.readRecord()) {
             String line = reader.getRawRecord();
-            if (log.isDebugEnabled()) {
-                log.debug(line);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(line);
             }
             AbstractStockPrice bean = parseCurrentRecord(reader);
             if (bean != null) {
                 if ((bean.getLastPrice().getPrice() <= 0.0) && (skipIfNoPrice)) {
-                    if (log.isDebugEnabled()) {
-                        log.warn("SKIP: " + line);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.warn("SKIP: " + line);
                     }
                 } else {
                     if (beans != null) {
@@ -60,12 +81,20 @@ public class CsvUtils {
                     }
                 }
             } else {
-                log.warn("Cannot parse line=" + line);
+                LOGGER.warn("Cannot parse line=" + line);
             }
         }
         return beans;
     }
 
+    /**
+     * To stock prices.
+     *
+     * @param reader the reader
+     * @param skipIfNoPrice the skip if no price
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static List<AbstractStockPrice> toStockPrices(Reader reader, boolean skipIfNoPrice) throws IOException {
         List<AbstractStockPrice> stockPrices = null;
 
@@ -85,6 +114,13 @@ public class CsvUtils {
         return stockPrices;
     }
 
+    /**
+     * To stock prices.
+     *
+     * @param reader the reader
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static List<AbstractStockPrice> toStockPrices(Reader reader) throws IOException {
         boolean skipIfNoPrice = true;
         return toStockPrices(reader, skipIfNoPrice);

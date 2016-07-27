@@ -1,12 +1,18 @@
 package app;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AccountInquiryCmd.
+ */
 public class AccountInquiryCmd {
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
-        com.le.tools.moneyutils.ofx.quotes.net.CheckOfxVersion.main(args);
+        com.hungle.tools.moneyutils.ofx.quotes.net.CheckOfxVersion.main(args);
     }
 
 }

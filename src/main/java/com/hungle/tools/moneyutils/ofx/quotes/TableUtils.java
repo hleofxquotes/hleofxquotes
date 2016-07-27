@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.awt.Component;
 
@@ -7,7 +7,18 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TableUtils.
+ */
 public class TableUtils {
+    
+    /**
+     * Adjust column sizes.
+     *
+     * @param table the table
+     * @param maxWidthValues the max width values
+     */
     /*
      * This method picks good column sizes. If all column heads are wider than
      * the column's cells' contents, then you can just use
@@ -36,6 +47,12 @@ public class TableUtils {
         }
     }
 
+    /**
+     * Calculate max width values.
+     *
+     * @param values the values
+     * @return the object[]
+     */
     public static Object[] calculateMaxWidthValues(int[] values) {
         final int columns = values.length;
         final Object maxWidthValues[] = new Object[columns];

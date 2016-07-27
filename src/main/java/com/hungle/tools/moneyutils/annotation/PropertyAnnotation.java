@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.annotation;
+package com.hungle.tools.moneyutils.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

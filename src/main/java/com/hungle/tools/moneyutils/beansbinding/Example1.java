@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.beansbinding;
+package com.hungle.tools.moneyutils.beansbinding;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.misc;
+package com.hungle.tools.moneyutils.misc;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,16 +8,24 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.ofx.quotes.OfxUtils;
-import com.le.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.le.tools.moneyutils.yahoo.GetYahooQuotes;
+import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.yahoo.GetYahooQuotes;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CreateExample.
+ */
 public class CreateExample {
-    private static final Logger log = Logger.getLogger(CreateExample.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(CreateExample.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         List<String> stockNames = null;
@@ -36,14 +44,14 @@ public class CreateExample {
             try {
                 stockNames = OfxUtils.getList("dotd.txt");
             } catch (IOException e) {
-                log.warn(e);
+                LOGGER.warn(e);
                 stockNames = new ArrayList<String>();
                 stockNames.add("CRM");
             }
         }
 
         File outFile = new File(args[0]);
-        log.info("outFile=" + outFile);
+        LOGGER.info("outFile=" + outFile);
 
         GetYahooQuotes quoteGetter = new GetYahooQuotes();
         try {
@@ -52,14 +60,14 @@ public class CreateExample {
             OfxPriceInfo ofxPriceInfo = new OfxPriceInfo(stockPrices, stockPriceOffset);
             ofxPriceInfo.save(outFile);
         } catch (IOException e) {
-            log.warn(e);
+            LOGGER.warn(e);
         } catch (URISyntaxException e) {
-            log.warn(e);
+            LOGGER.warn(e);
         } finally {
             if (quoteGetter != null) {
                 quoteGetter.shutdown();
             }
-            log.info("< DONE, file=" + outFile);
+            LOGGER.info("< DONE, file=" + outFile);
         }
     }
 }

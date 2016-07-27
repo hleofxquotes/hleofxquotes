@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.jna;
+package com.hungle.tools.moneyutils.jna;
 
 import org.apache.log4j.Logger;
 
@@ -9,27 +9,50 @@ import com.sun.jna.platform.win32.WinDef.LPARAM;
 import com.sun.jna.platform.win32.WinDef.WPARAM;
 import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CheckMsMoneyWindow.
+ */
 public class CheckMsMoneyWindow {
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(Logger.class);
+
+    /**
+     * The Class CountChildWindows.
+     */
     private static final class CountChildWindows implements WNDENUMPROC {
+        
+        /** The count. */
         private int count = 0;
+        
+        /* (non-Javadoc)
+         * @see com.sun.jna.platform.win32.WinUser.WNDENUMPROC#callback(com.sun.jna.platform.win32.WinDef.HWND, com.sun.jna.Pointer)
+         */
         @Override
         public boolean callback(HWND hwnd, Pointer pointer) {
-            if (log.isDebugEnabled()) {
-                log.debug("Child window: " + hwnd);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Child window: " + hwnd);
             }
             count++;
             return true;
         }
+        
+        /**
+         * Gets the count.
+         *
+         * @return the count
+         */
         public int getCount() {
             return count;
         }
-
+    
     }
 
-    private static final Logger log = Logger.getLogger(Logger.class);
-
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         User32 user32 = User32.INSTANCE;
@@ -42,7 +65,7 @@ public class CheckMsMoneyWindow {
         className = "MSMoney Frame";
         windowName = null;
         hWnd = user32.FindWindow(className, windowName);
-        log.info("Is Money actually running? hWnd=" + hWnd);
+        LOGGER.info("Is Money actually running? hWnd=" + hWnd);
 
         
 //FindWindow(L"#32770″, "Microsoft Money") – dialog that appears when Money is not running during import.
@@ -138,7 +161,7 @@ public class CheckMsMoneyWindow {
         className = "#32770";
         windowName = "Microsoft Money";
         hWnd = user32.FindWindow(className, windowName);
-        log.info("Dialog to start MsMoney? hWnd=" + hWnd);
+        LOGGER.info("Dialog to start MsMoney? hWnd=" + hWnd);
         
         
 //        >>>> Window <<<<
@@ -198,9 +221,9 @@ public class CheckMsMoneyWindow {
             Pointer pointer = null;
             user32.EnumChildWindows(hWnd, counter, pointer);
         }
-        log.info("Children window count=" + counter.getCount());
+        LOGGER.info("Children window count=" + counter.getCount());
         if (counter.getCount() < 7) {
-            log.info("Import a file dialog? hWnd=" + hWnd);
+            LOGGER.info("Import a file dialog? hWnd=" + hWnd);
             boolean autoclick = false;
             if (autoclick) {
                 // #define WM_COMMAND 0x0111
@@ -278,9 +301,9 @@ public class CheckMsMoneyWindow {
             user32.EnumChildWindows(hWnd, counter, pointer);
 
         }
-        log.info("Children window count=" + counter.getCount());
+        LOGGER.info("Children window count=" + counter.getCount());
         if (counter.getCount() > 6) {
-            log.info("(NO ACCOUNT) Import a file dialog? hWnd=" + hWnd);
+            LOGGER.info("(NO ACCOUNT) Import a file dialog? hWnd=" + hWnd);
         }
     }
 

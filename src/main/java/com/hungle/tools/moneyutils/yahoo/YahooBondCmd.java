@@ -1,14 +1,22 @@
-package com.le.tools.moneyutils.yahoo;
+package com.hungle.tools.moneyutils.yahoo;
 
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class YahooBondCmd.
+ */
 public class YahooBondCmd {
-    private static final Logger log = Logger.getLogger(YahooBondCmd.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(YahooBondCmd.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         // http://developer.yahoo.com/yql/console
@@ -26,12 +34,12 @@ public class YahooBondCmd {
         try {
             for (String token : tokens) {
                 String price = yahooBond.getPrice(token);
-                log.info("price=" + price);
+                LOGGER.info("price=" + price);
             }
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } finally {
-            log.info("< DONE");
+            LOGGER.info("< DONE");
         }
     }
 

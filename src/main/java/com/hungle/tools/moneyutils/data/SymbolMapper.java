@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.data;
+package com.hungle.tools.moneyutils.data;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,10 +13,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
-import com.le.tools.moneyutils.ofx.quotes.SymbolMapperEntry;
 
 public class SymbolMapper {
-    private static final Logger log = Logger.getLogger(SymbolMapper.class);
+    private static final Logger LOGGER = Logger.getLogger(SymbolMapper.class);
 
     private final Map<String, List<SymbolMapperEntry>> mapByMsMoneySymbol = new HashMap<String, List<SymbolMapperEntry>>();
     private final Map<String, List<SymbolMapperEntry>> mapByQuotesSourceSymbol = new HashMap<String, List<SymbolMapperEntry>>();
@@ -42,7 +41,7 @@ public class SymbolMapper {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
@@ -51,13 +50,13 @@ public class SymbolMapper {
 
     }
 
-    void load(CsvReader csvReader) throws IOException {
+    public void load(CsvReader csvReader) throws IOException {
         SymbolMapperEntry entry;
         while (csvReader.readRecord()) {
             entry = new SymbolMapperEntry();
-            if (log.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 String line = csvReader.getRawRecord();
-                log.debug(line);
+                LOGGER.debug(line);
             }
 
             entry.load(csvReader);
@@ -189,16 +188,16 @@ public class SymbolMapper {
         SymbolMapper symbolMapper = new SymbolMapper();
         String fileName = "mapper.csv";
         File symbolMapperFile = new File(fileName);
-        log.info("Looking for mapper=" + symbolMapperFile.getAbsoluteFile().getAbsolutePath());
+        LOGGER.info("Looking for mapper=" + symbolMapperFile.getAbsoluteFile().getAbsolutePath());
         if (symbolMapperFile.exists()) {
             try {
                 symbolMapper.load(symbolMapperFile);
-                log.info("Loaded symbolMapperFile=" + symbolMapperFile);
+                LOGGER.info("Loaded symbolMapperFile=" + symbolMapperFile);
             } catch (IOException e) {
-                log.warn("Cannot load symbolMapperFile=" + symbolMapperFile);
+                LOGGER.warn("Cannot load symbolMapperFile=" + symbolMapperFile);
             }
         } else {
-            log.info("No " + fileName + " file.");
+            LOGGER.info("No " + fileName + " file.");
         }
         return symbolMapper;
     }

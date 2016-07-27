@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes.net;
+package com.hungle.tools.moneyutils.ofx.quotes.net;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -8,7 +8,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
 public interface HttpQuoteGetter {
 

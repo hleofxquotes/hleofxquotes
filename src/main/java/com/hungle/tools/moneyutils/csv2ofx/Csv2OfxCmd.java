@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.csv2ofx;
+package com.hungle.tools.moneyutils.csv2ofx;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,11 +7,19 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.apache.velocity.app.Velocity;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Csv2OfxCmd.
+ */
 public class Csv2OfxCmd {
-    private static final Logger log = Logger.getLogger(Csv2OfxCmd.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(Csv2OfxCmd.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         File csvFile = null;
@@ -31,10 +39,10 @@ public class Csv2OfxCmd {
             System.exit(1);
         }
 
-        log.info("csvFile=" + csvFile);
-        log.info("ofxFile=" + ofxFile);
+        LOGGER.info("csvFile=" + csvFile);
+        LOGGER.info("ofxFile=" + ofxFile);
         if (mapFile != null) {
-            log.info("mapFile=" + mapFile);
+            LOGGER.info("mapFile=" + mapFile);
         }
         Csv2OfxCmd.initVelocity();
 
@@ -43,14 +51,17 @@ public class Csv2OfxCmd {
         try {
             count = csv2Ofx.convert(csvFile, ofxFile, mapFile);
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } finally {
-            log.info("Parsed " + count + " transactions.");
-            log.info("ofxFile=" + ofxFile);
-            log.info("< DONE");
+            LOGGER.info("Parsed " + count + " transactions.");
+            LOGGER.info("ofxFile=" + ofxFile);
+            LOGGER.info("< DONE");
         }
     }
 
+    /**
+     * Inits the velocity.
+     */
     public static void initVelocity() {
         // org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
         // loader = null;

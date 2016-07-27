@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ssl;
+package com.hungle.tools.moneyutils.ssl;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;

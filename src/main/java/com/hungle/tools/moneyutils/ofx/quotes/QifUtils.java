@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,14 +8,27 @@ import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.le.tools.moneyutils.stockprice.Price;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.stockprice.Price;
 
 import ca.odell.glazedlists.EventList;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class QifUtils.
+ */
 public class QifUtils {
+    
+    /** The calendar. */
     private static Calendar calendar = Calendar.getInstance();
 
+    /**
+     * Save to qif.
+     *
+     * @param priceList the price list
+     * @param file the file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     static void saveToQif(EventList<AbstractStockPrice> priceList, File file) throws IOException {
         PrintWriter writer = null;
         try {
@@ -29,6 +42,12 @@ public class QifUtils {
         }
     }
 
+    /**
+     * Save to qif.
+     *
+     * @param priceList the price list
+     * @param writer the writer
+     */
     static void saveToQif(EventList<AbstractStockPrice> priceList, PrintWriter writer) {
         // !Type:Prices
         writer.println("!Type:Prices");
@@ -78,6 +97,12 @@ public class QifUtils {
         }
     }
 
+    /**
+     * To qif date string.
+     *
+     * @param date the date
+     * @return the string
+     */
     private static String toQifDateString(Date date) {
         StringBuilder sb = new StringBuilder();
 

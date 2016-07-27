@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -23,9 +23,22 @@ import java.util.List;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Utils.
+ */
 public class Utils {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(Utils.class);
 
+    /**
+     * Split to sub lists.
+     *
+     * @param stocks the stocks
+     * @param bucketSize the bucket size
+     * @return the list
+     */
     public static List<List<String>> splitToSubLists(List<String> stocks, int bucketSize) {
         List<List<String>> subLists = new ArrayList<List<String>>();
         int fromIndex = 0;
@@ -41,6 +54,12 @@ public class Utils {
         return subLists;
     }
 
+    /**
+     * Checks if is null.
+     *
+     * @param str the str
+     * @return true, if is null
+     */
     public static boolean isNull(String str) {
         if (str == null) {
             return true;
@@ -53,6 +72,16 @@ public class Utils {
         return false;
     }
 
+    /**
+     * Compare files.
+     *
+     * @param file1 the file 1
+     * @param file2 the file 2
+     * @param algorithm the algorithm
+     * @return true, if successful
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static boolean compareFiles(File file1, File file2, String algorithm) throws NoSuchAlgorithmException, IOException {
         MessageDigest md;
         byte[] digest1;
@@ -70,6 +99,14 @@ public class Utils {
         return true;
     }
 
+    /**
+     * Calculate message digest.
+     *
+     * @param md the md
+     * @param file the file
+     * @return the byte[]
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static byte[] calculateMessageDigest(MessageDigest md, File file) throws IOException {
         byte[] digest = null;
         DigestInputStream mdIn = null;
@@ -88,6 +125,13 @@ public class Utils {
         return digest;
     }
 
+    /**
+     * Copy file.
+     *
+     * @param fromFile the from file
+     * @param toFile the to file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static void copyFile(File fromFile, File toFile) throws IOException {
         BufferedReader reader = null;
         BufferedWriter writer = null;
@@ -123,6 +167,14 @@ public class Utils {
 
     }
 
+    /**
+     * Compare files.
+     *
+     * @param file1 the file 1
+     * @param file2 the file 2
+     * @return true, if successful
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static boolean compareFiles(File file1, File file2) throws IOException {
         try {
             String algorithm = null;
@@ -145,6 +197,13 @@ public class Utils {
         return true;
     }
 
+    /**
+     * Copy to file.
+     *
+     * @param url the url
+     * @param file the file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     static void copyToFile(URL url, File file) throws IOException {
         InputStream in = null;
         OutputStream out = null;
@@ -169,11 +228,24 @@ public class Utils {
         }
     }
 
+    /**
+     * Encode hex string.
+     *
+     * @param data the data
+     * @return the string
+     */
     public static String encodeHexString(byte[] data) {
         boolean decorated = true;
         return encodeHexString(data, decorated);
     }
 
+    /**
+     * Encode hex string.
+     *
+     * @param data the data
+     * @param decorated the decorated
+     * @return the string
+     */
     public static String encodeHexString(byte[] data, boolean decorated) {
         String str = Hex.encodeHexString(data);
 
@@ -196,6 +268,12 @@ public class Utils {
         return str;
     }
 
+    /**
+     * Encode hex string.
+     *
+     * @param md the md
+     * @return the string
+     */
     public static String encodeHexString(MessageDigest md) {
         return encodeHexString(md.digest());
     }

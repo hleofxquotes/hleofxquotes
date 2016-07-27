@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.statement;
+package com.hungle.tools.moneyutils.ofx.statement;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -24,7 +24,7 @@ import javax.swing.WindowConstants;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.UpdateFiDir;
 
 public class ShowErrorDialog extends JDialog {
     /**

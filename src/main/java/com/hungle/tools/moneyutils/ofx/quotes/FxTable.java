@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,13 +13,24 @@ import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class FxTable.
+ */
 public class FxTable {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(FxTable.class);
 
+    /** The entries. */
     private List<FxTableEntry> entries = new ArrayList<FxTableEntry>();
 
+    /** The rate formatter. */
     private NumberFormat rateFormatter;
 
+    /**
+     * Instantiates a new fx table.
+     */
     public FxTable() {
         super();
         this.rateFormatter = NumberFormat.getNumberInstance();
@@ -28,6 +39,13 @@ public class FxTable {
         this.rateFormatter.setMaximumFractionDigits(10);
     }
 
+    /**
+     * Gets the rate string.
+     *
+     * @param fromCurrency the from currency
+     * @param toCurrency the to currency
+     * @return the rate string
+     */
     public Double getRateString(String fromCurrency, String toCurrency) {
         if (log.isDebugEnabled()) {
             log.debug("getRateString: " + fromCurrency + ", " + toCurrency);
@@ -79,6 +97,12 @@ public class FxTable {
         return null;
     }
 
+    /**
+     * Load.
+     *
+     * @param file the file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void load(File file) throws IOException {
         Reader reader = null;
         CsvReader csvReader = null;
@@ -154,6 +178,12 @@ public class FxTable {
         }
     }
 
+    /**
+     * Checks if is null.
+     *
+     * @param str the str
+     * @return true, if is null
+     */
     private boolean isNull(String str) {
         if (str == null) {
             return true;
@@ -166,6 +196,11 @@ public class FxTable {
         return false;
     }
 
+    /**
+     * Creates the default fx table.
+     *
+     * @return the fx table
+     */
     static FxTable createDefaultFxTable() {
         FxTable fxTable = new FxTable();
         String fileName = "fx.csv";

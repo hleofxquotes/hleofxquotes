@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.yahoo;
+package com.hungle.tools.moneyutils.yahoo;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,17 +9,25 @@ import java.util.List;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.data.SymbolMapper;
-import com.le.tools.moneyutils.ofx.quotes.FxTable;
-import com.le.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
-import com.le.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
-import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.data.SymbolMapper;
+import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
+import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
+import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
+import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GetYahooHistoricalQuotesCmd.
+ */
 public class GetYahooHistoricalQuotesCmd {
-    private static final Logger log = Logger.getLogger(GetYahooHistoricalQuotesCmd.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(GetYahooHistoricalQuotesCmd.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         GetYahooHistoricalQuotes getQuotes = null;
@@ -28,7 +36,7 @@ public class GetYahooHistoricalQuotesCmd {
             getQuotes = new GetYahooHistoricalQuotes();
             List<String> stocks = new ArrayList<String>();
             stocks.add("MSFT");
-            log.info("stocks=" + stocks);
+            LOGGER.info("stocks=" + stocks);
             List<AbstractStockPrice> stockPrices = getQuotes.getQuotes(stocks);
             int i = 0;
             for (AbstractStockPrice stockPrice : stockPrices) {
@@ -42,17 +50,17 @@ public class GetYahooHistoricalQuotesCmd {
                 i++;
             }
         } catch (ClientProtocolException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } catch (URISyntaxException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } finally {
             if (getQuotes != null) {
                 getQuotes.shutdown();
                 getQuotes = null;
             }
-            log.info("< DONE");
+            LOGGER.info("< DONE");
         }
 
     }

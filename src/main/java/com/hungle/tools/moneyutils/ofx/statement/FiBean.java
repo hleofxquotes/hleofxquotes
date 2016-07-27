@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.statement;
+package com.hungle.tools.moneyutils.ofx.statement;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -17,8 +17,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import com.le.tools.moneyutils.fi.UpdateFiDir;
-import com.le.tools.moneyutils.fi.props.FIBean;
+import com.hungle.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.props.FIBean;
 
 public class FiBean {
     private static final Logger log = Logger.getLogger(FiBean.class);

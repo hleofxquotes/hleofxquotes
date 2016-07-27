@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.jna;
+package com.hungle.tools.moneyutils.jna;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -8,17 +8,30 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ImportDialogAutoClickService.
+ */
 public class ImportDialogAutoClickService {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(ImportDialogAutoClickService.class);
 
+    /** The thread pool. */
     private ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(2);
 
+    /** The enable. */
     private boolean enable;
 
+    /** The shutting down. */
     private boolean shuttingDown = false;
 
+    /** The semaphore. */
     private final Semaphore semaphore = new Semaphore(1);
 
+    /**
+     * Schedule.
+     */
     public void schedule() {
         long initialDelay = 1L;
         TimeUnit unit = TimeUnit.SECONDS;
@@ -26,6 +39,9 @@ public class ImportDialogAutoClickService {
         threadPool.scheduleAtFixedRate(new ImportDialogAutoClickTask(this), initialDelay, period, unit);
     }
 
+    /**
+     * Shutdown.
+     */
     public void shutdown() {
         log.info("> shutdown");
         this.shuttingDown = true;
@@ -69,18 +85,38 @@ public class ImportDialogAutoClickService {
         }
     }
 
+    /**
+     * Checks if is shutting down.
+     *
+     * @return true, if is shutting down
+     */
     public boolean isShuttingDown() {
         return shuttingDown;
     }
 
+    /**
+     * Checks if is enable.
+     *
+     * @return true, if is enable
+     */
     public boolean isEnable() {
         return enable;
     }
 
+    /**
+     * Sets the enable.
+     *
+     * @param enable the new enable
+     */
     public void setEnable(boolean enable) {
         this.enable = enable;
     }
 
+    /**
+     * Gets the semaphore.
+     *
+     * @return the semaphore
+     */
     public Semaphore getSemaphore() {
         return semaphore;
     }

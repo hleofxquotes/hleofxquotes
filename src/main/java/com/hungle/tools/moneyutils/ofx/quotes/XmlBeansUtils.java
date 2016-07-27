@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,18 +14,39 @@ import org.apache.xmlbeans.XmlOptions;
 
 import net.ofx.types.x2003.x04.OFX;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class XmlBeansUtils.
+ */
 public class XmlBeansUtils {
+    
+    /** The Constant SUCCESSFUL_SIGN_ON. */
     public static final String SUCCESSFUL_SIGN_ON = "Successful Sign On";
+    
+    /** The Constant DEFAULT_NAME_SPACE_VALUE. */
     private static final String DEFAULT_NAME_SPACE_VALUE = "http://ofx.net/types/2003/04";
+    
+    /** The Constant random. */
     private static final Random random = new Random();
+    
+    /** The dt as of pattern. */
     private static String dtAsOfPattern = "yyyyMMddHHmmss";
+    
+    /** The dt as of gmtf formatter. */
     private static SimpleDateFormat dtAsOfGmtfFormatter = new SimpleDateFormat(dtAsOfPattern);
+    
+    /** The dt as of local formatter. */
     private static SimpleDateFormat dtAsOfLocalFormatter = new SimpleDateFormat(dtAsOfPattern);
     static {
         Calendar cal = Calendar.getInstance(new SimpleTimeZone(0, "GMT"));
         dtAsOfGmtfFormatter.setCalendar(cal);
     }
 
+    /**
+     * Creates the xml options.
+     *
+     * @return the xml options
+     */
     public static XmlOptions createXmlOptions() {
         // on output:
         // http://wiki.apache.org/xmlbeans/XmlBeansFaq#suggestedPrefixes
@@ -54,6 +75,13 @@ public class XmlBeansUtils {
         return xmlOptions;
     }
 
+    /**
+     * Adds the key value pair.
+     *
+     * @param key the key
+     * @param value the value
+     * @param sb the sb
+     */
     public static void addKeyValuePair(String key, String value, StringBuilder sb) {
         if (sb.length() > 0) {
             sb.append(" ");
@@ -65,10 +93,20 @@ public class XmlBeansUtils {
         sb.append("\"");
     }
 
+    /**
+     * Gets the random.
+     *
+     * @return the random
+     */
     public static Random getRandom() {
         return random;
     }
 
+    /**
+     * Insert proc inst.
+     *
+     * @param ofx the ofx
+     */
     public static void insertProcInst(OFX ofx) {
         StringBuilder sb = new StringBuilder();
         String value = null;
@@ -109,11 +147,22 @@ public class XmlBeansUtils {
         }
     }
 
+    /**
+     * Gets the current date time.
+     *
+     * @return the current date time
+     */
     // return localtime
     public static String getCurrentDateTime() {
         return getCurrentDateTime(0L);
     }
 
+    /**
+     * Gets the current date time.
+     *
+     * @param offset the offset
+     * @return the current date time
+     */
     // return localtime
     public static String getCurrentDateTime(long offset) {
         Date date = null;
@@ -126,24 +175,54 @@ public class XmlBeansUtils {
         return formatLocal(date);
     }
 
+    /**
+     * Format local.
+     *
+     * @param date the date
+     * @return the string
+     */
     public static String formatLocal(Date date) {
         return dtAsOfLocalFormatter.format(date);
     }
 
+    /**
+     * Format gmt.
+     *
+     * @param date the date
+     * @return the string
+     */
     // return GMT
     public static String formatGmt(Date date) {
         return dtAsOfGmtfFormatter.format(date);
     }
 
+    /**
+     * Parses the gmt.
+     *
+     * @param gmtTime the gmt time
+     * @return the date
+     * @throws ParseException the parse exception
+     */
     // return GMT
     public static Date parseGmt(String gmtTime) throws ParseException {
         return dtAsOfGmtfFormatter.parse(gmtTime);
     }
 
+    /**
+     * Gets the dt client.
+     *
+     * @return the dt client
+     */
     public static String getDtClient() {
         return formatGmt(new Date());
     }
 
+    /**
+     * Last trade date to dt as of.
+     *
+     * @param maxLastTradeDate the max last trade date
+     * @return the string
+     */
     public static String lastTradeDateToDtAsOf(Date maxLastTradeDate) {
         // TODO Auto-generated method stub
         return null;

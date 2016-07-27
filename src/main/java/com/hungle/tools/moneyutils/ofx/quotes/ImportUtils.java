@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,9 +8,22 @@ import java.util.concurrent.Executor;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ImportUtils.
+ */
 public class ImportUtils {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(ImportUtils.class);
 
+    /**
+     * Do import.
+     *
+     * @param threadPool the thread pool
+     * @param ofxFiles the ofx files
+     * @return the int
+     */
     public static int doImport(Executor threadPool, List<File> ofxFiles) {
         if (ofxFiles == null) {
             return 0;
@@ -24,6 +37,13 @@ public class ImportUtils {
         return count;
     }
 
+    /**
+     * Do import.
+     *
+     * @param threadPool the thread pool
+     * @param ofxFile the ofx file
+     * @return true, if successful
+     */
     private static boolean doImport(Executor threadPool, File ofxFile) {
         if (ofxFile == null) {
             log.warn("No OFX output file");

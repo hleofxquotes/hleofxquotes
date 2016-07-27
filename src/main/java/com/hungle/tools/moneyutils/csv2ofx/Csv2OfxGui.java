@@ -1,4 +1,4 @@
-package com.le.tools.moneyutils.csv2ofx;
+package com.hungle.tools.moneyutils.csv2ofx;
 
 import java.awt.EventQueue;
 
@@ -6,13 +6,22 @@ import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Csv2OfxGui.
+ */
 public class Csv2OfxGui {
-    private static final Logger log = Logger.getLogger(Csv2OfxGui.class);
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = Logger.getLogger(Csv2OfxGui.class);
 
+    /** The frame. */
     private JFrame frame;
 
     /**
      * Launch the application.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -22,7 +31,7 @@ public class Csv2OfxGui {
                     Csv2OfxGui window = new Csv2OfxGui();
                     window.frame.setVisible(true);
                 } catch (Exception e) {
-                    log.error(e, e);
+                    LOGGER.error(e, e);
                 }
             }
         });
