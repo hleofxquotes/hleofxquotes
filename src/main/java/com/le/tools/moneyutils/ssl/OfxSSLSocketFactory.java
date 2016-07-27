@@ -1,0 +1,46 @@
+package com.le.tools.moneyutils.ssl;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.params.HttpParams;
+import org.apache.log4j.Logger;
+
+final class OfxSSLSocketFactory extends SSLSocketFactory {
+    private static final Logger log = Logger.getLogger(OfxSSLSocketFactory.class);
+
+    private OfxHandshakeCompletedListener handshakeCompletedListener;
+
+    OfxSSLSocketFactory(SSLContext sslContext, X509HostnameVerifier hostnameVerifier, OfxHandshakeCompletedListener handshakeCompletedListener) {
+        super(sslContext, hostnameVerifier);
+        this.handshakeCompletedListener = handshakeCompletedListener;
+    }
+
+    public OfxSSLSocketFactory(TrustStrategy ts, OfxHandshakeCompletedListener handshakeCompletedListener) throws KeyManagementException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException {
+        super(ts);
+        this.handshakeCompletedListener = handshakeCompletedListener;
+    }
+
+    @Override
+    public Socket createSocket(HttpParams params) throws IOException {
+        log.info("> createSocket");
+        Socket socket = super.createSocket(params);
+
+        SSLSocket sslSocket = (SSLSocket) socket;
+        if (handshakeCompletedListener != null) {
+            sslSocket.addHandshakeCompletedListener(handshakeCompletedListener);
+        }
+
+        return socket;
+    }
+}

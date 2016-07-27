@@ -1,0 +1,249 @@
+package com.le.tools.moneyutils.ft;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import org.apache.log4j.Logger;
+
+import com.csvreader.CsvReader;
+import com.le.tools.moneyutils.data.SymbolMapper;
+import com.le.tools.moneyutils.ofx.quotes.FxTable;
+import com.le.tools.moneyutils.ofx.xmlbeans.CurrencyUtils;
+import com.le.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
+import com.le.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
+import com.le.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.le.tools.moneyutils.stockprice.Price;
+import com.le.tools.moneyutils.stockprice.StockPrice;
+
+public abstract class AbstractCsvConverter implements CsvConverter {
+    private static final Logger log = Logger.getLogger(AbstractCsvConverter.class);
+
+    private SymbolMapper symbolMapper = new SymbolMapper();
+
+    private Locale decimalLocale = null;
+
+    private boolean useQuoteSourceShareCount = true;
+
+    private SimpleDateFormat quoteDateAndTimeFormatter = new SimpleDateFormat("MMM dd yyy HH:mm z");
+
+    private SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+    private SimpleDateFormat lastTradeTimeFormatter = new SimpleDateFormat("hh:mm");
+
+    public AbstractCsvConverter() {
+        super();
+    }
+
+    public List<AbstractStockPrice> convert(File fromFile) throws IOException {
+        File toFile = null;
+        boolean forceGeneratingINVTRANLIST = false;
+        return convert(fromFile, forceGeneratingINVTRANLIST, toFile);
+    }
+
+    public List<AbstractStockPrice> convert(File inFile, boolean forceGeneratingINVTRANLIST, File outFile) throws IOException {
+        List<AbstractStockPrice> beans = new ArrayList<AbstractStockPrice>();
+        CsvReader csvReader = null;
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(inFile));
+            csvReader = new CsvReader(reader);
+            log.info("Reading from inFile=" + inFile);
+            csvReader.readHeaders();
+            while (csvReader.readRecord()) {
+                if (log.isDebugEnabled()) {
+                    String line = csvReader.getRawRecord();
+                    log.debug(line);
+                }
+                StockPrice bean = null;
+                try {
+                    bean = convert(csvReader);
+                    if (bean != null) {
+                        beans.add(bean);
+                    }
+                } catch (Exception e) {
+                    log.warn(e);
+                }
+            }
+            if (outFile != null) {
+                log.info("Writing to outFile=" + outFile);
+                String defaultCurrency = CurrencyUtils.getDefaultCurrency();
+                OfxSaveParameter params = new OfxSaveParameter();
+                params.setDefaultCurrency(defaultCurrency);
+                params.setForceGeneratingINVTRANLIST(forceGeneratingINVTRANLIST);
+                Integer dateOffset = 0;
+                params.setDateOffset(dateOffset);
+                FxTable fxTable = new FxTable();
+                OfxPriceInfo.save(beans, outFile, params, this.symbolMapper, fxTable);
+            }
+        } finally {
+            if (csvReader != null) {
+                try {
+                    csvReader.close();
+                } finally {
+                    csvReader = null;
+                }
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } finally {
+                    reader = null;
+                }
+            }
+        }
+        return beans;
+    }
+
+    public boolean isNull(String str) {
+        if (str == null) {
+            return true;
+        }
+
+        if (str.length() <= 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public StockPrice convert(CsvReader csvReader) throws IOException {
+        StockPrice stockPrice = new StockPrice();
+    
+        try {
+            setStockName(csvReader, stockPrice);
+    
+            setStockSymbol(csvReader, stockPrice);
+    
+            setLastPrice(csvReader, stockPrice);
+    
+            setLastTrade(csvReader, stockPrice);
+            
+            setCurrency(csvReader, stockPrice);
+    
+            setUnits(csvReader, stockPrice);
+        } finally {
+            if (isNull(stockPrice.getStockName())) {
+                stockPrice.setStockName(stockPrice.getStockSymbol());
+            }
+            stockPrice.calculateSecType();
+            stockPrice.updateLastPriceCurrency();
+        }
+    
+        return stockPrice;
+    }
+
+    protected void setStockName(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+        String stockName = csvReader.get(columnName);
+        if (log.isDebugEnabled()) {
+            log.debug(columnName + ": " + stockName);
+        }
+        if (isNull(stockName)) {
+            throw new IOException("SKIP: invalid name=" + stockName);
+        }
+        stockPrice.setStockName(stockName);
+    }
+
+    protected void setStockSymbol(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+        String stockSymbol = csvReader.get(columnName);
+        if (log.isDebugEnabled()) {
+            log.debug(columnName + ": " + stockSymbol);
+        }
+        if (isNull(stockSymbol)) {
+            throw new IOException("SKIP: invalid symbolExchange=" + stockSymbol + ", name=" + stockPrice.getStockName());
+        }
+        stockPrice.setStockSymbol(stockSymbol);
+    }
+
+    protected void setLastPrice(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+        String lastPrice = csvReader.get(columnName);
+        if (log.isDebugEnabled()) {
+            log.debug(columnName + ": " + lastPrice);
+        }
+        if (isNull(lastPrice)) {
+            throw new IOException("SKIP: no price for " + stockPrice.getStockSymbol());
+        }
+        NumberFormat formatter = null;
+        if (decimalLocale != null) {
+            formatter = NumberFormat.getNumberInstance(decimalLocale);
+        } else {
+            formatter = NumberFormat.getNumberInstance();
+        }
+        Number number = null;
+        try {
+            number = formatter.parse(lastPrice);
+            if (log.isDebugEnabled()) {
+                log.debug("lastPrice number=" + number);
+            }
+        } catch (ParseException e) {
+            throw new IOException(e);
+        }
+        Price price = new Price(number.doubleValue());
+        stockPrice.setLastPrice(price);
+    }
+
+    protected void setLastTrade(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+        String quoteDateAndTime = csvReader.get(columnName);
+        if (log.isDebugEnabled()) {
+            log.debug(columnName + ": " + quoteDateAndTime);
+        }
+        if (!isNull(quoteDateAndTime)) {
+            try {
+                Date date = quoteDateAndTimeFormatter.parse(quoteDateAndTime);
+                stockPrice.setLastTradeDate(lastTradeDateFormatter.format(date));
+                stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(date));
+                stockPrice.setLastTrade(date);
+            } catch (ParseException e) {
+                log.warn(e);
+            }
+        }
+
+    }
+
+    protected void setCurrency(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+        String currency = csvReader.get(columnName);
+        if (log.isDebugEnabled()) {
+            log.debug(columnName + ": " + currency);
+        }
+        stockPrice.setCurrency(currency);
+    }
+
+    protected void setUnits(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+        if (useQuoteSourceShareCount) {
+            String quantity = csvReader.get(columnName);
+            if (log.isDebugEnabled()) {
+                log.debug(columnName + ": " + quantity);
+            }
+            if (!isNull(quantity)) {
+                Double units;
+                try {
+                    units = Double.valueOf(quantity);
+                    stockPrice.setUnits(units);
+                } catch (NumberFormatException e) {
+                    log.warn("Cannot convert quantity=" + quantity);
+                }
+            }
+        } else {
+            stockPrice.setUnits(0.0);
+        }
+    }
+
+    public Locale getDecimalLocale() {
+        return decimalLocale;
+    }
+
+    public void setDecimalLocale(Locale decimalLocale) {
+        this.decimalLocale = decimalLocale;
+    }
+
+    public void setUseQuoteSourceShareCount(boolean useQuoteSourceShareCount) {
+        this.useQuoteSourceShareCount = useQuoteSourceShareCount;
+    }
+}

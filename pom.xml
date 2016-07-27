@@ -1,0 +1,248 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.le.tools.moneyutils</groupId>
+  <artifactId>hleOfxQuotes</artifactId>
+  <name>hleOfxQuotes</name>
+  <version>0.0.3-SNAPSHOT</version>
+  <description>hleOfxQuotes</description>
+  <url>http://code.google.com/p/hle-ofx-quotes/</url>
+  <issueManagement>
+    <url>http://code.google.com/p/hle-ofx-quotes/issues/list</url>
+  </issueManagement>
+  <inceptionYear>2008</inceptionYear>
+  <scm>
+    <connection>scm:svn:http://192.168.1.161/svn/repo1/hle/com.le.tools.moneyutils/trunk</connection>
+  </scm>
+  <organization>
+    <url>http://code.google.com/p/hle-ofx-quotes/</url>
+  </organization>
+  <build>
+    <defaultGoal>compile</defaultGoal>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <excludes>
+            <exclude>**/ca/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <!-- <plugin> -->
+      <!-- <groupId>org.codehaus.mojo</groupId> -->
+      <!-- <artifactId>build-helper-maven-plugin</artifactId> -->
+      <!-- <version>1.6</version> -->
+      <!-- <executions> -->
+      <!-- <execution> -->
+      <!-- <id>add-source</id> -->
+      <!-- <phase>generate-sources</phase> -->
+      <!-- <goals> -->
+      <!-- <goal>add-source</goal> -->
+      <!-- </goals> -->
+      <!-- <configuration> -->
+      <!-- <sources> -->
+      <!-- <source>xmlbeans/src/generated/java</source> -->
+      <!-- </sources> -->
+      <!-- </configuration> -->
+      <!-- </execution> -->
+      <!-- </executions> -->
+      <!-- </plugin> -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2.1</version>
+        <configuration>
+          <finalName>${project.artifactId}-Build_${buildNumber}-app</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+          <archive>
+            <index>true</index>
+            <manifest>
+              <mainClass>app.GUI</mainClass>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <Implementation-Build>${project.artifactId}-Build_${buildNumber}-app</Implementation-Build>
+            </manifestEntries>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id> <!-- this is used for inheritance merges -->
+            <phase>package</phase> <!-- bind to the packaging phase -->
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <format>{0,date,yyyyMMdd}_{1,number}</format>
+          <items>
+            <item>timestamp</item>
+            <item>buildNumber0</item>
+          </items>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <id>mandubian-mvn</id>
+      <url>http://mandubian-mvn.googlecode.com/svn/trunk/mandubian-mvn/repository</url>
+    </repository>
+    <!-- http://download.java.net/maven/2/ beansbinding -->
+    <repository>
+      <id>maven2-repository.sunriise</id>
+      <name>sunriise Repository for Maven</name>
+      <url>http://sunriise.sourceforge.net/m2-repo/</url>
+    </repository>
+    <!-- <repository> <id>maven2-jna</id> <url>https://maven.atlassian.com/content/repositories/atlassian-3rdparty/</url> </repository> -->
+    <repository>
+      <id>maven2-repository.dev.java.net</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2/</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.7</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.13</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.javacsv</groupId>
+      <artifactId>javacsv</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.glazedlists</groupId>
+      <artifactId>glazedlists_java15</artifactId>
+      <version>1.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.7</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+<!--     <dependency> -->
+<!--       <groupId>com.google.gdata</groupId> -->
+<!--       <artifactId>gdata-finance-2.0</artifactId> -->
+<!--       <version>1.41.5</version> -->
+<!--     </dependency> -->
+    <dependency>
+      <groupId>com.jgoodies</groupId>
+      <artifactId>forms</artifactId>
+      <version>1.2.1</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jdesktop</groupId>
+      <artifactId>beansbinding</artifactId>
+      <version>1.2.1</version>
+    </dependency>
+    <!-- <dependency> <groupId>it.tidalwave.betterbeansbinding</groupId> <artifactId>betterbeansbinding-core</artifactId> <version>1.3.0</version> <type>jar</type> 
+      <scope>compile</scope> </dependency> <dependency> <groupId>it.tidalwave.betterbeansbinding</groupId> <artifactId>betterbeansbinding-swingbinding</artifactId> <version>1.3.0</version> 
+      <type>jar</type> <scope>compile</scope> </dependency> -->
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.4</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+<!--
+    <dependency>
+      <groupId>com.le.tools</groupId>
+      <artifactId>ofx</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+-->
+<!-- https://mvnrepository.com/artifact/org.aspectj/aspectjrt -->
+<dependency>
+    <groupId>org.aspectj</groupId>
+    <artifactId>aspectjrt</artifactId>
+    <version>1.8.9</version>
+</dependency>
+
+    <dependency>
+<groupId>com.hungle.tools</groupId>
+  <artifactId>ofx</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.swinglabs</groupId>
+      <artifactId>swingx</artifactId>
+      <version>1.6.1</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>3.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>3.4.0</version>
+      <classifier>platform</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.1.2</version>
+    </dependency>
+    <dependency>
+    <groupId>com.googlecode.java-diff-utils</groupId>
+    <artifactId>diffutils</artifactId>
+    <version>1.2.1</version>
+</dependency>
+    <dependency>
+    	<groupId>com.fifesoft</groupId>
+    	<artifactId>rsyntaxtextarea</artifactId>
+    	<version>2.0.2</version>
+    </dependency>
+  </dependencies>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+</project>
