@@ -10,7 +10,7 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.log4j.Logger;
 
 class OfxHandshakeCompletedListener implements HandshakeCompletedListener {
-    private static final Logger log = Logger.getLogger(OfxHandshakeCompletedListener.class);
+    private static final Logger LOGGER = Logger.getLogger(OfxHandshakeCompletedListener.class);
 
     private final TrustStrategy trustStrategy;
 
@@ -39,17 +39,17 @@ class OfxHandshakeCompletedListener implements HandshakeCompletedListener {
     @Override
     public void handshakeCompleted(HandshakeCompletedEvent event) {
         setHandshakeException(null);
-        log.info("> handshakeCompleted 1");
-        log.info("getCipherSuite=" + event.getCipherSuite());
-        log.info("getPeerHost=" + event.getSession().getPeerHost());
+        LOGGER.info("> handshakeCompleted 1");
+        LOGGER.info("getCipherSuite=" + event.getCipherSuite());
+        LOGGER.info("getPeerHost=" + event.getSession().getPeerHost());
 
         javax.security.cert.X509Certificate[] chains;
         try {
             chains = event.getPeerCertificateChain();
-            log.info("PeerCertificateChain: " + chains.length);
+            LOGGER.info("PeerCertificateChain: " + chains.length);
             int count = 0;
             for (X509Certificate chain : chains) {
-                log.info("  [" + count + "], getSigAlgName=" + chain.getSigAlgName());
+                LOGGER.info("  [" + count + "], getSigAlgName=" + chain.getSigAlgName());
                 count++;
             }
 
@@ -63,8 +63,8 @@ class OfxHandshakeCompletedListener implements HandshakeCompletedListener {
             }
         } catch (Exception e) {
             setHandshakeException(e);
-            if (log.isDebugEnabled()) {
-                log.warn(e, e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.warn(e, e);
             }
         } finally {
             latch.countDown();

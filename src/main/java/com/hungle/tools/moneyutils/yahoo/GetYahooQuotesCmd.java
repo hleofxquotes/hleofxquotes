@@ -9,11 +9,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.data.SymbolMapper;
-import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
-import com.hungle.tools.moneyutils.ofx.xmlbeans.CurrencyUtils;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
-import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
 // TODO: Auto-generated Javadoc

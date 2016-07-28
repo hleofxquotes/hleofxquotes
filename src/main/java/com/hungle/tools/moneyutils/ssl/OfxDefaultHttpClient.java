@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import com.hungle.tools.moneyutils.fi.OfxPostClientParams;
 
 public class OfxDefaultHttpClient extends DefaultHttpClient {
-    private static final Logger log = Logger.getLogger(OfxDefaultHttpClient.class);
+    private static final Logger LOGGER = Logger.getLogger(OfxDefaultHttpClient.class);
 
     private OfxHandshakeCompletedListener handshakeCompletedListener;
 
@@ -46,7 +46,7 @@ public class OfxDefaultHttpClient extends DefaultHttpClient {
         if (!allowTrustStrategy) {
             trustStrategy = null;
         }
-        log.info("trustStrategy=" + trustStrategy);
+        LOGGER.info("trustStrategy=" + trustStrategy);
 
         // See also: http://www.imperialviolet.org/2011/05/04/pinning.html
         final OfxHandshakeCompletedListener handshakeCompletedListener = new OfxHandshakeCompletedListener(trustStrategy);
@@ -59,9 +59,9 @@ public class OfxDefaultHttpClient extends DefaultHttpClient {
         // now if we need to allow ANY certificate, do that here by re-wrapping the current client with a new one that 
         // will allow all certificates.
         boolean acceptAnySslCertificate = params.getHttpProperties().isAcceptAnySslCertificate();
-        log.info("acceptAnySslCertificate=" + acceptAnySslCertificate);
+        LOGGER.info("acceptAnySslCertificate=" + acceptAnySslCertificate);
         if (acceptAnySslCertificate) {
-            log.warn("SSL: skipping server certificate check in SSL Handshake!!!");
+            LOGGER.warn("SSL: skipping server certificate check in SSL Handshake!!!");
             try {
                 httpClient = OfxDefaultHttpClient.wrapToAllowAllClient(httpClient);
             } catch (KeyManagementException e) {

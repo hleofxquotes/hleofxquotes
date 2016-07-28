@@ -26,7 +26,7 @@ import javax.security.cert.X509Certificate;
 import org.apache.log4j.Logger;
 
 public class SimpleSSLConnectionCmd {
-    private static final Logger log = Logger.getLogger(SimpleSSLConnectionCmd.class);
+    private static final Logger LOGGER = Logger.getLogger(SimpleSSLConnectionCmd.class);
 
     public static final String TLS = "TLS";
 
@@ -44,7 +44,7 @@ public class SimpleSSLConnectionCmd {
 
                 SSLContext sslContext = createDefaultSSLContext();
 
-                log.info("sslContext=" + sslContext);
+                LOGGER.info("sslContext=" + sslContext);
 
                 if (sslContext != null) {
                     socketFactory = sslContext.getSocketFactory();
@@ -58,23 +58,23 @@ public class SimpleSSLConnectionCmd {
                 HandshakeCompletedListener listener = new HandshakeCompletedListener() {
                     @Override
                     public void handshakeCompleted(HandshakeCompletedEvent event) {
-                        log.info("> handshakeCompleted");
-                        log.info("getCipherSuite=" + event.getCipherSuite());
+                        LOGGER.info("> handshakeCompleted");
+                        LOGGER.info("getCipherSuite=" + event.getCipherSuite());
                         X509Certificate[] chains;
                         try {
                             chains = event.getPeerCertificateChain();
-                            log.info("PeerCertificateChain: " + chains.length);
+                            LOGGER.info("PeerCertificateChain: " + chains.length);
                             for (X509Certificate chain : chains) {
-                                log.info("getSigAlgName=" + chain.getSigAlgName());
+                                LOGGER.info("getSigAlgName=" + chain.getSigAlgName());
                             }
                         } catch (SSLPeerUnverifiedException e) {
-                            log.error(e, e);
+                            LOGGER.error(e, e);
                         }
                     }
                 };
                 socket.addHandshakeCompletedListener(listener);
 
-                log.info("hostname=" + hostname);
+                LOGGER.info("hostname=" + hostname);
                 socket.startHandshake();
             } finally {
                 if (socket != null) {
@@ -82,7 +82,7 @@ public class SimpleSSLConnectionCmd {
                 }
             }
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         }
     }
 
@@ -106,7 +106,7 @@ public class SimpleSSLConnectionCmd {
         tmfactory.init(truststore);
         TrustManager[] trustmanagers = tmfactory.getTrustManagers();
 
-        log.info("trustmanagers: " + trustmanagers.length);
+        LOGGER.info("trustmanagers: " + trustmanagers.length);
         // add a custom TrustManager
         TrustManager[] newTrustmanagers = new TrustManager[trustmanagers.length + 1];
         for (int i = 0; i < trustmanagers.length; i++) {
@@ -115,17 +115,17 @@ public class SimpleSSLConnectionCmd {
         newTrustmanagers[newTrustmanagers.length - 1] = new X509TrustManager() {
             @Override
             public void checkClientTrusted(java.security.cert.X509Certificate[] ax509certificate, String s) throws CertificateException {
-                log.info("checkClientTrusted");
+                LOGGER.info("checkClientTrusted");
             }
 
             @Override
             public void checkServerTrusted(java.security.cert.X509Certificate[] ax509certificate, String s) throws CertificateException {
-                log.info("checkServerTrusted");
+                LOGGER.info("checkServerTrusted");
             }
 
             @Override
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                log.info("getAcceptedIssuers");
+                LOGGER.info("getAcceptedIssuers");
                 return null;
             }
             

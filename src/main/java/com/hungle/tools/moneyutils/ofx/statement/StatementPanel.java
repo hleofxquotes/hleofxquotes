@@ -81,12 +81,14 @@ import ca.odell.glazedlists.ObservableElementList;
 import ca.odell.glazedlists.ObservableElementList.Connector;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TextFilterator;
+import ca.odell.glazedlists.TransformedList;
 import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.impl.beans.BeanTableFormat;
 import ca.odell.glazedlists.matchers.MatcherEditor;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 import difflib.Delta;
@@ -99,7 +101,7 @@ public class StatementPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(StatementPanel.class);
+    private static final Logger LOGGER = Logger.getLogger(StatementPanel.class);
 
     // private JButton downloadAllButton;
     // private JButton downloadSelectedButton;
@@ -107,7 +109,7 @@ public class StatementPanel extends JPanel {
     // private JButton importSelectedButton;
     // private JScrollPane scrollPane;
     private EventList<FiBean> fiBeans = new BasicEventList<FiBean>();
-    private EventSelectionModel<FiBean> fiBeansSelectionModel;
+    private DefaultEventSelectionModel<FiBean> fiBeansSelectionModel;
     private final Executor threadPool = Executors.newCachedThreadPool();
     private JTable table;
 
@@ -186,7 +188,7 @@ public class StatementPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            log.info("> saving " + fiPropertiesFile);
+            LOGGER.info("> saving " + fiPropertiesFile);
 
             JTextArea textArea = fiPropertiesTextArea;
             if (textArea == null) {
@@ -211,27 +213,27 @@ public class StatementPanel extends JPanel {
                             UpdateFiDir updater = new UpdateFiDir(d);
                             refreshBean(bean, updater);
                         } catch (IOException e) {
-                            log.error(e, e);
+                            LOGGER.error(e, e);
                         } finally {
                         }
                     }
                 };
                 SwingUtilities.invokeLater(doRun);
             } catch (IOException e) {
-                log.error(e);
+                LOGGER.error(e);
             } finally {
                 if (writer != null) {
                     try {
                         writer.close();
                     } catch (IOException e) {
-                        log.warn(e);
+                        LOGGER.warn(e);
                     } finally {
                         writer = null;
                     }
                 }
                 JOptionPane.showMessageDialog(StatementPanel.this, "File:\n" + fiPropertiesFile.getAbsolutePath() + " is saved.", "File saved",
                         JOptionPane.PLAIN_MESSAGE);
-                log.info("< DONE saving " + fiPropertiesFile);
+                LOGGER.info("< DONE saving " + fiPropertiesFile);
             }
         }
     }
@@ -252,7 +254,7 @@ public class StatementPanel extends JPanel {
                 for (FiBean fiBean : fiBeans) {
                     if (progressMonitor != null) {
                         if (progressMonitor.isCanceled()) {
-                            log.info("User cancels before full completion.");
+                            LOGGER.info("User cancels before full completion.");
                             break;
                         }
                     }
@@ -272,13 +274,13 @@ public class StatementPanel extends JPanel {
 
                     Exception exception = null;
                     boolean skip = false;
-                    log.info("> START updating fi=" + fiBean.getName());
+                    LOGGER.info("> START updating fi=" + fiBean.getName());
                     try {
                         fiBean.setStatus("START");
                         fiBean.setException(exception);
                         skip = !fiBean.getUpdater().update();
                     } catch (Exception e) {
-                        log.error(e);
+                        LOGGER.error(e);
                         exception = e;
                     } finally {
                         fiBean.setException(exception);
@@ -300,7 +302,7 @@ public class StatementPanel extends JPanel {
                         }
                         fiBean.setDownloaded(true);
 
-                        log.info("< DONE updating fi=" + fiBean.getName());
+                        LOGGER.info("< DONE updating fi=" + fiBean.getName());
                     }
                     i++;
                 }
@@ -376,9 +378,9 @@ public class StatementPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                log.info("> Save Certificates: " + detailsForBean.getFiUrl());
+                LOGGER.info("> Save Certificates: " + detailsForBean.getFiUrl());
                 if (detailsForBean == null) {
-                    log.warn("detailsForBean is null.");
+                    LOGGER.warn("detailsForBean is null.");
                     return;
                 }
 
@@ -407,8 +409,8 @@ public class StatementPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                log.info("###");
-                log.info("> Show Diffs: " + detailsForBean.getFiUrl());
+                LOGGER.info("###");
+                LOGGER.info("> Show Diffs: " + detailsForBean.getFiUrl());
                 if (detailsForBean == null) {
                     return;
                 }
@@ -419,9 +421,9 @@ public class StatementPanel extends JPanel {
                 try {
                     List<String> original = fileToLines(savedCertificates.getAbsolutePath());
                     List<String> revised = fileToLines(currentCertificates.getAbsolutePath());
-                    Patch patch = DiffUtils.diff(original, revised);
-                    for (Delta delta: patch.getDeltas()) {
-                        log.info(delta);
+                    Patch<String> patch = DiffUtils.diff(original, revised);
+                    for (Delta<?> delta: patch.getDeltas()) {
+                        LOGGER.info(delta);
                     }
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(StatementPanel.this, e.toString(), "Error generating diff for SSL Certificates", JOptionPane.ERROR_MESSAGE);
@@ -555,7 +557,7 @@ public class StatementPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                log.info("> format responseFile=" + responseFile);
+                LOGGER.info("> format responseFile=" + responseFile);
 
                 File formatter = new File("tools/OFXFormatter/OFX Formatter.exe");
                 if (!formatter.exists()) {
@@ -563,7 +565,7 @@ public class StatementPanel extends JPanel {
                     return;
                 }
                 formatter = formatter.getAbsoluteFile();
-                log.info("Has formmatter=" + formatter.getAbsolutePath());
+                LOGGER.info("Has formmatter=" + formatter.getAbsolutePath());
 
                 try {
                     List<String> command = new ArrayList<String>();
@@ -578,15 +580,15 @@ public class StatementPanel extends JPanel {
                     final InputStream stderr = process.getErrorStream();
                     threadPool.execute(new StreamConsumer(stderr, "stderr"));
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("pre proc.waitFor()");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("pre proc.waitFor()");
                     }
                     int status = process.waitFor();
                     if (status != 0) {
-                        log.warn("Formatter command failed with exit status=" + status);
-                        log.warn("  command=" + command);
+                        LOGGER.warn("Formatter command failed with exit status=" + status);
+                        LOGGER.warn("  command=" + command);
                     } else {
-                        log.info("Formatter command OK with exit status=" + status);
+                        LOGGER.info("Formatter command OK with exit status=" + status);
 
                         File file = new File(responseFile.getParentFile(), "resp.tab");
                         // setText(fiResponseTextArea, file);
@@ -595,13 +597,13 @@ public class StatementPanel extends JPanel {
                             in = new BufferedReader(new FileReader(file));
                             fiResponseTextArea.read(in, "resp.tab");
                         } catch (IOException e) {
-                            log.error(e);
+                            LOGGER.error(e);
                         } finally {
                             if (in != null) {
                                 try {
                                     in.close();
                                 } catch (IOException e) {
-                                    log.warn(e);
+                                    LOGGER.warn(e);
                                 } finally {
                                     in = null;
                                 }
@@ -609,9 +611,9 @@ public class StatementPanel extends JPanel {
                         }
                     }
                 } catch (IOException e) {
-                    log.error(e);
+                    LOGGER.error(e);
                 } catch (InterruptedException e) {
-                    log.error(e);
+                    LOGGER.error(e);
                 }
             }
         });
@@ -867,7 +869,7 @@ public class StatementPanel extends JPanel {
                             refreshBean(bean, updater);
                             fiBeans.add(bean);
                         } catch (IOException e) {
-                            log.error(e);
+                            LOGGER.error(e);
                             bean = null;
                         }
                     }
@@ -908,10 +910,10 @@ public class StatementPanel extends JPanel {
         // TODO_FI
 //        File topDir = new File("fi");
         File topDir = getFiDir();
-        log.info("> Loading fiDir=" + topDir);
+        LOGGER.info("> Loading fiDir=" + topDir);
         
         if (!topDir.isDirectory()) {
-            log.warn("Not a directory topDir=" + topDir);
+            LOGGER.warn("Not a directory topDir=" + topDir);
             return updaters;
         }
 
@@ -949,7 +951,7 @@ public class StatementPanel extends JPanel {
     }
 
     private void updateStarted(final EventList<FiBean> fiBeans, final ProgressMonitor progressMonitor) {
-        log.info("> updateStarted");
+        LOGGER.info("> updateStarted");
         Runnable doRun = new Runnable() {
 
             @Override
@@ -969,7 +971,7 @@ public class StatementPanel extends JPanel {
     }
 
     private void updateCompleted(final EventList<FiBean> fiBeans, final ProgressMonitor progressMonitor) {
-        log.info("> updateCompleted");
+        LOGGER.info("> updateCompleted");
         Runnable doRun = new Runnable() {
 
             @Override
@@ -1003,19 +1005,19 @@ public class StatementPanel extends JPanel {
 
     protected void setRecursiveEnabled(Container root, boolean enable) {
         Component children[] = root.getComponents();
-        if (log.isDebugEnabled()) {
-            log.debug(children.length);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(children.length);
         }
         for (int i = 0; i < children.length; i++) {
-            if (log.isDebugEnabled()) {
-                log.debug(children[i].getClass().getName());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(children[i].getClass().getName());
             }
             if (children[i] instanceof Container) {
                 setRecursiveEnabled((Container) children[i], enable);
                 children[i].setEnabled(enable);
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(children[i] + ", " + enable);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(children[i] + ", " + enable);
                 }
                 children[i].setEnabled(enable);
             }
@@ -1031,8 +1033,8 @@ public class StatementPanel extends JPanel {
             public void run() {
                 try {
                     for (FiBean fiBean : fiBeans) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("> START importing fi=" + fiBean.getName());
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("> START importing fi=" + fiBean.getName());
                         }
                         try {
                             String status = fiBean.getStatus();
@@ -1046,15 +1048,15 @@ public class StatementPanel extends JPanel {
                                     files.add(respFile);
                                     int count = ImportUtils.doImport(threadPool, files);
                                     if (count != files.size()) {
-                                        log.warn("Last import failed");
+                                        LOGGER.warn("Last import failed");
                                     } else {
                                         fiBean.setLastImported(new Date());
                                     }
                                 }
                             }
                         } finally {
-                            if (log.isDebugEnabled()) {
-                                log.debug("< DONE importing fi=" + fiBean.getName());
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("< DONE importing fi=" + fiBean.getName());
                             }
                         }
                     }
@@ -1093,14 +1095,15 @@ public class StatementPanel extends JPanel {
         String propertyNames[] = { "name", "status", "lastDownloaded", "lastImported" };
         String columnLabels[] = { "Name", "Status", "Last Downloaded", "Last Imported" };
         AdvancedTableFormat tableFormat = new BeanTableFormat(beanClass, propertyNames, columnLabels);
-        final EventTableModel<FiBean> tableModel = new EventTableModel<FiBean>(source, tableFormat);
+        final TransformedList<FiBean, FiBean> sourceProxyList = GlazedListsSwing.swingThreadProxyList(source);
+        final DefaultEventTableModel<FiBean> tableModel = new DefaultEventTableModel<FiBean>(sourceProxyList, tableFormat);
         JTable table = new JTable(tableModel);
 
         if (sortedList != null) {
             TableComparatorChooser tableSorter = TableComparatorChooser.install(table, sortedList, AbstractTableComparatorChooser.SINGLE_COLUMN);
         }
 
-        fiBeansSelectionModel = new EventSelectionModel(source);
+        fiBeansSelectionModel = new DefaultEventSelectionModel(source);
         ListSelectionListener listener = new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -1113,8 +1116,8 @@ public class StatementPanel extends JPanel {
                 }
                 EventList<FiBean> beans = fiBeansSelectionModel.getSelected();
                 for (FiBean bean : beans) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("selected bean=" + bean.getName());
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("selected bean=" + bean.getName());
                     }
                     updateDetailPane(bean);
                     detailsForBean = bean;
@@ -1177,8 +1180,8 @@ public class StatementPanel extends JPanel {
                     private boolean hasNewDownload(FiBean bean) {
                         Date downloadDate = bean.getLastDownloaded();
                         Date importedDate = bean.getLastImported();
-                        if (log.isDebugEnabled()) {
-                            log.debug(downloadDate + ", " + importedDate);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug(downloadDate + ", " + importedDate);
                         }
                         if ((downloadDate == null) && (importedDate == null)) {
                             return false;
@@ -1357,7 +1360,7 @@ public class StatementPanel extends JPanel {
                                 showDiffsButton.setEnabled(true);
                             }
                         } catch (IOException e) {
-                            log.warn(e);
+                            LOGGER.warn(e);
                         }
                     }
                 }
@@ -1385,7 +1388,7 @@ public class StatementPanel extends JPanel {
         File dir = updater.getDir();
         File file = new File(dir, fileName);
         if (!file.exists()) {
-            log.warn("No such file=" + fileName);
+            LOGGER.warn("No such file=" + fileName);
             return null;
         }
 
@@ -1402,13 +1405,13 @@ public class StatementPanel extends JPanel {
             in = new BufferedReader(new FileReader(file));
             textArea.read(in, fileName);
         } catch (IOException e) {
-            log.error(e);
+            LOGGER.error(e);
         } finally {
             if (in != null) {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     in = null;
                 }
@@ -1421,8 +1424,8 @@ public class StatementPanel extends JPanel {
     }
 
     protected void setText(JTextArea textArea, File file) {
-        if (log.isDebugEnabled()) {
-            log.info("setText to file=" + file);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.info("setText to file=" + file);
         }
         textArea.setText("");
         if (!file.exists()) {
@@ -1434,21 +1437,21 @@ public class StatementPanel extends JPanel {
             reader = new BufferedReader(new FileReader(file));
             String line = null;
             while ((line = reader.readLine()) != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(line);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(line);
                 }
                 textArea.append(line);
                 textArea.append("\n");
             }
         } catch (IOException e) {
-            log.error(e);
+            LOGGER.error(e);
             textArea.setText(e.toString());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
