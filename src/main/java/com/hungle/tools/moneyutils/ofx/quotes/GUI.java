@@ -93,6 +93,7 @@ import com.hungle.tools.moneyutils.ft.FtDotComQuoteSourcePanel;
 import com.hungle.tools.moneyutils.fx.UpdateFx;
 import com.hungle.tools.moneyutils.jna.ImportDialogAutoClickService;
 import com.hungle.tools.moneyutils.misc.BuildNumber;
+import com.hungle.tools.moneyutils.ofx.statement.FiBean;
 import com.hungle.tools.moneyutils.ofx.statement.StatementPanel;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
@@ -110,12 +111,14 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TextFilterator;
+import ca.odell.glazedlists.TransformedList;
 import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.impl.beans.BeanTableFormat;
 import ca.odell.glazedlists.matchers.MatcherEditor;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 import net.ofx.types.x2003.x04.CurrencyEnum;
@@ -131,11 +134,13 @@ public class GUI extends JFrame {
 
     /** The Constant prefs. */
     // TODO: le.com.tools.moneyutils.ofx.quotes.GUI
-    private static final Preferences prefs = Preferences
+    private static final Preferences PREFS = Preferences
             .userNodeForPackage(le.com.tools.moneyutils.ofx.quotes.GUI.class);
 
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(GUI.class);
+    private static final Logger LOGGER = Logger.getLogger(GUI.class);
+
+    private static final String DEFAULT_FI_DIR = "fi";
 
     /** The Constant VERSION_PREFIX. */
     private static final String VERSION_PREFIX = "Build";
@@ -227,17 +232,17 @@ public class GUI extends JFrame {
     private JButton saveOfxButton;
 
     /** The default currency. */
-    private String defaultCurrency = prefs.get(PREF_DEFAULT_CURRENCY, CurrencyEnum.USD.toString());
+    private String defaultCurrency = PREFS.get(PREF_DEFAULT_CURRENCY, CurrencyEnum.USD.toString());
 
     /** The randomize share count. */
-    private Boolean randomizeShareCount = Boolean.valueOf(prefs.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
+    private Boolean randomizeShareCount = Boolean.valueOf(PREFS.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
     
     /** The random. */
     private Random random = new Random();
 
     /** The incrementally increased share count. */
     private Boolean incrementallyIncreasedShareCount = Boolean
-            .valueOf(prefs.get(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT, "False"));
+            .valueOf(PREFS.get(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT, "False"));
 
     /** The bottom tabs. */
     private JTabbedPane bottomTabs;
@@ -258,16 +263,16 @@ public class GUI extends JFrame {
     private QuoteSourceListener quoteSourceListener;
 
     /** The force generating INVTRANLIST. */
-    private Boolean forceGeneratingINVTRANLIST = Boolean.valueOf(prefs.get(PREF_FORCE_GENERATING_INVTRANLIST, "False"));
+    private Boolean forceGeneratingINVTRANLIST = Boolean.valueOf(PREFS.get(PREF_FORCE_GENERATING_INVTRANLIST, "False"));
 
     /** The date offset. */
-    private Integer dateOffset = Integer.valueOf(prefs.get(PREF_DATE_OFFSET, "0"));
+    private Integer dateOffset = Integer.valueOf(PREFS.get(PREF_DATE_OFFSET, "0"));
 
     /** The suspicious price. */
-    private Integer suspiciousPrice = Integer.valueOf(prefs.get(PREF_SUSPICIOUS_PRICE, "10000"));
+    private Integer suspiciousPrice = Integer.valueOf(PREFS.get(PREF_SUSPICIOUS_PRICE, "10000"));
 
     /** The account id. */
-    private String accountId = prefs.get(PREF_ACCOUNT_ID, OfxPriceInfo.DEFAULT_ACCOUNT_ID);
+    private String accountId = PREFS.get(PREF_ACCOUNT_ID, OfxPriceInfo.DEFAULT_ACCOUNT_ID);
 
     /** The account id label. */
     private JLabel accountIdLabel;
@@ -298,7 +303,7 @@ public class GUI extends JFrame {
 
     /** The fi dir. */
     // TODO_FI
-    private File fiDir = new File("fi");
+    private File fiDir = new File(System.getProperty("fi.dir", DEFAULT_FI_DIR));
 
     /**
      * The Class EditRandomizeShareCountAction.
@@ -331,11 +336,11 @@ public class GUI extends JFrame {
             // If a string was returned, say so.
             if ((s != null) && (s.length() > 0)) {
                 String value = s;
-                log.info("Selected new 'Randomize Share Count': " + value);
+                LOGGER.info("Selected new 'Randomize Share Count': " + value);
                 Boolean newValue = Boolean.valueOf(value);
                 if (newValue.compareTo(randomizeShareCount) != 0) {
                     randomizeShareCount = newValue;
-                    prefs.put(PREF_RANDOMIZE_SHARE_COUNT, randomizeShareCount.toString());
+                    PREFS.put(PREF_RANDOMIZE_SHARE_COUNT, randomizeShareCount.toString());
                     // to clear the pricing table
                     QuoteSource quoteSource = null;
                     stockSymbolsStringReceived(quoteSource, null);
@@ -378,12 +383,12 @@ public class GUI extends JFrame {
             // If a string was returned, say so.
             if ((s != null) && (s.length() > 0)) {
                 String value = s;
-                log.info("Selected new 'Warn Suspicious Price': " + value);
+                LOGGER.info("Selected new 'Warn Suspicious Price': " + value);
                 try {
                     Integer newValue = Integer.valueOf(value);
                     if (newValue.compareTo(suspiciousPrice) != 0) {
                         suspiciousPrice = newValue;
-                        prefs.put(PREF_SUSPICIOUS_PRICE, suspiciousPrice.toString());
+                        PREFS.put(PREF_SUSPICIOUS_PRICE, suspiciousPrice.toString());
                         // to clear the pricing table
                         // stockSymbolsStringReceived(null);
                     }
@@ -502,7 +507,7 @@ public class GUI extends JFrame {
             try {
                 UpdateFx.invoke();
             } catch (Exception e) {
-                log.error(e);
+                LOGGER.error(e);
 
                 StringBuilder message = new StringBuilder();
                 message.append(e.toString() + "\n");
@@ -546,15 +551,15 @@ public class GUI extends JFrame {
                         if (getJarFile(uri, toJarFile, progressMonitor)) {
                             actionPerformed(event);
                         } else {
-                            log.warn("User cancel downloading!");
+                            LOGGER.warn("User cancel downloading!");
                             if (!toJarFile.delete()) {
-                                log.warn("Failed to delete file=" + toJarFile);
+                                LOGGER.warn("Failed to delete file=" + toJarFile);
                             } else {
-                                log.info("Deleted file=" + toJarFile);
+                                LOGGER.info("Deleted file=" + toJarFile);
                             }
                         }
                     } catch (IOException e) {
-                        log.warn(e, e);
+                        LOGGER.warn(e, e);
                         errorMessage = e.toString();
                     } finally {
                         if (progressMonitor != null) {
@@ -587,25 +592,25 @@ public class GUI extends JFrame {
             boolean canceled = false;
             HttpClient client = new DefaultHttpClient();
             HttpGet httpGet = new HttpGet(uri);
-            log.info("GET " + uri);
+            LOGGER.info("GET " + uri);
             HttpResponse httpResponse = client.execute(httpGet);
 
             Long contentLength = -1L;
             Header header = httpResponse.getFirstHeader("Content-Length");
             if (header != null) {
                 String value = header.getValue();
-                log.info(header.getName() + ": " + value);
+                LOGGER.info(header.getName() + ": " + value);
                 if ((value != null) && (value.length() > 0)) {
                     try {
                         contentLength = Long.valueOf(value);
                     } catch (NumberFormatException e) {
-                        log.warn(e);
+                        LOGGER.warn(e);
                     }
                 }
             }
             StatusLine statusLine = httpResponse.getStatusLine();
             int statusCode = statusLine.getStatusCode();
-            log.info("  statusCode=" + statusCode);
+            LOGGER.info("  statusCode=" + statusCode);
             if (statusCode == HttpStatus.SC_OK) {
                 HttpEntity entity = httpResponse.getEntity();
                 BufferedInputStream in = null;
@@ -613,7 +618,7 @@ public class GUI extends JFrame {
 
                 try {
                     out = new BufferedOutputStream(new FileOutputStream(toJarFile));
-                    log.info("  ... saving to " + toJarFile);
+                    LOGGER.info("  ... saving to " + toJarFile);
                     in = new BufferedInputStream(entity.getContent());
                     long total = 0L;
                     long percentageDone = 0L;
@@ -644,8 +649,8 @@ public class GUI extends JFrame {
                                 }
                                 final String message = updateProgressMonitor(percentageDone, progressMonitor);
 
-                                if (log.isDebugEnabled()) {
-                                    log.debug(total + "/" + contentLength + ", " + message);
+                                if (LOGGER.isDebugEnabled()) {
+                                    LOGGER.debug(total + "/" + contentLength + ", " + message);
                                 }
                             }
                         }
@@ -658,14 +663,14 @@ public class GUI extends JFrame {
                     percentageDone = 100;
                     updateProgressMonitor(percentageDone, progressMonitor);
                 } finally {
-                    if (log.isDebugEnabled()) {
-                        log.debug("  > DONE saving");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("  > DONE saving");
                     }
 
                     if (in != null) {
                         try {
-                            if (log.isDebugEnabled()) {
-                                log.debug("  calling in.close()");
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("  calling in.close()");
                             }
                             in.close();
                         } finally {
@@ -674,21 +679,21 @@ public class GUI extends JFrame {
                     }
                     if (out != null) {
                         try {
-                            if (log.isDebugEnabled()) {
-                                log.debug("  calling out.close()");
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("  calling out.close()");
                             }
                             out.close();
                         } finally {
                             out = null;
                         }
                     }
-                    log.info("  > DONE saving (post-closing)");
+                    LOGGER.info("  > DONE saving (post-closing)");
                 }
             } else {
                 throw new IOException(statusLine.toString());
             }
 
-            log.info("canceled=" + canceled);
+            LOGGER.info("canceled=" + canceled);
 
             return !canceled;
         }
@@ -722,16 +727,16 @@ public class GUI extends JFrame {
          * @param progressMonitor the progress monitor
          */
         private void notifyCanceled(HttpGet httpGet, HttpEntity entity, final ProgressMonitor progressMonitor) {
-            log.warn("progressMonitor.isCanceled()=" + progressMonitor.isCanceled());
+            LOGGER.warn("progressMonitor.isCanceled()=" + progressMonitor.isCanceled());
             if (httpGet != null) {
                 httpGet.abort();
             }
             if (entity != null) {
-                log.info("  calling entity.consumeContent()");
+                LOGGER.info("  calling entity.consumeContent()");
                 try {
                     entity.consumeContent();
                 } catch (IOException e) {
-                    log.warn("Failed to entity.consumeContent(), " + e);
+                    LOGGER.warn("Failed to entity.consumeContent(), " + e);
                 }
             }
             Runnable doRun = new Runnable() {
@@ -791,12 +796,12 @@ public class GUI extends JFrame {
          */
         @Override
         public void windowClosing(WindowEvent event) {
-            log.info("> windowClosing");
+            LOGGER.info("> windowClosing");
             try {
                 shutdown();
             } finally {
                 // TODO: see if this will help with JNA crash on the way out
-                log.info("> Calling System.gc()");
+                LOGGER.info("> Calling System.gc()");
                 System.gc();
             }
         }
@@ -806,12 +811,12 @@ public class GUI extends JFrame {
          */
         @Override
         public void windowClosed(WindowEvent event) {
-            log.info("> windowClosed");
+            LOGGER.info("> windowClosed");
             try {
                 shutdown();
             } finally {
                 // TODO: see if this will help with JNA crash on the way out
-                log.info("> Calling System.gc()");
+                LOGGER.info("> Calling System.gc()");
                 System.gc();
             }
         }
@@ -822,18 +827,18 @@ public class GUI extends JFrame {
         private void shutdown() {
             if (threadPool != null) {
                 List<Runnable> tasks = threadPool.shutdownNow();
-                log.info("Number of not-run tasks=" + ((tasks == null) ? 0 : tasks.size()));
+                LOGGER.info("Number of not-run tasks=" + ((tasks == null) ? 0 : tasks.size()));
                 long timeout = 1L;
                 TimeUnit unit = TimeUnit.MINUTES;
                 try {
-                    log.info("WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
+                    LOGGER.info("WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
                     if (!threadPool.awaitTermination(timeout, unit)) {
-                        log.warn("Timed-out waiting for threadPool.awaitTermination");
+                        LOGGER.warn("Timed-out waiting for threadPool.awaitTermination");
                     }
                 } catch (InterruptedException e) {
-                    log.error(e, e);
+                    LOGGER.error(e, e);
                 } finally {
-                    log.info("DONE WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
+                    LOGGER.info("DONE WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
                 }
             }
             if (importDialogAutoClickService != null) {
@@ -898,8 +903,8 @@ public class GUI extends JFrame {
          */
         @Override
         public void run() {
-            if (log.isDebugEnabled()) {
-                log.debug("> stockPricesReceived, size=" + beans.size());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("> stockPricesReceived, size=" + beans.size());
             }
 
             priceList.getReadWriteLock().writeLock().lock();
@@ -908,8 +913,8 @@ public class GUI extends JFrame {
                 priceList.addAll(beans);
             } finally {
                 priceList.getReadWriteLock().writeLock().unlock();
-                if (log.isDebugEnabled()) {
-                    log.debug("< stockPricesReceived");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("< stockPricesReceived");
                 }
             }
 
@@ -924,8 +929,8 @@ public class GUI extends JFrame {
                 }
             } finally {
                 exchangeRates.getReadWriteLock().writeLock().unlock();
-                if (log.isDebugEnabled()) {
-                    log.debug("< exchangeRatesReceived");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("< exchangeRatesReceived");
                 }
             }
 
@@ -933,13 +938,13 @@ public class GUI extends JFrame {
                 boolean onePerFile = quoteSource.isHistoricalQuotes();
                 List<File> ofxFiles = saveToOFX(beans, symbolMapper, fxTable, onePerFile);
                 for (File ofxFile : ofxFiles) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("ofxFile=" + ofxFile);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("ofxFile=" + ofxFile);
                     }
                 }
 
                 File csvFile = saveToCsv(beans);
-                log.info("csvFile=" + csvFile);
+                LOGGER.info("csvFile=" + csvFile);
 
                 mapper.getReadWriteLock().writeLock().lock();
                 try {
@@ -949,7 +954,7 @@ public class GUI extends JFrame {
                     mapper.getReadWriteLock().writeLock().unlock();
                 }
             } catch (IOException e) {
-                log.warn(e);
+                LOGGER.warn(e);
             } finally {
                 Runnable doRun = null;
 
@@ -1046,7 +1051,7 @@ public class GUI extends JFrame {
                         "Error creating", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            log.info("Created new FI dir=" + d.getAbsolutePath());
+            LOGGER.info("Created new FI dir=" + d.getAbsolutePath());
             String fiPropertiesFileName = UpdateFiDir.DEFAULT_PROPERTIES_FILENAME;
             String sampleFileName = "samples" + "/" + fiPropertiesFileName;
             URL url = OfxUtils.getResource(sampleFileName);
@@ -1141,21 +1146,21 @@ public class GUI extends JFrame {
          */
         @Override
         public void actionPerformed(ActionEvent event) {
-            log.info("> ExitAction.actionPerformed");
+            LOGGER.info("> ExitAction.actionPerformed");
 
             List<Runnable> tasks = threadPool.shutdownNow();
-            log.info("Number of not-run tasks=" + ((tasks == null) ? 0 : tasks.size()));
+            LOGGER.info("Number of not-run tasks=" + ((tasks == null) ? 0 : tasks.size()));
             long timeout = 1L;
             TimeUnit unit = TimeUnit.MINUTES;
             try {
-                log.info("WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
+                LOGGER.info("WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
                 if (!threadPool.awaitTermination(timeout, unit)) {
-                    log.warn("Timed-out waiting for threadPool.awaitTermination");
+                    LOGGER.warn("Timed-out waiting for threadPool.awaitTermination");
                 }
             } catch (InterruptedException e) {
-                log.error(e, e);
+                LOGGER.error(e, e);
             } finally {
-                log.info("DONE WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
+                LOGGER.info("DONE WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
             }
 
             if (importDialogAutoClickService != null) {
@@ -1163,9 +1168,9 @@ public class GUI extends JFrame {
                 importDialogAutoClickService.shutdown();
             }
 
-            log.info("> Calling System.gc()");
+            LOGGER.info("> Calling System.gc()");
             System.gc();
-            log.info("> Calling System.exit(0)");
+            LOGGER.info("> Calling System.exit(0)");
             System.exit(0);
         }
     }
@@ -1202,13 +1207,13 @@ public class GUI extends JFrame {
                 resultView.read(reader, outputFile.getName());
                 resultView.setCaretPosition(0);
             } catch (IOException e) {
-                log.warn(e);
+                LOGGER.warn(e);
             } finally {
                 if (reader != null) {
                     try {
                         reader.close();
                     } catch (IOException e) {
-                        log.warn(e);
+                        LOGGER.warn(e);
                     } finally {
                         reader = null;
                     }
@@ -1240,7 +1245,7 @@ public class GUI extends JFrame {
          */
         @Override
         public void actionPerformed(ActionEvent event) {
-            log.info("> Import action");
+            LOGGER.info("> Import action");
             Runnable command = new Runnable() {
                 @Override
                 public void run() {
@@ -1254,7 +1259,7 @@ public class GUI extends JFrame {
                                 if (lastKnownImport != null) {
                                     lastKnownImport.setText(lastKnownImportString);
                                 }
-                                prefs.put(PREF_LAST_KNOWN_IMPORT_STRING, lastKnownImportString);
+                                PREFS.put(PREF_LAST_KNOWN_IMPORT_STRING, lastKnownImportString);
                             }
                         };
                         SwingUtilities.invokeLater(doRun);
@@ -1302,7 +1307,7 @@ public class GUI extends JFrame {
             int randomInt = random.nextInt(998);
             randomInt = randomInt + 1;
             double value = randomInt / 1000.00;
-            log.info("randomizeShareCount=" + randomizeShareCount + ", value=" + value);
+            LOGGER.info("randomizeShareCount=" + randomizeShareCount + ", value=" + value);
             for (AbstractStockPrice bean : beans) {
                 bean.setUnits(value);
             }
@@ -1311,21 +1316,21 @@ public class GUI extends JFrame {
         boolean hasWrappedShareCount = false;
         if (incrementallyIncreasedShareCount) {
             String key = PREF_INCREMENTALLY_INCREASED_SHARE_COUNT_VALUE;
-            double value = prefs.getDouble(key, 0.000);
+            double value = PREFS.getDouble(key, 0.000);
             if (value > 0.999) {
                 value = 0.000;
                 // TODO
-                log.warn("incrementallyIncreasedShareCount, is wrapping back to " + value);
+                LOGGER.warn("incrementallyIncreasedShareCount, is wrapping back to " + value);
                 hasWrappedShareCount = true;
             }
             value = value + 0.001;
             for (AbstractStockPrice bean : beans) {
                 bean.setUnits(value);
             }
-            if (log.isDebugEnabled()) {
-                log.debug("incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
             }
-            prefs.putDouble(key, value);
+            PREFS.putDouble(key, value);
         }
 
         // for (StockPriceBean bean : beans) {
@@ -1417,11 +1422,11 @@ public class GUI extends JFrame {
             throws IOException {
         File outputFile = File.createTempFile("quotes", ".ofx");
         outputFile.deleteOnExit();
-        if (log.isDebugEnabled()) {
-            log.debug("outputFile=" + outputFile.getAbsolutePath());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("outputFile=" + outputFile.getAbsolutePath());
         }
 
-        log.info("forceGeneratingINVTRANLIST=" + forceGeneratingINVTRANLIST);
+        LOGGER.info("forceGeneratingINVTRANLIST=" + forceGeneratingINVTRANLIST);
         OfxSaveParameter params = new OfxSaveParameter();
         params.setDefaultCurrency(defaultCurrency);
         params.setAccountId(accountId);
@@ -1503,15 +1508,15 @@ public class GUI extends JFrame {
             if (isNull(quoteSourceSymbol)) {
                 continue;
             }
-            if (log.isDebugEnabled()) {
-                log.debug("s=" + quoteSourceSymbol + ", symbol=" + symbol);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("s=" + quoteSourceSymbol + ", symbol=" + symbol);
             }
             if (quoteSourceSymbol.compareToIgnoreCase(symbol) != 0) {
                 continue;
             }
             currency = entry.getQuotesSourceCurrency();
-            if (log.isDebugEnabled()) {
-                log.debug("getMapperCurrency: s=" + quoteSourceSymbol + ", currency=" + currency);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("getMapperCurrency: s=" + quoteSourceSymbol + ", currency=" + currency);
             }
             if (!isNull(currency)) {
                 return currency;
@@ -1539,8 +1544,8 @@ public class GUI extends JFrame {
                 String symbol = stockPrice.getStockSymbol();
                 String overridingCurrency = null;
                 overridingCurrency = getMapperCurrency(symbol, symbolMapper, overridingCurrency);
-                if (log.isDebugEnabled()) {
-                    log.info("symbol: " + symbol + ", overridingCurrency=" + overridingCurrency);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.info("symbol: " + symbol + ", overridingCurrency=" + overridingCurrency);
                 }
                 if (!isNull(overridingCurrency)) {
                     stockPrice.setCurrency(overridingCurrency);
@@ -1657,15 +1662,15 @@ public class GUI extends JFrame {
                 boolean selected = aButton.getModel().isSelected();
                 if (selected) {
                     importDialogAutoClickService.setEnable(true);
-                    prefs.putBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.TRUE);
+                    PREFS.putBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.TRUE);
                 } else {
                     importDialogAutoClickService.setEnable(false);
-                    prefs.putBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
+                    PREFS.putBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
                 }
             }
         };
         importAutoClick.addActionListener(listener);
-        Boolean autoClick = prefs.getBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
+        Boolean autoClick = PREFS.getBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
         importAutoClick.setSelected(autoClick);
         importDialogAutoClickService.setEnable(autoClick);
         menu.add(importAutoClick);
@@ -1697,7 +1702,7 @@ public class GUI extends JFrame {
                 try {
                     Desktop.getDesktop().browse(uri);
                 } catch (IOException e) {
-                    log.error(e, e);
+                    LOGGER.error(e, e);
                 }
             }
         });
@@ -1716,7 +1721,7 @@ public class GUI extends JFrame {
                 try {
                     Desktop.getDesktop().browse(uri);
                 } catch (IOException e) {
-                    log.error(e, e);
+                    LOGGER.error(e, e);
                 }
             }
         });
@@ -1735,7 +1740,7 @@ public class GUI extends JFrame {
                 try {
                     Desktop.getDesktop().browse(uri);
                 } catch (IOException e) {
-                    log.error(e, e);
+                    LOGGER.error(e, e);
                 }
             }
         });
@@ -1754,7 +1759,7 @@ public class GUI extends JFrame {
                 try {
                     Desktop.getDesktop().browse(uri);
                 } catch (IOException e) {
-                    log.error(e, e);
+                    LOGGER.error(e, e);
                 }
             }
         });
@@ -1796,7 +1801,7 @@ public class GUI extends JFrame {
                         String value = BeanUtils.getProperty(GUI.this, key);
                         sb.append(key + "=" + value + "\n");
                     } catch (Exception e) {
-                        log.warn(e);
+                        LOGGER.warn(e);
                     }
                 }
 
@@ -1849,7 +1854,7 @@ public class GUI extends JFrame {
 
         File[] files = dir.listFiles();
         for (File file : files) {
-            log.info("file=" + file);
+            LOGGER.info("file=" + file);
             if (file.isDirectory()) {
                 continue;
             }
@@ -1880,13 +1885,13 @@ public class GUI extends JFrame {
             JMenuItem item = new JMenuItem(new ProfileSelectedAction(name, props));
             profilesMenu.add(item);
         } catch (IOException e) {
-            log.warn(e);
+            LOGGER.warn(e);
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
@@ -1944,11 +1949,11 @@ public class GUI extends JFrame {
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
                     String value = s;
-                    log.info("Selected new 'Incrementally Increased Share Count': " + value);
+                    LOGGER.info("Selected new 'Incrementally Increased Share Count': " + value);
                     Boolean newValue = Boolean.valueOf(value);
                     if (newValue.compareTo(incrementallyIncreasedShareCount) != 0) {
                         incrementallyIncreasedShareCount = newValue;
-                        prefs.put(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT,
+                        PREFS.put(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT,
                                 incrementallyIncreasedShareCount.toString());
                         // to clear the pricing table
                         QuoteSource quoteSource = null;
@@ -1977,11 +1982,11 @@ public class GUI extends JFrame {
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
                     String value = s;
-                    log.info("Selected new 'Force <INVTRANLIST>': " + value);
+                    LOGGER.info("Selected new 'Force <INVTRANLIST>': " + value);
                     Boolean newValue = Boolean.valueOf(value);
                     if (newValue.compareTo(forceGeneratingINVTRANLIST) != 0) {
                         forceGeneratingINVTRANLIST = newValue;
-                        prefs.put(PREF_FORCE_GENERATING_INVTRANLIST, forceGeneratingINVTRANLIST.toString());
+                        PREFS.put(PREF_FORCE_GENERATING_INVTRANLIST, forceGeneratingINVTRANLIST.toString());
                         // to clear the pricing table
                         QuoteSource quoteSource = null;
                         stockSymbolsStringReceived(quoteSource, null);
@@ -2009,12 +2014,12 @@ public class GUI extends JFrame {
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
                     String value = s;
-                    log.info("Selected new 'Date Offset': " + value);
+                    LOGGER.info("Selected new 'Date Offset': " + value);
                     try {
                         Integer newValue = Integer.valueOf(value);
                         if (newValue.compareTo(dateOffset) != 0) {
                             dateOffset = newValue;
-                            prefs.put(PREF_DATE_OFFSET, dateOffset.toString());
+                            PREFS.put(PREF_DATE_OFFSET, dateOffset.toString());
                             // to clear the pricing table
                             QuoteSource quoteSource = null;
                             stockSymbolsStringReceived(quoteSource, null);
@@ -2047,7 +2052,7 @@ public class GUI extends JFrame {
             @Override
             public void stateChanged(ChangeEvent event) {
                 JTabbedPane p = (JTabbedPane) event.getSource();
-                log.info("selectedIndex=" + p.getSelectedIndex());
+                LOGGER.info("selectedIndex=" + p.getSelectedIndex());
             }
         });
         // TAB: #1
@@ -2055,6 +2060,7 @@ public class GUI extends JFrame {
 
         // TAB: #2
         downloadView = new StatementPanel();
+        downloadView.setFiDir(getFiDir());
         downloadView.refreshFiDir();
         mainTabbed.addTab("Statements", downloadView);
 
@@ -2102,8 +2108,8 @@ public class GUI extends JFrame {
 
         view.add(splitPane, BorderLayout.CENTER);
 
-        if (log.isDebugEnabled()) {
-            log.debug("< createMainDataView");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("< createMainDataView");
         }
 
         return view;
@@ -2146,7 +2152,7 @@ public class GUI extends JFrame {
             public void stateChanged(ChangeEvent event) {
                 JTabbedPane p = (JTabbedPane) event.getSource();
                 selectedQuoteSource = p.getSelectedIndex();
-                log.info("selectedQuoteSource=" + selectedQuoteSource);
+                LOGGER.info("selectedQuoteSource=" + selectedQuoteSource);
                 QuoteSource quoteSource = null;
                 stockPricesLookupStarted(quoteSource);
             }
@@ -2171,33 +2177,33 @@ public class GUI extends JFrame {
         // });
         // tabbedPane.addMouseListener(new PopupListener(popup));
 
-        if (log.isDebugEnabled()) {
-            log.debug("> creating createYahooSourceView");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> creating createYahooSourceView");
         }
         tabbedPane.addTab("Yahoo", createYahooSourceView());
 
-        if (log.isDebugEnabled()) {
-            log.debug("> creating createYahooApiSourceView");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> creating createYahooApiSourceView");
         }
         tabbedPane.addTab("Yahoo Options", createYahooApiSourceView());
 
-        if (log.isDebugEnabled()) {
-            log.debug("> creating createFtDotComSourceView");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> creating createFtDotComSourceView");
         }
         tabbedPane.addTab("ft.com", createFtDotComSourceView());
 
-        if (log.isDebugEnabled()) {
-            log.debug("> creating createYahooHistoricalSourceView");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> creating createYahooHistoricalSourceView");
         }
         tabbedPane.addTab("Yahoo Historical", createYahooHistoricalSourceView());
 
-        if (log.isDebugEnabled()) {
-            log.debug("> creating createBloombergSourceView");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> creating createBloombergSourceView");
         }
         tabbedPane.addTab("Bloomberg", createBloombergSourceView());
 
-        if (log.isDebugEnabled()) {
-            log.debug("> creating createTIAACREFQuoteSourceView");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> creating createTIAACREFQuoteSourceView");
         }
         tabbedPane.addTab("Scholarshare", createTIAACREFQuoteSourceView());
 
@@ -2417,8 +2423,8 @@ public class GUI extends JFrame {
      * @return the component
      */
     private Component createPricesView() {
-        if (log.isDebugEnabled()) {
-            log.debug("> createPricesView");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> createPricesView");
         }
         final JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -2441,7 +2447,7 @@ public class GUI extends JFrame {
 
         commandView.add(new JLabel("Last import on:"));
         commandView.add(Box.createHorizontalStrut(3));
-        lastKnownImportString = prefs.get(PREF_LAST_KNOWN_IMPORT_STRING, null);
+        lastKnownImportString = PREFS.get(PREF_LAST_KNOWN_IMPORT_STRING, null);
         lastKnownImport = new JLabel(lastKnownImportString == null ? "Not known" : lastKnownImportString);
         commandView.add(lastKnownImport);
 
@@ -2512,7 +2518,7 @@ public class GUI extends JFrame {
                     return;
                 }
                 File toFile = fc.getSelectedFile();
-                prefs.put(SaveOfxAction.PREF_SAVE_OFX_DIR, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
+                PREFS.put(SaveOfxAction.PREF_SAVE_OFX_DIR, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                 try {
                     QifUtils.saveToQif(priceList, toFile);
                 } catch (IOException e) {
@@ -2521,13 +2527,13 @@ public class GUI extends JFrame {
             }
 
             private void initFileChooser() {
-                if (log.isDebugEnabled()) {
-                    log.debug("> creating FileChooser");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("> creating FileChooser");
                 }
                 String key = SaveOfxAction.PREF_SAVE_OFX_DIR;
-                fc = new JFileChooser(prefs.get(key, "."));
-                if (log.isDebugEnabled()) {
-                    log.debug("< creating FileChooser");
+                fc = new JFileChooser(PREFS.get(key, "."));
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("< creating FileChooser");
                 }
             }
         };
@@ -2542,8 +2548,8 @@ public class GUI extends JFrame {
      * @return the component
      */
     private Component createExchangeRatesView() {
-        if (log.isDebugEnabled()) {
-            log.debug("> createExchangeRatesView");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> createExchangeRatesView");
         }
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -2598,8 +2604,8 @@ public class GUI extends JFrame {
      * @return the component
      */
     private Component createMapperView() {
-        if (log.isDebugEnabled()) {
-            log.debug("> createMapperView");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> createMapperView");
         }
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -2676,7 +2682,8 @@ public class GUI extends JFrame {
         String propertyNames[] = { "quotesSourceSymbol", "msMoneySymbol", "type" };
         String columnLabels[] = { "Symbol", "MSMoney Symbol", "Type" };
         AdvancedTableFormat tableFormat = new BeanTableFormat(beanClass, propertyNames, columnLabels);
-        EventTableModel<SymbolMapperEntry> tableModel = new EventTableModel<SymbolMapperEntry>(source, tableFormat);
+        final TransformedList<SymbolMapperEntry, SymbolMapperEntry> sourceProxyList = GlazedListsSwing.swingThreadProxyList(source);
+        DefaultEventTableModel<SymbolMapperEntry> tableModel = new DefaultEventTableModel<SymbolMapperEntry>(sourceProxyList, tableFormat);
         JTable table = new JTable(tableModel);
 
         if (sortedList != null) {
@@ -2684,8 +2691,8 @@ public class GUI extends JFrame {
                     AbstractTableComparatorChooser.SINGLE_COLUMN);
         }
 
-        EventSelectionModel myEventSelectionModel = new EventSelectionModel(source);
-        table.setSelectionModel(myEventSelectionModel);
+        DefaultEventSelectionModel myDefaultEventSelectionModel = new DefaultEventSelectionModel(source);
+        table.setSelectionModel(myDefaultEventSelectionModel);
 
         if (addStripe) {
             // TableCellRenderer striped = new StripedTableCellRenderer(new
@@ -2705,7 +2712,7 @@ public class GUI extends JFrame {
         }
         colWidths = null;
         if (colWidths != null) {
-            log.info("colWidths=" + colWidths);
+            LOGGER.info("colWidths=" + colWidths);
             Object[] maxWidthValues = TableUtils.calculateMaxWidthValues(colWidths);
             TableUtils.adjustColumnSizes(table, maxWidthValues);
         }
@@ -2747,7 +2754,8 @@ public class GUI extends JFrame {
         String propertyNames[] = { "stockSymbol", "stockName", "lastPrice", "lastTradeDate", "lastTradeTime" };
         String columnLabels[] = { "Symbol", "Name", "Price", "Last Trade Date", "Last Trade Time" };
         AdvancedTableFormat tableFormat = new BeanTableFormat(beanClass, propertyNames, columnLabels);
-        EventTableModel<AbstractStockPrice> tableModel = new EventTableModel<AbstractStockPrice>(source, tableFormat);
+        TransformedList<AbstractStockPrice, AbstractStockPrice> sourceProxyList = GlazedListsSwing.swingThreadProxyList(source);
+        DefaultEventTableModel<AbstractStockPrice> tableModel = new DefaultEventTableModel<AbstractStockPrice>(sourceProxyList, tableFormat);
 
         JTable table = new JTable(tableModel);
 
@@ -2756,8 +2764,8 @@ public class GUI extends JFrame {
                     AbstractTableComparatorChooser.SINGLE_COLUMN);
         }
 
-        EventSelectionModel myEventSelectionModel = new EventSelectionModel(source);
-        table.setSelectionModel(myEventSelectionModel);
+        DefaultEventSelectionModel myDefaultEventSelectionModel = new DefaultEventSelectionModel(source);
+        table.setSelectionModel(myDefaultEventSelectionModel);
 
         if (addStripe) {
             // final Color oddRowsColor = new Color(204, 255, 204);
@@ -2876,7 +2884,7 @@ public class GUI extends JFrame {
     private void deleteOutputFile(File outputFile) {
         if ((outputFile != null) && (outputFile.exists())) {
             if (!outputFile.delete()) {
-                log.warn("Failed to delete outputFile=" + outputFile);
+                LOGGER.warn("Failed to delete outputFile=" + outputFile);
             }
         }
     }
@@ -2964,7 +2972,7 @@ public class GUI extends JFrame {
      * @return the prefs
      */
     public static Preferences getPrefs() {
-        return prefs;
+        return PREFS;
     }
 
     /**
@@ -3036,11 +3044,11 @@ public class GUI extends JFrame {
      * @param value the value
      */
     private void selectNewCurrency(String value) {
-        log.info("Selected new currency: " + value);
+        LOGGER.info("Selected new currency: " + value);
         String newValue = value;
         if (newValue.compareTo(defaultCurrency) != 0) {
             defaultCurrency = value;
-            prefs.put(PREF_DEFAULT_CURRENCY, defaultCurrency);
+            PREFS.put(PREF_DEFAULT_CURRENCY, defaultCurrency);
             defaulCurrencyLabel.setText("Default currency: " + defaultCurrency);
             // to clear the pricing table
             QuoteSource quoteSource = null;
@@ -3054,11 +3062,11 @@ public class GUI extends JFrame {
      * @param value the value
      */
     private void selectNewAccountId(String value) {
-        log.info("Selected new 'OFX Account Id': " + value);
+        LOGGER.info("Selected new 'OFX Account Id': " + value);
         String newValue = value;
         if (newValue.compareTo(accountId) != 0) {
             accountId = newValue;
-            prefs.put(PREF_ACCOUNT_ID, accountId);
+            PREFS.put(PREF_ACCOUNT_ID, accountId);
             accountIdLabel.setText("OFX Account Id: " + accountId);
             // to clear the pricing table
             QuoteSource quoteSource = null;
@@ -3077,26 +3085,26 @@ public class GUI extends JFrame {
         String implementationVendorId = "com.le.tools.moneyutils";
         String buildNumber = BuildNumber.findBuilderNumber(implementationVendorId);
         if (buildNumber == null) {
-            log.warn("Cannot find buildNumber from Manifest.");
-            log.warn("Using built-in buildNumber which is likely to be wrong!");
+            LOGGER.warn("Cannot find buildNumber from Manifest.");
+            LOGGER.warn("Using built-in buildNumber which is likely to be wrong!");
         } else {
             GUI.VERSION = buildNumber;
         }
 
         String title = "OFX - Update stock prices - " + GUI.VERSION;
-        log.info(title);
+        LOGGER.info(title);
 
         String cwd = "Current directory is " + getCurrentWorkingDirectory();
-        log.info(cwd);
+        LOGGER.info(cwd);
 
         final GUI mainFrame = new GUI(title);
-        log.info("Using quote server: " + mainFrame.getYahooQuoteServer());
+        LOGGER.info("Using quote server: " + mainFrame.getYahooQuoteServer());
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
                 mainFrame.showMainFrame();
-                if (log.isDebugEnabled()) {
-                    log.debug("post mainFrame.showMainFrame()");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("post mainFrame.showMainFrame()");
                 }
             }
         };

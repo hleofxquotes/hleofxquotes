@@ -10,7 +10,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
 final class CheckHandshakeStatus implements HttpRequestInterceptor {
-    private static final Logger log = Logger.getLogger(CheckHandshakeStatus.class);
+    private static final Logger LOGGER = Logger.getLogger(CheckHandshakeStatus.class);
 
     private final OfxHandshakeCompletedListener handshakeCompletedListener;
 
@@ -24,12 +24,12 @@ final class CheckHandshakeStatus implements HttpRequestInterceptor {
         CountDownLatch latch = handshakeCompletedListener.getLatch();
         try {
             // make sure that SSL handshake is done.
-            log.info("await for SSL handshake to complete.");
+            LOGGER.info("await for SSL handshake to complete.");
             latch.await();
 
             Exception handshakeException = handshakeCompletedListener.getHandshakeException();
             if (handshakeException != null) {
-                log.error("> SKIP sending request, has SSL handshake error.");
+                LOGGER.error("> SKIP sending request, has SSL handshake error.");
                 // log.error(handshakeException, handshakeException);
                 throw new RuntimeException(handshakeException);
             }

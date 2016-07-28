@@ -17,7 +17,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.log4j.Logger;
 
 final class OfxSSLSocketFactory extends SSLSocketFactory {
-    private static final Logger log = Logger.getLogger(OfxSSLSocketFactory.class);
+    private static final Logger LOGGER = Logger.getLogger(OfxSSLSocketFactory.class);
 
     private OfxHandshakeCompletedListener handshakeCompletedListener;
 
@@ -33,7 +33,7 @@ final class OfxSSLSocketFactory extends SSLSocketFactory {
 
     @Override
     public Socket createSocket(HttpParams params) throws IOException {
-        log.info("> createSocket");
+        LOGGER.info("> createSocket");
         Socket socket = super.createSocket(params);
 
         SSLSocket sslSocket = (SSLSocket) socket;

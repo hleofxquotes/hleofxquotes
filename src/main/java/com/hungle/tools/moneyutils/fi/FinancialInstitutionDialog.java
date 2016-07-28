@@ -34,7 +34,7 @@ public class FinancialInstitutionDialog extends JDialog {
     private final List<String> m_names;
     private JPanel m_contentPane;
     private JButton m_buttonOk;
-    private JComboBox m_comboBox;
+    private JComboBox<?> m_comboBox;
 
     public FinancialInstitutionDialog(List<String> names, com.hungle.tools.moneyutils.fi.model.AccountGroup phoneGroup) {
         m_names = names;

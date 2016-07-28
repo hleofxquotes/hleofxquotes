@@ -9,7 +9,7 @@ import com.hungle.tools.moneyutils.fi.OfxPostClient;
 import com.hungle.tools.moneyutils.fi.OfxPostClientParams;
 
 public class SendRequestCmd {
-    private static final Logger log = Logger.getLogger(SendRequestCmd.class);
+    private static final Logger LOGGER = Logger.getLogger(SendRequestCmd.class);
 
     /**
      * @param args
@@ -19,15 +19,15 @@ public class SendRequestCmd {
         File reqFile = new File("fi/vanguard2/req.ofx");
         File respFile = new File("fi/vanguard2/resp.ofx");
         try {
-            log.info("uri=" + uri);
-            log.info("reqFile=" + reqFile);
-            log.info("respFile=" + respFile);
+            LOGGER.info("uri=" + uri);
+            LOGGER.info("reqFile=" + reqFile);
+            LOGGER.info("respFile=" + respFile);
             // TODO
             OfxPostClient.sendRequest(new OfxPostClientParams(uri, reqFile, respFile, null));
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         } finally {
-            log.info("< DONE");
+            LOGGER.info("< DONE");
         }
     }
 
