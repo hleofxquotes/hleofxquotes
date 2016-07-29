@@ -17,9 +17,9 @@ import org.apache.xmlbeans.XmlOptions;
 
 import com.hungle.tools.moneyutils.data.SymbolMapper;
 import com.hungle.tools.moneyutils.data.SymbolMapperEntry;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
 import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
-import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 import com.hungle.tools.moneyutils.ofx.quotes.XmlBeansUtils;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 import com.hungle.tools.moneyutils.stockprice.FxSymbol;
@@ -228,7 +228,7 @@ public class OfxPriceInfo {
             date = stockPrice.getLastTrade();
             if (date == null) {
                 String lastTradeDate = stockPrice.getLastTradeDate();
-                if (!Utils.isNull(lastTradeDate)) {
+                if (!PropertiesUtils.isNull(lastTradeDate)) {
                     try {
                         date = lastTradeDateFormatter.parse(lastTradeDate);
                     } catch (ParseException e) {
@@ -360,7 +360,7 @@ public class OfxPriceInfo {
         // stockSourceTicker = quoteSourceSymbol;
         // quoteSourceSymbol = msMoneySymbol;
         // }
-        if (Utils.isNull(msMoneySymbol)) {
+        if (PropertiesUtils.isNull(msMoneySymbol)) {
             msMoneySymbol = quoteSourceSymbol;
         }
         double units = stockPrice.getUnits();
@@ -670,7 +670,7 @@ public class OfxPriceInfo {
      * @param msMoneySymbol the ms money symbol
      */
     private void addGeneralSecurityInfo(SecurityList securityList, AbstractStockPrice stockPrice, String quoteSourceSymbol, String msMoneySymbol) {
-        if (Utils.isNull(msMoneySymbol)) {
+        if (PropertiesUtils.isNull(msMoneySymbol)) {
             msMoneySymbol = quoteSourceSymbol;
         }
 
@@ -949,7 +949,7 @@ public class OfxPriceInfo {
             String comment = "Ticker from quote source is: " + quoteSourceTicker;
             insertComment(secInfo, comment);
         }
-        if (Utils.isNull(secName)) {
+        if (PropertiesUtils.isNull(secName)) {
             secName = ticker;
         }
         secInfo.setSECNAME(secName);
@@ -1041,7 +1041,7 @@ public class OfxPriceInfo {
                 ofxPriceInfo.setCurDef(curDef);
             }
         }
-        if (!Utils.isNull(params.getAccountId())) {
+        if (!PropertiesUtils.isNull(params.getAccountId())) {
             ofxPriceInfo.setAccountId(params.getAccountId());
         }
 

@@ -67,6 +67,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 
 import com.hungle.tools.moneyutils.fi.UpdateFiDir;
 import com.hungle.tools.moneyutils.fi.props.FIBean;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.ImportUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.StreamConsumer;
 import com.hungle.tools.moneyutils.ofx.quotes.StripedTableRenderer;
@@ -93,7 +94,6 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 import difflib.Delta;
 import difflib.DiffUtils;
-import difflib.Patch;
 
 public class StatementPanel extends JPanel {
     /**
@@ -143,7 +143,7 @@ public class StatementPanel extends JPanel {
 
     // TODO_FI
     private File fiDir = new File("fi");
-    
+
     private final class ShowLastErrorAction extends AbstractAction {
         /**
          * 
@@ -231,7 +231,8 @@ public class StatementPanel extends JPanel {
                         writer = null;
                     }
                 }
-                JOptionPane.showMessageDialog(StatementPanel.this, "File:\n" + fiPropertiesFile.getAbsolutePath() + " is saved.", "File saved",
+                JOptionPane.showMessageDialog(StatementPanel.this,
+                        "File:\n" + fiPropertiesFile.getAbsolutePath() + " is saved.", "File saved",
                         JOptionPane.PLAIN_MESSAGE);
                 LOGGER.info("< DONE saving " + fiPropertiesFile);
             }
@@ -386,13 +387,16 @@ public class StatementPanel extends JPanel {
 
                 File respFile = detailsForBean.getUpdater().getRespFile();
                 File savedCertificates = new File(respFile.getAbsoluteFile().getParentFile(), "savedCertificates.txt");
-                File currentCertificates = new File(respFile.getAbsoluteFile().getParentFile(), "currentCertificates.txt");
+                File currentCertificates = new File(respFile.getAbsoluteFile().getParentFile(),
+                        "currentCertificates.txt");
                 try {
                     Utils.copyFile(currentCertificates, savedCertificates);
-                    JOptionPane.showMessageDialog(StatementPanel.this, "Saved current SSL certificates succesfully.\nPlease try download again.",
+                    JOptionPane.showMessageDialog(StatementPanel.this,
+                            "Saved current SSL certificates succesfully.\nPlease try download again.",
                             "Saving SSL Certificates", JOptionPane.PLAIN_MESSAGE);
                 } catch (IOException e) {
-                    JOptionPane.showMessageDialog(StatementPanel.this, e.toString(), "Error saving SSL Certificates", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(StatementPanel.this, e.toString(), "Error saving SSL Certificates",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -417,16 +421,18 @@ public class StatementPanel extends JPanel {
 
                 File respFile = detailsForBean.getUpdater().getRespFile();
                 File savedCertificates = new File(respFile.getAbsoluteFile().getParentFile(), "savedCertificates.txt");
-                File currentCertificates = new File(respFile.getAbsoluteFile().getParentFile(), "currentCertificates.txt");
+                File currentCertificates = new File(respFile.getAbsoluteFile().getParentFile(),
+                        "currentCertificates.txt");
                 try {
                     List<String> original = fileToLines(savedCertificates.getAbsolutePath());
                     List<String> revised = fileToLines(currentCertificates.getAbsolutePath());
-                    Patch<String> patch = DiffUtils.diff(original, revised);
-                    for (Delta<?> delta: patch.getDeltas()) {
+                    difflib.Patch<String> patch = DiffUtils.diff(original, revised);
+                    for (Delta<?> delta : patch.getDeltas()) {
                         LOGGER.info(delta);
                     }
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(StatementPanel.this, e.toString(), "Error generating diff for SSL Certificates", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(StatementPanel.this, e.toString(),
+                            "Error generating diff for SSL Certificates", JOptionPane.ERROR_MESSAGE);
                 }
 
             }
@@ -531,21 +537,21 @@ public class StatementPanel extends JPanel {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
 
-//        JScrollPane scrollPane = new JScrollPane();
-//        view.add(scrollPane, BorderLayout.CENTER);
-//
-//        fiResponseTextArea = new JTextArea();
-//        fiResponseTextArea.setEditable(false);
-//        scrollPane.setViewportView(fiResponseTextArea);
+        // JScrollPane scrollPane = new JScrollPane();
+        // view.add(scrollPane, BorderLayout.CENTER);
+        //
+        // fiResponseTextArea = new JTextArea();
+        // fiResponseTextArea.setEditable(false);
+        // scrollPane.setViewportView(fiResponseTextArea);
 
         RSyntaxTextArea textArea = new RSyntaxTextArea();
         textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_XML);
         RTextScrollPane sp = new RTextScrollPane(textArea);
         fiResponseTextArea = textArea;
         fiResponseTextArea.setEditable(false);
-        
+
         view.add(sp, BorderLayout.CENTER);
-        
+
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem menuItem = null;
         menuItem = new JMenuItem(new AbstractAction("Format") {
@@ -627,10 +633,10 @@ public class StatementPanel extends JPanel {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
 
-//        JScrollPane scrollPane = new JScrollPane();
-//        fiPropertiesTextArea = new JTextArea();
-//        scrollPane.setViewportView(fiPropertiesTextArea);
-//        view.add(scrollPane, BorderLayout.CENTER);
+        // JScrollPane scrollPane = new JScrollPane();
+        // fiPropertiesTextArea = new JTextArea();
+        // scrollPane.setViewportView(fiPropertiesTextArea);
+        // view.add(scrollPane, BorderLayout.CENTER);
 
         RSyntaxTextArea textArea = new RSyntaxTextArea();
         textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE);
@@ -693,7 +699,7 @@ public class StatementPanel extends JPanel {
         // control-s to save
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK);
         keyMap.addActionForKeyStroke(keyStroke, saveAction);
-        
+
         return view;
     }
 
@@ -701,21 +707,21 @@ public class StatementPanel extends JPanel {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
 
-//        JScrollPane scrollPane = new JScrollPane();
-//        view.add(scrollPane, BorderLayout.CENTER);
-//
-//        fiRequestTextArea = new JTextArea();
-//        fiRequestTextArea.setEditable(false);
-//        scrollPane.setViewportView(fiRequestTextArea);
+        // JScrollPane scrollPane = new JScrollPane();
+        // view.add(scrollPane, BorderLayout.CENTER);
+        //
+        // fiRequestTextArea = new JTextArea();
+        // fiRequestTextArea.setEditable(false);
+        // scrollPane.setViewportView(fiRequestTextArea);
 
         RSyntaxTextArea textArea = new RSyntaxTextArea();
         textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_XML);
         RTextScrollPane sp = new RTextScrollPane(textArea);
         fiRequestTextArea = textArea;
         fiRequestTextArea.setEditable(false);
-        
+
         view.add(sp, BorderLayout.CENTER);
-        
+
         return view;
     }
 
@@ -855,7 +861,7 @@ public class StatementPanel extends JPanel {
 
     public void refreshFiDir() {
         final List<UpdateFiDir> updaters = loadFiDir();
-        
+
         Runnable doRun = new Runnable() {
 
             @Override
@@ -889,7 +895,7 @@ public class StatementPanel extends JPanel {
         if (fi != null) {
             bean.setFi(fi);
             String name = fi.getName();
-            if (!isNull(name)) {
+            if (!PropertiesUtils.isNull(name)) {
                 bean.setName(name);
             }
         }
@@ -897,8 +903,8 @@ public class StatementPanel extends JPanel {
 
     protected void updateFis(final EventList<FiBean> fiBeans) {
         // progress monitor to show the update progress
-        final ProgressMonitor progressMonitor = new ProgressMonitor(StatementPanel.this, "Downloading ...                                           \t", "", 0,
-                fiBeans.size());
+        final ProgressMonitor progressMonitor = new ProgressMonitor(StatementPanel.this,
+                "Downloading ...                                           \t", "", 0, fiBeans.size());
         updateStarted(fiBeans, progressMonitor);
         Runnable command = new UpdateFisTask(progressMonitor, fiBeans);
         threadPool.execute(command);
@@ -908,10 +914,10 @@ public class StatementPanel extends JPanel {
         List<UpdateFiDir> updaters = new ArrayList<UpdateFiDir>();
 
         // TODO_FI
-//        File topDir = new File("fi");
+        // File topDir = new File("fi");
         File topDir = getFiDir();
         LOGGER.info("> Loading fiDir=" + topDir);
-        
+
         if (!topDir.isDirectory()) {
             LOGGER.warn("Not a directory topDir=" + topDir);
             return updaters;
@@ -1041,7 +1047,8 @@ public class StatementPanel extends JPanel {
                             if ((status != null) && (status.compareToIgnoreCase("SUCCESS") == 0)) {
                                 File respFile = fiBean.getUpdater().getRespFile();
                                 if (respFile == null) {
-                                    respFile = new File(fiBean.getUpdater().getDir(), fiBean.getUpdater().getRespFileName());
+                                    respFile = new File(fiBean.getUpdater().getDir(),
+                                            fiBean.getUpdater().getRespFileName());
                                 }
                                 if ((respFile != null) && (respFile.exists())) {
                                     List<File> files = new ArrayList<File>();
@@ -1068,8 +1075,8 @@ public class StatementPanel extends JPanel {
         threadPool.execute(command);
     }
 
-    private JTable createPriceTable(EventList<FiBean> fiBeans, Comparator<? super FiBean> comparator, JTextField filterEdit, TextFilterator<FiBean> filter,
-            boolean addStripe) {
+    private JTable createPriceTable(EventList<FiBean> fiBeans, Comparator<? super FiBean> comparator,
+            JTextField filterEdit, TextFilterator<FiBean> filter, boolean addStripe) {
         EventList<FiBean> source = fiBeans;
 
         SortedList<FiBean> sortedList = null;
@@ -1096,11 +1103,13 @@ public class StatementPanel extends JPanel {
         String columnLabels[] = { "Name", "Status", "Last Downloaded", "Last Imported" };
         AdvancedTableFormat tableFormat = new BeanTableFormat(beanClass, propertyNames, columnLabels);
         final TransformedList<FiBean, FiBean> sourceProxyList = GlazedListsSwing.swingThreadProxyList(source);
-        final DefaultEventTableModel<FiBean> tableModel = new DefaultEventTableModel<FiBean>(sourceProxyList, tableFormat);
+        final DefaultEventTableModel<FiBean> tableModel = new DefaultEventTableModel<FiBean>(sourceProxyList,
+                tableFormat);
         JTable table = new JTable(tableModel);
 
         if (sortedList != null) {
-            TableComparatorChooser tableSorter = TableComparatorChooser.install(table, sortedList, AbstractTableComparatorChooser.SINGLE_COLUMN);
+            TableComparatorChooser tableSorter = TableComparatorChooser.install(table, sortedList,
+                    AbstractTableComparatorChooser.SINGLE_COLUMN);
         }
 
         fiBeansSelectionModel = new DefaultEventSelectionModel(source);
@@ -1147,8 +1156,10 @@ public class StatementPanel extends JPanel {
                     }
 
                     @Override
-                    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                        Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                            boolean hasFocus, int row, int column) {
+                        Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                                row, column);
                         FiBean bean = tableModel.getElementAt(row);
                         if (column == 2) {
                             if (hasNewDownload(bean)) {
@@ -1419,7 +1430,7 @@ public class StatementPanel extends JPanel {
         }
 
         textArea.setCaretPosition(0);
-        
+
         return file;
     }
 
@@ -1458,18 +1469,6 @@ public class StatementPanel extends JPanel {
             }
         }
         textArea.setCaretPosition(0);
-    }
-
-    private boolean isNull(String str) {
-        if (str == null) {
-            return true;
-        }
-
-        if (str.length() <= 0) {
-            return true;
-        }
-
-        return false;
     }
 
     public File getFiDir() {

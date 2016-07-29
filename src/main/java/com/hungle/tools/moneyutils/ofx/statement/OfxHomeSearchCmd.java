@@ -14,7 +14,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -56,7 +56,7 @@ public class OfxHomeSearchCmd {
 
     private List<FI> search(String searchName) throws ClientProtocolException, IOException {
         // http://www.ofxhome.com/api.txt
-        HttpClient httpClient = new DefaultHttpClient();
+        HttpClient httpClient = HttpClientBuilder.create().build();
         String uri = API_SEARCH_URL + URLEncoder.encode(searchName, "UTF-8");
         HttpGet httpGet = new HttpGet(uri);
 
@@ -102,7 +102,7 @@ public class OfxHomeSearchCmd {
 
     private void getFiDetails(FI fi) throws IOException {
         // http://www.ofxhome.com/api.php?lookup=1234
-        HttpClient httpClient = new DefaultHttpClient();
+        HttpClient httpClient = HttpClientBuilder.create().build();
         String uri = "http://www.ofxhome.com/api.php" + "?" + "lookup=" + URLEncoder.encode(fi.getId(), "UTF-8");
         HttpGet httpGet = new HttpGet(uri);
 

@@ -68,7 +68,7 @@ public abstract class AbstractGetQuotesTask<V> implements Callable<V> {
         }
         if (httpQuoteGetter != null) {
             try {
-                StockPrice stockPriceBean = new StockPrice();
+                AbstractStockPrice stockPriceBean = new StockPrice();
                 String format = stockPriceBean.getFormat();
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("format=" + format);

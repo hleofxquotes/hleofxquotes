@@ -21,16 +21,31 @@ public class StockPriceCsvUtils {
     /**
      * Parses the current record.
      *
-     * @param reader the reader
+     * @param csvReader the reader
      * @return the abstract stock price
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private static AbstractStockPrice parseCurrentRecord(final CsvReader reader) throws IOException {
+    private static AbstractStockPrice parseCurrentRecord(final CsvReader csvReader) throws IOException {
+        CsvRow cvsRow = getCurrentCsvRow(csvReader);
+
+        AbstractStockPrice stockPrice = new StockPrice(cvsRow);
+
+        return stockPrice;
+    }
+
+    /**
+     * Read from reader and return the current CsvRow.
+     * 
+     * @param csvReader
+     * @return
+     * @throws IOException
+     */
+    private static CsvRow getCurrentCsvRow(final CsvReader csvReader) throws IOException {
         if (LOGGER.isDebugEnabled()) {
-            int count = reader.getColumnCount();
+            int count = csvReader.getColumnCount();
             LOGGER.debug("");
             for (int i = 0; i < count; i++) {
-                String value = reader.get(i);
+                String value = csvReader.get(i);
                 LOGGER.debug("i=" + i + ", value=" + value);
             }
         }
@@ -39,37 +54,34 @@ public class StockPriceCsvUtils {
 
             @Override
             public String getColumnValue(int i) throws IOException {
-                return reader.get(i);
+                return csvReader.get(i);
             }
 
             @Override
             public String getRawRecord() {
-                return reader.getRawRecord();
+                return csvReader.getRawRecord();
             }
         };
-
-        AbstractStockPrice stockPrice = new StockPrice(cvsRow);
-
-        return stockPrice;
+        
+        return cvsRow;
     }
 
     /**
      * To stock price beans.
      *
-     * @param reader the reader
+     * @param csvReader the reader
      * @param skipIfNoPrice the skip if no price
      * @return the list
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private static List<AbstractStockPrice> toStockPriceBeans(CsvReader reader, boolean skipIfNoPrice) throws IOException {
+    private static List<AbstractStockPrice> toStockPriceBeans(CsvReader csvReader, boolean skipIfNoPrice) throws IOException {
         List<AbstractStockPrice> beans = new ArrayList<AbstractStockPrice>();
         // reader.readHeaders();
-        while (reader.readRecord()) {
-            String line = reader.getRawRecord();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(line);
-            }
-            AbstractStockPrice bean = parseCurrentRecord(reader);
+        while (csvReader.readRecord()) {
+            String line = csvReader.getRawRecord();
+            LOGGER.info(line);
+            
+            AbstractStockPrice bean = parseCurrentRecord(csvReader);
             if (bean != null) {
                 if ((bean.getLastPrice().getPrice() <= 0.0) && (skipIfNoPrice)) {
                     if (LOGGER.isDebugEnabled()) {

@@ -37,7 +37,7 @@ public class HttpUtils {
 
         Reader reader = null;
         try {
-            reader = toReader(entity);
+            reader = entityToReader(entity);
             beans = StockPriceCsvUtils.toStockPrices(reader, skipIfNoPrice);
         } finally {
             if (reader != null) {
@@ -58,7 +58,7 @@ public class HttpUtils {
      * @return the reader
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public static Reader toReader(HttpEntity entity) throws IOException {
+    public static Reader entityToReader(HttpEntity entity) throws IOException {
         InputStream in = entity.getContent();
         Charset charset = HttpUtils.getCharset(entity);
         Reader reader = new BufferedReader(new InputStreamReader(in, charset));

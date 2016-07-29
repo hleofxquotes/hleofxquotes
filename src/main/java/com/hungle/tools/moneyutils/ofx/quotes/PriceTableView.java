@@ -12,18 +12,17 @@ import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.hungle.tools.moneyutils.stockprice.StockPrice;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TextFilterator;
 import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
-import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.impl.beans.BeanTableFormat;
 import ca.odell.glazedlists.matchers.MatcherEditor;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 
@@ -31,173 +30,175 @@ import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 /**
  * The Class PriceTableView.
  */
-public class PriceTableView extends JScrollPane {
-    
+public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
+
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
-    
+
     /** The popup menu. */
     private final JPopupMenu popupMenu;
+
+    private TextFilterator<T> filter;
+
+    private boolean addStripe = true;
+
+    private Comparator<T> comparator;
 
     /**
      * Instantiates a new price table view.
      *
-     * @param filterEdit the filter edit
-     * @param priceList the price list
+     * @param filterEdit
+     *            the filter edit
+     * @param priceList
+     *            the price list
      */
-    public PriceTableView(JTextField filterEdit, EventList<AbstractStockPrice> priceList) {
+    public PriceTableView(JTextField filterEdit, EventList<T> priceList, Class<T> baseClass) {
         super();
+
         popupMenu = new JPopupMenu();
-        setViewportView(createViewportView(filterEdit, priceList));
+
+        this.comparator = new Comparator<T>() {
+            @Override
+            public int compare(T b1, T b2) {
+                return b1.getStockSymbol().compareTo(b2.getStockSymbol());
+            }
+        };
+
+        this.filter = new TextFilterator<T>() {
+            @Override
+            public void getFilterStrings(List<String> list, T bean) {
+                list.add(bean.getStockName());
+                list.add(bean.getStockSymbol());
+            }
+        };
+
+        setViewportView(createViewportView(filterEdit, priceList, baseClass));
     }
 
     /**
      * Creates the viewport view.
      *
-     * @param filterEdit the filter edit
-     * @param priceList the price list
+     * @param filterEdit
+     *            the filter edit
+     * @param priceList
+     *            the price list
      * @return the j table
      */
-    private JTable createViewportView(JTextField filterEdit, EventList<AbstractStockPrice> priceList) {
-        Comparator<? super AbstractStockPrice> comparator = new Comparator<AbstractStockPrice>() {
-            @Override
-            public int compare(AbstractStockPrice b1, AbstractStockPrice b2) {
-                return b1.getStockSymbol().compareTo(b2.getStockSymbol());
-            }
-        };
-        // JTextField filterEdit = new JTextField(10);
-        TextFilterator<AbstractStockPrice> filter = null;
-        // String propertyNames[] = { "stockName", "stockSymbol", };
-        // filter = new BeanTextFilterator(propertyNames);
-        filter = new TextFilterator<AbstractStockPrice>() {
-            @Override
-            public void getFilterStrings(List<String> list, AbstractStockPrice bean) {
-                list.add(bean.getStockName());
-                list.add(bean.getStockSymbol());
-            }
-        };
-        boolean addStripe = true;
-        JTable table = createPriceTable(priceList, comparator, filterEdit, filter, addStripe);
+    private JTable createViewportView(JTextField filterEdit, EventList<T> priceList, Class<T> baseClass) {
+        JTable table = createPriceTable(priceList, comparator, filterEdit, filter, addStripe, baseClass);
         // table.setFillsViewportHeight(true);
 
         MouseListener popupListener = new PopupListener(popupMenu);
         // Add the listener to the JTable:
         table.addMouseListener(popupListener);
         // Add the listener specifically to the header:
-//        table.getTableHeader().addMouseListener(popupListener);
+        // table.getTableHeader().addMouseListener(popupListener);
 
         return table;
-        // JScrollPane scrolledPane = new JScrollPane(table);
-        //
-        // return scrolledPane;
     }
 
     /**
      * Creates the price table.
      *
-     * @param priceList the price list
-     * @param comparator the comparator
-     * @param filterEdit the filter edit
-     * @param filter the filter
-     * @param addStripe the add stripe
+     * @param priceList
+     *            the price list
+     * @param comparator
+     *            the comparator
+     * @param filterEdit
+     *            the filter edit
+     * @param filter
+     *            the filter
+     * @param addStripe
+     *            the add stripe
      * @return the j table
      */
-    private JTable createPriceTable(EventList<AbstractStockPrice> priceList, Comparator<? super AbstractStockPrice> comparator, JTextField filterEdit,
-            TextFilterator<AbstractStockPrice> filter, boolean addStripe) {
-        EventList<AbstractStockPrice> source = priceList;
+    private JTable createPriceTable(EventList<T> priceList, Comparator<T> comparator, JTextField filterEdit,
+            TextFilterator<T> filter, boolean addStripe, Class<T> baseClass) {
 
-        SortedList<AbstractStockPrice> sortedList = null;
+        EventList<T> source = priceList;
+
+        SortedList<T> sortedList = null;
 
         if (comparator != null) {
-            sortedList = new SortedList<AbstractStockPrice>(source, comparator);
+            sortedList = new SortedList<T>(source, comparator);
             source = sortedList;
         }
 
         if ((filterEdit != null) && (filter != null)) {
-            FilterList<AbstractStockPrice> filterList = null;
-            MatcherEditor<AbstractStockPrice> textMatcherEditor = new TextComponentMatcherEditor<AbstractStockPrice>(filterEdit, filter);
-            filterList = new FilterList<AbstractStockPrice>(source, textMatcherEditor);
-            source = filterList;
+            source = addFiltering(filterEdit, filter, source);
         }
 
-        Class<StockPrice> beanClass = StockPrice.class;
-        String propertyNames[] = { "stockSymbol", "stockName", "lastPrice", "lastTradeDate", "lastTradeTime" };
-        String columnLabels[] = { "Symbol", "Name", "Price", "Last Trade Date", "Last Trade Time" };
-        AdvancedTableFormat tableFormat = new BeanTableFormat(beanClass, propertyNames, columnLabels);
-        EventTableModel<AbstractStockPrice> tableModel = new EventTableModel<AbstractStockPrice>(source, tableFormat);
+        DefaultEventTableModel<T> tableModel = createTableModel(source, baseClass);
 
         JTable table = new JTable(tableModel);
 
         if (sortedList != null) {
-            TableComparatorChooser tableSorter = TableComparatorChooser.install(table, sortedList, AbstractTableComparatorChooser.SINGLE_COLUMN);
+            addSorting(sortedList, table);
         }
 
-        EventSelectionModel myEventSelectionModel = new EventSelectionModel(source);
-        table.setSelectionModel(myEventSelectionModel);
+        setSelectionModel(source, table);
 
         if (addStripe) {
-            // final Color oddRowsColor = new Color(204, 255, 204);
-            // final Color evenRowsColor = Color.WHITE;
-            TableCellRenderer renderer = null;
-            // renderer = new StripedTableCellRenderer(oddRowsColor,
-            // evenRowsColor) {
-            //
-            // public Component getTableCellRendererComponent(JTable table,
-            // Object value, boolean isSelected, boolean hasFocus, int row, int
-            // column) {
-            // Component rendererComponent = null;
-            // rendererComponent = super.getTableCellRendererComponent(table,
-            // value, isSelected, hasFocus, row, column);
-            // if (column == 3) {
-            // // ((JLabel)
-            // rendererComponent).setHorizontalAlignment(JLabel.RIGHT);
-            // // (javax.swing.JLabel)
-            // rendererComponent).setHorizontalAlignment(JLabel.RIGHT);
-            // rendererComponent.setEnabled(false);
-            // }
-            // return rendererComponent;
-            // }
-            //
-            // };
-            int cols = table.getColumnModel().getColumnCount();
-            for (int i = 0; i < cols; i++) {
-                renderer = new StripedTableRenderer() {
-
-                    /**
-                     * 
-                     */
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    protected void setCellHorizontalAlignment(int column) {
-                        super.setCellHorizontalAlignment(column);
-                        if ((column == 0) || (column == 2) || (column == 3)) {
-                            setHorizontalAlignment(SwingConstants.RIGHT);
-                        }
-                    }
-                };
-                table.getColumnModel().getColumn(i).setCellRenderer(renderer);
-            }
+            addStripeToTable(table);
         }
-        // String dateFormat = "yyyyMMddHHMMSS";
-        // DateTableCellRenderer renderer = new
-        // DateTableCellRenderer(dateFormat);
-        // table.getColumnModel().getColumn(2).setCellRenderer(renderer);
-        //
-        // final int columnCount = 3;
-        // int[] colWidths = new int[columnCount];
-        // for (int i = 0; i < colWidths.length; i++) {
-        // colWidths[i] = -1;
-        // }
-        // colWidths = null;
-        // if (colWidths != null) {
-        // log.info("colWidths=" + colWidths);
-        // Object[] maxWidthValues =
-        // TableUtils.calculateMaxWidthValues(colWidths);
-        // TableUtils.adjustColumnSizes(table, maxWidthValues);
-        // }
 
         return table;
+    }
+
+    private static <T> EventList<T> addFiltering(JTextField filterEdit, TextFilterator<T> filter, EventList<T> source) {
+        FilterList<T> filterList = null;
+        MatcherEditor<T> textMatcherEditor = new TextComponentMatcherEditor<T>(filterEdit, filter);
+        filterList = new FilterList<T>(source, textMatcherEditor);
+        source = filterList;
+        return source;
+    }
+
+    private static <T> void addSorting(SortedList<T> sortedList, JTable table) {
+        @SuppressWarnings("unused")
+        TableComparatorChooser<T> tableSorter = TableComparatorChooser.install(table, sortedList,
+                AbstractTableComparatorChooser.SINGLE_COLUMN);
+    }
+
+    private static <T> void setSelectionModel(EventList<T> source, JTable table) {
+        DefaultEventSelectionModel<T> eventSelectionModel = createEventSelectionModel(source);
+        table.setSelectionModel(eventSelectionModel);
+    }
+
+    private static void addStripeToTable(JTable table) {
+        TableCellRenderer renderer = null;
+        int cols = table.getColumnModel().getColumnCount();
+        for (int i = 0; i < cols; i++) {
+            renderer = new StripedTableRenderer() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                protected void setCellHorizontalAlignment(int column) {
+                    super.setCellHorizontalAlignment(column);
+                    if ((column == 0) || (column == 2) || (column == 3)) {
+                        setHorizontalAlignment(SwingConstants.RIGHT);
+                    }
+                }
+            };
+            table.getColumnModel().getColumn(i).setCellRenderer(renderer);
+        }
+    }
+
+    private static <T> DefaultEventSelectionModel<T> createEventSelectionModel(EventList<T> source) {
+        DefaultEventSelectionModel<T> eventSelectionModel = new DefaultEventSelectionModel<T>(
+                GlazedListsSwing.swingThreadProxyList(source));
+        return eventSelectionModel;
+    }
+
+    private static <T> DefaultEventTableModel<T> createTableModel(EventList<T> source, Class<T> baseClass) {
+        String propertyNames[] = { "stockSymbol", "stockName", "lastPrice", "lastTradeDate", "lastTradeTime" };
+        String columnLabels[] = { "Symbol", "Name", "Price", "Last Trade Date", "Last Trade Time" };
+        BeanTableFormat<T> tableFormat = new BeanTableFormat<T>(baseClass, propertyNames, columnLabels);
+        DefaultEventTableModel<T> tableModel = new DefaultEventTableModel<T>(
+                GlazedListsSwing.swingThreadProxyList(source), tableFormat);
+        return tableModel;
     }
 
     /**

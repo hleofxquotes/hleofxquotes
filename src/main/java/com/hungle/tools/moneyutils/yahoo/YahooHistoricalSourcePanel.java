@@ -63,7 +63,7 @@ public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
         LOGGER.info("user selected, limitToFriday=" + dialog.getLimitToFriday());
         LOGGER.info("user selected, limitToEOM=" + dialog.getLimitToEOM());
         
-        GetYahooQuotes quoteGetter = new GetYahooHistoricalQuotes(fromDate, toDate, dialog.getLimitToFriday(), dialog.getLimitToEOM());
+        YahooQuotesGetter quoteGetter = new GetYahooHistoricalQuotes(fromDate, toDate, dialog.getLimitToFriday(), dialog.getLimitToEOM());
         if (quoteServer != null) {
             quoteGetter.setHost(quoteServer);
         }

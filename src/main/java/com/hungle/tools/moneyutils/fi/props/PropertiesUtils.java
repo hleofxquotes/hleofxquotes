@@ -31,30 +31,34 @@ import com.hungle.tools.moneyutils.scrubber.ResponseFilter;
  * The Class PropertiesUtils.
  */
 public class PropertiesUtils {
-    
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(PropertiesUtils.class);
 
     /** The Constant DEFAULT_APP_VER. */
     private static final String DEFAULT_APP_VER = "1900";
-    
+
     /** The Constant DEFAULT_APP_ID. */
     private static final String DEFAULT_APP_ID = "QWIN";
 
     /**
      * Creates the velocity context.
      *
-     * @param propsFile the props file
+     * @param propsFile
+     *            the props file
      * @return the velocity context
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public static VelocityContext createVelocityContext(File propsFile) throws IOException {
-        VelocityContext context = new VelocityContext();
-
         Properties props = loadProperties(propsFile);
-        ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
-        BeanUtilsBean beanUtilsBean = new BeanUtilsBean(convertUtilsBean, new PropertyUtilsBean());
+        BeanUtilsBean beanUtilsBean = getDefaultBeanUtilsBean();
 
+        return createVelocityContext(props, beanUtilsBean);
+    }
+
+    private static VelocityContext createVelocityContext(Properties props, BeanUtilsBean beanUtilsBean) {
+        VelocityContext context = new VelocityContext();
         // FI
         FIBean fi = FIBean.parseFI(props, beanUtilsBean);
         if (LOGGER.isDebugEnabled()) {
@@ -73,7 +77,7 @@ public class PropertiesUtils {
         // requestType
         String requestType = null;
         String property = props.getProperty("requestType");
-        if (!isNull(property)) {
+        if (!PropertiesUtils.isNull(property)) {
             requestType = property;
         }
         if (LOGGER.isDebugEnabled()) {
@@ -92,13 +96,13 @@ public class PropertiesUtils {
         // DefaultAppID = 'QWIN'
         // DefaultAppVer = '1900'
         String appID = props.getProperty("appId");
-        if (isNull(appID)) {
+        if (PropertiesUtils.isNull(appID)) {
             appID = DEFAULT_APP_ID;
         }
         context.put("appId", appID);
 
         String appVer = props.getProperty("appVer");
-        if (isNull(appVer)) {
+        if (PropertiesUtils.isNull(appVer)) {
             appVer = DEFAULT_APP_VER;
         }
         context.put("appVer", appVer);
@@ -134,16 +138,23 @@ public class PropertiesUtils {
         return context;
     }
 
+    static BeanUtilsBean getDefaultBeanUtilsBean() {
+        ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
+        BeanUtilsBean beanUtilsBean = new BeanUtilsBean(convertUtilsBean, new PropertyUtilsBean());
+        return beanUtilsBean;
+    }
+
     /**
      * Parses the start date.
      *
-     * @param props the props
+     * @param props
+     *            the props
      * @return the string
      */
     private static String parseStartDate(Properties props) {
         String startDate = null;
         String property = props.getProperty("startDate");
-        if (!isNull(property)) {
+        if (!PropertiesUtils.isNull(property)) {
             property = property.trim();
             if (property.charAt(0) == '-') {
                 try {
@@ -217,9 +228,11 @@ public class PropertiesUtils {
                 if (!respFile.exists()) {
                     return;
                 }
-                LOGGER.info("> ResponseFilter: " + "url=" + fi.getUrl() + "ofx.version=" + ofx.getVersion() + ", respFile=" + respFile);
+                LOGGER.info("> ResponseFilter: " + "url=" + fi.getUrl() + "ofx.version=" + ofx.getVersion()
+                        + ", respFile=" + respFile);
                 OfxScrubber scrubber = new IngDirectScrubber();
-                File outFile = new File(respFile.getAbsoluteFile().getParentFile(), respFile.getName() + "-scrubbed.txt");
+                File outFile = new File(respFile.getAbsoluteFile().getParentFile(),
+                        respFile.getName() + "-scrubbed.txt");
                 File backupFile = new File(respFile.getAbsoluteFile().getParentFile(), respFile.getName() + "-bak.txt");
                 try {
                     scrubber.scrub(respFile, outFile);
@@ -240,7 +253,8 @@ public class PropertiesUtils {
     /**
      * Parses the start date.
      *
-     * @param offset the offset
+     * @param offset
+     *            the offset
      * @return the string
      */
     public static String parseStartDate(Long offset) {
@@ -258,34 +272,47 @@ public class PropertiesUtils {
     /**
      * Checks if is null.
      *
-     * @param property the property
+     * @param property
+     *            the property
      * @return true, if is null
      */
     public static boolean isNull(String property) {
         if (property == null) {
             return true;
         }
-    
+
         if (property.length() <= 0) {
             return true;
         }
-    
+
         return false;
     }
 
     /**
-     * Sets the properties.
-     *
-     * @param beanUtilsBean the bean utils bean
-     * @param bean the bean
-     * @param prefix the prefix
-     * @param keys the keys
-     * @param props the props
+     * Pre jackson/json date. For given prefix.key, get the value in props and
+     * set the matching property in 'bean'.
+     * 
+     * @param prefix
+     *            the prefix
+     * @param keys
+     *            the keys
+     * @param props
+     *            the props
+     * @param bean
+     *            the bean
+     * @param beanUtilsBean
+     *            the bean utils bean
      */
-    public static void setProperties(BeanUtilsBean beanUtilsBean, Object bean, String prefix, Collection<String> keys, Properties props) {
+    public static void setProperties(String prefix, Collection<String> keys, Properties props, Object bean,
+            BeanUtilsBean beanUtilsBean) {
         for (String key : keys) {
-            String property = props.getProperty(prefix + "." + key);
-            if (!isNull(property)) {
+            String property = null;
+            if (PropertiesUtils.isNull(prefix)) {
+                property = props.getProperty(key);
+            } else {
+                property = props.getProperty(prefix + "." + key);
+            }
+            if (!PropertiesUtils.isNull(property)) {
                 try {
                     property = property.trim();
                     beanUtilsBean.setProperty(bean, key, property);
@@ -299,11 +326,13 @@ public class PropertiesUtils {
     }
 
     /**
-     * Load properties.
+     * Load a property file.
      *
-     * @param file the file
+     * @param file
+     *            the file
      * @return the properties
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     // TODO_ENCRYPTION
     private static Properties loadProperties(File file) throws IOException {

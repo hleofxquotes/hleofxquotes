@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
 import com.hungle.tools.moneyutils.data.SymbolMapper;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.CurrencyUtils;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
@@ -62,7 +63,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
                     String line = csvReader.getRawRecord();
                     LOGGER.debug(line);
                 }
-                StockPrice bean = null;
+                AbstractStockPrice bean = null;
                 try {
                     bean = convert(csvReader);
                     if (bean != null) {
@@ -102,19 +103,8 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         return beans;
     }
 
-    public boolean isNull(String str) {
-        if (str == null) {
-            return true;
-        }
-
-        if (str.length() <= 0) {
-            return true;
-        }
-        return false;
-    }
-
     @Override
-    public StockPrice convert(CsvReader csvReader) throws IOException {
+    public AbstractStockPrice convert(CsvReader csvReader) throws IOException {
         StockPrice stockPrice = new StockPrice();
     
         try {
@@ -130,7 +120,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
     
             setUnits(csvReader, stockPrice);
         } finally {
-            if (isNull(stockPrice.getStockName())) {
+            if (PropertiesUtils.isNull(stockPrice.getStockName())) {
                 stockPrice.setStockName(stockPrice.getStockSymbol());
             }
             stockPrice.calculateSecType();
@@ -140,34 +130,34 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         return stockPrice;
     }
 
-    protected void setStockName(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+    protected void setStockName(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         String stockName = csvReader.get(columnName);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + stockName);
         }
-        if (isNull(stockName)) {
+        if (PropertiesUtils.isNull(stockName)) {
             throw new IOException("SKIP: invalid name=" + stockName);
         }
         stockPrice.setStockName(stockName);
     }
 
-    protected void setStockSymbol(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+    protected void setStockSymbol(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         String stockSymbol = csvReader.get(columnName);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + stockSymbol);
         }
-        if (isNull(stockSymbol)) {
+        if (PropertiesUtils.isNull(stockSymbol)) {
             throw new IOException("SKIP: invalid symbolExchange=" + stockSymbol + ", name=" + stockPrice.getStockName());
         }
         stockPrice.setStockSymbol(stockSymbol);
     }
 
-    protected void setLastPrice(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+    protected void setLastPrice(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         String lastPrice = csvReader.get(columnName);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + lastPrice);
         }
-        if (isNull(lastPrice)) {
+        if (PropertiesUtils.isNull(lastPrice)) {
             throw new IOException("SKIP: no price for " + stockPrice.getStockSymbol());
         }
         NumberFormat formatter = null;
@@ -189,12 +179,12 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         stockPrice.setLastPrice(price);
     }
 
-    protected void setLastTrade(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+    protected void setLastTrade(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         String quoteDateAndTime = csvReader.get(columnName);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + quoteDateAndTime);
         }
-        if (!isNull(quoteDateAndTime)) {
+        if (!PropertiesUtils.isNull(quoteDateAndTime)) {
             try {
                 Date date = quoteDateAndTimeFormatter.parse(quoteDateAndTime);
                 stockPrice.setLastTradeDate(lastTradeDateFormatter.format(date));
@@ -207,7 +197,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
 
     }
 
-    protected void setCurrency(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+    protected void setCurrency(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         String currency = csvReader.get(columnName);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + currency);
@@ -215,13 +205,13 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         stockPrice.setCurrency(currency);
     }
 
-    protected void setUnits(CsvReader csvReader, StockPrice stockPrice, String columnName) throws IOException {
+    protected void setUnits(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         if (useQuoteSourceShareCount) {
             String quantity = csvReader.get(columnName);
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(columnName + ": " + quantity);
             }
-            if (!isNull(quantity)) {
+            if (!PropertiesUtils.isNull(quantity)) {
                 Double units;
                 try {
                     units = Double.valueOf(quantity);

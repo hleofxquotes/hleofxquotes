@@ -24,9 +24,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 
@@ -44,10 +43,10 @@ import com.hungle.tools.moneyutils.stockprice.FxSymbol;
 /**
  * The Class GetYahooQuotes.
  */
-public class GetYahooQuotes implements HttpQuoteGetter {
+public class YahooQuotesGetter implements HttpQuoteGetter {
     
     /** The Constant log. */
-    private static final Logger LOGGER = Logger.getLogger(GetYahooQuotes.class);
+    private static final Logger LOGGER = Logger.getLogger(YahooQuotesGetter.class);
     
     /** The Constant DEFAULT_TIMEOUT. */
     private static final long DEFAULT_TIMEOUT = 120L;
@@ -136,10 +135,8 @@ public class GetYahooQuotes implements HttpQuoteGetter {
     public HttpResponse httpGet(List<String> stocks, String format) throws URISyntaxException, IOException, ClientProtocolException {
         URI uri = createURI(stocks, format);
         HttpGet httpGet = new HttpGet(uri);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("uri=" + uri);
-        }
-        HttpClient httpClient = new DefaultHttpClient();
+        LOGGER.info("uri=" + uri);
+        HttpClient httpClient = HttpClientBuilder.create().build();
         HttpResponse response = httpClient.execute(httpGet);
         return response;
     }
@@ -163,7 +160,8 @@ public class GetYahooQuotes implements HttpQuoteGetter {
      */
     public List<AbstractStockPrice> getQuotes(List<String> stocks) throws ClientProtocolException, URISyntaxException, IOException {
         GetQuotesListener listener = null;
-        List<AbstractStockPrice> quotes = getQuotes(stocks, listener, true);
+        boolean skipNoPrice = true;
+        List<AbstractStockPrice> quotes = getQuotes(stocks, listener, skipNoPrice);
         return quotes;
     }
 
@@ -178,7 +176,8 @@ public class GetYahooQuotes implements HttpQuoteGetter {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener) throws ClientProtocolException, URISyntaxException, IOException {
-        List<AbstractStockPrice> quotes = getQuotes(stocks, listener, true);
+        boolean skipNoPrice = true;
+        List<AbstractStockPrice> quotes = getQuotes(stocks, listener, skipNoPrice);
         return quotes;
     }
 
@@ -295,27 +294,32 @@ public class GetYahooQuotes implements HttpQuoteGetter {
      * @throws URISyntaxException the URI syntax exception
      */
     protected URI createURI(List<String> stocks, String format) throws URISyntaxException {
-        return URIUtils.createURI(getScheme(), getHost(), getPort(), getPath(), createQueries(stocks, format), null);
+        URI uri =  null;
+        
+//        uri =  URIUtils.createURI(getScheme(), getHost(), getPort(), getPath(), createQueries(stocks, format), null);
+        uri = new URIBuilder()
+                .setScheme(getScheme())
+                .setHost(getHost())
+                .setPort(getPort())
+                .setPath(getPath())
+                .setParameters(createParameters(stocks, format))
+                .setFragment(null)
+                .build();
+        
+        return uri;
     }
 
-    /**
-     * Creates the queries.
-     *
-     * @param stocks the stocks
-     * @param format the format
-     * @return the string
-     */
-    private static String createQueries(List<String> stocks, String format) {
+    private static List<NameValuePair> createParameters(List<String> stocks, String format) {
         // http://download.finance.yahoo.com/d/quotes.csv?s=IBM&f=sl1d1t1c1ohgv&e=.csv
         // http://download.finance.yahoo.com/d/quotes.csv?s=EDL.L&f=sl1d1t1c1ohgv&e=.csv
         // http://uk.old.finance.yahoo.com/d/quotes.csv?s=GB0032346800.L&f=sl1d1t1c1ohgv&e=.csv
         // ^GSPC
         // http://download.finance.yahoo.com/d/quotes.csv?s=%5EGSPC&f=sl1d1t1c1ohgv&e=.csv
-        List<NameValuePair> qParams = new ArrayList<NameValuePair>();
-        qParams.add(new BasicNameValuePair("s", OfxUtils.toSeparatedString(stocks)));
-        qParams.add(new BasicNameValuePair("f", format));
-        qParams.add(new BasicNameValuePair("e", ".csv"));
-        return URLEncodedUtils.format(qParams, "UTF-8");
+        List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+        parameters.add(new BasicNameValuePair("s", OfxUtils.toSeparatedString(stocks)));
+        parameters.add(new BasicNameValuePair("f", format));
+        parameters.add(new BasicNameValuePair("e", ".csv"));
+        return parameters;
     }
 
     /**
@@ -457,7 +461,7 @@ public class GetYahooQuotes implements HttpQuoteGetter {
      * @param fxSymbol the fx symbol
      * @param now the now
      */
-    protected void writeFxCsvEntry(PrintWriter writer, FxSymbol fxSymbol, Date now) {
+    private void writeFxCsvEntry(PrintWriter writer, FxSymbol fxSymbol, Date now) {
         writer.println(fxSymbol.getFromCurrency() + ", " + fxSymbol.getToCurrency() + ", " + fxSymbol.getRate() + ", " + now);
     }
 

@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -174,7 +175,7 @@ public class SymbolMapperEntry {
     public void load(CsvReader csvReader) throws IOException {
         // MSMoneySymbol
         String msMoneySymbol = csvReader.get("MSMoneySymbol");
-        if (isNull(msMoneySymbol)) {
+        if (PropertiesUtils.isNull(msMoneySymbol)) {
             LOGGER.warn("MSMoneySymbol column is blank");
             return;
         } else {
@@ -183,7 +184,7 @@ public class SymbolMapperEntry {
 
         // QuotesSourceSymbol
         String quotesSourceSymbol = csvReader.get("QuotesSourceSymbol");
-        if (isNull(quotesSourceSymbol)) {
+        if (PropertiesUtils.isNull(quotesSourceSymbol)) {
             LOGGER.warn("QuotesSourceSymbol column is blank");
             return;
         } else {
@@ -192,7 +193,7 @@ public class SymbolMapperEntry {
 
         // IsMutualFund
         String isMutualFund = csvReader.get("IsMutualFund");
-        if (isNull(quotesSourceSymbol)) {
+        if (PropertiesUtils.isNull(quotesSourceSymbol)) {
             setMutualFund(false);
         } else {
             setMutualFund(Boolean.valueOf(isMutualFund));
@@ -200,7 +201,7 @@ public class SymbolMapperEntry {
 
         // IsOptions
         String isOptions = csvReader.get("IsOptions");
-        if (isNull(quotesSourceSymbol)) {
+        if (PropertiesUtils.isNull(quotesSourceSymbol)) {
             setOptions(false);
         } else {
             setOptions(Boolean.valueOf(isOptions));
@@ -208,7 +209,7 @@ public class SymbolMapperEntry {
 
         // Type
         String type = csvReader.get("Type");
-        if (isNull(type)) {
+        if (PropertiesUtils.isNull(type)) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.warn("Type column is blank");
             }
@@ -232,7 +233,7 @@ public class SymbolMapperEntry {
 
         // MSMoneyCurrency
         String mSMoneyCurrency = csvReader.get("MSMoneyCurrency");
-        if (isNull(mSMoneyCurrency)) {
+        if (PropertiesUtils.isNull(mSMoneyCurrency)) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.warn("MSMoneyCurrency column is blank");
             }
@@ -242,31 +243,13 @@ public class SymbolMapperEntry {
 
         // QuotesSourceCurrency
         String quotesSourceCurrency = csvReader.get("QuotesSourceCurrency");
-        if (isNull(quotesSourceCurrency)) {
+        if (PropertiesUtils.isNull(quotesSourceCurrency)) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.warn("QuotesSourceCurrency column is blank");
             }
         } else {
             setQuotesSourceCurrency(quotesSourceCurrency);
         }
-    }
-
-    /**
-     * Checks if is null.
-     *
-     * @param str the str
-     * @return true, if is null
-     */
-    private static boolean isNull(String str) {
-        if (str == null) {
-            return true;
-        }
-
-        if (str.length() <= 0) {
-            return true;
-        }
-
-        return false;
     }
 
     /**

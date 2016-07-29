@@ -3,7 +3,7 @@ package com.hungle.tools.moneyutils.fi.model.bean;
 import org.apache.log4j.Logger;
 
 public class FiInfoBean implements Cloneable {
-    private static final Logger log = Logger.getLogger(FiInfoBean.class);
+    private static final Logger LOGGER = Logger.getLogger(FiInfoBean.class);
 
     private String name;
     private String id;

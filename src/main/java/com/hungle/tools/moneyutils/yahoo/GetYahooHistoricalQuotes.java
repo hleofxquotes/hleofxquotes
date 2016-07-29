@@ -33,7 +33,7 @@ import com.hungle.tools.moneyutils.stockprice.StockPrice;
 /**
  * The Class GetYahooHistoricalQuotes.
  */
-public class GetYahooHistoricalQuotes extends GetYahooQuotes {
+public class GetYahooHistoricalQuotes extends YahooQuotesGetter {
     
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(GetYahooHistoricalQuotes.class);
@@ -163,7 +163,7 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
 
         Reader reader = null;
         try {
-            reader = HttpUtils.toReader(entity);
+            reader = HttpUtils.entityToReader(entity);
             beans = toStockPrices(reader, skipIfNoPrice);
         } finally {
             if (reader != null) {
@@ -243,7 +243,7 @@ public class GetYahooHistoricalQuotes extends GetYahooQuotes {
             Comparator<AbstractStockPrice> c = new Comparator<AbstractStockPrice>() {
                 @Override
                 public int compare(AbstractStockPrice o1, AbstractStockPrice o2) {
-                    return o1.getLastTrade().compareTo(o2.getLastTrade());
+                    return o1.getLastTradeDate().compareTo(o2.getLastTradeDate());
                 }
             };
             Collections.sort(beans, c);

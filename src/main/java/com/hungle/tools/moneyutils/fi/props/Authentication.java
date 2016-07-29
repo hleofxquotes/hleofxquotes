@@ -15,6 +15,12 @@ import com.hungle.tools.moneyutils.fi.AbstractFiContext;
  */
 public class Authentication {
     
+    private static final String KEY_PASSWORD = "password";
+
+    private static final String KEY_ID = "id";
+
+    private static final String PREFIX = "user";
+
     /** The id. */
     private String id;
     
@@ -89,11 +95,11 @@ public class Authentication {
         String prefix;
         Collection<String> keys;
         Authentication auth = new Authentication();
-        prefix = "user";
+        prefix = PREFIX;
         keys = new ArrayList<String>();
-        keys.add("id");
-        keys.add("password");
-        PropertiesUtils.setProperties(beanUtilsBean, auth, prefix, keys, props);
+        keys.add(KEY_ID);
+        keys.add(KEY_PASSWORD);
+        PropertiesUtils.setProperties(prefix, keys, props, auth, beanUtilsBean);
         return auth;
     }
 }

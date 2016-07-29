@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -118,7 +119,7 @@ public class FxTable {
 
                 columnName = "FromCurrency";
                 String fromCurrency = csvReader.get(columnName);
-                if (isNull(fromCurrency)) {
+                if (PropertiesUtils.isNull(fromCurrency)) {
                     log.warn("Value for column=" + columnName + " is null.");
                     continue;
                 }
@@ -132,7 +133,7 @@ public class FxTable {
 
                 columnName = "ToCurrency";
                 String toCurrency = csvReader.get(columnName);
-                if (isNull(toCurrency)) {
+                if (PropertiesUtils.isNull(toCurrency)) {
                     log.warn("Value for column=" + columnName + " is null.");
                     continue;
                 }
@@ -146,7 +147,7 @@ public class FxTable {
 
                 columnName = "Rate";
                 String rate = csvReader.get(columnName);
-                if (isNull(rate)) {
+                if (PropertiesUtils.isNull(rate)) {
                     log.warn("Value for column=" + columnName + " is null.");
                     continue;
                 }
@@ -176,24 +177,6 @@ public class FxTable {
                 }
             }
         }
-    }
-
-    /**
-     * Checks if is null.
-     *
-     * @param str the str
-     * @return true, if is null
-     */
-    private boolean isNull(String str) {
-        if (str == null) {
-            return true;
-        }
-
-        if (str.length() <= 0) {
-            return true;
-        }
-
-        return false;
     }
 
     /**

@@ -11,7 +11,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.annotation.PropertyAnnotation;
-import com.hungle.tools.moneyutils.ofx.quotes.Utils;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -135,7 +135,7 @@ public class StockPrice extends AbstractStockPrice {
     public void init() {
         String stockSymbol = getStockSymbol();
 
-        if (isNull(getStockName())) {
+        if (PropertiesUtils.isNull(getStockName())) {
             setStockName(stockSymbol);
         }
 
@@ -165,7 +165,7 @@ public class StockPrice extends AbstractStockPrice {
      */
     private void updateLastTrade(String stockSymbol) {
         String lastTradeDate = getLastTradeDate();
-        if (!Utils.isNull(lastTradeDate)) {
+        if (!PropertiesUtils.isNull(lastTradeDate)) {
             try {
                 Date date = lastTradeDateFormatter.parse(lastTradeDate);
                 setLastTrade(date);
@@ -175,24 +175,6 @@ public class StockPrice extends AbstractStockPrice {
         }
         // hh:mm am/pm
         // String lastTradeTime = getLastTradeTime();
-    }
-
-    /**
-     * Checks if is null.
-     *
-     * @param str the str
-     * @return true, if is null
-     */
-    private boolean isNull(String str) {
-        if (str == null) {
-            return true;
-        }
-
-        if (str.length() <= 0) {
-            return true;
-        }
-
-        return false;
     }
 
     /* (non-Javadoc)

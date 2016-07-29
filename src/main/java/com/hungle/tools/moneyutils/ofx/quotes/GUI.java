@@ -81,7 +81,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.bloomberg.BloombergQuoteSourcePanel;
@@ -89,11 +89,11 @@ import com.hungle.tools.moneyutils.data.SymbolMapper;
 import com.hungle.tools.moneyutils.data.SymbolMapperEntry;
 import com.hungle.tools.moneyutils.fi.UpdateFiDir;
 import com.hungle.tools.moneyutils.fi.VelocityUtils;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.hungle.tools.moneyutils.ft.FtDotComQuoteSourcePanel;
 import com.hungle.tools.moneyutils.fx.UpdateFx;
 import com.hungle.tools.moneyutils.jna.ImportDialogAutoClickService;
 import com.hungle.tools.moneyutils.misc.BuildNumber;
-import com.hungle.tools.moneyutils.ofx.statement.FiBean;
 import com.hungle.tools.moneyutils.ofx.statement.StatementPanel;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
@@ -101,10 +101,10 @@ import com.hungle.tools.moneyutils.scholarshare.TIAACREFQuoteSourcePanel;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 import com.hungle.tools.moneyutils.stockprice.Price;
 import com.hungle.tools.moneyutils.stockprice.StockPrice;
-import com.hungle.tools.moneyutils.yahoo.GetYahooQuotes;
 import com.hungle.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel;
 import com.hungle.tools.moneyutils.yahoo.YahooHistoricalSourcePanel;
 import com.hungle.tools.moneyutils.yahoo.YahooQuoteSourcePanel;
+import com.hungle.tools.moneyutils.yahoo.YahooQuotesGetter;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -590,7 +590,7 @@ public class GUI extends JFrame {
         private boolean getJarFile(String uri, File toJarFile, final ProgressMonitor progressMonitor)
                 throws IOException {
             boolean canceled = false;
-            HttpClient client = new DefaultHttpClient();
+            HttpClient client = HttpClientBuilder.create().build();
             HttpGet httpGet = new HttpGet(uri);
             LOGGER.info("GET " + uri);
             HttpResponse httpResponse = client.execute(httpGet);
@@ -1114,11 +1114,11 @@ public class GUI extends JFrame {
             }
 
             String accountId = props.getProperty("accountId");
-            if (!isNull(accountId)) {
+            if (!PropertiesUtils.isNull(accountId)) {
                 selectNewAccountId(accountId);
             }
             String currency = props.getProperty("currency");
-            if (!isNull(currency)) {
+            if (!PropertiesUtils.isNull(currency)) {
                 selectNewCurrency(currency);
             }
         }
@@ -1335,12 +1335,12 @@ public class GUI extends JFrame {
 
         // for (StockPriceBean bean : beans) {
         // String currency = bean.getCurrency();
-        // if (isNull(currency)) {
+        // if (PropertiesUtils.isNull(currency)) {
         // String symbol = bean.getStockSymbol();
         // String overridingCurrency = getMapperCurrency(symbol, mapper);
         // log.info("symbol: " + symbol + ", overridingCurrency=" +
         // overridingCurrency);
-        // if (!isNull(overridingCurrency)) {
+        // if (!PropertiesUtils.isNull(overridingCurrency)) {
         // bean.setCurrency(overridingCurrency);
         // }
         // }
@@ -1505,7 +1505,7 @@ public class GUI extends JFrame {
         String currency = defaultValue;
         for (SymbolMapperEntry entry : mapper.getEntries()) {
             quoteSourceSymbol = entry.getQuotesSourceSymbol();
-            if (isNull(quoteSourceSymbol)) {
+            if (PropertiesUtils.isNull(quoteSourceSymbol)) {
                 continue;
             }
             if (LOGGER.isDebugEnabled()) {
@@ -1518,7 +1518,7 @@ public class GUI extends JFrame {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("getMapperCurrency: s=" + quoteSourceSymbol + ", currency=" + currency);
             }
-            if (!isNull(currency)) {
+            if (!PropertiesUtils.isNull(currency)) {
                 return currency;
             }
         }
@@ -1540,14 +1540,14 @@ public class GUI extends JFrame {
                 price.setCurrency(defaultCurrency);
             }
             String currency = stockPrice.getCurrency();
-            if (isNull(currency)) {
+            if (PropertiesUtils.isNull(currency)) {
                 String symbol = stockPrice.getStockSymbol();
                 String overridingCurrency = null;
                 overridingCurrency = getMapperCurrency(symbol, symbolMapper, overridingCurrency);
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.info("symbol: " + symbol + ", overridingCurrency=" + overridingCurrency);
                 }
-                if (!isNull(overridingCurrency)) {
+                if (!PropertiesUtils.isNull(overridingCurrency)) {
                     stockPrice.setCurrency(overridingCurrency);
                     stockPrice.updateLastPriceCurrency();
                 }
@@ -1879,7 +1879,7 @@ public class GUI extends JFrame {
             reader = new BufferedReader(new FileReader(file));
             props.load(reader);
             String name = props.getProperty("name");
-            if (isNull(name)) {
+            if (PropertiesUtils.isNull(name)) {
                 name = file.getName();
             }
             JMenuItem item = new JMenuItem(new ProfileSelectedAction(name, props));
@@ -2071,24 +2071,6 @@ public class GUI extends JFrame {
         view.add(mainTabbed, BorderLayout.CENTER);
 
         return view;
-    }
-
-    /**
-     * Checks if is null.
-     *
-     * @param str the str
-     * @return true, if is null
-     */
-    public static final boolean isNull(String str) {
-        if (str == null) {
-            return true;
-        }
-
-        if (str.length() <= 0) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -2430,7 +2412,7 @@ public class GUI extends JFrame {
         view.setLayout(new BorderLayout());
 
         priceFilterEdit = new JTextField(10);
-        PriceTableView priceScrollPane = new PriceTableView(priceFilterEdit, priceList);
+        PriceTableView<AbstractStockPrice> priceScrollPane = new PriceTableView<AbstractStockPrice>(priceFilterEdit, priceList, AbstractStockPrice.class);
         view.add(priceScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -2555,7 +2537,7 @@ public class GUI extends JFrame {
         view.setLayout(new BorderLayout());
 
         JTextField filterEdit = new JTextField(10);
-        PriceTableView fxScrollPane = new PriceTableView(filterEdit, exchangeRates);
+        PriceTableView<AbstractStockPrice> fxScrollPane = new PriceTableView<AbstractStockPrice>(filterEdit, exchangeRates, AbstractStockPrice.class);
         view.add(fxScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -2952,7 +2934,7 @@ public class GUI extends JFrame {
         if (quoteSourceView != null) {
             yahooQuoteServer = quoteSourceView.getQuoteServer();
         } else {
-            yahooQuoteServer = GetYahooQuotes.DEFAULT_HOST;
+            yahooQuoteServer = YahooQuotesGetter.DEFAULT_HOST;
         }
         return yahooQuoteServer;
     }

@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.hungle.tools.moneyutils.yahoo.GetYahooQuotes;
+import com.hungle.tools.moneyutils.yahoo.YahooQuotesGetter;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -53,7 +53,7 @@ public class CreateExample {
         File outFile = new File(args[0]);
         LOGGER.info("outFile=" + outFile);
 
-        GetYahooQuotes quoteGetter = new GetYahooQuotes();
+        YahooQuotesGetter quoteGetter = new YahooQuotesGetter();
         try {
             List<AbstractStockPrice> stockPrices = quoteGetter.getQuotes(stockNames);
             double stockPriceOffset = 1000.00;

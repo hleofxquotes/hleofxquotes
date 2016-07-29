@@ -55,24 +55,6 @@ public class Utils {
     }
 
     /**
-     * Checks if is null.
-     *
-     * @param str the str
-     * @return true, if is null
-     */
-    public static boolean isNull(String str) {
-        if (str == null) {
-            return true;
-        }
-
-        if (str.length() <= 0) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Compare files.
      *
      * @param file1 the file 1

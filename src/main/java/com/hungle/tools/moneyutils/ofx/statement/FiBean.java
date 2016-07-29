@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.fi.UpdateFiDir;
 import com.hungle.tools.moneyutils.fi.props.FIBean;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 
 public class FiBean {
     private static final Logger log = Logger.getLogger(FiBean.class);
@@ -94,16 +95,6 @@ public class FiBean {
         readDownloadData();
     }
 
-    private boolean isNull(String str) {
-        if (str == null) {
-            return true;
-        }
-        if (str.length() <= 0) {
-            return true;
-        }
-        return false;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -141,11 +132,11 @@ public class FiBean {
             props.load(reader);
             String value = null;
             value = props.getProperty("download.status");
-            if (!isNull(value)) {
+            if (!PropertiesUtils.isNull(value)) {
                 setStatus(value);
             }
             value = props.getProperty("download.lastImported");
-            if (!isNull(value)) {
+            if (!PropertiesUtils.isNull(value)) {
                 try {
                     setLastImported(dateFormatter.parse(value));
                 } catch (ParseException e) {
@@ -153,7 +144,7 @@ public class FiBean {
                 }
             }
             value = props.getProperty("download.lastDownloaded");
-            if (!isNull(value)) {
+            if (!PropertiesUtils.isNull(value)) {
                 try {
                     setLastDownloaded(dateFormatter.parse(value));
                 } catch (ParseException e) {

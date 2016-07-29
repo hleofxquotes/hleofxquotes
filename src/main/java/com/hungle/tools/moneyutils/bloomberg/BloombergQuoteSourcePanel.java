@@ -45,7 +45,7 @@ public class BloombergQuoteSourcePanel extends YahooApiQuoteSourcePanel {
         if (price == null) {
             throw new IOException("Cannot get price for symbol=" + symbol);
         }
-        StockPrice bean = new StockPrice();
+        AbstractStockPrice bean = new StockPrice();
         bean.setStockSymbol(symbol);
         bean.setStockName(symbol);
         String currency = scrapper.getCurrency();

@@ -27,7 +27,7 @@ public class GetYahooQuotesCmd {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        final Map<String, String> sourceHostNames = GetYahooQuotes.QUOTE_HOSTS;
+        final Map<String, String> sourceHostNames = YahooQuotesGetter.QUOTE_HOSTS;
 
         String sourceHostName = null;
         sourceHostName = sourceHostNames.get("US");
@@ -40,7 +40,7 @@ public class GetYahooQuotesCmd {
         File outFile = new File("quotes.xml");
         LOGGER.info("outFile=" + outFile.getAbsolutePath());
 
-        GetYahooQuotes quoteGetter = new GetYahooQuotes();
+        YahooQuotesGetter quoteGetter = new YahooQuotesGetter();
         quoteGetter.setHost(sourceHostName);
         try {
             List<AbstractStockPrice> stockPrices = quoteGetter.getQuotes(stockNames);

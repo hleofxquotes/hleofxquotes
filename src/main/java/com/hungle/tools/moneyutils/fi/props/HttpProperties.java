@@ -101,7 +101,7 @@ public class HttpProperties {
         keys.add("httpsOnly");
         keys.add("acceptAnySslCertificate");
     
-        PropertiesUtils.setProperties(beanUtilsBean, bean, prefix, keys, props);
+        PropertiesUtils.setProperties(prefix, keys, props, bean, beanUtilsBean);
         return bean;
     }
 }

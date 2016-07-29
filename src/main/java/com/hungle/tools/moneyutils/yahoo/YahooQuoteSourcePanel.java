@@ -123,7 +123,7 @@ public class YahooQuoteSourcePanel extends JPanel {
         if (this.threadPool == null) {
             LOGGER.warn("YahooQuoteSourcePanel is constructed with this.threadPool=null");
         }
-        this.quoteServer = prefs.get(YahooQuoteSourcePanel.PREF_YAHOO_QUOTE_SERVER, GetYahooQuotes.DEFAULT_HOST);
+        this.quoteServer = prefs.get(YahooQuoteSourcePanel.PREF_YAHOO_QUOTE_SERVER, YahooQuotesGetter.DEFAULT_HOST);
         quoteSourceListener = new QuoteSourceListener() {
 
             @Override
@@ -670,7 +670,7 @@ public class YahooQuoteSourcePanel extends JPanel {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            Set<String> keys = GetYahooQuotes.QUOTE_HOSTS.keySet();
+            Set<String> keys = YahooQuotesGetter.QUOTE_HOSTS.keySet();
             String[] possibilities = new String[keys.size()];
             int i = 0;
             for (String key : keys) {
@@ -682,7 +682,7 @@ public class YahooQuoteSourcePanel extends JPanel {
 
             // If a string was returned, say so.
             if ((s != null) && (s.length() > 0)) {
-                String value = GetYahooQuotes.QUOTE_HOSTS.get(s);
+                String value = YahooQuotesGetter.QUOTE_HOSTS.get(s);
                 LOGGER.info("Selected new Yahoo Quote Server: " + value);
                 quoteServer = value;
                 prefs.put(YahooQuoteSourcePanel.PREF_YAHOO_QUOTE_SERVER, quoteServer);
@@ -822,7 +822,7 @@ public class YahooQuoteSourcePanel extends JPanel {
      */
     protected List<AbstractStockPrice> getStockQuotes(final List<String> stockSymbols) throws IOException {
         List<AbstractStockPrice> stockPrices;
-        GetYahooQuotes quoteGetter = new GetYahooQuotes();
+        YahooQuotesGetter quoteGetter = new YahooQuotesGetter();
         if (quoteServer != null) {
             quoteGetter.setHost(quoteServer);
         }

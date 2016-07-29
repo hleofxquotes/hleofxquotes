@@ -159,7 +159,7 @@ public class FIBean {
         keys.add("brokerId");
         keys.add("url");
     
-        PropertiesUtils.setProperties(beanUtilsBean, bean, prefix, keys, props);
+        PropertiesUtils.setProperties(prefix, keys, props, bean, beanUtilsBean);
         
         return bean;
     }

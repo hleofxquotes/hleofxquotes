@@ -108,7 +108,7 @@ public class YahooApiQuoteSourcePanel extends YahooQuoteSourcePanel {
             LOGGER.warn("Cannot get price for symbol=" + symbol);
             return;
         }
-        StockPrice bean = new StockPrice();
+        AbstractStockPrice bean = new StockPrice();
         bean.setStockSymbol(symbol);
         bean.setStockName(symbol);
 

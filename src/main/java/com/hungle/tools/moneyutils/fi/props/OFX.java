@@ -13,6 +13,8 @@ import org.apache.commons.beanutils.BeanUtilsBean;
  */
 public class OFX {
     
+    static final String PREFIX = "ofx";
+    static final String KEY_VERSION = "version";
     /** The version. */
     private String version;
 
@@ -42,14 +44,14 @@ public class OFX {
      * @return the ofx
      */
     public static OFX parseOFX(Properties props, BeanUtilsBean beanUtilsBean) {
-        String prefix = "ofx";
+        String prefix = PREFIX;
     
         OFX ofx = new OFX();
     
         Collection<String> keys = new ArrayList<String>();
-        keys.add("version");
+        keys.add(KEY_VERSION);
         
-        PropertiesUtils.setProperties(beanUtilsBean, ofx, prefix, keys, props);
+        PropertiesUtils.setProperties(prefix, keys, props, ofx, beanUtilsBean);
         
         return ofx;
     }

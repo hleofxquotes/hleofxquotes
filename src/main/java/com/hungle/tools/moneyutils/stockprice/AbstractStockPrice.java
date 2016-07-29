@@ -19,7 +19,7 @@ import com.hungle.tools.moneyutils.annotation.PropertyAnnotation;
  * The Class AbstractStockPrice.
  */
 public abstract class AbstractStockPrice {
-    
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(AbstractStockPrice.class);
 
@@ -46,7 +46,8 @@ public abstract class AbstractStockPrice {
     /**
      * Adds the annotated property fields.
      *
-     * @param fields the fields
+     * @param fields
+     *            the fields
      */
     protected void addAnnotatedPropertyFields(Field[] fields) {
         if (LOGGER.isDebugEnabled()) {
@@ -62,7 +63,8 @@ public abstract class AbstractStockPrice {
             }
             if (annotation != null) {
                 PropertyAnnotation propertyAnnotation = (PropertyAnnotation) annotation;
-                FieldInfo fieldInfo = new FieldInfo(propertyAnnotation.index(), propertyAnnotation.key(), field.getName());
+                FieldInfo fieldInfo = new FieldInfo(propertyAnnotation.index(), propertyAnnotation.key(),
+                        field.getName());
                 properties.add(fieldInfo);
             }
         }
@@ -71,8 +73,10 @@ public abstract class AbstractStockPrice {
     /**
      * Sets the bean properties.
      *
-     * @param row the row
-     * @param bean the bean
+     * @param row
+     *            the row
+     * @param bean
+     *            the bean
      */
     private void setBeanProperties(CsvRow row, AbstractStockPrice bean) {
         if (LOGGER.isDebugEnabled()) {
@@ -106,9 +110,12 @@ public abstract class AbstractStockPrice {
     /**
      * Instantiates a new abstract stock price.
      *
-     * @param row the row
-     * @param properties the properties
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param row
+     *            the row
+     * @param properties
+     *            the properties
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public AbstractStockPrice(CsvRow row, Set<FieldInfo> properties) throws IOException {
         this();
@@ -128,8 +135,10 @@ public abstract class AbstractStockPrice {
     /**
      * Instantiates a new abstract stock price.
      *
-     * @param row the row
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param row
+     *            the row
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public AbstractStockPrice(CsvRow row) throws IOException {
         this(row, null);
@@ -169,7 +178,8 @@ public abstract class AbstractStockPrice {
     /**
      * Sets the properties.
      *
-     * @param properties the new properties
+     * @param properties
+     *            the new properties
      */
     public void setProperties(Set<FieldInfo> properties) {
         this.properties = properties;
@@ -185,7 +195,8 @@ public abstract class AbstractStockPrice {
     /**
      * Sets the currency.
      *
-     * @param currency the new currency
+     * @param currency
+     *            the new currency
      */
     public abstract void setCurrency(String currency);
 
@@ -197,11 +208,27 @@ public abstract class AbstractStockPrice {
     public abstract String getStockSymbol();
 
     /**
+     * Sets the stock symbol.
+     *
+     * @param stockSymbol
+     *            the new stock symbol
+     */
+    public abstract void setStockSymbol(String stockSymbol);
+
+    /**
      * Gets the last price.
      *
      * @return the last price
      */
     public abstract Price getLastPrice();
+
+    /**
+     * Sets the last price.
+     *
+     * @param price
+     *            the new last price
+     */
+    public abstract void setLastPrice(Price price);
 
     /**
      * Gets the stock name.
@@ -211,11 +238,27 @@ public abstract class AbstractStockPrice {
     public abstract String getStockName();
 
     /**
+     * Sets the stock name.
+     *
+     * @param stockName
+     *            the new stock name
+     */
+    public abstract void setStockName(String stockName);
+
+    /**
      * Gets the last trade date.
      *
      * @return the last trade date
      */
     public abstract String getLastTradeDate();
+
+    /**
+     * Sets the last trade date string.
+     *
+     * @param dateString
+     *            the new last trade date string
+     */
+    public abstract void setLastTradeDate(String dateString);
 
     /**
      * Gets the last trade.
@@ -225,9 +268,28 @@ public abstract class AbstractStockPrice {
     public abstract Date getLastTrade();
 
     /**
+     * Sets the last trade date.
+     *
+     * @param date
+     *            the new last trade date
+     */
+    public abstract void setLastTrade(Date date);
+
+    public abstract String getLastTradeTime();
+
+    /**
+     * Sets the last trade time string.
+     *
+     * @param timeString
+     *            the new last trade time string
+     */
+    public abstract void setLastTradeTime(String timeString);
+
+    /**
      * Sets the units.
      *
-     * @param units the new units
+     * @param units
+     *            the new units
      */
     public abstract void setUnits(double units);
 
@@ -256,7 +318,7 @@ public abstract class AbstractStockPrice {
      * @return true, if is mf
      */
     public abstract boolean isMf();
-    
+
     /**
      * Checks if is bond.
      *
