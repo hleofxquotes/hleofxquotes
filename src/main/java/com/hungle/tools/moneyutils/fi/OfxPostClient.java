@@ -29,7 +29,7 @@ import org.apache.velocity.VelocityContext;
 
 import com.hungle.tools.moneyutils.encryption.EncryptionHelper;
 import com.hungle.tools.moneyutils.encryption.EncryptionHelperException;
-import com.hungle.tools.moneyutils.ofx.quotes.HttpUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.net.HttpUtils;
 
 public class OfxPostClient {
     private static final Logger LOGGER = Logger.getLogger(OfxPostClient.class);

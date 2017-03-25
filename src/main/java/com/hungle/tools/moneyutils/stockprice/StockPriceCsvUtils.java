@@ -35,10 +35,10 @@ public class StockPriceCsvUtils {
 
     /**
      * Read from reader and return the current CsvRow.
-     * 
-     * @param csvReader
-     * @return
-     * @throws IOException
+     *
+     * @param csvReader the csv reader
+     * @return the current csv row
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private static CsvRow getCurrentCsvRow(final CsvReader csvReader) throws IOException {
         if (LOGGER.isDebugEnabled()) {

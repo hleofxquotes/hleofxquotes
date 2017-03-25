@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hungle.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.gui;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -23,11 +23,13 @@ import javax.swing.JFileChooser;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.tools.moneyutils.ofx.quotes.ImportUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SaveOfxAction.
  */
-final class SaveOfxAction extends AbstractAction {
+public final class SaveOfxAction extends AbstractAction {
     
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -56,7 +58,7 @@ final class SaveOfxAction extends AbstractAction {
      * @param gui the gui
      * @param name the name
      */
-    SaveOfxAction(GUI gui, String name) {
+    public SaveOfxAction(GUI gui, String name) {
         super(name);
         this.gui = gui;
         this.prefs = GUI.getPrefs();

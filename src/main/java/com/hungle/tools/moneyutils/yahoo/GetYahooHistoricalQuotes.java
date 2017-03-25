@@ -24,7 +24,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
-import com.hungle.tools.moneyutils.ofx.quotes.HttpUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.net.HttpUtils;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 import com.hungle.tools.moneyutils.stockprice.Price;
 import com.hungle.tools.moneyutils.stockprice.StockPrice;

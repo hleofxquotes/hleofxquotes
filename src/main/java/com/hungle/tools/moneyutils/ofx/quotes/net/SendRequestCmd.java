@@ -8,11 +8,19 @@ import org.apache.log4j.Logger;
 import com.hungle.tools.moneyutils.fi.OfxPostClient;
 import com.hungle.tools.moneyutils.fi.OfxPostClientParams;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SendRequestCmd.
+ */
 public class SendRequestCmd {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(SendRequestCmd.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         String uri = "https://vesnc.vanguard.com/us/OfxDirectConnectServlet";

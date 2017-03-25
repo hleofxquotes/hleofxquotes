@@ -7,11 +7,19 @@ import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.fi.UpdateFiDir;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CheckRespFileV2Main.
+ */
 public class CheckRespFileV2Main {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(CheckRespFileV2Main.class);
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         File respFile = null;

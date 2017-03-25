@@ -186,7 +186,7 @@ public class Utils {
      * @param file the file
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    static void copyToFile(URL url, File file) throws IOException {
+    public static void copyToFile(URL url, File file) throws IOException {
         InputStream in = null;
         OutputStream out = null;
         try {

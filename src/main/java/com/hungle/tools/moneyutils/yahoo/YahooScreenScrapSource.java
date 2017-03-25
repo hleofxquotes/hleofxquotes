@@ -6,36 +6,31 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+
+import com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource;
+import com.hungle.tools.moneyutils.scholarshare.TIAACREFPriceInfo;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class YahooScreenScrapSource.
  */
-public class YahooScreenScrapSource {
-    
+public class YahooScreenScrapSource extends AbstractScreenScrapSource<TIAACREFPriceInfo> {
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapSource.class);
-
-    /** The Constant DEFAULT_ENCODING. */
-    private static final String DEFAULT_ENCODING = "UTF-8";
-
-    /** The Constant DEFAULT_YAHOOAPIS_SERVER. */
-    // http://developer.yahoo.com/yql/console/
-    private static final String DEFAULT_YAHOOAPIS_SERVER = "query.yahooapis.com";
 
     /** The Constant DEFAULT_QUOTE_SERVER. */
     private static final String DEFAULT_QUOTE_SERVER = "finance.yahoo.com";
@@ -47,27 +42,17 @@ public class YahooScreenScrapSource {
     private String yahooApisServer = DEFAULT_YAHOOAPIS_SERVER;
 
     /** The enc. */
-    private String enc = DEFAULT_ENCODING;
+    private String encoding = DEFAULT_ENCODING;
 
-    /**
-     * Gets the price.
-     *
-     * @param symbol the symbol
-     * @return the price
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    public String getPrice(String symbol) throws IOException {
+    public YahooScreenScrapSource(List<String> stockSymbols) {
+        super(stockSymbols);
+    }
+
+    private String getPrice(String symbol) throws IOException {
         String price = null;
         InputStream stream = null;
         try {
-            URL url = createUrl(symbol);
-
-            LOGGER.info("> Getting information for symbol=" + symbol);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.info("debug=" + url);
-            }
-
-            stream = url.openStream();
+            stream = getStream(symbol);
 
             Document document = createDocument(stream);
             if (document != null) {
@@ -91,12 +76,29 @@ public class YahooScreenScrapSource {
         return price;
     }
 
+    private InputStream getStream(String symbol)
+            throws UnsupportedEncodingException, MalformedURLException, IOException {
+        InputStream stream;
+        URL url = createUrl(symbol);
+
+        LOGGER.info("> Getting information for symbol=" + symbol);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.info("url=" + url);
+        }
+
+        stream = url.openStream();
+        
+        return stream;
+    }
+
     /**
      * Gets the price.
      *
-     * @param document the document
+     * @param document
+     *            the document
      * @return the price
-     * @throws XPathExpressionException the x path expression exception
+     * @throws XPathExpressionException
+     *             the x path expression exception
      */
     private String getPrice(Document document) throws XPathExpressionException {
         String price = null;
@@ -116,37 +118,6 @@ public class YahooScreenScrapSource {
         return price;
     }
 
-    /**
-     * Creates the document.
-     *
-     * @param stream the stream
-     * @return the document
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private Document createDocument(InputStream stream) throws IOException {
-        DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-        domFactory.setNamespaceAware(true);
-        DocumentBuilder builder = null;
-        Document document = null;
-        try {
-            builder = domFactory.newDocumentBuilder();
-            document = builder.parse(stream);
-        } catch (ParserConfigurationException e) {
-            throw new IOException(e);
-        } catch (SAXException e) {
-            throw new IOException(e);
-        }
-        return document;
-    }
-
-    /**
-     * Creates the url.
-     *
-     * @param symbol the symbol
-     * @return the url
-     * @throws UnsupportedEncodingException the unsupported encoding exception
-     * @throws MalformedURLException the malformed URL exception
-     */
     private URL createUrl(String symbol) throws UnsupportedEncodingException, MalformedURLException {
         // http://finance.yahoo.com/q?s=CSCO110128C00017000&d=s
         // currency: http://finance.yahoo.com/q?s=CADUSD=X
@@ -158,14 +129,45 @@ public class YahooScreenScrapSource {
             LOGGER.debug("selectUrl=" + selectUrl);
         }
 
-        // xpath="//span[@class='time_rtq_ticker']/span"
-        String selectXPath = "xpath=" + "\"" + "//span[@class=\'" + "time_rtq_ticker" + "\']/span" + "\"";
-        String selectStatement = "select content from html" + " where " + selectUrl + " and " + selectXPath;
-        LOGGER.info("selectStatement=" + selectStatement);
+        String selectStatement = createSelectStatement(selectUrl);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("selectStatement=" + selectStatement);
+        }
 
-        selectStatement = URLEncoder.encode(selectStatement, enc);
         URL url = new URL("http://" + yahooApisServer + "/v1/public/yql?q=" + selectStatement);
 
         return url;
+    }
+
+    private String createSelectStatement(String selectUrl) throws UnsupportedEncodingException {
+        // xpath="//span[@class='time_rtq_ticker']/span"
+        String selectXPath = "xpath=" + "\"" + "//span[@class=\'" + "time_rtq_ticker" + "\']/span" + "\"";
+        String selectStatement = "select content from html" + " where " + selectUrl + " and " + selectXPath;
+        selectStatement = URLEncoder.encode(selectStatement, encoding);
+        return selectStatement;
+    }
+
+    public List<TIAACREFPriceInfo> scrap() {
+        List<TIAACREFPriceInfo> prices = new ArrayList<TIAACREFPriceInfo>();
+
+        List<String> stockSymbols = getStockSymbols();
+        for (String stockSymbol : stockSymbols) {
+            try {
+                String price = getPrice(stockSymbol);
+                if (StringUtils.isNotEmpty(price)) {
+                    TIAACREFPriceInfo priceInfo = new TIAACREFPriceInfo();
+                    priceInfo.setSymbol(stockSymbol);
+                    priceInfo.setPrice(Double.valueOf(price));
+                    prices.add(priceInfo);
+                } else {
+                    LOGGER.warn("Cannot get price for stockSymbol=" + stockSymbol);
+                }
+            } catch (IOException e) {
+                LOGGER.warn("Cannot get price for stockSymbol=" + stockSymbol);
+            } catch (NumberFormatException e) {
+                LOGGER.warn("Cannot get price for stockSymbol=" + stockSymbol);
+            }
+        }
+        return prices;
     }
 }

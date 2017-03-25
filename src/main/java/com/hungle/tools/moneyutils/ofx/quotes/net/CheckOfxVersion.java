@@ -30,11 +30,26 @@ import com.hungle.tools.moneyutils.fi.UpdateFiDir;
 import com.hungle.tools.moneyutils.fi.VelocityUtils;
 import com.hungle.tools.moneyutils.fi.props.OFX;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CheckOfxVersion.
+ */
 public class CheckOfxVersion {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(CheckOfxVersion.class);
+    
+    /** The account id pattern. */
     private Pattern accountIdPattern = Pattern.compile("\\<ACCTID\\>" + "([a-zA-Z0-9]+)");
+    
+    /** The bank id pattern. */
     private Pattern bankIdPattern = Pattern.compile("\\<BANKID\\>" + "([a-zA-Z0-9]+)");
 
+    /**
+     * Check.
+     *
+     * @param args the args
+     */
     public void check(String[] args) {
 
         for (String arg : args) {
@@ -44,6 +59,13 @@ public class CheckOfxVersion {
         }
     }
 
+    /**
+     * Parses the account inquiry response.
+     *
+     * @param version the version
+     * @param respFile the resp file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected void parseAccountInquiryResponse(String version, File respFile) throws IOException {
         List<String> bankIds = new ArrayList<String>();
         List<String> accountIds = new ArrayList<String>();
@@ -168,6 +190,13 @@ public class CheckOfxVersion {
         }
     }
 
+    /**
+     * Write account info.
+     *
+     * @param bankIds the bank ids
+     * @param accountIds the account ids
+     * @param writer the writer
+     */
     private void writeAccountInfo(List<String> bankIds, List<String> accountIds, PrintWriter writer) {
         int bankIdsCount = bankIds.size();
         int accountIdsCount = accountIds.size();
@@ -203,6 +232,11 @@ public class CheckOfxVersion {
         }
     }
 
+    /**
+     * Check.
+     *
+     * @param dir the dir
+     */
     public void check(File dir) {
         String[] versions = { "v2", "v1", };
         for (String version : versions) {
@@ -248,6 +282,13 @@ public class CheckOfxVersion {
         }
     }
 
+    /**
+     * Notify version is not supported.
+     *
+     * @param version the version
+     * @param respponseFile the respponse file
+     * @param e the e
+     */
     protected void notifyVersionIsNotSupported(String version, File respponseFile, Exception e) {
         log.error("Not OK. version=" + version + " is NOT support. " + e.getMessage());
         BufferedReader reader = null;
@@ -272,6 +313,13 @@ public class CheckOfxVersion {
         }
     }
 
+    /**
+     * Notify version is supported.
+     *
+     * @param version the version
+     * @param responseFile the response file
+     * @param updater the updater
+     */
     protected void notifyVersionIsSupported(String version, File responseFile, UpdateFiDir updater) {
         log.info("OK. version=" + version + " is supported.");
         try {
@@ -282,7 +330,9 @@ public class CheckOfxVersion {
     }
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         if (args.length == 0) {

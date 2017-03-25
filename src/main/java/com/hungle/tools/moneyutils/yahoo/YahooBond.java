@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class YahooBond.
@@ -192,7 +194,8 @@ public class YahooBond {
     private URL createUrl(String token) throws MalformedURLException, UnsupportedEncodingException {
         String sourceUrlString = token;
         sourceUrlString = URLEncoder.encode(sourceUrlString, "UTF-8");
-        String urlString = "http://" + "query.yahooapis.com" + "/v1/public/yql" + "?" + "q" + "=" + "select%20*%20from%20html%20where%20url%3D" + "'"
+        String server = AbstractScreenScrapSource.DEFAULT_YAHOOAPIS_SERVER;
+        String urlString = "http://" + server + "/v1/public/yql" + "?" + "q" + "=" + "select%20*%20from%20html%20where%20url%3D" + "'"
                 + sourceUrlString + "'" + "%20" + "and" + "%20" + "xpath" + "%3D"
                 + "%22%2F%2Ftd%5B%40class%3D'yfnc_tablehead1'%20or%20%40class%3D'yfnc_tabledata1'%5D%22%0A&diagnostics=true";
         URL url = new URL(urlString);

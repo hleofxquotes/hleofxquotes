@@ -1,4 +1,4 @@
-package com.hungle.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes.net;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -10,7 +10,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.ofx.quotes.net.HttpQuoteGetter;
+import com.hungle.tools.moneyutils.ofx.quotes.StopWatch;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 import com.hungle.tools.moneyutils.stockprice.StockPrice;
 

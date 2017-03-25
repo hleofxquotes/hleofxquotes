@@ -1,4 +1,4 @@
-package com.hungle.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.ofx.quotes.net;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hungle.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.gui;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,6 +9,9 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
+
+import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.StopWatch;
 
 // TODO: Auto-generated Javadoc
 /**

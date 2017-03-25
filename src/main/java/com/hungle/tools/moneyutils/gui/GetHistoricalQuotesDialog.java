@@ -1,4 +1,4 @@
-package com.hungle.tools.moneyutils.yahoo;
+package com.hungle.tools.moneyutils.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

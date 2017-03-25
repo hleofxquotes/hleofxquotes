@@ -5,6 +5,7 @@ package com.hungle.tools.moneyutils.ofx.quotes;
 
 import java.util.List;
 
+import com.hungle.tools.moneyutils.ofx.quotes.net.AbstractGetQuotesTask;
 import com.hungle.tools.moneyutils.ofx.quotes.net.HttpQuoteGetter;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 

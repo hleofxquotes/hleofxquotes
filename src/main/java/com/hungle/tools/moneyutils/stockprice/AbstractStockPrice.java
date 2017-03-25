@@ -275,6 +275,11 @@ public abstract class AbstractStockPrice {
      */
     public abstract void setLastTrade(Date date);
 
+    /**
+     * Gets the last trade time.
+     *
+     * @return the last trade time
+     */
     public abstract String getLastTradeTime();
 
     /**

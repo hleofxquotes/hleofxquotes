@@ -1,4 +1,4 @@
-package com.hungle.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -94,6 +94,15 @@ import com.hungle.tools.moneyutils.ft.FtDotComQuoteSourcePanel;
 import com.hungle.tools.moneyutils.fx.UpdateFx;
 import com.hungle.tools.moneyutils.jna.ImportDialogAutoClickService;
 import com.hungle.tools.moneyutils.misc.BuildNumber;
+import com.hungle.tools.moneyutils.ofx.quotes.CurrencyUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.DefaultQuoteSource;
+import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
+import com.hungle.tools.moneyutils.ofx.quotes.ImportUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.QifUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.QuoteSource;
+import com.hungle.tools.moneyutils.ofx.quotes.QuoteSourceListener;
+import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 import com.hungle.tools.moneyutils.ofx.statement.StatementPanel;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
@@ -2164,30 +2173,30 @@ public class GUI extends JFrame {
         }
         tabbedPane.addTab("Yahoo", createYahooSourceView());
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("> creating createYahooApiSourceView");
-        }
-        tabbedPane.addTab("Yahoo Options", createYahooApiSourceView());
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("> creating createFtDotComSourceView");
-        }
-        tabbedPane.addTab("ft.com", createFtDotComSourceView());
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("> creating createYahooHistoricalSourceView");
-        }
-        tabbedPane.addTab("Yahoo Historical", createYahooHistoricalSourceView());
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("> creating createBloombergSourceView");
-        }
-        tabbedPane.addTab("Bloomberg", createBloombergSourceView());
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("> creating createTIAACREFQuoteSourceView");
-        }
-        tabbedPane.addTab("Scholarshare", createTIAACREFQuoteSourceView());
+//        if (LOGGER.isDebugEnabled()) {
+//            LOGGER.debug("> creating createYahooApiSourceView");
+//        }
+//        tabbedPane.addTab("Yahoo Options", createYahooApiSourceView());
+//
+//        if (LOGGER.isDebugEnabled()) {
+//            LOGGER.debug("> creating createFtDotComSourceView");
+//        }
+//        tabbedPane.addTab("ft.com", createFtDotComSourceView());
+//
+//        if (LOGGER.isDebugEnabled()) {
+//            LOGGER.debug("> creating createYahooHistoricalSourceView");
+//        }
+//        tabbedPane.addTab("Yahoo Historical", createYahooHistoricalSourceView());
+//
+//        if (LOGGER.isDebugEnabled()) {
+//            LOGGER.debug("> creating createBloombergSourceView");
+//        }
+//        tabbedPane.addTab("Bloomberg", createBloombergSourceView());
+//
+//        if (LOGGER.isDebugEnabled()) {
+//            LOGGER.debug("> creating createTIAACREFQuoteSourceView");
+//        }
+//        tabbedPane.addTab("Scholarshare", createTIAACREFQuoteSourceView());
 
         tabbedPane.setSelectedIndex(0);
         return tabbedPane;
@@ -2232,7 +2241,7 @@ public class GUI extends JFrame {
      * @return the component
      */
     private Component createYahooHistoricalSourceView() {
-        final YahooQuoteSourcePanel view = new YahooHistoricalSourcePanel(this, "yahooHistoricalStockSymbols");
+        final YahooQuoteSourcePanel view = new YahooHistoricalSourcePanel(this);
         this.yahooHistoricalQuoteSourceView = view;
         return view;
     }
@@ -2500,7 +2509,7 @@ public class GUI extends JFrame {
                     return;
                 }
                 File toFile = fc.getSelectedFile();
-                PREFS.put(SaveOfxAction.PREF_SAVE_OFX_DIR, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
+                PREFS.put(SaveOfxAction.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                 try {
                     QifUtils.saveToQif(priceList, toFile);
                 } catch (IOException e) {
@@ -2512,7 +2521,7 @@ public class GUI extends JFrame {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("> creating FileChooser");
                 }
-                String key = SaveOfxAction.PREF_SAVE_OFX_DIR;
+                String key = SaveOfxAction.ACCELERATOR_KEY;
                 fc = new JFileChooser(PREFS.get(key, "."));
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("< creating FileChooser");

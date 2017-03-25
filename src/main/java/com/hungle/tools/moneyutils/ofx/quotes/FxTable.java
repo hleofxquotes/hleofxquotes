@@ -184,7 +184,7 @@ public class FxTable {
      *
      * @return the fx table
      */
-    static FxTable createDefaultFxTable() {
+    public static FxTable createDefaultFxTable() {
         FxTable fxTable = new FxTable();
         String fileName = "fx.csv";
         File fxTableFile = new File(fileName);

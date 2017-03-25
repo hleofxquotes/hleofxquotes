@@ -416,7 +416,7 @@ public class OfxUtils {
      * @param sep the sep
      * @return the string
      */
-    static String breakLines(String stockSymbolsString, int maxTokens, String sep) {
+    public static String breakLines(String stockSymbolsString, int maxTokens, String sep) {
         String newLine = "\n";
         String[] tokens = stockSymbolsString.split(sep);
         StringBuilder sb = new StringBuilder();

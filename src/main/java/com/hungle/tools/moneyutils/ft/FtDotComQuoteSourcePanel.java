@@ -28,11 +28,11 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.csv2ofx.AbstractCsvConverter;
+import com.hungle.tools.moneyutils.gui.GUI;
+import com.hungle.tools.moneyutils.gui.ShowDialogTask;
 import com.hungle.tools.moneyutils.ofx.quotes.DefaultQuoteSource;
-import com.hungle.tools.moneyutils.ofx.quotes.GUI;
 import com.hungle.tools.moneyutils.ofx.quotes.QuoteSource;
 import com.hungle.tools.moneyutils.ofx.quotes.QuoteSourceListener;
-import com.hungle.tools.moneyutils.ofx.quotes.ShowDialogTask;
 import com.hungle.tools.moneyutils.ofx.quotes.StopWatch;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 

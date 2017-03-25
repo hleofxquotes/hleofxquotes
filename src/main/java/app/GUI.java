@@ -12,7 +12,7 @@ public class GUI {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        com.hungle.tools.moneyutils.ofx.quotes.GUI.main(args);
+        com.hungle.tools.moneyutils.gui.GUI.main(args);
     }
 
 }

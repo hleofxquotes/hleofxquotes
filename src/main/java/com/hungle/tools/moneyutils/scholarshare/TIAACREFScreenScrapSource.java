@@ -16,9 +16,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -29,28 +26,29 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+
+import com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class TIAACREFScreenScrapSource.
  */
-public class TIAACREFScreenScrapSource {
+public class TIAACREFScreenScrapSource extends AbstractScreenScrapSource {
     
-    private static final String DEFAULT_URL = "https://www.scholarshare.com/research/daily.shtml";
-
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(TIAACREFScreenScrapSource.class);
 
-    /** The Constant DEFAULT_ENCODING. */
-    private static final String DEFAULT_ENCODING = "UTF-8";
+    /** The Constant DEFAULT_URL. */
+    private static final String DEFAULT_URL = "https://www.scholarshare.com/research/daily.shtml";
+
+    
 
     /** The Constant DEFAULT_YAHOOAPIS_SERVER. */
     // http://developer.yahoo.com/yql/console/
-    private static final String DEFAULT_YAHOOAPIS_SERVER = "query.yahooapis.com";
+//    private static final String DEFAULT_YAHOOAPIS_SERVER = "query.yahooapis.com";
 
     /** The yahoo apis server. */
-    private String yahooApisServer = DEFAULT_YAHOOAPIS_SERVER;
+    private String yahooApisServer = AbstractScreenScrapSource.DEFAULT_YAHOOAPIS_SERVER;
 
     /** The enc. */
     private String enc = DEFAULT_ENCODING;
@@ -70,6 +68,14 @@ public class TIAACREFScreenScrapSource {
     /** The currency. */
     private String currency;
 
+    public TIAACREFScreenScrapSource(List<String> stockSymbols) {
+        super(stockSymbols);
+    }
+
+    public TIAACREFScreenScrapSource() {
+        this(new ArrayList<String>());
+    }
+
     /**
      * Query.
      *
@@ -80,7 +86,7 @@ public class TIAACREFScreenScrapSource {
         
         InputStream stream = null;
         try {
-            URL url = createUrl();
+            URL url = createUrl(null);
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("url=" + url);
@@ -331,37 +337,7 @@ public class TIAACREFScreenScrapSource {
         return priceInfo;
     }
 
-    /**
-     * Creates the document.
-     *
-     * @param stream the stream
-     * @return the document
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private Document createDocument(InputStream stream) throws IOException {
-        DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-        domFactory.setNamespaceAware(true);
-        DocumentBuilder builder = null;
-        Document document = null;
-        try {
-            builder = domFactory.newDocumentBuilder();
-            document = builder.parse(stream);
-        } catch (ParserConfigurationException e) {
-            throw new IOException(e);
-        } catch (SAXException e) {
-            throw new IOException(e);
-        }
-        return document;
-    }
-
-    /**
-     * Creates the url.
-     *
-     * @return the url
-     * @throws UnsupportedEncodingException the unsupported encoding exception
-     * @throws MalformedURLException the malformed URL exception
-     */
-    private URL createUrl() throws UnsupportedEncodingException, MalformedURLException {
+    protected URL createUrl(String symbol) throws UnsupportedEncodingException, MalformedURLException {
         // http://www.scholarshare.com/performance/fundperformance.shtml
         // http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D'http%3A%2F%2Fwww.scholarshare.com%2Fperformance%2Ffundperformance.shtml'%20and%20xpath%3D%22%2F%2Ftable%5B%40id%3D'realtimechart'%5D%22%0A&diagnostics=true
         String selectUrl = "url=" + "\"" + DEFAULT_URL + "\"";
@@ -463,6 +439,12 @@ public class TIAACREFScreenScrapSource {
                 return price;
             }
         }
+        return null;
+    }
+
+    @Override
+    public List scrap() {
+        // TODO Auto-generated method stub
         return null;
     }
 }

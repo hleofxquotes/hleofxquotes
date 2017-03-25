@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * The Class TIAACREFPriceInfo.
  */
-class TIAACREFPriceInfo {
+public class TIAACREFPriceInfo {
     
     /** The date. */
     private Date date;

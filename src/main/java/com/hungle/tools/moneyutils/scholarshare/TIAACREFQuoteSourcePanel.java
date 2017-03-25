@@ -2,10 +2,7 @@ package com.hungle.tools.moneyutils.scholarshare;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -13,15 +10,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.ofx.quotes.GUI;
+import com.hungle.tools.moneyutils.gui.GUI;
+import com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.hungle.tools.moneyutils.stockprice.Price;
-import com.hungle.tools.moneyutils.stockprice.StockPrice;
 import com.hungle.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel;
 
 // TODO: Auto-generated Javadoc
@@ -36,8 +31,11 @@ public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(TIAACREFQuoteSourcePanel.class);
     
+    /** The Constant STOCK_SYMBOLS_PREF_KEY. */
+    private static final String STOCK_SYMBOLS_PREF_KEY = "TIAACREFStockSymbols";
+
     /** The scrapper. */
-    private TIAACREFScreenScrapSource scrapper;
+    private AbstractScreenScrapSource scrapper;
 
     /** The date formatter. */
     // December 9, 2011
@@ -49,7 +47,7 @@ public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
      * @param gui the gui
      */
     public TIAACREFQuoteSourcePanel(GUI gui) {
-        super(gui, "TIAACREFStockSymbols");
+        super(gui, STOCK_SYMBOLS_PREF_KEY);
     }
 
     /* (non-Javadoc)
@@ -57,52 +55,52 @@ public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
      */
     @Override
     protected void addPrice(String symbol, List<AbstractStockPrice> stockPrices) throws IOException {
-        String price = scrapper.getPrice(symbol);
-        if (price == null) {
-            throw new IOException("Cannot get price for symbol=" + symbol);
-        }
-        AbstractStockPrice bean = new StockPrice();
-        bean.setStockSymbol(symbol);
-        bean.setStockName(symbol);
-        String currency = scrapper.getCurrency();
-        LOGGER.info(symbol + ", " + price + ", " + currency);
-        if (currency != null) {
-            bean.setCurrency(currency);
-        }
-
-        NumberFormat formatter = null;
-        if (getDecimalLocale() != null) {
-            formatter = NumberFormat.getNumberInstance(getDecimalLocale());
-        } else {
-            formatter = NumberFormat.getNumberInstance();
-        }
-        Number number = null;
-        try {
-            number = formatter.parse(price);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("price number=" + number);
-            }
-            Price lastPrice = new Price(number.doubleValue());
-            if (currency != null) {
-                lastPrice.setCurrency(currency);
-            }
-            bean.setLastPrice(lastPrice);
-
-            String stockName = scrapper.getName(symbol);
-            bean.setStockName(stockName);
-
-            Date date = scrapper.getDate(symbol);
-
-            if (date != null) {
-                bean.setLastTradeDate(dateFormatter.format(date));
-            }
-
-            bean.setLastTrade(date);
-
-            stockPrices.add(bean);
-        } catch (ParseException e) {
-            throw new IOException(e);
-        }
+//        String price = scrapper.getPrice(symbol);
+//        if (price == null) {
+//            throw new IOException("Cannot get price for symbol=" + symbol);
+//        }
+//        AbstractStockPrice bean = new StockPrice();
+//        bean.setStockSymbol(symbol);
+//        bean.setStockName(symbol);
+//        String currency = scrapper.getCurrency();
+//        LOGGER.info(symbol + ", " + price + ", " + currency);
+//        if (currency != null) {
+//            bean.setCurrency(currency);
+//        }
+//
+//        NumberFormat formatter = null;
+//        if (getDecimalLocale() != null) {
+//            formatter = NumberFormat.getNumberInstance(getDecimalLocale());
+//        } else {
+//            formatter = NumberFormat.getNumberInstance();
+//        }
+//        Number number = null;
+//        try {
+//            number = formatter.parse(price);
+//            if (LOGGER.isDebugEnabled()) {
+//                LOGGER.debug("price number=" + number);
+//            }
+//            Price lastPrice = new Price(number.doubleValue());
+//            if (currency != null) {
+//                lastPrice.setCurrency(currency);
+//            }
+//            bean.setLastPrice(lastPrice);
+//
+//            String stockName = scrapper.getName(symbol);
+//            bean.setStockName(stockName);
+//
+//            Date date = scrapper.getDate(symbol);
+//
+//            if (date != null) {
+//                bean.setLastTradeDate(dateFormatter.format(date));
+//            }
+//
+//            bean.setLastTrade(date);
+//
+//            stockPrices.add(bean);
+//        } catch (ParseException e) {
+//            throw new IOException(e);
+//        }
     }
 
     /* (non-Javadoc)
@@ -110,14 +108,15 @@ public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
      */
     @Override
     protected List<AbstractStockPrice> getStockQuotes(final List<String> stockSymbols) throws IOException {
-        scrapper = new TIAACREFScreenScrapSource();
-        scrapper.query();
-        try {
-            scrapper.parse();
-        } catch (XPathExpressionException e) {
-            throw new IOException(e);
-        }
-        return super.getStockQuotes(stockSymbols);
+//        scrapper = new TIAACREFScreenScrapSource(stockSymbols);
+//        scrapper.query();
+//        try {
+//            scrapper.parse();
+//        } catch (XPathExpressionException e) {
+//            throw new IOException(e);
+//        }
+//        return super.getStockQuotes(stockSymbols);
+        return null;
     }
 
     /* (non-Javadoc)
@@ -140,18 +139,18 @@ public class TIAACREFQuoteSourcePanel extends YahooApiQuoteSourcePanel {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                TIAACREFScreenScrapSource screenScrapper = new TIAACREFScreenScrapSource();
+                AbstractScreenScrapSource screenScrapper = new TIAACREFScreenScrapSource();
                 try {
-                    screenScrapper.query();
-                    screenScrapper.parse();
-                    List<TIAACREFPriceInfo> prices = screenScrapper.getPrices();
-                    for (TIAACREFPriceInfo price : prices) {
-                        System.out.println(price);
-                    }
-                } catch (IOException e) {
-                    LOGGER.error(e, e);
-                } catch (XPathExpressionException e) {
-                    LOGGER.error(e, e);
+//                    screenScrapper.query();
+//                    screenScrapper.parse();
+//                    List<TIAACREFPriceInfo> prices = screenScrapper.getPrices();
+//                    for (TIAACREFPriceInfo price : prices) {
+//                        System.out.println(price);
+//                    }
+//                } catch (IOException e) {
+//                    LOGGER.error(e, e);
+//                } catch (XPathExpressionException e) {
+//                    LOGGER.error(e, e);
                 } finally {
                     LOGGER.info("< DONE");
                 }

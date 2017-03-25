@@ -29,7 +29,7 @@ public class QifUtils {
      * @param file the file
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    static void saveToQif(EventList<AbstractStockPrice> priceList, File file) throws IOException {
+    public static void saveToQif(EventList<AbstractStockPrice> priceList, File file) throws IOException {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));

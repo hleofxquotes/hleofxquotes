@@ -10,7 +10,8 @@ import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.ofx.quotes.GUI;
+import com.hungle.tools.moneyutils.gui.GUI;
+import com.hungle.tools.moneyutils.gui.GetHistoricalQuotesDialog;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
 // TODO: Auto-generated Javadoc
@@ -25,6 +26,8 @@ public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(YahooHistoricalSourcePanel.class);
 
+    private static final String STOCK_SYMBOLS_PREF_KEY = "yahooHistoricalStockSymbols";
+
     /**
      * Instantiates a new yahoo historical source panel.
      *
@@ -34,6 +37,10 @@ public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
     public YahooHistoricalSourcePanel(GUI gui, String stockSymbolsPrefKey) {
         super(gui, stockSymbolsPrefKey);
         getQuoteSource().setHistoricalQuotes(true);
+    }
+
+    public YahooHistoricalSourcePanel(GUI gui) {
+        this(gui, STOCK_SYMBOLS_PREF_KEY);
     }
 
     /* (non-Javadoc)

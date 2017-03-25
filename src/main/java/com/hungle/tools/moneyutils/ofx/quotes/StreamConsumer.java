@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.tools.moneyutils.gui.GUI;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class StreamConsumer.

@@ -68,9 +68,9 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import com.hungle.tools.moneyutils.fi.UpdateFiDir;
 import com.hungle.tools.moneyutils.fi.props.FIBean;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
+import com.hungle.tools.moneyutils.gui.StripedTableRenderer;
 import com.hungle.tools.moneyutils.ofx.quotes.ImportUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.StreamConsumer;
-import com.hungle.tools.moneyutils.ofx.quotes.StripedTableRenderer;
 import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 import com.hungle.tools.moneyutils.ofx.quotes.net.CheckOfxVersion;
 

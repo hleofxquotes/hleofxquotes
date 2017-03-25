@@ -1,37 +1,44 @@
 package com.hungle.tools.moneyutils.yahoo;
 
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource;
+import com.hungle.tools.moneyutils.scholarshare.TIAACREFPriceInfo;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class YahooScreenScrapSourceCmd.
  */
 public class YahooScreenScrapSourceCmd {
-    
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapSourceCmd.class);
 
     /**
      * The main method.
      *
-     * @param args the arguments
+     * @param args
+     *            the arguments
      */
     public static void main(String[] args) {
-        YahooScreenScrapSource screenScrapper = new YahooScreenScrapSource();
-        String[] symbols = { "CSCO110128C00017000", "CSCO", "AAPL", "123", "A", "B", "C", "IBM" };
+//        String[] symbols = { "CSCO110128C00017000", "CSCO", "AAPL", "123", "A", "B", "C", "IBM" };
         // String[] symbols = { "CSCO110128C00017000" };
+        String[] symbols = { "CSCO" };
+        AbstractScreenScrapSource<TIAACREFPriceInfo> screenScrapper = new YahooScreenScrapSource(Arrays.asList(symbols));
         try {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Getting price for symbols=" + symbols);
+                LOGGER.debug("Getting price for symbols:");
+                for(String symbol : symbols) {
+                    LOGGER.debug("  symbol=" + symbol);
+                }
             }
-            for (String symbol : symbols) {
-                String price = screenScrapper.getPrice(symbol);
-                LOGGER.info(symbol + ": " + price);
+            List<TIAACREFPriceInfo> prices = screenScrapper.scrap();
+            for (TIAACREFPriceInfo price : prices) {
+                LOGGER.info(price);
             }
-        } catch (IOException e) {
-            LOGGER.error(e, e);
         } finally {
             LOGGER.info("< DONE");
         }

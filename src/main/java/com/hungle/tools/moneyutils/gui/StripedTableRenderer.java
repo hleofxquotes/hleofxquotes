@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hungle.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.gui;
 
 import java.awt.Color;
 import java.awt.Component;

@@ -11,7 +11,7 @@ import com.hungle.tools.moneyutils.fi.model.bean.FiInfoBean;
 
 public class BeanSupportTest {
     @Test
-    public void addressChangeNotifications() {
+    public void valueChangeNotifications() {
         FiInfoBean testCustomer = new FiInfoBean();
         testCustomer.setName("oldName");
 

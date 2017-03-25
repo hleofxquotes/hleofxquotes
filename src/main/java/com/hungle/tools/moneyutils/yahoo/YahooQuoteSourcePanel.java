@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.prefs.Preferences;
@@ -43,15 +44,15 @@ import javax.swing.SwingUtilities;
 import org.apache.http.HttpEntity;
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.ofx.quotes.AbstractLoadStockSymbolsTask;
+import com.hungle.tools.moneyutils.gui.AbstractLoadStockSymbolsTask;
+import com.hungle.tools.moneyutils.gui.GUI;
+import com.hungle.tools.moneyutils.gui.PopupListener;
+import com.hungle.tools.moneyutils.gui.ShowDialogTask;
 import com.hungle.tools.moneyutils.ofx.quotes.DefaultQuoteSource;
-import com.hungle.tools.moneyutils.ofx.quotes.GUI;
-import com.hungle.tools.moneyutils.ofx.quotes.GetQuotesListener;
 import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
-import com.hungle.tools.moneyutils.ofx.quotes.PopupListener;
 import com.hungle.tools.moneyutils.ofx.quotes.QuoteSource;
 import com.hungle.tools.moneyutils.ofx.quotes.QuoteSourceListener;
-import com.hungle.tools.moneyutils.ofx.quotes.ShowDialogTask;
+import com.hungle.tools.moneyutils.ofx.quotes.net.GetQuotesListener;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
 // TODO: Auto-generated Javadoc
@@ -67,7 +68,9 @@ public class YahooQuoteSourcePanel extends JPanel {
     private static final Logger LOGGER = Logger.getLogger(YahooQuoteSourcePanel.class);
 
     /** The Constant PREF_YAHOO_QUOTE_SERVER. */
-    private static final String PREF_YAHOO_QUOTE_SERVER = "yahooQuoteServer";
+    private static final String QUOTE_SERVER_PREFS_KEY = "yahooQuoteServer";
+
+    private static final String STOCK_SYMBOLS_PREF_KEY = null;
 
     /** The prefs. */
     private final Preferences prefs;
@@ -123,7 +126,7 @@ public class YahooQuoteSourcePanel extends JPanel {
         if (this.threadPool == null) {
             LOGGER.warn("YahooQuoteSourcePanel is constructed with this.threadPool=null");
         }
-        this.quoteServer = prefs.get(YahooQuoteSourcePanel.PREF_YAHOO_QUOTE_SERVER, YahooQuotesGetter.DEFAULT_HOST);
+        this.quoteServer = prefs.get(YahooQuoteSourcePanel.QUOTE_SERVER_PREFS_KEY, YahooQuotesGetter.DEFAULT_HOST);
         quoteSourceListener = new QuoteSourceListener() {
 
             @Override
@@ -159,7 +162,7 @@ public class YahooQuoteSourcePanel extends JPanel {
      * @param gui the gui
      */
     public YahooQuoteSourcePanel(GUI gui) {
-        this(gui, null);
+        this(gui, STOCK_SYMBOLS_PREF_KEY);
     }
 
     /**
@@ -354,6 +357,42 @@ public class YahooQuoteSourcePanel extends JPanel {
                 textArea.paste();
             }
         });
+        menu.add(menuItem);
+
+        menu.addSeparator();
+        menuItem = new JMenuItem(new AbstractAction("Clean up") {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String currentText = textArea.getText();
+				currentText = cleanupText(currentText);
+				textArea.setText(currentText);
+	            textArea.setCaretPosition(0);
+			}
+
+			private String cleanupText(String stocksString) {
+				String cleanupText = stocksString;
+	            try {
+					List<String> stockSymbols = toStockSymbols(stocksString);
+					TreeSet<String> cleanupStockSymbols = new TreeSet<String>();
+					cleanupStockSymbols.addAll(stockSymbols);
+					
+					int count = 0;
+					StringBuilder sb = new StringBuilder();
+					for (String stockSymbol : cleanupStockSymbols) {
+						if (count > 0) {
+							sb.append("\r\n");
+						}
+						sb.append(stockSymbol);
+						count++;
+					}
+					cleanupText = sb.toString();
+				} catch (IOException e) {
+					LOGGER.error(e);
+				}
+				return cleanupText;
+			}
+		});
         menu.add(menuItem);
 
         menu.addSeparator();
@@ -685,7 +724,7 @@ public class YahooQuoteSourcePanel extends JPanel {
                 String value = YahooQuotesGetter.QUOTE_HOSTS.get(s);
                 LOGGER.info("Selected new Yahoo Quote Server: " + value);
                 quoteServer = value;
-                prefs.put(YahooQuoteSourcePanel.PREF_YAHOO_QUOTE_SERVER, quoteServer);
+                prefs.put(YahooQuoteSourcePanel.QUOTE_SERVER_PREFS_KEY, quoteServer);
             } else {
             }
 

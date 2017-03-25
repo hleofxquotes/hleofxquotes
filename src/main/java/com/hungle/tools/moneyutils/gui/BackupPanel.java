@@ -1,4 +1,4 @@
-package com.hungle.tools.moneyutils.ofx.quotes;
+package com.hungle.tools.moneyutils.gui;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
