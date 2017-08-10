@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -27,91 +28,180 @@ import com.hungle.tools.moneyutils.fi.props.HttpProperties;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.hungle.tools.moneyutils.scrubber.ResponseFilter;
 
-public class UpdateFiDir {
-    private static final Logger log = Logger.getLogger(UpdateFiDir.class);
+// TODO: Auto-generated Javadoc
+/**
+ * The Class UpdateFiDir.
+ */
+public abstract class AbstractUpdateFiDir {
     
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = Logger.getLogger(AbstractUpdateFiDir.class);
+    
+    /** The Constant DEFAULT_PROPERTIES_FILENAME. */
     public static final String DEFAULT_PROPERTIES_FILENAME = "fi.properties";
     
+    /** The dir. */
     private File dir;
+    
+    /** The properties file name. */
     private String propertiesFileName = DEFAULT_PROPERTIES_FILENAME;
+    
+    /** The template. */
     private String template;
-    private String requestFileName = OfxPostClient.REQ_FILE_OFX;
-    private String respFileName = OfxPostClient.RESP_FILE_OFX;
+    
+    /** The request file name. */
+    private String requestFileName = AbstractUpdateFiDir.REQ_FILE_OFX;
+    
+    /** The req file. */
     private File reqFile;
+
+    /** The resp file name. */
+    private String respFileName = AbstractUpdateFiDir.RESP_FILE_OFX;
+    
+    /** The resp file. */
     private File respFile;
 
-    public UpdateFiDir(File dir) {
+    /** The velocity context. */
+    private final VelocityContext velocityContext;
+
+    /** The Constant APPLICATION_X_OFX. */
+    static final String APPLICATION_X_OFX = "application/x-ofx";
+
+    /** The Constant DEFAULT_TEMPLATE_ENCODING. */
+    public static final String DEFAULT_TEMPLATE_ENCODING = "UTF-8";
+
+    /** The Constant RESP_FILE_OFX. */
+    public static final String RESP_FILE_OFX = "resp.ofx";
+
+    /** The Constant REQ_FILE_OFX. */
+    public static final String REQ_FILE_OFX = "req.ofx";
+
+    /**
+     * Instantiates a new update fi dir.
+     *
+     * @param dir the dir
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public AbstractUpdateFiDir(File dir) throws IOException {
         this.dir = dir;
+        this.velocityContext = createVelocityContext();
     }
 
+    /**
+     * Update.
+     *
+     * @return true, if successful
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public boolean update() throws IOException {
-        VelocityContext context = createVelocityContext();
+        String workingTemplate = getWorkingTemplate();
+        LOGGER.info("template=" + workingTemplate);
 
+        reqFile = new File(dir, requestFileName);
+        generateRequestFileContent(workingTemplate, reqFile);
+
+        respFile = new File(dir, respFileName);
+
+        HttpProperties httpProperties = (HttpProperties) velocityContext.get("httpProperties");
+        FIBean fi = (FIBean) velocityContext.get("fi");
+        String url = fi.getUrl();
+        if (PropertiesUtils.isNull(url)) {
+            LOGGER.warn("Skip sending request, fi.url is null");
+            return false;
+        }
+
+        LOGGER.info("FI.name=" + fi.getName());
+        LOGGER.info("Sending request to " + url);
+        
+        URI uri = URI.create(url);
+        
+        boolean httpsOnly = httpProperties.getHttpsOnly();
+        LOGGER.info("httpsOnly=" + httpsOnly);
+        if (httpsOnly) {
+            checkHttpsOnly(uri);
+        }
+
+        update(url, reqFile, respFile, httpProperties);
+
+        List<ResponseFilter> responseFilters = (List<ResponseFilter>) velocityContext.get("filters.onResponse");
+        if (responseFilters != null) {
+            for (ResponseFilter responseFilter : responseFilters) {
+                responseFilter.filter(respFile, velocityContext);
+            }
+        }
+
+        com.hungle.tools.moneyutils.fi.props.OFX ofx = (com.hungle.tools.moneyutils.fi.props.OFX) velocityContext.get("ofx");
+        checkRespFile(respFile, ofx);
+
+        return true;
+    }
+
+    /**
+     * Update.
+     *
+     * @param url the url
+     * @param reqFile the req file
+     * @param respFile the resp file
+     * @param httpProperties the http properties
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    protected abstract void update(String url, File reqFile, File respFile, HttpProperties httpProperties) throws IOException;
+
+
+    /**
+     * Generate request file content.
+     *
+     * @param workingTemplate the working template
+     * @param reqFile the req file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    private void generateRequestFileContent(String workingTemplate, File reqFile) throws IOException {
+        String encoding = AbstractUpdateFiDir.DEFAULT_TEMPLATE_ENCODING;
+        VelocityUtils.mergeTemplate(velocityContext, workingTemplate, encoding, reqFile);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Created reqFile=" + reqFile);
+        }
+    }
+
+    /**
+     * Gets the working template.
+     *
+     * @return the working template
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    private String getWorkingTemplate() throws IOException {
         String workingTemplate = null;
         if (!PropertiesUtils.isNull(this.template)) {
             workingTemplate = this.template;
         } else {
-            workingTemplate = getTemplate(context);
+            workingTemplate = getTemplateFromContext(velocityContext);
         }
         if (PropertiesUtils.isNull(workingTemplate)) {
             throw new IOException("template is null");
         }
 
         workingTemplate = "/templates/" + workingTemplate;
-
-        if (log.isDebugEnabled()) {
-            log.debug("template=" + workingTemplate);
-        }
-        reqFile = new File(dir, requestFileName);
-        String encoding = OfxPostClient.DEFAULT_TEMPLATE_ENCODING;
-        VelocityUtils.mergeTemplate(context, workingTemplate, encoding, reqFile);
-        if (log.isDebugEnabled()) {
-            log.debug("Created reqFile=" + reqFile);
-        }
-
-        respFile = new File(dir, respFileName);
-
-        HttpProperties httpProperties = (HttpProperties) context.get("httpProperties");
-
-        FIBean fi = (FIBean) context.get("fi");
-        String url = fi.getUrl();
-
-        if (PropertiesUtils.isNull(url)) {
-            log.warn("Skip sending request, fi.url is null");
-            return false;
-        }
-
-        log.info("FI.name=" + fi.getName());
-        log.info("Sending request to " + url);
-        // respFile = new File(dir, respFileName);
-        OfxPostClientParams params = new OfxPostClientParams(url, reqFile, respFile, httpProperties);
-//        try {
-//            params.setEncryptionHelper(new EncryptionHelper());
-//        } catch (EncryptionHelperException e) {
-//            throw new IOException(e);
-//        }
-        OfxPostClient.sendRequest(params);
-        if (log.isDebugEnabled()) {
-            log.debug("Created respFile=" + respFile.getAbsolutePath());
-        }
-        com.hungle.tools.moneyutils.fi.props.OFX ofx = (com.hungle.tools.moneyutils.fi.props.OFX) context.get("ofx");
-
-        List<ResponseFilter> responseFilters = (List<ResponseFilter>) context.get("filters.onResponse");
-        if (responseFilters != null) {
-            for (ResponseFilter responseFilter : responseFilters) {
-                responseFilter.filter(respFile, context);
-            }
-        }
-
-        checkRespFile(respFile, ofx);
-
-        return true;
+        return workingTemplate;
     }
 
+    /**
+     * Check resp file.
+     *
+     * @param respFile the resp file
+     * @param ofx the ofx
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected void checkRespFile(File respFile, com.hungle.tools.moneyutils.fi.props.OFX ofx) throws IOException {
         checkVersionedRespFile(respFile, ofx);
     }
 
+    /**
+     * Check versioned resp file.
+     *
+     * @param respFile the resp file
+     * @param ofx the ofx
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static void checkVersionedRespFile(File respFile, com.hungle.tools.moneyutils.fi.props.OFX ofx) throws IOException {
         int version = 1;
         String ofxVersion = null;
@@ -123,7 +213,7 @@ public class UpdateFiDir {
             try {
                 version = Integer.valueOf(ofxVersion);
             } catch (NumberFormatException e) {
-                log.warn(e);
+                LOGGER.warn(e);
                 version = 1;
             }
         }
@@ -133,10 +223,16 @@ public class UpdateFiDir {
         } else if (version == 2) {
             checkRespFileV2(respFile);
         } else {
-            log.warn("Unsupported ofx.version=" + version);
+            LOGGER.warn("Unsupported ofx.version=" + version);
         }
     }
 
+    /**
+     * Check resp file V 2.
+     *
+     * @param respFile the resp file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static void checkRespFileV2(File respFile) throws IOException {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -167,8 +263,8 @@ public class UpdateFiDir {
                 throw new IOException("Cannot find tag <STATUS><CODE>");
             }
             String code = nodeValue;
-            if (log.isDebugEnabled()) {
-                log.debug("code=" + code);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("code=" + code);
             }
 
             expression = "SEVERITY/text()";
@@ -177,8 +273,8 @@ public class UpdateFiDir {
                 throw new IOException("Cannot find tag <STATUS><SEVERITY>");
             }
             String severity = nodeValue;
-            if (log.isDebugEnabled()) {
-                log.debug("severity=" + severity);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("severity=" + severity);
             }
             // MESSAGE is optional
             expression = "MESSAGE/text()";
@@ -187,8 +283,8 @@ public class UpdateFiDir {
             // throw new IOException("Cannot find tag <STATUS><MESSAGE>");
             // }
             String message = nodeValue;
-            if (log.isDebugEnabled()) {
-                log.debug("message=" + message);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("message=" + message);
             }
 
             if (code.compareToIgnoreCase("0") != 0) {
@@ -209,6 +305,12 @@ public class UpdateFiDir {
         }
     }
 
+    /**
+     * Check resp file V 1.
+     *
+     * @param respFile the resp file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static void checkRespFileV1(File respFile) throws IOException {
         BufferedReader reader = null;
         try {
@@ -219,7 +321,7 @@ public class UpdateFiDir {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
@@ -227,6 +329,12 @@ public class UpdateFiDir {
         }
     }
 
+    /**
+     * Fixes ofx V 1 long line.
+     *
+     * @param str the str
+     * @return the string
+     */
     private static String fixesOfxV1LongLine(String str) {
         String newline = System.getProperty("line.separator");
         int max = str.length();
@@ -241,6 +349,12 @@ public class UpdateFiDir {
         return sb.toString();
     }
 
+    /**
+     * Check resp file V 1.
+     *
+     * @param reader the reader
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void checkRespFileV1(BufferedReader reader) throws IOException {
         String line = null;
         boolean inHeader = true;
@@ -263,12 +377,18 @@ public class UpdateFiDir {
         }
 
         String str = sb.toString();
-        if (log.isDebugEnabled()) {
-            log.debug(str);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(str);
         }
         checkRespFileV1(str);
     }
 
+    /**
+     * Check resp file V 1.
+     *
+     * @param string the string
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void checkRespFileV1(String string) throws IOException {
         boolean status = false;
         String code = null;
@@ -317,7 +437,7 @@ public class UpdateFiDir {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
@@ -325,7 +445,13 @@ public class UpdateFiDir {
         }
     }
 
-    public VelocityContext createVelocityContext() throws IOException {
+    /**
+     * Creates the velocity context.
+     *
+     * @return the velocity context
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    private VelocityContext createVelocityContext() throws IOException {
         if (dir == null) {
             throw new IOException("dir is null.");
         }
@@ -338,62 +464,158 @@ public class UpdateFiDir {
         return context;
     }
 
-    public static String getTemplate(VelocityContext context) {
+    /**
+     * Gets the template from context.
+     *
+     * @param context the context
+     * @return the template from context
+     */
+    private static String getTemplateFromContext(VelocityContext context) {
         String requestType = (String) context.get("requestType");
         if (PropertiesUtils.isNull(requestType)) {
-            log.error("Cannot create template, requestType is null");
+            LOGGER.error("Cannot create template, requestType is null");
             return null;
         }
         com.hungle.tools.moneyutils.fi.props.OFX ofx = (com.hungle.tools.moneyutils.fi.props.OFX) context.get("ofx");
         if (ofx == null) {
-            log.error("Cannot create template, OFX object is null");
+            LOGGER.error("Cannot create template, OFX object is null");
             return null;
         }
         String version = ofx.getVersion();
         if (PropertiesUtils.isNull(version)) {
-            log.error("Cannot create template, OFX version is null");
+            LOGGER.error("Cannot create template, OFX version is null");
         }
         return requestType + "-v" + version + ".vm";
     }
 
+    /**
+     * Gets the template.
+     *
+     * @return the template
+     */
     public String getTemplate() {
         return template;
     }
 
+    /**
+     * Sets the template.
+     *
+     * @param template the new template
+     */
     public void setTemplate(String template) {
         this.template = template;
     }
 
+    /**
+     * Gets the request file name.
+     *
+     * @return the request file name
+     */
     public String getRequestFileName() {
         return requestFileName;
     }
 
+    /**
+     * Sets the request file name.
+     *
+     * @param requestFileName the new request file name
+     */
     public void setRequestFileName(String requestFileName) {
         this.requestFileName = requestFileName;
     }
 
+    /**
+     * Gets the resp file name.
+     *
+     * @return the resp file name
+     */
     public String getRespFileName() {
         return respFileName;
     }
 
+    /**
+     * Sets the resp file name.
+     *
+     * @param respFileName the new resp file name
+     */
     public void setRespFileName(String respFileName) {
         this.respFileName = respFileName;
     }
 
+    /**
+     * Gets the req file.
+     *
+     * @return the req file
+     */
     public File getReqFile() {
         return reqFile;
     }
 
+    /**
+     * Gets the resp file.
+     *
+     * @return the resp file
+     */
     public File getRespFile() {
         return respFile;
     }
 
+    /**
+     * Gets the dir.
+     *
+     * @return the dir
+     */
     public File getDir() {
         return dir;
     }
 
+    /**
+     * Sets the dir.
+     *
+     * @param dir the new dir
+     */
     public void setDir(File dir) {
         this.dir = dir;
+    }
+
+    /**
+     * Gets the velocity context.
+     *
+     * @return the velocity context
+     */
+    public VelocityContext getVelocityContext() {
+        return velocityContext;
+    }
+
+    /**
+     * Gets the fi bean.
+     *
+     * @return the fi bean
+     */
+    public FIBean getFiBean() {
+        VelocityContext context = getVelocityContext();
+        FIBean fi = (FIBean) context.get("fi");
+        return fi;
+    }
+
+    /**
+     * Check https only.
+     *
+     * @param uri the uri
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    private static void checkHttpsOnly(URI uri) throws IOException {
+        String scheme = uri.getScheme();
+        if (scheme == null) {
+            throw new IOException("URL must be https, uri=" + uri.toString());
+        }
+        if (scheme.length() <= 0) {
+            throw new IOException("URL must be https, uri=" + uri.toString());
+        }
+        if (scheme.compareToIgnoreCase("https") != 0) {
+            throw new IOException("URL must be https, uri=" + uri.toString());
+        }
+        LOGGER.info("YES, url is https - " + uri.toString());
     }
 
 }

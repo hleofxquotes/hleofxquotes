@@ -8,12 +8,26 @@ import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class BrowserLauncher.
+ */
 public class BrowserLauncher {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(BrowserLauncher.class);
 
+    /** The Constant browsers. */
     private static final String[] browsers = { "google-chrome", "firefox", "opera", "epiphany", "konqueror", "conkeror", "midori", "kazehakase", "mozilla" };
+    
+    /** The Constant errMsg. */
     private static final String errMsg = "Error attempting to launch web browser";
 
+    /**
+     * Open URL.
+     *
+     * @param urlString the url string
+     */
     public static void openURL(String urlString) {
         URI uri = URI.create(urlString);
         if (desktopBrowse(uri)) {
@@ -41,6 +55,12 @@ public class BrowserLauncher {
         }
     }
 
+    /**
+     * Desktop browse.
+     *
+     * @param uri the uri
+     * @return true, if successful
+     */
     public static boolean desktopBrowse(URI uri) {
         boolean rv = false;
         // attempt to use Desktop library from JDK 1.6+

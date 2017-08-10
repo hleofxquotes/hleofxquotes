@@ -45,6 +45,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -71,6 +72,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.TableCellRenderer;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -87,7 +89,7 @@ import org.apache.log4j.Logger;
 import com.hungle.tools.moneyutils.bloomberg.BloombergQuoteSourcePanel;
 import com.hungle.tools.moneyutils.data.SymbolMapper;
 import com.hungle.tools.moneyutils.data.SymbolMapperEntry;
-import com.hungle.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
 import com.hungle.tools.moneyutils.fi.VelocityUtils;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.hungle.tools.moneyutils.ft.FtDotComQuoteSourcePanel;
@@ -149,7 +151,8 @@ public class GUI extends JFrame {
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(GUI.class);
 
-    private static final String DEFAULT_FI_DIR = "fi";
+    /** The Constant DEFAULT_FI_DIR. */
+    public static final String DEFAULT_FI_DIR = "fi";
 
     /** The Constant VERSION_PREFIX. */
     private static final String VERSION_PREFIX = "Build";
@@ -312,7 +315,7 @@ public class GUI extends JFrame {
 
     /** The fi dir. */
     // TODO_FI
-    private File fiDir = new File(System.getProperty("fi.dir", DEFAULT_FI_DIR));
+    private File fiDir = new File(System.getProperty("fi.dir", getDefaultFiDir()));
 
     /**
      * The Class EditRandomizeShareCountAction.
@@ -1012,17 +1015,20 @@ public class GUI extends JFrame {
     /**
      * The Class CreateNewFi.
      */
-    private final class CreateNewFi extends AbstractAction {
+    private final class CreateNewFiAction extends AbstractAction {
         
         /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
+        
+        /** The parent component. */
+        private Component parentComponent = GUI.this;
 
         /**
          * Instantiates a new creates the new fi.
          *
          * @param name the name
          */
-        private CreateNewFi(String name) {
+        private CreateNewFiAction(String name) {
             super(name);
         }
 
@@ -1031,7 +1037,7 @@ public class GUI extends JFrame {
          */
         @Override
         public void actionPerformed(ActionEvent event) {
-            String fiName = JOptionPane.showInputDialog(GUI.this, "Enter a new 'Financial Institution' name");
+            String fiName = JOptionPane.showInputDialog(parentComponent, "Enter a new 'Financial Institution' name");
             if (fiName == null) {
                 // cancel
                 return;
@@ -1041,49 +1047,67 @@ public class GUI extends JFrame {
             if (fiName.length() <= 0) {
                 return;
             }
-            // TODO_FI
-            // File topDir = new File("fi");
-            File topDir = getFiDir();
+            
+            File topDir = getTopDir();
             if ((!topDir.exists()) && (!topDir.mkdirs())) {
-                JOptionPane.showMessageDialog(GUI.this, "Cannot create dir\ndir=" + topDir.getAbsolutePath(),
+                JOptionPane.showMessageDialog(parentComponent, "Cannot create dir\ndir=" + topDir.getAbsolutePath(),
                         "Error creating", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            File d = new File(topDir, fiName);
-            if (d.exists()) {
-                JOptionPane.showMessageDialog(GUI.this, "Directory exist\ndir=" + d.getAbsolutePath(), "Error creating",
+            File fiDir = new File(topDir, fiName);
+            if (fiDir.exists()) {
+                JOptionPane.showMessageDialog(parentComponent, "Directory exist\ndir=" + fiDir.getAbsolutePath(), "Error creating",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            if (!d.mkdirs()) {
-                JOptionPane.showMessageDialog(GUI.this, "Cannot create dir\ndir=" + d.getAbsolutePath(),
+            if (!fiDir.mkdirs()) {
+                JOptionPane.showMessageDialog(parentComponent, "Cannot create dir\ndir=" + fiDir.getAbsolutePath(),
                         "Error creating", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            LOGGER.info("Created new FI dir=" + d.getAbsolutePath());
-            String fiPropertiesFileName = UpdateFiDir.DEFAULT_PROPERTIES_FILENAME;
+            LOGGER.info("Created new FI dir=" + fiDir.getAbsolutePath());
+            
+            String fiPropertiesFileName = AbstractUpdateFiDir.DEFAULT_PROPERTIES_FILENAME;
             String sampleFileName = "samples" + "/" + fiPropertiesFileName;
             URL url = OfxUtils.getResource(sampleFileName);
             if (url == null) {
-                JOptionPane.showMessageDialog(GUI.this, "Cannot find sample file\nfile=" + sampleFileName,
+                JOptionPane.showMessageDialog(parentComponent, "Cannot find sample file\nfile=" + sampleFileName,
                         "Error creating", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            
             File fiPropertiesFile = null;
             try {
-                fiPropertiesFile = new File(d, fiPropertiesFileName);
+                fiPropertiesFile = new File(fiDir, fiPropertiesFileName);
                 Utils.copyToFile(url, fiPropertiesFile);
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(GUI.this, "Error creating " + fiPropertiesFileName, "Error creating",
+                JOptionPane.showMessageDialog(parentComponent, "Error creating " + fiPropertiesFileName, "Error creating",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            
             JOptionPane
-                    .showMessageDialog(GUI.this,
+                    .showMessageDialog(parentComponent,
                             "Succesfully created dirctory for fi=" + fiName + "\n" + "Please edit file\n"
                                     + fiPropertiesFile.getAbsolutePath(),
                             "FI Created", JOptionPane.INFORMATION_MESSAGE);
 
+            postCreated();
+        }
+
+        /**
+         * Gets the top dir.
+         *
+         * @return the top dir
+         */
+        protected File getTopDir() {
+            return getFiDir();
+        }
+
+        /**
+         * Post created.
+         */
+        protected void postCreated() {
             downloadView.refreshFiDir();
 
             mainTabbed.setSelectedIndex(1);
@@ -1290,6 +1314,20 @@ public class GUI extends JFrame {
         if (priceFilterEdit != null) {
             priceFilterEdit.setText("");
         }
+    }
+
+    /**
+     * Gets the default fi dir.
+     *
+     * @return the default fi dir
+     */
+    private String getDefaultFiDir() {
+        File dir = FileSystemView.getFileSystemView().getDefaultDirectory();
+        if ((dir == null) || (! dir.exists()) || (! dir.isDirectory())) {
+            dir = new File(".");
+        }
+        File fiDir = new File(dir, DEFAULT_FI_DIR);
+        return fiDir.getAbsolutePath();
     }
 
     /**
@@ -1838,7 +1876,7 @@ public class GUI extends JFrame {
         JMenu newMenu = new JMenu("New");
         menu.add(newMenu);
 
-        menuItem = new JMenuItem(new CreateNewFi("Financial Institution"));
+        menuItem = new JMenuItem(new CreateNewFiAction("Financial Institution"));
         newMenu.add(menuItem);
 
         JMenu profilesMenu = new JMenu("Open Quotes Profiles");
@@ -2509,7 +2547,7 @@ public class GUI extends JFrame {
                     return;
                 }
                 File toFile = fc.getSelectedFile();
-                PREFS.put(SaveOfxAction.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
+                PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                 try {
                     QifUtils.saveToQif(priceList, toFile);
                 } catch (IOException e) {
@@ -2521,7 +2559,7 @@ public class GUI extends JFrame {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("> creating FileChooser");
                 }
-                String key = SaveOfxAction.ACCELERATOR_KEY;
+                String key = Action.ACCELERATOR_KEY;
                 fc = new JFileChooser(PREFS.get(key, "."));
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("< creating FileChooser");

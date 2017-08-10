@@ -38,30 +38,73 @@ import com.hungle.tools.moneyutils.fi.model.Account;
 import com.hungle.tools.moneyutils.fi.model.AccountGroup;
 import com.hungle.tools.moneyutils.fi.model.AccountGroups;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class FiManager.
+ *
  * @author lobas_av
- * 
  */
 public class FiManager extends JFrame {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(FiManager.class);
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The m groups. */
     private AccountGroups m_groups = new AccountGroups();
+    
+    /** The m names. */
     private List<String> m_names = new ArrayList<String>();
+    
+    /** The m content pane. */
     private JSplitPane m_contentPane;
+    
+    /** The m group list. */
     private JList m_groupList;
+    
+    /** The group toolbar. */
     private JPanel groupToolbar;
+    
+    /** The m new group button. */
     private JButton m_newGroupButton;
+    
+    /** The m edit group button. */
     private JButton m_editGroupButton;
+    
+    /** The m delete group button. */
     private JButton m_deleteGroupButton;
+    
+    /** The m person table. */
     private JTable m_personTable;
+    
+    /** The m new person button. */
     private JButton m_newPersonButton;
+    
+    /** The m delete person button. */
     private JButton m_deletePersonButton;
+    
+    /** The m name text field. */
     private JTextField m_nameTextField;
+    
+    /** The m email text field. */
     private JTextField m_emailTextField;
+    
+    /** The m phone text field. */
     private JTextField m_phoneTextField;
+    
+    /** The m mobile phone 1 text field. */
     private JTextField m_mobilePhone1TextField;
+    
+    /** The m mobile phone 2 text field. */
     private JTextField m_mobilePhone2TextField;
 
+    /**
+     * The main method.
+     *
+     * @param args the arguments
+     */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
 
@@ -79,6 +122,9 @@ public class FiManager extends JFrame {
         });
     }
 
+    /**
+     * Sets the default values.
+     */
     private void setDefaultValues() {
         AccountGroup group1 = new AccountGroup("Developer Team");
         m_groups.addGroup(group1);
@@ -106,6 +152,9 @@ public class FiManager extends JFrame {
         m_names.add("Advertising department");
     }
 
+    /**
+     * Instantiates a new fi manager.
+     */
     public FiManager() {
         // setDefaultValues();
         setTitle("FiManager");
@@ -370,6 +419,9 @@ public class FiManager extends JFrame {
         initDataBindings();
     }
 
+    /**
+     * Inits the data bindings.
+     */
     protected void initDataBindings() {
         BeanProperty<AccountGroups, List<AccountGroup>> phoneGroupsBeanProperty = BeanProperty.create("groups");
         JListBinding<AccountGroup, AccountGroups, JList> jListBinding = SwingBindings.createJListBinding(AutoBinding.UpdateStrategy.READ, m_groups,

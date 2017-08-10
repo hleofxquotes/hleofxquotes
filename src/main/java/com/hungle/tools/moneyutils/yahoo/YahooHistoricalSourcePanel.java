@@ -26,6 +26,7 @@ public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(YahooHistoricalSourcePanel.class);
 
+    /** The Constant STOCK_SYMBOLS_PREF_KEY. */
     private static final String STOCK_SYMBOLS_PREF_KEY = "yahooHistoricalStockSymbols";
 
     /**
@@ -39,6 +40,11 @@ public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
         getQuoteSource().setHistoricalQuotes(true);
     }
 
+    /**
+     * Instantiates a new yahoo historical source panel.
+     *
+     * @param gui the gui
+     */
     public YahooHistoricalSourcePanel(GUI gui) {
         this(gui, STOCK_SYMBOLS_PREF_KEY);
     }

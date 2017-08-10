@@ -14,13 +14,30 @@ import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SymbolMapper.
+ */
 public class SymbolMapper {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(SymbolMapper.class);
 
+    /** The map by ms money symbol. */
     private final Map<String, List<SymbolMapperEntry>> mapByMsMoneySymbol = new HashMap<String, List<SymbolMapperEntry>>();
+    
+    /** The map by quotes source symbol. */
     private final Map<String, List<SymbolMapperEntry>> mapByQuotesSourceSymbol = new HashMap<String, List<SymbolMapperEntry>>();
+    
+    /** The entries. */
     private final List<SymbolMapperEntry> entries = new ArrayList<SymbolMapperEntry>();
 
+    /**
+     * Load.
+     *
+     * @param file the file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void load(File file) throws IOException {
         CsvReader csvReader = null;
         Reader reader = null;
@@ -50,6 +67,12 @@ public class SymbolMapper {
 
     }
 
+    /**
+     * Load.
+     *
+     * @param csvReader the csv reader
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void load(CsvReader csvReader) throws IOException {
         SymbolMapperEntry entry;
         while (csvReader.readRecord()) {
@@ -67,6 +90,11 @@ public class SymbolMapper {
         }
     }
 
+    /**
+     * Update map bys.
+     *
+     * @param entry the entry
+     */
     private void updateMapBys(SymbolMapperEntry entry) {
         String msMoneySymbol = entry.getMsMoneySymbol();
         String quotesSourceSymbol = entry.getQuotesSourceSymbol();
@@ -87,6 +115,12 @@ public class SymbolMapper {
         list.add(entry);
     }
 
+    /**
+     * Entries by quote source.
+     *
+     * @param quoteSourceSymbol the quote source symbol
+     * @return the list
+     */
     public List<SymbolMapperEntry> entriesByQuoteSource(String quoteSourceSymbol) {
         List<SymbolMapperEntry> list = mapByQuotesSourceSymbol.get(quoteSourceSymbol);
         if (list == null) {
@@ -95,6 +129,12 @@ public class SymbolMapper {
         return list;
     }
 
+    /**
+     * Checks for entry.
+     *
+     * @param ticker the ticker
+     * @return true, if successful
+     */
     public boolean hasEntry(String ticker) {
         if (mapByQuotesSourceSymbol.get(ticker) != null) {
             return true;
@@ -106,6 +146,12 @@ public class SymbolMapper {
         return false;
     }
 
+    /**
+     * Gets the checks if is mutual fund.
+     *
+     * @param ticker the ticker
+     * @return the checks if is mutual fund
+     */
     public boolean getIsMutualFund(String ticker) {
         List<SymbolMapperEntry> list = null;
 
@@ -130,6 +176,12 @@ public class SymbolMapper {
         return false;
     }
 
+    /**
+     * Gets the checks if is options.
+     *
+     * @param ticker the ticker
+     * @return the checks if is options
+     */
     public boolean getIsOptions(String ticker) {
         List<SymbolMapperEntry> list = null;
 
@@ -155,6 +207,12 @@ public class SymbolMapper {
         return false;
     }
 
+    /**
+     * Gets the checks if is bond.
+     *
+     * @param ticker the ticker
+     * @return the checks if is bond
+     */
     public boolean getIsBond(String ticker) {
         List<SymbolMapperEntry> list = null;
 
@@ -180,10 +238,20 @@ public class SymbolMapper {
         return false;
     }
 
+    /**
+     * Gets the entries.
+     *
+     * @return the entries
+     */
     public List<SymbolMapperEntry> getEntries() {
         return entries;
     }
 
+    /**
+     * Creates the default symbol mapper.
+     *
+     * @return the symbol mapper
+     */
     public static SymbolMapper createDefaultSymbolMapper() {
         SymbolMapper symbolMapper = new SymbolMapper();
         String fileName = "mapper.csv";

@@ -20,13 +20,20 @@ import org.jdesktop.swingbinding.JTableBinding;
 import org.jdesktop.swingbinding.JTableBinding.ColumnBinding;
 import org.jdesktop.swingbinding.SwingBindings;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Example1.
+ */
 public class Example1 extends JFrame {
 
-    /**
-     * 
-     */
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new example 1.
+     *
+     * @param title the title
+     */
     public Example1(String title) {
         super(title);
 
@@ -35,6 +42,11 @@ public class Example1 extends JFrame {
         getContentPane().add(createMainView());
     }
 
+    /**
+     * Creates the main view.
+     *
+     * @return the component
+     */
     private Component createMainView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -96,7 +108,9 @@ public class Example1 extends JFrame {
     }
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         String title = "Example1";
@@ -111,6 +125,9 @@ public class Example1 extends JFrame {
         SwingUtilities.invokeLater(doRun);
     }
 
+    /**
+     * Show main frame.
+     */
     private void showMainFrame() {
         pack();
         setLocationRelativeTo(null);

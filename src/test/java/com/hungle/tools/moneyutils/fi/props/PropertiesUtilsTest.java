@@ -8,7 +8,15 @@ import org.apache.commons.beanutils.BeanUtilsBean;
 import org.junit.Assert;
 import org.junit.Test;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PropertiesUtilsTest.
+ */
 public class PropertiesUtilsTest {
+    
+    /**
+     * Test is null.
+     */
     @Test
     public void testIsNull() {
         Assert.assertTrue(PropertiesUtils.isNull(null));
@@ -22,6 +30,9 @@ public class PropertiesUtilsTest {
         Assert.assertFalse(PropertiesUtils.isNull(" x "));
     }
 
+    /**
+     * Test set properties.
+     */
     @Test
     public void testSetProperties() {
         String prefix = null;
@@ -39,6 +50,13 @@ public class PropertiesUtilsTest {
         testSetOfxVersion(prefix, key, versionValue);
     }
 
+    /**
+     * Test set ofx version.
+     *
+     * @param prefix the prefix
+     * @param key the key
+     * @param versionValue the version value
+     */
     private void testSetOfxVersion(String prefix, String key, String versionValue) {
         Collection<String> keys = new ArrayList<String>();
         keys.add(key);

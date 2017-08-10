@@ -21,19 +21,37 @@ import net.ofx.types.x2003.x04.OFXDocument;
 import net.ofx.types.x2003.x04.SignonRequest;
 import net.ofx.types.x2003.x04.SignonRequestMessageSetV1;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class InvestmentStatementRequest.
+ */
 public class InvestmentStatementRequest {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(InvestmentStatementRequest.class);
 
+    /** The xml options. */
     private XmlOptions xmlOptions;
 
+    /** The ofx document. */
     private OFXDocument ofxDocument;
 
+    /** The user id. */
     private String userId;
 
+    /** The user password. */
     private String userPassword;
 
+    /** The org. */
     private String org;
 
+    /**
+     * Instantiates a new investment statement request.
+     *
+     * @param userId the user id
+     * @param userPassword the user password
+     * @param org the org
+     */
     public InvestmentStatementRequest(String userId, String userPassword, String org) {
         this.userId = userId;
         this.userPassword = userPassword;
@@ -41,6 +59,11 @@ public class InvestmentStatementRequest {
         this.ofxDocument = createRequestOfxDocument();
     }
 
+    /**
+     * Creates the request ofx document.
+     *
+     * @return the OFX document
+     */
     private OFXDocument createRequestOfxDocument() {
         this.xmlOptions = XmlBeansUtils.createXmlOptions();
         OFXDocument ofxDocument = OFXDocument.Factory.newInstance(xmlOptions);
@@ -57,6 +80,12 @@ public class InvestmentStatementRequest {
         return ofxDocument;
     }
 
+    /**
+     * Adds the todo.
+     *
+     * @param ofx the ofx
+     * @return the investment statement request message set V 1
+     */
     private InvestmentStatementRequestMessageSetV1 addTodo(OFX ofx) {
         InvestmentStatementRequestMessageSetV1 root = ofx.addNewINVSTMTMSGSRQV1();
 
@@ -83,6 +112,12 @@ public class InvestmentStatementRequest {
         return root;
     }
 
+    /**
+     * Adds the signon request message set V 1.
+     *
+     * @param ofx the ofx
+     * @return the signon request message set V 1
+     */
     private SignonRequestMessageSetV1 addSignonRequestMessageSetV1(OFX ofx) {
         SignonRequestMessageSetV1 root = ofx.addNewSIGNONMSGSRQV1();
         // 2.5.1.2 Signon Request <SONRQ>
@@ -111,14 +146,30 @@ public class InvestmentStatementRequest {
         return root;
     }
 
+    /**
+     * Save.
+     *
+     * @param file the file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void save(File file) throws IOException {
         ofxDocument.save(file, xmlOptions);
     }
 
+    /**
+     * Gets the ofx document.
+     *
+     * @return the ofx document
+     */
     public OFXDocument getOfxDocument() {
         return ofxDocument;
     }
 
+    /**
+     * Sets the ofx document.
+     *
+     * @param ofxDocument the new ofx document
+     */
     public void setOfxDocument(OFXDocument ofxDocument) {
         this.ofxDocument = ofxDocument;
     }

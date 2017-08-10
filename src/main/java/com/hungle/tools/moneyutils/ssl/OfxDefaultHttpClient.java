@@ -26,19 +26,44 @@ import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.fi.OfxPostClientParams;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class OfxDefaultHttpClient.
+ */
 public class OfxDefaultHttpClient extends DefaultHttpClient {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(OfxDefaultHttpClient.class);
 
+    /** The handshake completed listener. */
     private OfxHandshakeCompletedListener handshakeCompletedListener;
 
+    /**
+     * Instantiates a new ofx default http client.
+     *
+     * @param clientConnectionManager the client connection manager
+     */
     private OfxDefaultHttpClient(ClientConnectionManager clientConnectionManager) {
         super(clientConnectionManager);
     }
 
+    /**
+     * Instantiates a new ofx default http client.
+     *
+     * @param clientConnectionManager the client connection manager
+     * @param params the params
+     */
     private OfxDefaultHttpClient(ClientConnectionManager clientConnectionManager, HttpParams params) {
         super(clientConnectionManager, params);
     }
 
+    /**
+     * Creates the http client.
+     *
+     * @param params the params
+     * @return the ofx default http client
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static OfxDefaultHttpClient createHttpClient(OfxPostClientParams params) throws IOException {
         boolean allowTrustStrategy = true;
 
@@ -87,6 +112,13 @@ public class OfxDefaultHttpClient extends DefaultHttpClient {
         return httpClient;
     }
 
+    /**
+     * Creates the client connection manager.
+     *
+     * @param listener the listener
+     * @return the client connection manager
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static ClientConnectionManager createClientConnectionManager(final OfxHandshakeCompletedListener listener) throws IOException {
         ClientConnectionManager clientConnectionManager = null;
         try {
@@ -113,6 +145,14 @@ public class OfxDefaultHttpClient extends DefaultHttpClient {
         return clientConnectionManager;
     }
 
+    /**
+     * Wrap to allow all client.
+     *
+     * @param base the base
+     * @return the ofx default http client
+     * @throws KeyManagementException the key management exception
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     */
     static OfxDefaultHttpClient wrapToAllowAllClient(final OfxDefaultHttpClient base) throws KeyManagementException, NoSuchAlgorithmException {
         OfxHandshakeCompletedListener listener = base.handshakeCompletedListener;
 
@@ -129,6 +169,14 @@ public class OfxDefaultHttpClient extends DefaultHttpClient {
         return wrappedClient;
     }
 
+    /**
+     * Creates the allow all L ssl socket fatory.
+     *
+     * @param listener the listener
+     * @return the SSL socket factory
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     * @throws KeyManagementException the key management exception
+     */
     private static SSLSocketFactory createAllowAllLSslSocketFatory(OfxHandshakeCompletedListener listener) throws NoSuchAlgorithmException,
             KeyManagementException {
         SSLContext context = SSLContext.getInstance("TLS");

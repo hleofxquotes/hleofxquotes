@@ -36,32 +36,63 @@ import com.hungle.tools.moneyutils.ofx.quotes.QuoteSourceListener;
 import com.hungle.tools.moneyutils.ofx.quotes.StopWatch;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class FtDotComQuoteSourcePanel.
+ */
 public class FtDotComQuoteSourcePanel extends JPanel {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(FtDotComQuoteSourcePanel.class);
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /** The Constant PREF_IMPORT_FT_COM_CSV_DIR. */
     private static final String PREF_IMPORT_FT_COM_CSV_DIR = "importFtComCsvDir";
+    
+    /** The Constant PREF_FT_COM_USE_SOURCE_SHARE_COUNT. */
     private static final String PREF_FT_COM_USE_SOURCE_SHARE_COUNT = "ftComUseShareCount";
 
+    /** The prefs. */
     private final Preferences prefs;
+    
+    /** The quote source listener. */
     private final QuoteSourceListener quoteSourceListener;
+    
+    /** The share count check box. */
     private JCheckBox shareCountCheckBox;
+    
+    /** The stock prices. */
     private List<AbstractStockPrice> stockPrices = null;
+    
+    /** The quote source. */
     private QuoteSource quoteSource = new DefaultQuoteSource();
 
+    /**
+     * The Class ImportFtComCsvAction.
+     */
     private final class ImportFtComCsvAction extends AbstractAction {
-        /**
-         * 
-         */
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
+        
+        /** The fc. */
         private JFileChooser fc = null;
 
+        /**
+         * Instantiates a new import ft com csv action.
+         *
+         * @param name the name
+         */
         private ImportFtComCsvAction(String name) {
             super(name);
             // initFileChooser();
         }
 
+        /**
+         * Inits the file chooser.
+         */
         private void initFileChooser() {
             String dir = prefs.get(FtDotComQuoteSourcePanel.PREF_IMPORT_FT_COM_CSV_DIR, ".");
             LOGGER.info("> pre creating JFileChooser");
@@ -86,6 +117,9 @@ public class FtDotComQuoteSourcePanel extends JPanel {
             this.fc.setFileFilter(filter);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             if (fc == null) {
@@ -124,6 +158,11 @@ public class FtDotComQuoteSourcePanel extends JPanel {
         }
     }
 
+    /**
+     * Instantiates a new ft dot com quote source panel.
+     *
+     * @param gui the gui
+     */
     public FtDotComQuoteSourcePanel(GUI gui) {
         super();
         this.prefs = GUI.getPrefs();
@@ -131,6 +170,11 @@ public class FtDotComQuoteSourcePanel extends JPanel {
         createMainView();
     }
 
+    /**
+     * Creates the main view.
+     *
+     * @return the component
+     */
     private Component createMainView() {
         JPanel view = this;
         view.setLayout(new BorderLayout());
@@ -189,18 +233,34 @@ public class FtDotComQuoteSourcePanel extends JPanel {
         return view;
     }
 
+    /**
+     * Stock prices lookup started.
+     *
+     * @param quoteSource the quote source
+     */
     private void stockPricesLookupStarted(QuoteSource quoteSource) {
         if (quoteSourceListener != null) {
             quoteSourceListener.stockPricesLookupStarted(quoteSource);
         }
     }
 
+    /**
+     * Stock symbols string received.
+     *
+     * @param quoteSource the quote source
+     */
     private void stockSymbolsStringReceived(QuoteSource quoteSource) {
         if (quoteSourceListener != null) {
             quoteSourceListener.stockSymbolsStringReceived(quoteSource, null);
         }
     }
 
+    /**
+     * Stock prices received.
+     *
+     * @param quoteSource the quote source
+     * @param stockPrices the stock prices
+     */
     private void stockPricesReceived(QuoteSource quoteSource, List<AbstractStockPrice> stockPrices) {
         if (quoteSourceListener != null) {
             quoteSourceListener.stockPricesReceived(quoteSource, stockPrices);

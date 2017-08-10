@@ -13,19 +13,40 @@ import org.junit.Test;
 import com.csvreader.CsvReader;
 import com.hungle.tools.moneyutils.data.SymbolMapper;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SymbolMapperTest.
+ */
 public class SymbolMapperTest {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(SymbolMapperTest.class);
 
+    /** The mapper. */
     private SymbolMapper mapper;
 
+    /** The in. */
     private InputStream in = null;
+    
+    /** The csv reader. */
     private CsvReader csvReader = null;
 
+    /**
+     * Setup.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Before
     public void setup() throws IOException {
         mapper = new SymbolMapper();
     }
 
+    /**
+     * Load.
+     *
+     * @param id the id
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void load(String id) throws IOException {
         String[] tokens = getClass().getName().split("\\.");
 
@@ -40,6 +61,9 @@ public class SymbolMapperTest {
         mapper.load(csvReader);
     }
 
+    /**
+     * Teardown.
+     */
     @After
     public void teardown() {
         mapper = null;
@@ -56,6 +80,11 @@ public class SymbolMapperTest {
         }
     }
 
+    /**
+     * Test 01.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void test01() throws IOException {
         String id = "01";
@@ -63,6 +92,11 @@ public class SymbolMapperTest {
         Assert.assertEquals(0, mapper.getEntries().size());
     }
 
+    /**
+     * Test 02.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void test02() throws IOException {
         String id = "02";
@@ -70,6 +104,11 @@ public class SymbolMapperTest {
         Assert.assertEquals(9, mapper.getEntries().size());
     }
     
+    /**
+     * Test 03.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void test03() throws IOException {
         String id = "03";

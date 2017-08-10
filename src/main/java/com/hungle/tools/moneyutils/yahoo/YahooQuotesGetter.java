@@ -22,6 +22,7 @@ public class YahooQuotesGetter extends AbstractHttpQuoteGetter {
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(YahooQuotesGetter.class);
     
+    /** The Constant DEFAULT_HOST. */
     public static final String DEFAULT_HOST = "download.finance.yahoo.com";
 
     /** The Constant QUOTE_HOSTS. */

@@ -15,10 +15,13 @@ import com.hungle.tools.moneyutils.fi.AbstractFiContext;
  */
 public class Authentication {
     
+    /** The Constant KEY_PASSWORD. */
     private static final String KEY_PASSWORD = "password";
 
+    /** The Constant KEY_ID. */
     private static final String KEY_ID = "id";
 
+    /** The Constant PREFIX. */
     private static final String PREFIX = "user";
 
     /** The id. */

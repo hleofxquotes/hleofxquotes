@@ -9,7 +9,15 @@ import org.junit.Test;
 
 import com.hungle.tools.moneyutils.fi.model.bean.FiInfoBean;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class BeanSupportTest.
+ */
 public class BeanSupportTest {
+    
+    /**
+     * Value change notifications.
+     */
     @Test
     public void valueChangeNotifications() {
         FiInfoBean testCustomer = new FiInfoBean();

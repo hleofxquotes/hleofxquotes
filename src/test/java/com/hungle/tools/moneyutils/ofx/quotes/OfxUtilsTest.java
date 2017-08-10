@@ -10,9 +10,20 @@ import org.junit.Test;
 
 import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class OfxUtilsTest.
+ */
 public class OfxUtilsTest {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(OfxUtilsTest.class);
 
+    /**
+     * Test nyse list conversion.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testNyseListConversion() throws IOException {
         List<String> stocks = OfxUtils.getNYSEList();
@@ -20,6 +31,11 @@ public class OfxUtilsTest {
         Assert.assertEquals(expected, stocks.size());
     }
 
+    /**
+     * Test nasdaq list conversion.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testNasdaqListConversion() throws IOException {
         List<String> stocks = OfxUtils.getNASDAQList();
@@ -27,6 +43,11 @@ public class OfxUtilsTest {
         Assert.assertEquals(expected, stocks.size());
     }
 
+    /**
+     * Test store stock symbols.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     @Ignore
     public void testStoreStockSymbols() throws IOException {

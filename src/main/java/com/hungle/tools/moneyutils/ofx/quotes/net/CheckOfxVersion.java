@@ -26,7 +26,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.hungle.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
+import com.hungle.tools.moneyutils.fi.DefaultUpdateFiDir;
 import com.hungle.tools.moneyutils.fi.VelocityUtils;
 import com.hungle.tools.moneyutils.fi.props.OFX;
 
@@ -37,27 +38,49 @@ import com.hungle.tools.moneyutils.fi.props.OFX;
 public class CheckOfxVersion {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(CheckOfxVersion.class);
+    private static final Logger LOGGER = Logger.getLogger(CheckOfxVersion.class);
     
+    /**
+     * The Class MyUpdateFiDir.
+     */
+    private final class MyUpdateFiDir extends DefaultUpdateFiDir {
+        
+        /** The version. */
+        private final String version;
+    
+        /**
+         * Instantiates a new my update fi dir.
+         *
+         * @param dir the dir
+         * @param version the version
+         * @throws IOException Signals that an I/O exception has occurred.
+         */
+        private MyUpdateFiDir(File dir, String version) throws IOException {
+            super(dir);
+            this.version = version;
+        }
+    
+        /* (non-Javadoc)
+         * @see com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir#checkRespFile(java.io.File, com.hungle.tools.moneyutils.fi.props.OFX)
+         */
+        @Override
+        protected void checkRespFile(File respFile, OFX ofx) throws IOException {
+            if (version.compareToIgnoreCase("v1") == 0) {
+                ofx.setVersion("1");
+            } else if (version.compareToIgnoreCase("v2") == 0) {
+                ofx.setVersion("2");
+            } else {
+                ofx.setVersion("1");
+            }
+            super.checkRespFile(respFile, ofx);
+        }
+    }
+
     /** The account id pattern. */
     private Pattern accountIdPattern = Pattern.compile("\\<ACCTID\\>" + "([a-zA-Z0-9]+)");
     
     /** The bank id pattern. */
     private Pattern bankIdPattern = Pattern.compile("\\<BANKID\\>" + "([a-zA-Z0-9]+)");
-
-    /**
-     * Check.
-     *
-     * @param args the args
-     */
-    public void check(String[] args) {
-
-        for (String arg : args) {
-            File dir = new File(arg);
-            log.info("> START checking dir=" + dir);
-            check(dir);
-        }
-    }
 
     /**
      * Parses the account inquiry response.
@@ -84,37 +107,37 @@ public class CheckOfxVersion {
                 writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
                 String line = null;
                 while ((line = reader.readLine()) != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(line);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(line);
                     }
                     matcher = bankIdPattern.matcher(line);
                     while (matcher.find()) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("MATCHED=" + matcher.group());
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("MATCHED=" + matcher.group());
                         }
 
                         if (matcher.groupCount() != 1) {
-                            log.warn("Matcher found more than one group");
+                            LOGGER.warn("Matcher found more than one group");
                         } else {
                             String bankId = matcher.group(1);
-                            log.info("BANKID=" + bankId);
+                            LOGGER.info("BANKID=" + bankId);
                             bankIds.add(bankId);
                         }
                     }
 
                     matcher = accountIdPattern.matcher(line);
                     while (matcher.find()) {
-                        log.info("MATCHED=" + matcher.group());
+                        LOGGER.info("MATCHED=" + matcher.group());
                         if (matcher.groupCount() != 1) {
-                            log.warn("Matcher found more than one group");
+                            LOGGER.warn("Matcher found more than one group");
                         } else {
                             String accountId = matcher.group(1);
-                            log.info("ACCTID=" + accountId);
+                            LOGGER.info("ACCTID=" + accountId);
                             accountIds.add(accountId);
                         }
                     }
                 }
-                log.info("Writing account info to file=" + outFile);
+                LOGGER.info("Writing account info to file=" + outFile);
                 writeAccountInfo(bankIds, accountIds, writer);
             } finally {
                 if (reader != null) {
@@ -157,7 +180,7 @@ public class CheckOfxVersion {
                 nodes = (NodeList) result;
                 for (int i = 0; i < nodes.getLength(); i++) {
                     String bankId = nodes.item(i).getNodeValue();
-                    log.info("BANKID=" + bankId);
+                    LOGGER.info("BANKID=" + bankId);
                     bankIds.add(bankId);
                 }
 
@@ -166,11 +189,11 @@ public class CheckOfxVersion {
                 nodes = (NodeList) result;
                 for (int i = 0; i < nodes.getLength(); i++) {
                     String accountId = nodes.item(i).getNodeValue();
-                    log.info("ACCTID=" + accountId);
+                    LOGGER.info("ACCTID=" + accountId);
                     accountIds.add(accountId);
                 }
 
-                log.info("Writing account info to file=" + outFile);
+                LOGGER.info("Writing account info to file=" + outFile);
                 writeAccountInfo(bankIds, accountIds, writer);
             } catch (SAXException e) {
                 throw new IOException(e);
@@ -222,63 +245,15 @@ public class CheckOfxVersion {
 
             if (lastBankId != null) {
                 // account.1.id=371515742121005
-                writer.println("bankId." + (i + 1) + ".id=" + lastBankId);
+                writer.println("account." + (i + 1) + ".bankId=" + lastBankId);
+                // account.1.type=SAVINGS
+                writer.println("account." + (i + 1) + ".type=" + "CHECKING");
             }
             if (lastAccountId != null) {
                 // account.1.id=371515742121005
                 writer.println("account." + (i + 1) + ".id=" + lastAccountId);
             }
 
-        }
-    }
-
-    /**
-     * Check.
-     *
-     * @param dir the dir
-     */
-    public void check(File dir) {
-        String[] versions = { "v2", "v1", };
-        for (String version : versions) {
-            log.info("");
-            log.info("Checking if FI supports version=" + version);
-            final String v = version;
-            UpdateFiDir updater = new UpdateFiDir(dir) {
-
-                @Override
-                protected void checkRespFile(File respFile, OFX ofx) throws IOException {
-                    if (v.compareToIgnoreCase("v1") == 0) {
-                        ofx.setVersion("1");
-                    } else if (v.compareToIgnoreCase("v2") == 0) {
-                        ofx.setVersion("2");
-                    } else {
-                        ofx.setVersion("1");
-                    }
-                    super.checkRespFile(respFile, ofx);
-                }
-            };
-            boolean isSupported = false;
-            try {
-                String type = "accountInquiry-" + version;
-                updater.setTemplate(type + ".vm");
-                updater.setRequestFileName(type + "-req.ofx");
-                updater.setRespFileName(type + "-resp.ofx");
-                updater.update();
-                isSupported = true;
-                notifyVersionIsSupported(version, updater.getRespFile(), updater);
-            } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.error(e, e);
-                } else {
-                    log.warn(e);
-                }
-                if (isSupported) {
-                    notifyVersionIsNotSupported(version, updater.getRespFile(), e);
-                }
-            } finally {
-                log.info("");
-                log.info("< DONE checking dir=" + dir);
-            }
         }
     }
 
@@ -290,7 +265,7 @@ public class CheckOfxVersion {
      * @param e the e
      */
     protected void notifyVersionIsNotSupported(String version, File respponseFile, Exception e) {
-        log.error("Not OK. version=" + version + " is NOT support. " + e.getMessage());
+        LOGGER.error("Not OK. version=" + version + " is NOT support. " + e.getMessage());
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(respponseFile));
@@ -299,13 +274,13 @@ public class CheckOfxVersion {
                 System.out.println(line);
             }
         } catch (IOException e1) {
-            log.warn(e1);
+            LOGGER.warn(e1);
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e1) {
-                    log.warn(e1);
+                    LOGGER.warn(e1);
                 } finally {
                     reader = null;
                 }
@@ -320,12 +295,76 @@ public class CheckOfxVersion {
      * @param responseFile the response file
      * @param updater the updater
      */
-    protected void notifyVersionIsSupported(String version, File responseFile, UpdateFiDir updater) {
-        log.info("OK. version=" + version + " is supported.");
+    protected void notifyVersionIsSupported(String version, File responseFile, AbstractUpdateFiDir updater) {
+        LOGGER.info("OK. version=" + version + " is supported.");
         try {
             parseAccountInquiryResponse(version, updater.getRespFile());
         } catch (IOException e) {
-            log.error(e);
+            LOGGER.error(e);
+        }
+    }
+
+    /**
+     * Check.
+     *
+     * @param dir the dir
+     */
+    public void check(File dir) {
+        String[] versions = { "v2", "v1", };
+        for (String version : versions) {
+            checkVersion(dir, version);
+        }
+    }
+
+    /**
+     * Check version.
+     *
+     * @param dir the dir
+     * @param version the version
+     */
+    private void checkVersion(File dir, String version) {
+        LOGGER.info("");
+        LOGGER.info("Checking if FI supports version=" + version);
+        boolean isSupported = false;
+        AbstractUpdateFiDir updater = null;
+        try {
+            updater = new MyUpdateFiDir(dir, version);
+            String type = "accountInquiry-" + version;
+            updater.setTemplate(type + ".vm");
+            updater.setRequestFileName(type + "-req.ofx");
+            updater.setRespFileName(type + "-resp.ofx");
+            updater.update();
+            isSupported = true;
+            notifyVersionIsSupported(version, updater.getRespFile(), updater);
+        } catch (Exception e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.error(e, e);
+            } else {
+                LOGGER.warn(e);
+            }
+            if (isSupported) {
+                notifyVersionIsNotSupported(version, updater.getRespFile(), e);
+            }
+        } finally {
+            if (updater != null) {
+                updater = null;
+            }
+            LOGGER.info("");
+            LOGGER.info("< DONE checking dir=" + dir);
+        }
+    }
+
+    /**
+     * Check.
+     *
+     * @param args the args
+     */
+    public void check(String[] args) {
+    
+        for (String arg : args) {
+            File dir = new File(arg);
+            LOGGER.info("> START checking dir=" + dir);
+            check(dir);
         }
     }
 
@@ -336,7 +375,7 @@ public class CheckOfxVersion {
      */
     public static void main(String[] args) {
         if (args.length == 0) {
-            Class clz = CheckOfxVersion.class;
+            Class<CheckOfxVersion> clz = CheckOfxVersion.class;
             System.err.println("Usage: java " + clz.getName() + " fiDir1 ...");
             System.exit(1);
         }

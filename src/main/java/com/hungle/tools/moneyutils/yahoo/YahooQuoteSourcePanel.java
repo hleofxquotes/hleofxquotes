@@ -70,6 +70,7 @@ public class YahooQuoteSourcePanel extends JPanel {
     /** The Constant PREF_YAHOO_QUOTE_SERVER. */
     private static final String QUOTE_SERVER_PREFS_KEY = "yahooQuoteServer";
 
+    /** The Constant STOCK_SYMBOLS_PREF_KEY. */
     private static final String STOCK_SYMBOLS_PREF_KEY = null;
 
     /** The prefs. */

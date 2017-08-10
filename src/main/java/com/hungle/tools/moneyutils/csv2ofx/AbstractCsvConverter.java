@@ -25,30 +25,62 @@ import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 import com.hungle.tools.moneyutils.stockprice.Price;
 import com.hungle.tools.moneyutils.stockprice.StockPrice;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AbstractCsvConverter.
+ */
 public abstract class AbstractCsvConverter implements CsvConverter {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(AbstractCsvConverter.class);
 
+    /** The symbol mapper. */
     private SymbolMapper symbolMapper = new SymbolMapper();
 
+    /** The decimal locale. */
     private Locale decimalLocale = null;
 
+    /** The use quote source share count. */
     private boolean useQuoteSourceShareCount = true;
 
+    /** The quote date and time formatter. */
     private SimpleDateFormat quoteDateAndTimeFormatter = new SimpleDateFormat("MMM dd yyy HH:mm z");
 
+    /** The last trade date formatter. */
     private SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+    
+    /** The last trade time formatter. */
     private SimpleDateFormat lastTradeTimeFormatter = new SimpleDateFormat("hh:mm");
 
+    /**
+     * Instantiates a new abstract csv converter.
+     */
     public AbstractCsvConverter() {
         super();
     }
 
+    /**
+     * Convert.
+     *
+     * @param fromFile the from file
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public List<AbstractStockPrice> convert(File fromFile) throws IOException {
         File toFile = null;
         boolean forceGeneratingINVTRANLIST = false;
         return convert(fromFile, forceGeneratingINVTRANLIST, toFile);
     }
 
+    /**
+     * Convert.
+     *
+     * @param inFile the in file
+     * @param forceGeneratingINVTRANLIST the force generating INVTRANLIST
+     * @param outFile the out file
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public List<AbstractStockPrice> convert(File inFile, boolean forceGeneratingINVTRANLIST, File outFile) throws IOException {
         List<AbstractStockPrice> beans = new ArrayList<AbstractStockPrice>();
         CsvReader csvReader = null;
@@ -103,6 +135,9 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         return beans;
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.csv2ofx.CsvConverter#convert(com.csvreader.CsvReader)
+     */
     @Override
     public AbstractStockPrice convert(CsvReader csvReader) throws IOException {
         StockPrice stockPrice = new StockPrice();
@@ -130,6 +165,14 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         return stockPrice;
     }
 
+    /**
+     * Sets the stock name.
+     *
+     * @param csvReader the csv reader
+     * @param stockPrice the stock price
+     * @param columnName the column name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected void setStockName(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         String stockName = csvReader.get(columnName);
         if (LOGGER.isDebugEnabled()) {
@@ -141,6 +184,14 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         stockPrice.setStockName(stockName);
     }
 
+    /**
+     * Sets the stock symbol.
+     *
+     * @param csvReader the csv reader
+     * @param stockPrice the stock price
+     * @param columnName the column name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected void setStockSymbol(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         String stockSymbol = csvReader.get(columnName);
         if (LOGGER.isDebugEnabled()) {
@@ -152,6 +203,14 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         stockPrice.setStockSymbol(stockSymbol);
     }
 
+    /**
+     * Sets the last price.
+     *
+     * @param csvReader the csv reader
+     * @param stockPrice the stock price
+     * @param columnName the column name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected void setLastPrice(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         String lastPrice = csvReader.get(columnName);
         if (LOGGER.isDebugEnabled()) {
@@ -179,6 +238,14 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         stockPrice.setLastPrice(price);
     }
 
+    /**
+     * Sets the last trade.
+     *
+     * @param csvReader the csv reader
+     * @param stockPrice the stock price
+     * @param columnName the column name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected void setLastTrade(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         String quoteDateAndTime = csvReader.get(columnName);
         if (LOGGER.isDebugEnabled()) {
@@ -197,6 +264,14 @@ public abstract class AbstractCsvConverter implements CsvConverter {
 
     }
 
+    /**
+     * Sets the currency.
+     *
+     * @param csvReader the csv reader
+     * @param stockPrice the stock price
+     * @param columnName the column name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected void setCurrency(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         String currency = csvReader.get(columnName);
         if (LOGGER.isDebugEnabled()) {
@@ -205,6 +280,14 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         stockPrice.setCurrency(currency);
     }
 
+    /**
+     * Sets the units.
+     *
+     * @param csvReader the csv reader
+     * @param stockPrice the stock price
+     * @param columnName the column name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected void setUnits(CsvReader csvReader, AbstractStockPrice stockPrice, String columnName) throws IOException {
         if (useQuoteSourceShareCount) {
             String quantity = csvReader.get(columnName);
@@ -225,14 +308,29 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         }
     }
 
+    /**
+     * Gets the decimal locale.
+     *
+     * @return the decimal locale
+     */
     public Locale getDecimalLocale() {
         return decimalLocale;
     }
 
+    /**
+     * Sets the decimal locale.
+     *
+     * @param decimalLocale the new decimal locale
+     */
     public void setDecimalLocale(Locale decimalLocale) {
         this.decimalLocale = decimalLocale;
     }
 
+    /**
+     * Sets the use quote source share count.
+     *
+     * @param useQuoteSourceShareCount the new use quote source share count
+     */
     public void setUseQuoteSourceShareCount(boolean useQuoteSourceShareCount) {
         this.useQuoteSourceShareCount = useQuoteSourceShareCount;
     }

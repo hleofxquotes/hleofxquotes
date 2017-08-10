@@ -10,23 +10,42 @@ import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CertificatesChanges.
+ */
 public final class CertificatesChanges implements TrustStrategy {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(CertificatesChanges.class);
 
+    /** The uri string. */
     private final String uriString;
 
+    /** The current certificates. */
     private File currentCertificates;
 
+    /** The saved certificates. */
     private File savedCertificates;
 
+    /** The error if certificates changed. */
     private boolean errorIfCertificatesChanged = true;
 
+    /**
+     * Instantiates a new certificates changes.
+     *
+     * @param uriString the uri string
+     * @param respFile the resp file
+     */
     public CertificatesChanges(String uriString, File respFile) {
         this.uriString = uriString;
         this.savedCertificates = new File(respFile.getAbsoluteFile().getParentFile(), "savedCertificates.txt");
         this.currentCertificates = new File(respFile.getAbsoluteFile().getParentFile(), "currentCertificates.txt");
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.http.ssl.TrustStrategy#isTrusted(java.security.cert.X509Certificate[], java.lang.String)
+     */
     @Override
     public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         if (log.isDebugEnabled()) {
@@ -76,10 +95,20 @@ public final class CertificatesChanges implements TrustStrategy {
         return false;
     }
 
+    /**
+     * Checks if is error if certificates changed.
+     *
+     * @return true, if is error if certificates changed
+     */
     public boolean isErrorIfCertificatesChanged() {
         return errorIfCertificatesChanged;
     }
 
+    /**
+     * Sets the error if certificates changed.
+     *
+     * @param errorIfCertificatesChanged the new error if certificates changed
+     */
     public void setErrorIfCertificatesChanged(boolean errorIfCertificatesChanged) {
         this.errorIfCertificatesChanged = errorIfCertificatesChanged;
     }

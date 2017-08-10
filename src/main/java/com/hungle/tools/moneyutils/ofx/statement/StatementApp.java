@@ -10,16 +10,26 @@ import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.fi.VelocityUtils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class StatementApp.
+ */
 public class StatementApp extends JFrame {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(StatementApp.class);
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = Logger.getLogger(StatementApp.class);
 
+    /** The download panel. */
     private StatementPanel downloadPanel;
 
+    /**
+     * Instantiates a new statement app.
+     *
+     * @param title the title
+     */
     public StatementApp(String title) {
         super(title);
 
@@ -32,12 +42,20 @@ public class StatementApp extends JFrame {
         getContentPane().add(createMainView());
     }
 
+    /**
+     * Creates the main view.
+     *
+     * @return the component
+     */
     private Component createMainView() {
         this.downloadPanel = new StatementPanel();
         JPanel view = this.downloadPanel;
         return view;
     }
 
+    /**
+     * Show main view.
+     */
     private void showMainView() {
         setLocationRelativeTo(null);
         pack();
@@ -49,7 +67,9 @@ public class StatementApp extends JFrame {
     }
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         VelocityUtils.initVelocity();

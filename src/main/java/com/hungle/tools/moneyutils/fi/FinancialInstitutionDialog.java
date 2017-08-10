@@ -24,18 +24,38 @@ import org.jdesktop.swingbinding.SwingBindings;
 
 import com.hungle.tools.moneyutils.fi.model.AccountGroup;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class FinancialInstitutionDialog.
+ *
  * @author lobas_av
- * 
  */
 public class FinancialInstitutionDialog extends JDialog {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The m phone group. */
     private final com.hungle.tools.moneyutils.fi.model.AccountGroup m_phoneGroup;
+    
+    /** The m names. */
     private final List<String> m_names;
+    
+    /** The m content pane. */
     private JPanel m_contentPane;
+    
+    /** The m button ok. */
     private JButton m_buttonOk;
+    
+    /** The m combo box. */
     private JComboBox<?> m_comboBox;
 
+    /**
+     * Instantiates a new financial institution dialog.
+     *
+     * @param names the names
+     * @param phoneGroup the phone group
+     */
     public FinancialInstitutionDialog(List<String> names, com.hungle.tools.moneyutils.fi.model.AccountGroup phoneGroup) {
         m_names = names;
         m_phoneGroup = phoneGroup;
@@ -90,6 +110,9 @@ public class FinancialInstitutionDialog extends JDialog {
         initDataBindings();
     }
 
+    /**
+     * Inits the data bindings.
+     */
     protected void initDataBindings() {
         JComboBoxBinding<String, List<String>, JComboBox> jComboBinding = SwingBindings.createJComboBoxBinding(AutoBinding.UpdateStrategy.READ, m_names,
                 m_comboBox);

@@ -29,6 +29,8 @@ import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 // TODO: Auto-generated Javadoc
 /**
  * The Class PriceTableView.
+ *
+ * @param <T> the generic type
  */
 public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
 
@@ -38,19 +40,21 @@ public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
     /** The popup menu. */
     private final JPopupMenu popupMenu;
 
+    /** The filter. */
     private TextFilterator<T> filter;
 
+    /** The add stripe. */
     private boolean addStripe = true;
 
+    /** The comparator. */
     private Comparator<T> comparator;
 
     /**
      * Instantiates a new price table view.
      *
-     * @param filterEdit
-     *            the filter edit
-     * @param priceList
-     *            the price list
+     * @param filterEdit            the filter edit
+     * @param priceList            the price list
+     * @param baseClass the base class
      */
     public PriceTableView(JTextField filterEdit, EventList<T> priceList, Class<T> baseClass) {
         super();
@@ -78,10 +82,9 @@ public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
     /**
      * Creates the viewport view.
      *
-     * @param filterEdit
-     *            the filter edit
-     * @param priceList
-     *            the price list
+     * @param filterEdit            the filter edit
+     * @param priceList            the price list
+     * @param baseClass the base class
      * @return the j table
      */
     private JTable createViewportView(JTextField filterEdit, EventList<T> priceList, Class<T> baseClass) {
@@ -100,16 +103,12 @@ public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
     /**
      * Creates the price table.
      *
-     * @param priceList
-     *            the price list
-     * @param comparator
-     *            the comparator
-     * @param filterEdit
-     *            the filter edit
-     * @param filter
-     *            the filter
-     * @param addStripe
-     *            the add stripe
+     * @param priceList            the price list
+     * @param comparator            the comparator
+     * @param filterEdit            the filter edit
+     * @param filter            the filter
+     * @param addStripe            the add stripe
+     * @param baseClass the base class
      * @return the j table
      */
     private JTable createPriceTable(EventList<T> priceList, Comparator<T> comparator, JTextField filterEdit,
@@ -145,6 +144,15 @@ public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
         return table;
     }
 
+    /**
+     * Adds the filtering.
+     *
+     * @param <T> the generic type
+     * @param filterEdit the filter edit
+     * @param filter the filter
+     * @param source the source
+     * @return the event list
+     */
     private static <T> EventList<T> addFiltering(JTextField filterEdit, TextFilterator<T> filter, EventList<T> source) {
         FilterList<T> filterList = null;
         MatcherEditor<T> textMatcherEditor = new TextComponentMatcherEditor<T>(filterEdit, filter);
@@ -153,17 +161,36 @@ public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
         return source;
     }
 
+    /**
+     * Adds the sorting.
+     *
+     * @param <T> the generic type
+     * @param sortedList the sorted list
+     * @param table the table
+     */
     private static <T> void addSorting(SortedList<T> sortedList, JTable table) {
         @SuppressWarnings("unused")
         TableComparatorChooser<T> tableSorter = TableComparatorChooser.install(table, sortedList,
                 AbstractTableComparatorChooser.SINGLE_COLUMN);
     }
 
+    /**
+     * Sets the selection model.
+     *
+     * @param <T> the generic type
+     * @param source the source
+     * @param table the table
+     */
     private static <T> void setSelectionModel(EventList<T> source, JTable table) {
         DefaultEventSelectionModel<T> eventSelectionModel = createEventSelectionModel(source);
         table.setSelectionModel(eventSelectionModel);
     }
 
+    /**
+     * Adds the stripe to table.
+     *
+     * @param table the table
+     */
     private static void addStripeToTable(JTable table) {
         TableCellRenderer renderer = null;
         int cols = table.getColumnModel().getColumnCount();
@@ -186,12 +213,27 @@ public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
         }
     }
 
+    /**
+     * Creates the event selection model.
+     *
+     * @param <T> the generic type
+     * @param source the source
+     * @return the default event selection model
+     */
     private static <T> DefaultEventSelectionModel<T> createEventSelectionModel(EventList<T> source) {
         DefaultEventSelectionModel<T> eventSelectionModel = new DefaultEventSelectionModel<T>(
                 GlazedListsSwing.swingThreadProxyList(source));
         return eventSelectionModel;
     }
 
+    /**
+     * Creates the table model.
+     *
+     * @param <T> the generic type
+     * @param source the source
+     * @param baseClass the base class
+     * @return the default event table model
+     */
     private static <T> DefaultEventTableModel<T> createTableModel(EventList<T> source, Class<T> baseClass) {
         String propertyNames[] = { "stockSymbol", "stockName", "lastPrice", "lastTradeDate", "lastTradeTime" };
         String columnLabels[] = { "Symbol", "Name", "Price", "Last Trade Date", "Last Trade Time" };

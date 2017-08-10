@@ -9,15 +9,30 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CheckHandshakeStatus.
+ */
 final class CheckHandshakeStatus implements HttpRequestInterceptor {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(CheckHandshakeStatus.class);
 
+    /** The handshake completed listener. */
     private final OfxHandshakeCompletedListener handshakeCompletedListener;
 
+    /**
+     * Instantiates a new check handshake status.
+     *
+     * @param handshakeCompletedListener the handshake completed listener
+     */
     CheckHandshakeStatus(OfxHandshakeCompletedListener handshakeCompletedListener) {
         this.handshakeCompletedListener = handshakeCompletedListener;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.http.HttpRequestInterceptor#process(org.apache.http.HttpRequest, org.apache.http.protocol.HttpContext)
+     */
     @Override
     public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
         // request.setHeader(HTTP.USER_AGENT, "My-own-client");

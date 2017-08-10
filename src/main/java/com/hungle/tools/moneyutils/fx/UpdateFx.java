@@ -20,8 +20,10 @@ public class UpdateFx {
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(UpdateFx.class);
 
+    /** The Constant DEFAULT_CLASSNAME. */
     private static final String DEFAULT_CLASSNAME = "app.UpdateExchangeRatesGui";
 
+    /** The Constant DEFAULT_PLUGINS_DIR. */
     private static final String DEFAULT_PLUGINS_DIR = "plugins";
 
     /**

@@ -213,6 +213,7 @@ public class StockPrice extends AbstractStockPrice {
      *
      * @param stockSymbol the new stock symbol
      */
+    @Override
     public void setStockSymbol(String stockSymbol) {
         this.stockSymbol = stockSymbol;
     }
@@ -230,6 +231,7 @@ public class StockPrice extends AbstractStockPrice {
      *
      * @param stockName the new stock name
      */
+    @Override
     public void setStockName(String stockName) {
         this.stockName = stockName;
     }
@@ -277,6 +279,7 @@ public class StockPrice extends AbstractStockPrice {
      *
      * @param lastPrice the new last price
      */
+    @Override
     public void setLastPrice(Price lastPrice) {
         this.lastPrice = lastPrice;
     }
@@ -330,6 +333,7 @@ public class StockPrice extends AbstractStockPrice {
      *
      * @param lastTradeDate the new last trade date
      */
+    @Override
     public void setLastTradeDate(String lastTradeDate) {
         this.lastTradeDate = lastTradeDate;
     }
@@ -339,6 +343,7 @@ public class StockPrice extends AbstractStockPrice {
      *
      * @return the last trade time
      */
+    @Override
     public String getLastTradeTime() {
         return lastTradeTime;
     }
@@ -348,6 +353,7 @@ public class StockPrice extends AbstractStockPrice {
      *
      * @param lastTradeTime the new last trade time
      */
+    @Override
     public void setLastTradeTime(String lastTradeTime) {
         this.lastTradeTime = lastTradeTime;
     }
@@ -434,6 +440,7 @@ public class StockPrice extends AbstractStockPrice {
      *
      * @param lastTrade the new last trade
      */
+    @Override
     public void setLastTrade(Date lastTrade) {
         this.lastTrade = lastTrade;
     }

@@ -23,9 +23,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
     
-  	<maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+  	<maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
   	<aspectj-maven-plugin.version>1.10</aspectj-maven-plugin.version>
-  	<junit.version>4.7</junit.version>
+  	<junit.version>4.12</junit.version>
   	<log4j.version>1.2.13</log4j.version>
   	<ofx.version>0.0.1-SNAPSHOT</ofx.version>
   	<rsyntaxtextarea.version>2.5.8</rsyntaxtextarea.version>
@@ -33,7 +33,7 @@
   	<httpclient.version>4.5.3</httpclient.version>
   	<jna.version>4.4.0</jna.version>
   	<swingx.version>1.6.1</swingx.version>
-  	<aspectjrt.version>1.8.10</aspectjrt.version>
+  	<aspectjrt.version>1.8.9</aspectjrt.version>
   	<beansbinding.version>1.2.1</beansbinding.version>
   	<forms.version>1.2.1</forms.version>
   </properties>

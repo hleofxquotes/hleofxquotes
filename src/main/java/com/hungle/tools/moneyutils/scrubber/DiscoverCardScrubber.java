@@ -5,15 +5,28 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class DiscoverCardScrubber.
+ */
 public class DiscoverCardScrubber extends OfxScrubber {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(DiscoverCardScrubber.class);
 
+    /**
+     * Instantiates a new discover card scrubber.
+     *
+     * @param replacer the replacer
+     */
     public DiscoverCardScrubber(AbstractReplacer replacer) {
         super(replacer);
     }
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         if (args.length != 3) {

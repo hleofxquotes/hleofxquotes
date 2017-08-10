@@ -999,6 +999,13 @@ public class OfxPriceInfo {
         ofxDocument.save(file, xmlOptions);
     }
 
+    /**
+     * Save.
+     *
+     * @param stockPrices the stock prices
+     * @param outFile the out file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static void save(List<AbstractStockPrice> stockPrices, File outFile) throws IOException {
         String defaultCurrency = CurrencyUtils.getDefaultCurrency();
         boolean forceGeneratingINVTRANLIST = false;

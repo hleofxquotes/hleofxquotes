@@ -23,15 +23,35 @@ import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class EncryptionHelper.
+ */
 public class EncryptionHelper {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(EncryptionHelper.class);
 
+    /** The algorithm. */
     private String algorithm = "AES";
+    
+    /** The block mode. */
     private String blockMode = "CBC";
+    
+    /** The padding. */
     private String padding = "PKCS5PADDING";
 
+    /** The Constant CBC_SALT. */
     private static final IvParameterSpec CBC_SALT = new IvParameterSpec(new byte[] { 7, 34, 56, 78, 90, 87, 65, 43, 12, 34, 56, 78, -123, 87, 65, 43 });
 
+    /**
+     * Encrypt.
+     *
+     * @param key the key
+     * @param in the in
+     * @param out the out
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void encrypt(byte[] key, InputStream in, OutputStream out) throws IOException {
         CipherOutputStream cout = null;
         try {
@@ -67,6 +87,14 @@ public class EncryptionHelper {
         }
     }
 
+    /**
+     * Decrypt.
+     *
+     * @param key the key
+     * @param in the in
+     * @param out the out
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void decrypt(byte[] key, InputStream in, OutputStream out) throws IOException {
         CipherInputStream cin = null;
         try {
@@ -101,6 +129,14 @@ public class EncryptionHelper {
         }
     }
 
+    /**
+     * Decrypt file.
+     *
+     * @param password the password
+     * @param fromFileName the from file name
+     * @param toFileName the to file name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void decryptFile(String password, String fromFileName, String toFileName) throws IOException {
         EncryptionHelper helper = new EncryptionHelper();
         byte[] key = toKey(password, 16);
@@ -132,6 +168,14 @@ public class EncryptionHelper {
         }
     }
 
+    /**
+     * Encrypt file.
+     *
+     * @param password the password
+     * @param fromFileName the from file name
+     * @param toFileName the to file name
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void encryptFile(String password, String fromFileName, String toFileName) throws IOException {
         EncryptionHelper helper = new EncryptionHelper();
         byte[] key = toKey(password, 16);
@@ -163,6 +207,13 @@ public class EncryptionHelper {
         }
     }
 
+    /**
+     * To key.
+     *
+     * @param password the password
+     * @param max the max
+     * @return the byte[]
+     */
     private static byte[] toKey(String password, int max) {
         byte[] key = new byte[max];
         byte[] bytes = password.getBytes();
@@ -174,7 +225,9 @@ public class EncryptionHelper {
     }
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         // encrypt 012345678901234567890123456789 target/in.jar
@@ -184,7 +237,7 @@ public class EncryptionHelper {
         // encrypt 123hle target/in.jar target/encrypt.txt
         // decrypt 123hle target/encrypt.txt target/decrypt.txt
         if (args.length != 4) {
-            Class clz = EncryptionHelper.class;
+            Class<EncryptionHelper> clz = EncryptionHelper.class;
             System.out.println("Usage: java " + clz.getName() + " encrypt/decrypt password fromFile toFile");
             System.exit(1);
         }

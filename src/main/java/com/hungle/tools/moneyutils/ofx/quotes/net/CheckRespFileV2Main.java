@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -32,7 +32,7 @@ public class CheckRespFileV2Main {
             System.exit(1);
         }
         try {
-            UpdateFiDir.checkRespFileV2(respFile);
+            AbstractUpdateFiDir.checkRespFileV2(respFile);
         } catch (IOException e) {
             log.error(e, e);
         }

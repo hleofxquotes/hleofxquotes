@@ -13,9 +13,22 @@ import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
 import junit.framework.Assert;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class YahooQuotesGetterTest.
+ */
 public class YahooQuotesGetterTest {
+	
+	/** The Constant LOGGER. */
 	private static final Logger LOGGER = Logger.getLogger(YahooQuotesGetterTest.class);
 
+	/**
+	 * Test get.
+	 *
+	 * @throws ClientProtocolException the client protocol exception
+	 * @throws URISyntaxException the URI syntax exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@Test
 	public void testGet() throws ClientProtocolException, URISyntaxException, IOException {
 		YahooQuotesGetter quoteGetter = new YahooQuotesGetter();

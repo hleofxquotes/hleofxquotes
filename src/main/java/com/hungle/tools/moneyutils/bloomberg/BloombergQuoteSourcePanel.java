@@ -21,6 +21,7 @@ public class BloombergQuoteSourcePanel extends YahooApiQuoteSourcePanel {
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(BloombergQuoteSourcePanel.class);
 
+    /** The Constant STOCK_SYMBOLS_PREF_KEY. */
     private static final String STOCK_SYMBOLS_PREF_KEY = "bloombergStockSymbols";
 
     /**
@@ -40,6 +41,13 @@ public class BloombergQuoteSourcePanel extends YahooApiQuoteSourcePanel {
         todo(symbol, stockPrices);
     }
 
+    /**
+     * Todo.
+     *
+     * @param symbol the symbol
+     * @param stockPrices the stock prices
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void todo(String symbol, List<AbstractStockPrice> stockPrices) throws IOException {
 //        AbstractScreenScrapSource scrapper = new BloombergScreenScrapSource();
 //        scrapper.query(symbol);

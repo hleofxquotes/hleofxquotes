@@ -68,10 +68,18 @@ public class TIAACREFScreenScrapSource extends AbstractScreenScrapSource {
     /** The currency. */
     private String currency;
 
+    /**
+     * Instantiates a new TIAACREF screen scrap source.
+     *
+     * @param stockSymbols the stock symbols
+     */
     public TIAACREFScreenScrapSource(List<String> stockSymbols) {
         super(stockSymbols);
     }
 
+    /**
+     * Instantiates a new TIAACREF screen scrap source.
+     */
     public TIAACREFScreenScrapSource() {
         this(new ArrayList<String>());
     }
@@ -337,6 +345,14 @@ public class TIAACREFScreenScrapSource extends AbstractScreenScrapSource {
         return priceInfo;
     }
 
+    /**
+     * Creates the url.
+     *
+     * @param symbol the symbol
+     * @return the url
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws MalformedURLException the malformed URL exception
+     */
     protected URL createUrl(String symbol) throws UnsupportedEncodingException, MalformedURLException {
         // http://www.scholarshare.com/performance/fundperformance.shtml
         // http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D'http%3A%2F%2Fwww.scholarshare.com%2Fperformance%2Ffundperformance.shtml'%20and%20xpath%3D%22%2F%2Ftable%5B%40id%3D'realtimechart'%5D%22%0A&diagnostics=true
@@ -442,6 +458,9 @@ public class TIAACREFScreenScrapSource extends AbstractScreenScrapSource {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource#scrap()
+     */
     @Override
     public List scrap() {
         // TODO Auto-generated method stub

@@ -1,3 +1,4 @@
+
 package com.hungle.tools.moneyutils.stockprice;
 
 import java.io.File;
@@ -19,7 +20,17 @@ import com.hungle.tools.moneyutils.stockprice.FieldInfo;
 import com.hungle.tools.moneyutils.stockprice.Price;
 import com.hungle.tools.moneyutils.stockprice.StockPrice;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class StockPriceTest.
+ */
 public class StockPriceTest {
+    
+    /**
+     * Parses the from csv file.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void parseFromCsvFile() throws Exception {
         Reader reader = null;
@@ -44,6 +55,11 @@ public class StockPriceTest {
         Assert.assertEquals(expectedDate, lastTrade);
     }
 
+    /**
+     * Value of test.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void valueOfTest() throws IOException {
         CsvRow row = new CsvRow() {
@@ -79,6 +95,11 @@ public class StockPriceTest {
 
     }
 
+    /**
+     * Test field info.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testFieldInfo() throws IOException {
         CsvRow row;

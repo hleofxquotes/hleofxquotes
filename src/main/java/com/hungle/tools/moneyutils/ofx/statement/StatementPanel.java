@@ -60,14 +60,15 @@ import javax.swing.table.TableColumn;
 import javax.swing.text.Keymap;
 
 import org.apache.log4j.Logger;
-import org.apache.velocity.VelocityContext;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
-import com.hungle.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
+import com.hungle.tools.moneyutils.fi.DefaultUpdateFiDir;
 import com.hungle.tools.moneyutils.fi.props.FIBean;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
+import com.hungle.tools.moneyutils.gui.GUI;
 import com.hungle.tools.moneyutils.gui.StripedTableRenderer;
 import com.hungle.tools.moneyutils.ofx.quotes.ImportUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.StreamConsumer;
@@ -95,67 +96,141 @@ import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 import difflib.Delta;
 import difflib.DiffUtils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class StatementPanel.
+ */
 public class StatementPanel extends JPanel {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(StatementPanel.class);
 
-    // private JButton downloadAllButton;
-    // private JButton downloadSelectedButton;
-    // private JButton importAllButton;
-    // private JButton importSelectedButton;
-    // private JScrollPane scrollPane;
-    private EventList<FiBean> fiBeans = new BasicEventList<FiBean>();
-    private DefaultEventSelectionModel<FiBean> fiBeansSelectionModel;
-    private final Executor threadPool = Executors.newCachedThreadPool();
-    private JTable table;
+    /** The Constant CURRENT_CERTIFICATES_TXT. */
+    private static final String CURRENT_CERTIFICATES_TXT = "currentCertificates.txt";
 
+    /** The Constant SAVED_CERTIFICATES_TXT. */
+    private static final String SAVED_CERTIFICATES_TXT = "savedCertificates.txt";
+
+    /** The fi beans. */
+    private EventList<FiBean> fiBeans = new BasicEventList<FiBean>();
+
+    /** The fi beans selection model. */
+    private DefaultEventSelectionModel<FiBean> fiBeansSelectionModel;
+    
+    /** The thread pool. */
+    private final Executor threadPool = Executors.newCachedThreadPool();
+    
+    /** The command view. */
     private JPanel commandView;
 
+    /** The fi properties text area. */
     private JTextArea fiPropertiesTextArea;
+    
+    /** The fi properties file. */
     private File fiPropertiesFile;
 
+    /** The fi request text area. */
     private JTextArea fiRequestTextArea;
 
+    /** The fi response text area. */
     private JTextArea fiResponseTextArea;
+    
+    /** The response file. */
     private File responseFile;
 
+    /** The fi error text area. */
     private JTextArea fiErrorTextArea;
 
+    /** The details for bean. */
     private FiBean detailsForBean;
 
+    /** The saved certificates text area. */
     private JTextArea savedCertificatesTextArea;
+    
+    /** The saved certificates file. */
     private File savedCertificatesFile;
 
+    /** The current certificates text area. */
     private JTextArea currentCertificatesTextArea;
+    
+    /** The current certificates file. */
     private File currentCertificatesFile;
 
+    /** The certificate status. */
     private JLabel certificateStatus;
 
+    /** The save certificates button. */
     private JButton saveCertificatesButton;
 
+    /** The tabbed pane. */
     private JTabbedPane tabbedPane;
 
+    /** The show diffs button. */
     private JButton showDiffsButton;
 
+    /** The fi dir. */
     // TODO_FI
-    private File fiDir = new File("fi");
+    private File fiDir = new File(GUI.DEFAULT_FI_DIR);
 
-    private final class ShowLastErrorAction extends AbstractAction {
-        /**
-         * 
-         */
+    /**
+     * The Class GetAccountsInfoAction.
+     */
+    private final class GetAccountsInfoAction extends AbstractAction {
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
+
+        /**
+         * Instantiates a new gets the accounts info action.
+         *
+         * @param name the name
+         */
+        private GetAccountsInfoAction(String name) {
+            super(name);
+        }
+
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            CheckOfxVersion checkOfxVersion = new CheckOfxVersion();
+            EventList<FiBean> beans = fiBeansSelectionModel.getSelected();
+            for (FiBean bean : beans) {
+                File dir = bean.getUpdater().getDir();
+                checkOfxVersion.check(dir);
+            }
+        }
+    }
+
+    /**
+     * The Class ShowLastErrorAction.
+     */
+    private final class ShowLastErrorAction extends AbstractAction {
+        
+        /** The Constant serialVersionUID. */
+        private static final long serialVersionUID = 1L;
+        
+        /** The popup menu. */
         private final JPopupMenu popupMenu;
 
+        /**
+         * Instantiates a new show last error action.
+         *
+         * @param name the name
+         * @param popupMenu the popup menu
+         */
         private ShowLastErrorAction(String name, JPopupMenu popupMenu) {
             super(name);
             this.popupMenu = popupMenu;
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             EventList<FiBean> beans = fiBeansSelectionModel.getSelected();
@@ -176,16 +251,26 @@ public class StatementPanel extends JPanel {
         }
     }
 
+    /**
+     * The Class SavePropertiesAction.
+     */
     private final class SavePropertiesAction extends AbstractAction {
-        /**
-         * 
-         */
+        
+        /** The Constant serialVersionUID. */
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Instantiates a new save properties action.
+         *
+         * @param name the name
+         */
         private SavePropertiesAction(String name) {
             super(name);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         @Override
         public void actionPerformed(ActionEvent event) {
             LOGGER.info("> saving " + fiPropertiesFile);
@@ -210,7 +295,7 @@ public class StatementPanel extends JPanel {
                             if (bean == null) {
                                 return;
                             }
-                            UpdateFiDir updater = new UpdateFiDir(d);
+                            AbstractUpdateFiDir updater = new DefaultUpdateFiDir(d);
                             refreshBean(bean, updater);
                         } catch (IOException e) {
                             LOGGER.error(e, e);
@@ -239,15 +324,31 @@ public class StatementPanel extends JPanel {
         }
     }
 
-    private final class UpdateFisTask implements Runnable {
+    /**
+     * The Class DownloadStatementsTask.
+     */
+    private final class DownloadStatementsTask implements Runnable {
+        
+        /** The progress monitor. */
         private final ProgressMonitor progressMonitor;
+        
+        /** The fi beans. */
         private final EventList<FiBean> fiBeans;
 
-        private UpdateFisTask(ProgressMonitor progressMonitor, EventList<FiBean> fiBeans) {
+        /**
+         * Instantiates a new download statements task.
+         *
+         * @param progressMonitor the progress monitor
+         * @param fiBeans the fi beans
+         */
+        private DownloadStatementsTask(ProgressMonitor progressMonitor, EventList<FiBean> fiBeans) {
             this.progressMonitor = progressMonitor;
             this.fiBeans = fiBeans;
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
         @Override
         public void run() {
             try {
@@ -313,6 +414,9 @@ public class StatementPanel extends JPanel {
         }
     }
 
+    /**
+     * Instantiates a new statement panel.
+     */
     public StatementPanel() {
         super();
         setLayout(new BorderLayout());
@@ -325,6 +429,11 @@ public class StatementPanel extends JPanel {
         add(splitPane, BorderLayout.CENTER);
     }
 
+    /**
+     * Creates the fi detail view.
+     *
+     * @return the component
+     */
     private Component createFiDetailView() {
         // JPanel view = new JPanel();
         // view.setLayout(new BorderLayout());
@@ -342,6 +451,11 @@ public class StatementPanel extends JPanel {
         return tabbedPane;
     }
 
+    /**
+     * Creates the fi error view.
+     *
+     * @return the component
+     */
     private Component createFiErrorView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -356,6 +470,11 @@ public class StatementPanel extends JPanel {
         return view;
     }
 
+    /**
+     * Creates the SSL certificates view.
+     *
+     * @return the component
+     */
     private Component createSSLCertificatesView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -386,9 +505,9 @@ public class StatementPanel extends JPanel {
                 }
 
                 File respFile = detailsForBean.getUpdater().getRespFile();
-                File savedCertificates = new File(respFile.getAbsoluteFile().getParentFile(), "savedCertificates.txt");
+                File savedCertificates = new File(respFile.getAbsoluteFile().getParentFile(), SAVED_CERTIFICATES_TXT);
                 File currentCertificates = new File(respFile.getAbsoluteFile().getParentFile(),
-                        "currentCertificates.txt");
+                        CURRENT_CERTIFICATES_TXT);
                 try {
                     Utils.copyFile(currentCertificates, savedCertificates);
                     JOptionPane.showMessageDialog(StatementPanel.this,
@@ -420,9 +539,9 @@ public class StatementPanel extends JPanel {
                 }
 
                 File respFile = detailsForBean.getUpdater().getRespFile();
-                File savedCertificates = new File(respFile.getAbsoluteFile().getParentFile(), "savedCertificates.txt");
+                File savedCertificates = new File(respFile.getAbsoluteFile().getParentFile(), SAVED_CERTIFICATES_TXT);
                 File currentCertificates = new File(respFile.getAbsoluteFile().getParentFile(),
-                        "currentCertificates.txt");
+                        CURRENT_CERTIFICATES_TXT);
                 try {
                     List<String> original = fileToLines(savedCertificates.getAbsolutePath());
                     List<String> revised = fileToLines(currentCertificates.getAbsolutePath());
@@ -533,6 +652,11 @@ public class StatementPanel extends JPanel {
         return view;
     }
 
+    /**
+     * Creates the fi response view.
+     *
+     * @return the component
+     */
     private Component createFiResponseView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -629,6 +753,11 @@ public class StatementPanel extends JPanel {
         return view;
     }
 
+    /**
+     * Creates the fi properties view.
+     *
+     * @return the component
+     */
     private Component createFiPropertiesView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -703,6 +832,11 @@ public class StatementPanel extends JPanel {
         return view;
     }
 
+    /**
+     * Creates the fi request view.
+     *
+     * @return the component
+     */
     private Component createFiRequestView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -725,6 +859,11 @@ public class StatementPanel extends JPanel {
         return view;
     }
 
+    /**
+     * Creates the fi list view.
+     *
+     * @return the component
+     */
     private Component createFiListView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -736,6 +875,11 @@ public class StatementPanel extends JPanel {
         return view;
     }
 
+    /**
+     * Creates the fi list view 1.
+     *
+     * @return the component
+     */
     private Component createFiListView1() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -774,7 +918,7 @@ public class StatementPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateFis(fiBeansSelectionModel.getSelected());
+                downloadStatements(fiBeansSelectionModel.getSelected());
             }
         });
         commandView.add(downloadSelectedButton);
@@ -806,7 +950,7 @@ public class StatementPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateFis(fiBeans);
+                downloadStatements(fiBeans);
             }
         });
         commandView.add(downloadAllButton);
@@ -832,6 +976,12 @@ public class StatementPanel extends JPanel {
         return view;
     }
 
+    /**
+     * Creates the scrolled fi table.
+     *
+     * @param filterEdit the filter edit
+     * @return the j scroll pane
+     */
     private JScrollPane createScrolledFiTable(JTextField filterEdit) {
         Comparator<? super FiBean> comparator = new Comparator<FiBean>() {
 
@@ -852,15 +1002,18 @@ public class StatementPanel extends JPanel {
             }
         };
         boolean addStripe = true;
-        this.table = createPriceTable(fiBeans, comparator, filterEdit, filter, addStripe);
+        JTable table = createFiStatusTable(fiBeans, comparator, filterEdit, filter, addStripe);
         // table.setFillsViewportHeight(true);
         JScrollPane scrolledPane = new JScrollPane(table);
 
         return scrolledPane;
     }
 
+    /**
+     * Refresh fi dir.
+     */
     public void refreshFiDir() {
-        final List<UpdateFiDir> updaters = loadFiDir();
+        final List<AbstractUpdateFiDir> updaters = loadFiDir();
 
         Runnable doRun = new Runnable() {
 
@@ -869,7 +1022,7 @@ public class StatementPanel extends JPanel {
                 try {
                     fiBeans.getReadWriteLock().writeLock().lock();
                     fiBeans.clear();
-                    for (UpdateFiDir updater : updaters) {
+                    for (AbstractUpdateFiDir updater : updaters) {
                         FiBean bean = new FiBean();
                         try {
                             refreshBean(bean, updater);
@@ -887,11 +1040,17 @@ public class StatementPanel extends JPanel {
         SwingUtilities.invokeLater(doRun);
     }
 
-    protected void refreshBean(FiBean bean, UpdateFiDir updater) throws IOException {
+    /**
+     * Refresh bean.
+     *
+     * @param bean the bean
+     * @param updater the updater
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    protected void refreshBean(FiBean bean, AbstractUpdateFiDir updater) throws IOException {
         bean.setUpdater(updater);
         bean.setName(updater.getDir().getName());
-        VelocityContext context = updater.createVelocityContext();
-        FIBean fi = (FIBean) context.get("fi");
+        FIBean fi = updater.getFiBean();
         if (fi != null) {
             bean.setFi(fi);
             String name = fi.getName();
@@ -901,17 +1060,27 @@ public class StatementPanel extends JPanel {
         }
     }
 
-    protected void updateFis(final EventList<FiBean> fiBeans) {
+    /**
+     * Download statements.
+     *
+     * @param fiBeans the fi beans
+     */
+    protected void downloadStatements(final EventList<FiBean> fiBeans) {
         // progress monitor to show the update progress
         final ProgressMonitor progressMonitor = new ProgressMonitor(StatementPanel.this,
                 "Downloading ...                                           \t", "", 0, fiBeans.size());
         updateStarted(fiBeans, progressMonitor);
-        Runnable command = new UpdateFisTask(progressMonitor, fiBeans);
+        Runnable command = new DownloadStatementsTask(progressMonitor, fiBeans);
         threadPool.execute(command);
     }
 
-    private List<UpdateFiDir> loadFiDir() {
-        List<UpdateFiDir> updaters = new ArrayList<UpdateFiDir>();
+    /**
+     * Load fi dir.
+     *
+     * @return the list
+     */
+    private List<AbstractUpdateFiDir> loadFiDir() {
+        List<AbstractUpdateFiDir> updaters = new ArrayList<AbstractUpdateFiDir>();
 
         // TODO_FI
         // File topDir = new File("fi");
@@ -949,13 +1118,24 @@ public class StatementPanel extends JPanel {
         };
         File[] dirs = topDir.listFiles(filter);
         for (File dir : dirs) {
-            UpdateFiDir updater = new UpdateFiDir(dir);
-            updaters.add(updater);
+            try {
+                LOGGER.info("Loading dir=" + dir.getAbsolutePath());
+                AbstractUpdateFiDir updater = new DefaultUpdateFiDir(dir);
+                updaters.add(updater);
+            } catch (IOException e) {
+                LOGGER.error(e);
+            }
         }
 
         return updaters;
     }
 
+    /**
+     * Update started.
+     *
+     * @param fiBeans the fi beans
+     * @param progressMonitor the progress monitor
+     */
     private void updateStarted(final EventList<FiBean> fiBeans, final ProgressMonitor progressMonitor) {
         LOGGER.info("> updateStarted");
         Runnable doRun = new Runnable() {
@@ -976,6 +1156,12 @@ public class StatementPanel extends JPanel {
         SwingUtilities.invokeLater(doRun);
     }
 
+    /**
+     * Update completed.
+     *
+     * @param fiBeans the fi beans
+     * @param progressMonitor the progress monitor
+     */
     private void updateCompleted(final EventList<FiBean> fiBeans, final ProgressMonitor progressMonitor) {
         LOGGER.info("> updateCompleted");
         Runnable doRun = new Runnable() {
@@ -1009,6 +1195,12 @@ public class StatementPanel extends JPanel {
         SwingUtilities.invokeLater(doRun);
     }
 
+    /**
+     * Sets the recursive enabled.
+     *
+     * @param root the root
+     * @param enable the enable
+     */
     protected void setRecursiveEnabled(Container root, boolean enable) {
         Component children[] = root.getComponents();
         if (LOGGER.isDebugEnabled()) {
@@ -1030,6 +1222,11 @@ public class StatementPanel extends JPanel {
         }
     }
 
+    /**
+     * Import fis.
+     *
+     * @param fiBeans the fi beans
+     */
     protected void importFis(final EventList<FiBean> fiBeans) {
         final ProgressMonitor progressMonitor = null;
         updateStarted(fiBeans, progressMonitor);
@@ -1075,7 +1272,17 @@ public class StatementPanel extends JPanel {
         threadPool.execute(command);
     }
 
-    private JTable createPriceTable(EventList<FiBean> fiBeans, Comparator<? super FiBean> comparator,
+    /**
+     * Creates the fi status table.
+     *
+     * @param fiBeans the fi beans
+     * @param comparator the comparator
+     * @param filterEdit the filter edit
+     * @param filter the filter
+     * @param addStripe the add stripe
+     * @return the j table
+     */
+    private JTable createFiStatusTable(EventList<FiBean> fiBeans, Comparator<? super FiBean> comparator,
             JTextField filterEdit, TextFilterator<FiBean> filter, boolean addStripe) {
         EventList<FiBean> source = fiBeans;
 
@@ -1098,7 +1305,7 @@ public class StatementPanel extends JPanel {
         if (useThreadSafeList) {
             source = GlazedLists.threadSafeList(source);
         }
-        Class beanClass = FiBean.class;
+        Class<FiBean> beanClass = FiBean.class;
         String propertyNames[] = { "name", "status", "lastDownloaded", "lastImported" };
         String columnLabels[] = { "Name", "Status", "Last Downloaded", "Last Imported" };
         AdvancedTableFormat tableFormat = new BeanTableFormat(beanClass, propertyNames, columnLabels);
@@ -1137,106 +1344,15 @@ public class StatementPanel extends JPanel {
         table.setSelectionModel(fiBeansSelectionModel);
 
         if (addStripe) {
-            int cols = table.getColumnModel().getColumnCount();
-            for (int i = 0; i < cols; i++) {
-                TableColumn column = table.getColumnModel().getColumn(i);
-                TableCellRenderer renderer = new StripedTableRenderer() {
-
-                    /**
-                     * 
-                     */
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    protected void setCellHorizontalAlignment(int column) {
-                        super.setCellHorizontalAlignment(column);
-                        if ((column == 0) || (column == 1) || (column == 2)) {
-                            setHorizontalAlignment(SwingConstants.RIGHT);
-                        }
-                    }
-
-                    @Override
-                    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                            boolean hasFocus, int row, int column) {
-                        Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
-                                row, column);
-                        FiBean bean = tableModel.getElementAt(row);
-                        if (column == 2) {
-                            if (hasNewDownload(bean)) {
-                                setFont(getFont().deriveFont(Font.BOLD));
-                            }
-                        } else if (column == 1) {
-                            Exception downloadException = bean.getException();
-                            String stringValue = null;
-                            if (value instanceof String) {
-                                stringValue = (String) value;
-                            }
-                            if (downloadException != null) {
-                                component.setForeground(Color.RED);
-                            } else {
-                                if ((stringValue != null) && (stringValue.contains("ERROR"))) {
-                                    component.setForeground(Color.RED);
-                                } else {
-                                    component.setForeground(null);
-                                }
-                            }
-
-                            if ((stringValue != null) && (stringValue.contains("SKIP"))) {
-                                setFont(getFont().deriveFont(Font.ITALIC));
-                            }
-                        }
-                        return component;
-                    }
-
-                    private boolean hasNewDownload(FiBean bean) {
-                        Date downloadDate = bean.getLastDownloaded();
-                        Date importedDate = bean.getLastImported();
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug(downloadDate + ", " + importedDate);
-                        }
-                        if ((downloadDate == null) && (importedDate == null)) {
-                            return false;
-                        }
-
-                        if (downloadDate == null) {
-                            return false;
-                        }
-
-                        if (importedDate == null) {
-                            return true;
-                        }
-
-                        return downloadDate.compareTo(importedDate) > 0;
-                    }
-
-                };
-                column.setCellRenderer(renderer);
-            }
+            addStripe(tableModel, table);
         }
 
         final JPopupMenu popupMenu = new JPopupMenu();
         // final JPopupMenu popupMenu = null;
         if (popupMenu != null) {
             JMenuItem menuItem = null;
-            // menuItem = new JMenuItem(new
-            // ShowLastErrorAction("Show last error", popupMenu));
-            // popupMenu.add(menuItem);
-            menuItem = new JMenuItem(new AbstractAction("Get Accounts Info") {
-                /**
-                 * 
-                 */
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    CheckOfxVersion checkOfxVersion = new CheckOfxVersion();
-                    EventList<FiBean> beans = fiBeansSelectionModel.getSelected();
-                    for (FiBean bean : beans) {
-                        File dir = bean.getUpdater().getDir();
-                        checkOfxVersion.check(dir);
-                    }
-                }
-            });
+            
+            menuItem = new JMenuItem(new GetAccountsInfoAction("Get Accounts Info"));
             popupMenu.add(menuItem);
 
             MouseListener popupListener = new PopupListener(popupMenu);
@@ -1246,6 +1362,95 @@ public class StatementPanel extends JPanel {
         return table;
     }
 
+    /**
+     * Adds the stripe.
+     *
+     * @param tableModel the table model
+     * @param table the table
+     */
+    private void addStripe(final DefaultEventTableModel<FiBean> tableModel, JTable table) {
+        int cols = table.getColumnModel().getColumnCount();
+        for (int i = 0; i < cols; i++) {
+            TableColumn column = table.getColumnModel().getColumn(i);
+            TableCellRenderer renderer = new StripedTableRenderer() {
+
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                protected void setCellHorizontalAlignment(int column) {
+                    super.setCellHorizontalAlignment(column);
+                    if ((column == 0) || (column == 1) || (column == 2)) {
+                        setHorizontalAlignment(SwingConstants.RIGHT);
+                    }
+                }
+
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                        boolean hasFocus, int row, int column) {
+                    Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                            row, column);
+                    FiBean bean = tableModel.getElementAt(row);
+                    if (column == 2) {
+                        if (hasNewDownload(bean)) {
+                            setFont(getFont().deriveFont(Font.BOLD));
+                        }
+                    } else if (column == 1) {
+                        Exception downloadException = bean.getException();
+                        String stringValue = null;
+                        if (value instanceof String) {
+                            stringValue = (String) value;
+                        }
+                        if (downloadException != null) {
+                            component.setForeground(Color.RED);
+                        } else {
+                            if ((stringValue != null) && (stringValue.contains("ERROR"))) {
+                                component.setForeground(Color.RED);
+                            } else {
+                                component.setForeground(null);
+                            }
+                        }
+
+                        if ((stringValue != null) && (stringValue.contains("SKIP"))) {
+                            setFont(getFont().deriveFont(Font.ITALIC));
+                        }
+                    }
+                    return component;
+                }
+
+                private boolean hasNewDownload(FiBean bean) {
+                    Date downloadDate = bean.getLastDownloaded();
+                    Date importedDate = bean.getLastImported();
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(downloadDate + ", " + importedDate);
+                    }
+                    if ((downloadDate == null) && (importedDate == null)) {
+                        return false;
+                    }
+
+                    if (downloadDate == null) {
+                        return false;
+                    }
+
+                    if (importedDate == null) {
+                        return true;
+                    }
+
+                    return downloadDate.compareTo(importedDate) > 0;
+                }
+
+            };
+            column.setCellRenderer(renderer);
+        }
+    }
+
+    /**
+     * Update detail pane.
+     *
+     * @param bean the bean
+     */
     protected void updateDetailPane(FiBean bean) {
         updateFiPropertiesView(bean);
         updateFiRequestView(bean);
@@ -1254,6 +1459,11 @@ public class StatementPanel extends JPanel {
         updateCertificatesView(bean);
     }
 
+    /**
+     * Update fi error view.
+     *
+     * @param bean the bean
+     */
     private void updateFiErrorView(final FiBean bean) {
         final JTextArea textArea = fiErrorTextArea;
 
@@ -1264,7 +1474,7 @@ public class StatementPanel extends JPanel {
                 if (bean == null) {
                     return;
                 }
-                UpdateFiDir updater = bean.getUpdater();
+                AbstractUpdateFiDir updater = bean.getUpdater();
                 if (updater == null) {
                     return;
                 }
@@ -1306,6 +1516,11 @@ public class StatementPanel extends JPanel {
         SwingUtilities.invokeLater(doRun);
     }
 
+    /**
+     * Update fi response view.
+     *
+     * @param bean the bean
+     */
     private void updateFiResponseView(final FiBean bean) {
         final JTextArea textArea = fiResponseTextArea;
         final String fileName = "resp.ofx";
@@ -1319,6 +1534,11 @@ public class StatementPanel extends JPanel {
         SwingUtilities.invokeLater(doRun);
     }
 
+    /**
+     * Update fi request view.
+     *
+     * @param bean the bean
+     */
     private void updateFiRequestView(final FiBean bean) {
         final JTextArea textArea = fiRequestTextArea;
         final String fileName = "req.ofx";
@@ -1331,9 +1551,14 @@ public class StatementPanel extends JPanel {
         SwingUtilities.invokeLater(doRun);
     }
 
+    /**
+     * Update fi properties view.
+     *
+     * @param bean the bean
+     */
     private void updateFiPropertiesView(final FiBean bean) {
         final JTextArea textArea = fiPropertiesTextArea;
-        final String fileName = UpdateFiDir.DEFAULT_PROPERTIES_FILENAME;
+        final String fileName = AbstractUpdateFiDir.DEFAULT_PROPERTIES_FILENAME;
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
@@ -1344,12 +1569,17 @@ public class StatementPanel extends JPanel {
         SwingUtilities.invokeLater(doRun);
     }
 
+    /**
+     * Update certificates view.
+     *
+     * @param bean the bean
+     */
     private void updateCertificatesView(final FiBean bean) {
         final JTextArea textArea1 = savedCertificatesTextArea;
-        final String fileName1 = "savedCertificates.txt";
+        final String fileName1 = SAVED_CERTIFICATES_TXT;
 
         final JTextArea textArea2 = currentCertificatesTextArea;
-        final String fileName2 = "currentCertificates.txt";
+        final String fileName2 = CURRENT_CERTIFICATES_TXT;
 
         Runnable doRun = new Runnable() {
             @Override
@@ -1381,17 +1611,34 @@ public class StatementPanel extends JPanel {
 
     }
 
+    /**
+     * Update to file.
+     *
+     * @param textArea the text area
+     * @param bean the bean
+     * @param fileName the file name
+     * @return the file
+     */
     private File updateToFile(JTextArea textArea, FiBean bean, String fileName) {
         return updateToFile(textArea, bean, fileName, true);
     }
 
+    /**
+     * Update to file.
+     *
+     * @param textArea the text area
+     * @param bean the bean
+     * @param fileName the file name
+     * @param checkDownloaded the check downloaded
+     * @return the file
+     */
     private File updateToFile(JTextArea textArea, final FiBean bean, String fileName, boolean checkDownloaded) {
         textArea.setText("");
 
         if (bean == null) {
             return null;
         }
-        UpdateFiDir updater = bean.getUpdater();
+        AbstractUpdateFiDir updater = bean.getUpdater();
         if (updater == null) {
             return null;
         }
@@ -1434,6 +1681,12 @@ public class StatementPanel extends JPanel {
         return file;
     }
 
+    /**
+     * Sets the text.
+     *
+     * @param textArea the text area
+     * @param file the file
+     */
     protected void setText(JTextArea textArea, File file) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.info("setText to file=" + file);
@@ -1471,12 +1724,23 @@ public class StatementPanel extends JPanel {
         textArea.setCaretPosition(0);
     }
 
+    /**
+     * Gets the fi dir.
+     *
+     * @return the fi dir
+     */
     public File getFiDir() {
         return fiDir;
     }
 
+    /**
+     * Sets the fi dir.
+     *
+     * @param fiDir the new fi dir
+     */
     public void setFiDir(File fiDir) {
         this.fiDir = fiDir;
+        LOGGER.info("fi.dir=" + this.fiDir);
     }
 
 }

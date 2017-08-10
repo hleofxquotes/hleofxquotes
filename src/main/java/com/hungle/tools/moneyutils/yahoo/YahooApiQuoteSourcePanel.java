@@ -24,6 +24,7 @@ public class YahooApiQuoteSourcePanel extends YahooQuoteSourcePanel {
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(YahooApiQuoteSourcePanel.class);
 
+    /** The Constant STOCK_SYMBOLS_PREF_KEY. */
     private static final String STOCK_SYMBOLS_PREF_KEY = "yahooApiStockSymbols";
 
     /** The Constant DEFAULT_RETRIES. */

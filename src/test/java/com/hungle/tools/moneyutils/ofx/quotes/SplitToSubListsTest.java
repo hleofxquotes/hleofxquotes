@@ -12,9 +12,20 @@ import org.junit.Test;
 import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SplitToSubListsTest.
+ */
 public class SplitToSubListsTest {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(SplitToSubListsTest.class);
 
+    /**
+     * Split to sub lists test.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void splitToSubListsTest() throws IOException {
         List<String> stocks = OfxUtils.getNYSEList();

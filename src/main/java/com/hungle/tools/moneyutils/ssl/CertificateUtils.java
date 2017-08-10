@@ -21,9 +21,23 @@ import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CertificateUtils.
+ */
 public class CertificateUtils {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(CertificateUtils.class);
 
+    /**
+     * Convert certificate.
+     *
+     * @param cert the cert
+     * @return the java.security.cert. X 509 certificate
+     * @throws CertificateEncodingException the certificate encoding exception
+     * @throws CertificateException the certificate exception
+     */
     /*
      * Convert javax.security.cert.X509Certificate to java.security.cert.X509Certificate
      */
@@ -35,6 +49,12 @@ public class CertificateUtils {
         return (java.security.cert.X509Certificate) cf.generateCertificate(bis);
     }
 
+    /**
+     * Gets the cn.
+     *
+     * @param name the name
+     * @return the cn
+     */
     static Object getCN(String name) {
         Object cn = null;
         try {
@@ -55,6 +75,13 @@ public class CertificateUtils {
         return cn;
     }
 
+    /**
+     * Write certs.
+     *
+     * @param certs the certs
+     * @param outFile the out file
+     * @throws CertificateEncodingException the certificate encoding exception
+     */
     static void writeCerts(X509Certificate[] certs, File outFile) throws java.security.cert.CertificateEncodingException {
         log.info("writeCurrentCertificates=" + outFile.getAbsolutePath());
         

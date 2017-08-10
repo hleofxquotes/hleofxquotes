@@ -16,7 +16,7 @@ import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
 class ImportDialogAutoClickTask implements Runnable {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(ImportDialogAutoClickTask.class);
+    private static final Logger LOGGER = Logger.getLogger(ImportDialogAutoClickTask.class);
 
     /** The serivce. */
     private final ImportDialogAutoClickService serivce;
@@ -34,8 +34,8 @@ class ImportDialogAutoClickTask implements Runnable {
          */
         @Override
         public boolean callback(HWND hwnd, Pointer pointer) {
-            if (log.isDebugEnabled()) {
-                log.debug("Child window: " + hwnd);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Child window: " + hwnd);
             }
             count++;
             return true;
@@ -69,14 +69,14 @@ class ImportDialogAutoClickTask implements Runnable {
             this.serivce.getSemaphore().acquire();
             try {
                 if (!this.serivce.isEnable()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("SKIP ImportDialogAutoClickTask - not enabled");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("SKIP ImportDialogAutoClickTask - not enabled");
                     }
                     return;
                 }
 
                 if (this.serivce.isShuttingDown()) {
-                    log.info("SKIP ImportDialogAutoClickTask - isShuttingDown");
+                    LOGGER.info("SKIP ImportDialogAutoClickTask - isShuttingDown");
                     return;
                 }
 
@@ -85,7 +85,7 @@ class ImportDialogAutoClickTask implements Runnable {
                 this.serivce.getSemaphore().release();
             }
         } catch (InterruptedException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         }
     }
 
@@ -97,44 +97,44 @@ class ImportDialogAutoClickTask implements Runnable {
         String className = null;
         String windowName = null;
         if (!this.serivce.isEnable()) {
-            if (log.isDebugEnabled()) {
-                log.debug("SKIP ImportDialogAutoClickTask - not enabled");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("SKIP ImportDialogAutoClickTask - not enabled");
             }
             return;
         }
 
         HWND hWnd = null;
         if (this.serivce.isShuttingDown()) {
-            log.info("SKIP ImportDialogAutoClickTask - isShuttingDown");
+            LOGGER.info("SKIP ImportDialogAutoClickTask - isShuttingDown");
             return;
         }
         className = "#32770";
         windowName = "Import a file";
         hWnd = user32.FindWindow(className, windowName);
         if (hWnd == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("SKIP ImportDialogAutoClickTask, cannot find matching dialog");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("SKIP ImportDialogAutoClickTask, cannot find matching dialog");
             }
             return;
         }
         int childWindowsCount = getChildWindowsCount(user32, hWnd);
-        log.info("Dialog children window count=" + childWindowsCount);
+        LOGGER.info("Dialog children window count=" + childWindowsCount);
         if (childWindowsCount > 6) {
             return;
         }
 
-        log.info("> START - Found dialog, attempt to auto-click");
+        LOGGER.info("> START - Found dialog, attempt to auto-click");
 
         try {
             if (!this.serivce.isEnable()) {
-                if (log.isDebugEnabled()) {
-                    log.debug("SKIP ImportDialogAutoClickTask - not enabled");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("SKIP ImportDialogAutoClickTask - not enabled");
                 }
                 return;
             }
 
             if (this.serivce.isShuttingDown()) {
-                log.info("SKIP ImportDialogAutoClickTask - isShuttingDown");
+                LOGGER.info("SKIP ImportDialogAutoClickTask - isShuttingDown");
                 return;
             }
             // #define WM_COMMAND 0x0111
@@ -145,7 +145,7 @@ class ImportDialogAutoClickTask implements Runnable {
             // pressing OK button
             user32.PostMessage(hWnd, msg, wParam, lParam);
         } finally {
-            log.info("< DONE - auto-click");
+            LOGGER.info("< DONE - auto-click");
         }
 
     }

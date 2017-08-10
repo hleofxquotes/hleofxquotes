@@ -10,21 +10,39 @@ import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.ofx.quotes.OfxDate;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class IngDirectScrubber.
+ */
 public class IngDirectScrubber extends OfxScrubber {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(IngDirectScrubber.class);
 
     // <DTSTART>20110203000000.000<STMTTRN>
+    /** The pattern. */
     // p = re.compile(r'(<DTSTART>.+?)(?=<)',re.IGNORECASE)
     private Pattern pattern = Pattern.compile("(<DTSTART>.+?)(?=<)", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * Instantiates a new ing direct scrubber.
+     *
+     * @param replacer the replacer
+     */
     public IngDirectScrubber(AbstractReplacer replacer) {
         super(replacer);
     }
 
+    /**
+     * Instantiates a new ing direct scrubber.
+     */
     public IngDirectScrubber() {
         this(null);
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.scrubber.OfxScrubber#scrubLine(java.io.PrintWriter, com.hungle.tools.moneyutils.scrubber.AbstractReplacer, java.lang.String)
+     */
     @Override
     protected void scrubLine(PrintWriter writer, AbstractReplacer replacer, String line) {
 
@@ -51,7 +69,9 @@ public class IngDirectScrubber extends OfxScrubber {
     }
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         if (args.length != 2) {

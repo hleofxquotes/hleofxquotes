@@ -30,33 +30,63 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.impl.common.ReaderInputStream;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class EncryptionHelper.
+ */
 public class EncryptionHelper {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(EncryptionHelper.class);
 
+    /** The Constant ENCRYPTED_SUFFIX. */
     private static final String ENCRYPTED_SUFFIX = "-enc";
 
+    /** The Constant DEFAULT_PADDING. */
     private static final String DEFAULT_PADDING = "PKCS5Padding";
 
+    /** The Constant DEFAULT_BLOCK_MODE. */
     private static final String DEFAULT_BLOCK_MODE = "CBC";
 
+    /** The Constant DEFAULT_ALGORITHM. */
     private static final String DEFAULT_ALGORITHM = "AES";
 
+    /** The Constant DEFAULT_SALT_BYTES. */
     public static final byte[] DEFAULT_SALT_BYTES = new byte[] { 7, 34, 56, 78, 90, 87, 65, 43, 12, 34, 56, 78, -123, 87, 65, 43 };
+    
+    /** The Constant DEFAULT_SALT. */
     private static final IvParameterSpec DEFAULT_SALT = new IvParameterSpec(DEFAULT_SALT_BYTES);
 
+    /** The algorithm. */
     private String algorithm = DEFAULT_ALGORITHM;
+    
+    /** The block mode. */
     private String blockMode = DEFAULT_BLOCK_MODE;
+    
+    /** The padding. */
     private String padding = DEFAULT_PADDING;
 
+    /** The transformation. */
     private String transformation;
+    
+    /** The salt. */
     private final IvParameterSpec salt;
 
+    /** The cipher. */
     private final Cipher cipher;
 
+    /** The key store file name. */
     private String keyStoreFileName = ".lfz";
 
+    /** The tag. */
     private String tag = "hleofxquotes";
 
+    /**
+     * Instantiates a new encryption helper.
+     *
+     * @param salt the salt
+     * @throws EncryptionHelperException the encryption helper exception
+     */
     public EncryptionHelper(IvParameterSpec salt) throws EncryptionHelperException {
         super();
         this.transformation = algorithm + "/" + blockMode + "/" + padding;
@@ -74,12 +104,19 @@ public class EncryptionHelper {
         }
     }
 
+    /**
+     * Instantiates a new encryption helper.
+     *
+     * @throws EncryptionHelperException the encryption helper exception
+     */
     public EncryptionHelper() throws EncryptionHelperException {
         this(null);
     }
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         File inFile = null;
@@ -108,6 +145,12 @@ public class EncryptionHelper {
         }
     }
 
+    /**
+     * Process file.
+     *
+     * @param inFile the in file
+     * @throws EncryptionHelperException the encryption helper exception
+     */
     public void processFile(File inFile) throws EncryptionHelperException {
         SecretKey key;
 
@@ -128,6 +171,14 @@ public class EncryptionHelper {
         }
     }
 
+    /**
+     * Gets the key.
+     *
+     * @param inFile the in file
+     * @return the key
+     * @throws EncryptionHelperException the encryption helper exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public SecretKey getKey(File inFile) throws EncryptionHelperException, IOException {
         SecretKey key;
         File keyFile = getKeyFile(inFile);
@@ -151,18 +202,49 @@ public class EncryptionHelper {
         return key;
     }
 
+    /**
+     * Encrypt file.
+     *
+     * @param inFile the in file
+     * @param key the key
+     * @throws InvalidKeyException the invalid key exception
+     * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void encryptFile(File inFile, SecretKey key) throws InvalidKeyException, InvalidAlgorithmParameterException, IOException {
         int encryptMode = Cipher.ENCRYPT_MODE;
         cipher.init(encryptMode, key, salt);
         encryptFile(inFile, cipher);
     }
 
+    /**
+     * Decrypt file.
+     *
+     * @param inFile the in file
+     * @param key the key
+     * @throws InvalidKeyException the invalid key exception
+     * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void decryptFile(File inFile, SecretKey key) throws InvalidKeyException, InvalidAlgorithmParameterException, IOException {
         int encryptMode = Cipher.DECRYPT_MODE;
         cipher.init(encryptMode, key, salt);
         decryptFile(inFile, cipher);
     }
 
+    /**
+     * Generating key.
+     *
+     * @param keyAlgorithm the key algorithm
+     * @param keyFile the key file
+     * @param transformation the transformation
+     * @param salt the salt
+     * @return the secret key spec
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidAlgorithmParameterException the invalid algorithm parameter exception
+     * @throws NoSuchPaddingException the no such padding exception
+     */
     private SecretKeySpec generatingKey(final String keyAlgorithm, File keyFile, String transformation, IvParameterSpec salt) throws NoSuchAlgorithmException,
             IOException, InvalidAlgorithmParameterException, NoSuchPaddingException {
         SecretKeySpec key = null;
@@ -197,6 +279,13 @@ public class EncryptionHelper {
         return null;
     }
 
+    /**
+     * Read key.
+     *
+     * @param keyFile the key file
+     * @return the secret key
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private SecretKey readKey(File keyFile) throws IOException {
         SecretKey secretKey = null;
 
@@ -237,10 +326,23 @@ public class EncryptionHelper {
         return secretKey;
     }
 
+    /**
+     * Gets the key store instance.
+     *
+     * @return the key store instance
+     * @throws KeyStoreException the key store exception
+     */
     private KeyStore getKeyStoreInstance() throws KeyStoreException {
         return KeyStore.getInstance("JCEKS");
     }
 
+    /**
+     * Write key.
+     *
+     * @param secretKey the secret key
+     * @param keyFile the key file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void writeKey(SecretKey secretKey, File keyFile) throws IOException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("write key to keyFile=" + keyFile);
@@ -277,10 +379,24 @@ public class EncryptionHelper {
 
     }
 
+    /**
+     * Gets the password.
+     *
+     * @return the password
+     */
     private char[] getPassword() {
         return tag.toCharArray();
     }
 
+    /**
+     * Generating secret key spec.
+     *
+     * @param keyAlgorithm the key algorithm
+     * @param keySize the key size
+     * @return the secret key spec
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static SecretKeySpec generatingSecretKeySpec(final String keyAlgorithm, int keySize) throws NoSuchAlgorithmException, IOException {
         LOGGER.info("> generating key, keyAlgorithm=" + keyAlgorithm + ", keySize=" + keySize + " ...");
 
@@ -291,6 +407,14 @@ public class EncryptionHelper {
         return key;
     }
 
+    /**
+     * Generating secret key.
+     *
+     * @param algorithm the algorithm
+     * @param keySize the key size
+     * @return the secret key
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     */
     public static SecretKey generatingSecretKey(final String algorithm, int keySize) throws NoSuchAlgorithmException {
         final KeyGenerator kg = KeyGenerator.getInstance(algorithm);
         kg.init(keySize);
@@ -298,22 +422,49 @@ public class EncryptionHelper {
         return secretKey;
     }
 
+    /**
+     * Gets the key file.
+     *
+     * @param file the file
+     * @return the key file
+     */
     private File getKeyFile(File file) {
         File parentFile = file.getAbsoluteFile().getParentFile();
         File keyFile = new File(parentFile, keyStoreFileName);
         return keyFile;
     }
 
+    /**
+     * Checks if is encrypted file.
+     *
+     * @param inFile the in file
+     * @return true, if is encrypted file
+     */
     private static boolean isEncryptedFile(File inFile) {
         return inFile.getName().endsWith(ENCRYPTED_SUFFIX);
     }
 
+    /**
+     * Decrypt file.
+     *
+     * @param inFile the in file
+     * @param cipher the cipher
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void decryptFile(File inFile, Cipher cipher) throws IOException {
         File outFile = getDecryptedFile(inFile);
         LOGGER.info("outFile=" + outFile);
         decryptFile(inFile, outFile, cipher);
     }
 
+    /**
+     * Decrypt file.
+     *
+     * @param inFile the in file
+     * @param outFile the out file
+     * @param cipher the cipher
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void decryptFile(File inFile, File outFile, Cipher cipher) throws IOException {
         LOGGER.info("> decryptFile");
         InputStream in = null;
@@ -352,6 +503,12 @@ public class EncryptionHelper {
 
     }
 
+    /**
+     * Gets the decrypted file.
+     *
+     * @param file the file
+     * @return the decrypted file
+     */
     private static File getDecryptedFile(File file) {
         // fileName.xxx-enc -> fileName.xxx
 
@@ -363,6 +520,14 @@ public class EncryptionHelper {
         return decryptedFile;
     }
 
+    /**
+     * Encrypt file.
+     *
+     * @param inFile the in file
+     * @param cipher the cipher
+     * @return the file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static File encryptFile(File inFile, Cipher cipher) throws IOException {
         File outFile = getEncryptedFile(inFile);
         LOGGER.info("outFile=" + outFile);
@@ -371,6 +536,12 @@ public class EncryptionHelper {
         return outFile;
     }
 
+    /**
+     * Gets the encrypted file.
+     *
+     * @param file the file
+     * @return the encrypted file
+     */
     private static File getEncryptedFile(File file) {
         // fileName.xxx -> fileName.xxx-enc
 
@@ -382,6 +553,14 @@ public class EncryptionHelper {
         return encryptedFile;
     }
 
+    /**
+     * Encrypt file.
+     *
+     * @param inFile the in file
+     * @param outFile the out file
+     * @param cipher the cipher
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static void encryptFile(File inFile, File outFile, Cipher cipher) throws IOException {
         LOGGER.info("> encryptFile");
         LOGGER.info("  cipher=" + cipher.getAlgorithm());
@@ -422,6 +601,14 @@ public class EncryptionHelper {
         }
     }
 
+    /**
+     * Copy streams.
+     *
+     * @param in the in
+     * @param out the out
+     * @return the long
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static long copyStreams(InputStream in, OutputStream out) throws IOException {
         long bytes = 0;
         int bufSize = 1024;
@@ -434,6 +621,15 @@ public class EncryptionHelper {
         return bytes;
     }
 
+    /**
+     * Encrypt.
+     *
+     * @param reader the reader
+     * @param outFile the out file
+     * @param key the key
+     * @throws EncryptionHelperException the encryption helper exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void encrypt(BufferedReader reader, File outFile, SecretKey key) throws EncryptionHelperException, IOException {
         try {
             int encryptMode = Cipher.ENCRYPT_MODE;
@@ -480,10 +676,20 @@ public class EncryptionHelper {
         }
     }
 
+    /**
+     * Gets the cipher.
+     *
+     * @return the cipher
+     */
     public Cipher getCipher() {
         return cipher;
     }
 
+    /**
+     * Gets the salt.
+     *
+     * @return the salt
+     */
     public IvParameterSpec getSalt() {
         return salt;
     }

@@ -6,13 +6,22 @@ import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CheckFi.
+ */
 public class CheckFi {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(CheckFi.class);
 
+    /** The frame. */
     private JFrame frame;
 
     /**
      * Launch the application.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {

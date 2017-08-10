@@ -36,7 +36,7 @@ public class PropertiesUtils {
     private static final Logger LOGGER = Logger.getLogger(PropertiesUtils.class);
 
     /** The Constant DEFAULT_APP_VER. */
-    private static final String DEFAULT_APP_VER = "1900";
+    private static final String DEFAULT_APP_VER = "2500";
 
     /** The Constant DEFAULT_APP_ID. */
     private static final String DEFAULT_APP_ID = "QWIN";
@@ -57,6 +57,13 @@ public class PropertiesUtils {
         return createVelocityContext(props, beanUtilsBean);
     }
 
+    /**
+     * Creates the velocity context.
+     *
+     * @param props the props
+     * @param beanUtilsBean the bean utils bean
+     * @return the velocity context
+     */
     private static VelocityContext createVelocityContext(Properties props, BeanUtilsBean beanUtilsBean) {
         VelocityContext context = new VelocityContext();
         // FI
@@ -138,6 +145,11 @@ public class PropertiesUtils {
         return context;
     }
 
+    /**
+     * Gets the default bean utils bean.
+     *
+     * @return the default bean utils bean
+     */
     static BeanUtilsBean getDefaultBeanUtilsBean() {
         ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
         BeanUtilsBean beanUtilsBean = new BeanUtilsBean(convertUtilsBean, new PropertyUtilsBean());

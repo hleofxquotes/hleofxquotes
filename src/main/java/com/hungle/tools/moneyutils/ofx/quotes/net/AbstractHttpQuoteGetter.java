@@ -34,10 +34,13 @@ import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 import com.hungle.tools.moneyutils.stockprice.FxSymbol;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class AbstractHttpQuoteGetter.
  */
 public class AbstractHttpQuoteGetter implements HttpQuoteGetter {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(AbstractHttpQuoteGetter.class);
 
     /** The Constant DEFAULT_SCHEME. */
@@ -58,6 +61,7 @@ public class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     /** The Constant DEFAULT_TIMEOUT. */
     private static final long DEFAULT_TIMEOUT = 120L;
     
+    /** The Constant DEFAULT_FX_FILENAME. */
     private static final String DEFAULT_FX_FILENAME = "fx.csv";
 
     /** The Constant threadPool. */
@@ -96,6 +100,9 @@ public class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     /** The keep fx symbols. */
     private boolean keepFxSymbols = true;
 
+    /**
+     * Instantiates a new abstract http quote getter.
+     */
     public AbstractHttpQuoteGetter() {
         super();
     }

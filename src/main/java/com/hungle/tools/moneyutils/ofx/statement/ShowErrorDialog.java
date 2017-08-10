@@ -24,18 +24,29 @@ import javax.swing.WindowConstants;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ShowErrorDialog.
+ */
 public class ShowErrorDialog extends JDialog {
-    /**
-     * 
-     */
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(ShowErrorDialog.class);
 
+    /** The bean. */
     private FiBean bean;
 
+    /**
+     * Instantiates a new show error dialog.
+     *
+     * @param frameForComponent the frame for component
+     * @param bean the bean
+     */
     public ShowErrorDialog(Frame frameForComponent, FiBean bean) {
         super(frameForComponent);
         this.bean = bean;
@@ -43,6 +54,11 @@ public class ShowErrorDialog extends JDialog {
         this.getContentPane().add(createMainView());
     }
 
+    /**
+     * Creates the main view.
+     *
+     * @return the component
+     */
     private Component createMainView() {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
@@ -87,7 +103,7 @@ public class ShowErrorDialog extends JDialog {
         scrollPane_1.setBorder(BorderFactory.createTitledBorder("OFX Response File:"));
         JTextArea txtrLower = new JTextArea();
         txtrLower.setWrapStyleWord(true);
-        UpdateFiDir updater = bean.getUpdater();
+        AbstractUpdateFiDir updater = bean.getUpdater();
         File respFile = updater.getRespFile();
         if (respFile == null) {
             respFile = new File(updater.getDir(), updater.getRespFileName());
@@ -139,6 +155,11 @@ public class ShowErrorDialog extends JDialog {
         return view;
     }
 
+    /**
+     * Show dialog.
+     *
+     * @param c the c
+     */
     public void showDialog(Component c) {
         this.pack();
         this.setLocationRelativeTo(c);

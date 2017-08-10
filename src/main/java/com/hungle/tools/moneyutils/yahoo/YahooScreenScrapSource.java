@@ -44,10 +44,22 @@ public class YahooScreenScrapSource extends AbstractScreenScrapSource<TIAACREFPr
     /** The enc. */
     private String encoding = DEFAULT_ENCODING;
 
+    /**
+     * Instantiates a new yahoo screen scrap source.
+     *
+     * @param stockSymbols the stock symbols
+     */
     public YahooScreenScrapSource(List<String> stockSymbols) {
         super(stockSymbols);
     }
 
+    /**
+     * Gets the price.
+     *
+     * @param symbol the symbol
+     * @return the price
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private String getPrice(String symbol) throws IOException {
         String price = null;
         InputStream stream = null;
@@ -76,6 +88,15 @@ public class YahooScreenScrapSource extends AbstractScreenScrapSource<TIAACREFPr
         return price;
     }
 
+    /**
+     * Gets the stream.
+     *
+     * @param symbol the symbol
+     * @return the stream
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws MalformedURLException the malformed URL exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private InputStream getStream(String symbol)
             throws UnsupportedEncodingException, MalformedURLException, IOException {
         InputStream stream;
@@ -118,6 +139,14 @@ public class YahooScreenScrapSource extends AbstractScreenScrapSource<TIAACREFPr
         return price;
     }
 
+    /**
+     * Creates the url.
+     *
+     * @param symbol the symbol
+     * @return the url
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws MalformedURLException the malformed URL exception
+     */
     private URL createUrl(String symbol) throws UnsupportedEncodingException, MalformedURLException {
         // http://finance.yahoo.com/q?s=CSCO110128C00017000&d=s
         // currency: http://finance.yahoo.com/q?s=CADUSD=X
@@ -139,6 +168,13 @@ public class YahooScreenScrapSource extends AbstractScreenScrapSource<TIAACREFPr
         return url;
     }
 
+    /**
+     * Creates the select statement.
+     *
+     * @param selectUrl the select url
+     * @return the string
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     */
     private String createSelectStatement(String selectUrl) throws UnsupportedEncodingException {
         // xpath="//span[@class='time_rtq_ticker']/span"
         String selectXPath = "xpath=" + "\"" + "//span[@class=\'" + "time_rtq_ticker" + "\']/span" + "\"";
@@ -147,6 +183,10 @@ public class YahooScreenScrapSource extends AbstractScreenScrapSource<TIAACREFPr
         return selectStatement;
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource#scrap()
+     */
+    @Override
     public List<TIAACREFPriceInfo> scrap() {
         List<TIAACREFPriceInfo> prices = new ArrayList<TIAACREFPriceInfo>();
 

@@ -12,9 +12,21 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class VelocityUtils.
+ */
 public class VelocityUtils {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(VelocityUtils.class);
     
+    /**
+     * Creates the velocity context.
+     *
+     * @param fiContext the fi context
+     * @return the velocity context
+     */
     public static VelocityContext createVelocityContext(AbstractFiContext fiContext) {
         VelocityContext context = null;
     
@@ -35,6 +47,9 @@ public class VelocityUtils {
         return context;
     }
 
+    /**
+     * Inits the velocity.
+     */
     public static void initVelocity() {
         Properties props = new Properties();
         props.setProperty("resource.loader", "class");
@@ -43,6 +58,15 @@ public class VelocityUtils {
         Velocity.init(props);
     }
 
+    /**
+     * Merge template.
+     *
+     * @param context the context
+     * @param template the template
+     * @param encoding the encoding
+     * @param toFile the to file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static void mergeTemplate(VelocityContext context, String template, String encoding, File toFile) throws IOException {
         Writer writer = null;
         try {

@@ -22,38 +22,86 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class OfxHomeSearchCmd.
+ */
 public class OfxHomeSearchCmd {
+    
+    /** The Constant log. */
     private static final Logger log = Logger.getLogger(OfxHomeSearchCmd.class);
 
+    /** The Constant API_SEARCH_URL. */
     private static final String API_SEARCH_URL = "http://www.ofxhome.com/api.php?search=";
 
+    /**
+     * The Class FI.
+     */
     private class FI {
+        
+        /**
+         * Instantiates a new fi.
+         *
+         * @param name the name
+         * @param id the id
+         */
         public FI(String name, String id) {
             super();
             this.name = name;
             this.id = id;
         }
 
+        /** The id. */
         private String id;
+        
+        /** The name. */
         private String name;
 
+        /**
+         * Gets the id.
+         *
+         * @return the id
+         */
         public String getId() {
             return id;
         }
 
+        /**
+         * Sets the id.
+         *
+         * @param id the new id
+         */
         public void setId(String id) {
             this.id = id;
         }
 
+        /**
+         * Gets the name.
+         *
+         * @return the name
+         */
         public String getName() {
             return name;
         }
 
+        /**
+         * Sets the name.
+         *
+         * @param name the new name
+         */
         public void setName(String name) {
             this.name = name;
         }
     }
 
+    /**
+     * Search.
+     *
+     * @param searchName the search name
+     * @return the list
+     * @throws ClientProtocolException the client protocol exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private List<FI> search(String searchName) throws ClientProtocolException, IOException {
         // http://www.ofxhome.com/api.txt
         HttpClient httpClient = HttpClientBuilder.create().build();
@@ -100,6 +148,13 @@ public class OfxHomeSearchCmd {
 
     }
 
+    /**
+     * Gets the fi details.
+     *
+     * @param fi the fi
+     * @return the fi details
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void getFiDetails(FI fi) throws IOException {
         // http://www.ofxhome.com/api.php?lookup=1234
         HttpClient httpClient = HttpClientBuilder.create().build();
@@ -172,7 +227,9 @@ public class OfxHomeSearchCmd {
     }
 
     /**
-     * @param args
+     * The main method.
+     *
+     * @param args the arguments
      */
     public static void main(String[] args) {
         if (args.length == 0) {

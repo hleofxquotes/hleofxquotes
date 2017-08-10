@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.UpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -52,7 +52,7 @@ public class FixMissingTags {
         File file = new File("fi/fidelity/accountInquiry-v1-resp.ofx");
 
         try {
-            UpdateFiDir.checkRespFileV1(file);
+            AbstractUpdateFiDir.checkRespFileV1(file);
         } catch (IOException e) {
             log.error(e, e);
         }

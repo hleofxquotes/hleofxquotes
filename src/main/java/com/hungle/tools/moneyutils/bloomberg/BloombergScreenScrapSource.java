@@ -54,6 +54,11 @@ public class BloombergScreenScrapSource extends AbstractScreenScrapSource {
     /** The currency. */
     private String currency;
 
+    /**
+     * Instantiates a new bloomberg screen scrap source.
+     *
+     * @param stockSymbols the stock symbols
+     */
     public BloombergScreenScrapSource(List<String> stockSymbols) {
         super(stockSymbols);
     }
@@ -208,6 +213,14 @@ public class BloombergScreenScrapSource extends AbstractScreenScrapSource {
         return price;
     }
 
+    /**
+     * Creates the url.
+     *
+     * @param symbol the symbol
+     * @return the url
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws MalformedURLException the malformed URL exception
+     */
     protected URL createUrl(String symbol) throws UnsupportedEncodingException, MalformedURLException {
         // http://www.bloomberg.com/apps/quote?ticker=AAPL:US
         String selectUrl = "url=" + "\"http://" + quoteServer + "/apps/quote?ticker=" + symbol + "\"";
@@ -225,6 +238,13 @@ public class BloombergScreenScrapSource extends AbstractScreenScrapSource {
         return url;
     }
 
+    /**
+     * Creates the select statement.
+     *
+     * @param selectUrl the select url
+     * @return the string
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     */
     private String createSelectStatement(String selectUrl) throws UnsupportedEncodingException {
         String selectXPath = "xpath=" + "\"" + "//div[@id='price_info']" + "\"";
         String selectStatement = "select * from html" + " where " + selectUrl + " and " + selectXPath;
@@ -264,6 +284,9 @@ public class BloombergScreenScrapSource extends AbstractScreenScrapSource {
         return currency;
     }
 
+    /* (non-Javadoc)
+     * @see com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource#scrap()
+     */
     @Override
     public List scrap() {
         // TODO Auto-generated method stub

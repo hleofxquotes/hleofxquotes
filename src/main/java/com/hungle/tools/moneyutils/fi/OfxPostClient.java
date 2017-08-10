@@ -10,126 +10,65 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import javax.crypto.SecretKey;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.apache.velocity.VelocityContext;
 
 import com.hungle.tools.moneyutils.encryption.EncryptionHelper;
 import com.hungle.tools.moneyutils.encryption.EncryptionHelperException;
 import com.hungle.tools.moneyutils.ofx.quotes.net.HttpUtils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class OfxPostClient.
+ */
 public class OfxPostClient {
+
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(OfxPostClient.class);
 
-    public static final String DEFAULT_TEMPLATE_ENCODING = "UTF-8";
-
-    public static final String RESP_FILE_OFX = "resp.ofx";
-
-    public static final String REQ_FILE_OFX = "req.ofx";
-
-    private static final String APPLICATION_X_OFX = "application/x-ofx";
-
-    private AbstractFiContext fiContext = null;
-
-    private VelocityContext velocityContext = null;
-
-    private String templateEncoding = DEFAULT_TEMPLATE_ENCODING;
-
-    public OfxPostClient(AbstractFiContext fiContext) {
-        super();
-        this.fiContext = fiContext;
-        this.velocityContext = VelocityUtils.createVelocityContext(fiContext);
-    }
-
-    public static void sendRequest(OfxPostClientParams params) throws IOException {
+    /**
+     * Send request.
+     *
+     * @param params
+     *            the params
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
+    public void sendRequest(OfxPostClientParams params) throws IOException {
         String uriString = params.getUriString();
         URI uri = URI.create(uriString);
-        boolean httpsOnly = params.getHttpProperties().getHttpsOnly();
-        LOGGER.info("httpsOnly=" + httpsOnly);
-        if (httpsOnly) {
-            String scheme = uri.getScheme();
-            if (scheme == null) {
-                throw new IOException("URL must be https, url=" + uriString);
-            }
-            if (scheme.length() <= 0) {
-                throw new IOException("URL must be https, url=" + uriString);
-            }
-            if (scheme.compareToIgnoreCase("https") != 0) {
-                throw new IOException("URL must be https, url=" + uriString);
-            }
-            LOGGER.info("YES, url is https - " + uriString);
-        }
 
-        HttpPost httpPost = new HttpPost(uri);
-
-        AbstractHttpEntity requestEntity = null;
-        File reqFile = params.getReqFile();
-        requestEntity = new FileEntity(reqFile, ContentType.create(APPLICATION_X_OFX));
-        requestEntity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_X_OFX));
-        httpPost.setEntity(requestEntity);
-
-        // HttpClient httpClient =
-        // OfxDefaultHttpClient.createHttpClient(params);
         CloseableHttpClient httpClient = null;
         try {
-            httpClient = HttpClientBuilder.create().build();
-            HttpResponse response = httpClient.execute(httpPost);
-            HttpEntity responseEntity = response.getEntity();
-            Header contentType = responseEntity.getContentType();
+            httpClient = createHttpClient(params);
 
-            boolean strictRespContentType = false;
-            if (contentType == null) {
-                if (strictRespContentType) {
-                    throw new IOException("Not a valid ofx response. Bad contentType=" + contentType);
-                }
-            } else {
-                if (strictRespContentType) {
-                    if (contentType.getValue().compareToIgnoreCase(APPLICATION_X_OFX) != 0) {
-                        throw new IOException("Not a valid ofx response. Bad contentType=" + contentType);
-                    }
-                }
+            if (uriStringContains(params, "vanguard.com")) {
+                sendHeadRequest(uri, httpClient);
             }
-            
-            LOGGER.info("status=" + response.getStatusLine());
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode != 200) {
-                throw new IOException("Resonse is not valid, statusCode=" + statusCode);
-            }
-
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("response Content-Type: " + responseEntity.getContentType());
-            }
-
-            BufferedReader reader = null;
-            try {
-                InputStream in = responseEntity.getContent();
-                Charset charset = HttpUtils.getCharset(responseEntity);
-                LOGGER.info("charset=" + charset);
-                reader = new BufferedReader(new InputStreamReader(in, charset));
-
-                saveResponse(reader, params);
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } finally {
-                        reader = null;
-                    }
-                }
-            }
+            sendPostRequest(uri, httpClient, params);
         } finally {
             if (httpClient != null) {
                 httpClient.close();
@@ -138,20 +77,165 @@ public class OfxPostClient {
         }
     }
 
-    void sendRequest(File fiDir) throws IOException {
-        File reqFile = new File(fiDir, REQ_FILE_OFX);
-        File respFile = new File(fiDir, RESP_FILE_OFX);
-        VelocityUtils.mergeTemplate(velocityContext, fiContext.getTemplate(), templateEncoding, reqFile);
+    private void sendHeadRequest(URI uri, CloseableHttpClient httpClient) throws ClientProtocolException, IOException {
+        HttpHead httpHead = new HttpHead(uri);
 
+        HttpResponse response = httpClient.execute(httpHead);
+        HttpEntity responseEntity = response.getEntity();
+        EntityUtils.consume(responseEntity);
+    }
+
+    private void sendPostRequest(URI uri, CloseableHttpClient httpClient, OfxPostClientParams params)
+            throws IOException, ClientProtocolException {
+        HttpPost httpPost = new HttpPost(uri);
+        AbstractHttpEntity requestEntity = createRequestEntity(params);
+        httpPost.setEntity(requestEntity);
+        HttpResponse response = httpClient.execute(httpPost);
+        handlePostResponse(params, response);
+    }
+
+    /**
+     * Creates the http client.
+     * 
+     * @param params
+     *
+     * @return the closeable http client
+     */
+    private CloseableHttpClient createHttpClient(OfxPostClientParams params) {
+        HttpRequestInterceptor requestInterceptor = null;
+
+        CloseableHttpClient client = null;
+
+        if (uriStringContains(params, "discovercard.com")) {
+            requestInterceptor = new DiscoverHttpRequestInterceptor();
+        }
+        if (requestInterceptor != null) {
+            client = HttpClientBuilder.create().addInterceptorLast(requestInterceptor).build();
+        } else {
+            client = HttpClientBuilder.create().build();
+        }
+        return client;
+    }
+
+    private boolean uriStringContains(OfxPostClientParams params, String string) {
+        String uriString = params.getUriString();
+        if (StringUtils.isNotBlank(uriString)) {
+            if (uriString.contains(string)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Handle response.
+     *
+     * @param params
+     *            the params
+     * @param response
+     *            the response
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
+    protected void handlePostResponse(OfxPostClientParams params, HttpResponse response) throws IOException {
+        HttpEntity responseEntity = response.getEntity();
+
+        checkResponseContentType(responseEntity);
+
+        checkResponseStatus(response, responseEntity);
+
+        BufferedReader reader = null;
         try {
-            // TODO
-            sendRequest(new OfxPostClientParams(fiContext.getUri(), reqFile, respFile, null));
+            InputStream in = responseEntity.getContent();
+            Charset charset = HttpUtils.getCharset(responseEntity);
+            LOGGER.info("charset=" + charset);
+            reader = new BufferedReader(new InputStreamReader(in, charset));
+
+            saveResponse(reader, params);
         } finally {
-            LOGGER.info("reqFile=" + reqFile);
-            LOGGER.info("respFile=" + respFile);
+            if (reader != null) {
+                try {
+                    reader.close();
+                } finally {
+                    reader = null;
+                }
+            }
         }
     }
 
+    /**
+     * Check response status.
+     *
+     * @param response
+     *            the response
+     * @param responseEntity
+     *            the response entity
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
+    protected void checkResponseStatus(HttpResponse response, HttpEntity responseEntity) throws IOException {
+        LOGGER.info("status=" + response.getStatusLine());
+        int statusCode = response.getStatusLine().getStatusCode();
+        if (statusCode != HttpStatus.SC_OK) {
+            throw new IOException("Resonse is not valid, statusCode=" + statusCode);
+        }
+    }
+
+    /**
+     * Check response content type.
+     *
+     * @param responseEntity
+     *            the response entity
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
+    protected void checkResponseContentType(HttpEntity responseEntity) throws IOException {
+        Header contentTypeHeader = responseEntity.getContentType();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("response Content-Type: " + contentTypeHeader);
+        }
+
+        boolean strictRespContentType = false;
+        if (contentTypeHeader == null) {
+            if (strictRespContentType) {
+                throw new IOException("Not a valid ofx response. Bad contentType=" + contentTypeHeader);
+            }
+        } else {
+            if (strictRespContentType) {
+                String contentType = contentTypeHeader.getValue();
+                if (contentType.compareToIgnoreCase(AbstractUpdateFiDir.APPLICATION_X_OFX) != 0) {
+                    throw new IOException("Not a valid ofx response. Bad contentType=" + contentTypeHeader);
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates the request entity.
+     *
+     * @param params
+     *            the params
+     * @return the abstract http entity
+     */
+    protected AbstractHttpEntity createRequestEntity(OfxPostClientParams params) {
+        AbstractHttpEntity requestEntity = null;
+        File reqFile = params.getReqFile();
+        requestEntity = new FileEntity(reqFile, ContentType.create(AbstractUpdateFiDir.APPLICATION_X_OFX));
+        requestEntity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, AbstractUpdateFiDir.APPLICATION_X_OFX));
+        return requestEntity;
+    }
+
+    /**
+     * Save response.
+     *
+     * @param reader
+     *            the reader
+     * @param params
+     *            the params
+     * @return the file
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
     private static File saveResponse(BufferedReader reader, OfxPostClientParams params) throws IOException {
         File respFile = null;
         EncryptionHelper encryptionHelper = params.getEncryptionHelper();
@@ -171,6 +255,17 @@ public class OfxPostClient {
         return respFile;
     }
 
+    /**
+     * Save response plain.
+     *
+     * @param reader
+     *            the reader
+     * @param params
+     *            the params
+     * @return the file
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
     private static File saveResponsePlain(BufferedReader reader, OfxPostClientParams params) throws IOException {
         PrintWriter writer = null;
         File respFile = params.getRespFile();
