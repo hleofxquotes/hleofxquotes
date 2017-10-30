@@ -88,38 +88,47 @@ public class Account {
      * @param beanUtilsBean the bean utils bean
      * @return the list
      */
-    public static List<Account> parseAccounts(Properties props, BeanUtilsBean beanUtilsBean) {
-        String property;
+    public static List<Account> parse(Properties props, BeanUtilsBean beanUtilsBean) {
+        return parseAccounts(props, beanUtilsBean);
+    }
+
+    private static List<Account> parseAccounts(Properties props, BeanUtilsBean beanUtilsBean) {
         List<Account> accounts = new ArrayList<Account>();
-        property = props.getProperty("accounts");
+        String property = props.getProperty("accounts");
         if (!PropertiesUtils.isNull(property)) {
             property = property.trim();
             try {
                 int count = Long.valueOf(property).intValue();
                 for (int i = 0; i < count; i++) {
                     int index = i + 1;
-                    String[] keys = { "bankId", "id", "type", };
-                    Account account = new Account();
+                    Account account = parseAcccount(props, beanUtilsBean, index);
                     accounts.add(account);
-                    for (String key : keys) {
-                        property = props.getProperty("account" + "." + index + "." + key);
-                        if (!PropertiesUtils.isNull(property)) {
-                            property = property.trim();
-                            try {
-                                beanUtilsBean.setProperty(account, key, property);
-                            } catch (IllegalAccessException e) {
-                                LOGGER.error(e);
-                            } catch (InvocationTargetException e) {
-                                LOGGER.error(e);
-                            }
-                        }
-                    }
                 }
             } catch (NumberFormatException e) {
                 LOGGER.warn(e);
             }
         }
         return accounts;
+    }
+
+    private static Account parseAcccount(Properties props, BeanUtilsBean beanUtilsBean, int index) {
+        Account account = new Account();
+        String property;
+        String[] keys = { "bankId", "id", "type", };
+        for (String key : keys) {
+            property = props.getProperty("account" + "." + index + "." + key);
+            if (!PropertiesUtils.isNull(property)) {
+                property = property.trim();
+                try {
+                    beanUtilsBean.setProperty(account, key, property);
+                } catch (IllegalAccessException e) {
+                    LOGGER.error(e);
+                } catch (InvocationTargetException e) {
+                    LOGGER.error(e);
+                }
+            }
+        }
+        return account;
     }
 
 }

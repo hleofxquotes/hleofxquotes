@@ -89,7 +89,7 @@ import org.apache.log4j.Logger;
 import com.hungle.tools.moneyutils.bloomberg.BloombergQuoteSourcePanel;
 import com.hungle.tools.moneyutils.data.SymbolMapper;
 import com.hungle.tools.moneyutils.data.SymbolMapperEntry;
-import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractFiDir;
 import com.hungle.tools.moneyutils.fi.VelocityUtils;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.hungle.tools.moneyutils.ft.FtDotComQuoteSourcePanel;
@@ -132,7 +132,6 @@ import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
-import net.ofx.types.x2003.x04.CurrencyEnum;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -244,7 +243,7 @@ public class GUI extends JFrame {
     private JButton saveOfxButton;
 
     /** The default currency. */
-    private String defaultCurrency = PREFS.get(PREF_DEFAULT_CURRENCY, CurrencyEnum.USD.toString());
+    private String defaultCurrency = PREFS.get(PREF_DEFAULT_CURRENCY, com.hungle.tools.moneyutils.ofx.xmlbeans.CurrencyUtils.getDefaultCurrency());
 
     /** The randomize share count. */
     private Boolean randomizeShareCount = Boolean.valueOf(PREFS.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
@@ -1067,7 +1066,7 @@ public class GUI extends JFrame {
             }
             LOGGER.info("Created new FI dir=" + fiDir.getAbsolutePath());
             
-            String fiPropertiesFileName = AbstractUpdateFiDir.DEFAULT_PROPERTIES_FILENAME;
+            String fiPropertiesFileName = AbstractFiDir.DEFAULT_PROPERTIES_FILENAME;
             String sampleFileName = "samples" + "/" + fiPropertiesFileName;
             URL url = OfxUtils.getResource(sampleFileName);
             if (url == null) {

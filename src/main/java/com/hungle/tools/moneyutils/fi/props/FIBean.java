@@ -13,6 +13,8 @@ import org.apache.commons.beanutils.BeanUtilsBean;
  */
 public class FIBean {
     
+    public static final String FI_PREFIX = "fi";
+
     /** The name. */
     private String name;
     
@@ -147,8 +149,8 @@ public class FIBean {
      * @param beanUtilsBean the bean utils bean
      * @return the FI bean
      */
-    public static FIBean parseFI(Properties props, BeanUtilsBean beanUtilsBean) {
-        String prefix = "fi";
+    public static FIBean parse(Properties props, BeanUtilsBean beanUtilsBean) {
+        String prefix = FI_PREFIX;
     
         FIBean bean = new FIBean();
         Collection<String> keys = new ArrayList<String>();

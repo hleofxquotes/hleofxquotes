@@ -1,10 +1,13 @@
 package com.hungle.tools.moneyutils.fi.props;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.velocity.VelocityContext;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,7 +16,7 @@ import org.junit.Test;
  * The Class PropertiesUtilsTest.
  */
 public class PropertiesUtilsTest {
-    
+
     /**
      * Test is null.
      */
@@ -44,7 +47,7 @@ public class PropertiesUtilsTest {
         // with prefix
         prefix = OFX.PREFIX;
         testSetOfxVersion(prefix, key, versionValue);
-        
+
         // another value
         versionValue = "202";
         testSetOfxVersion(prefix, key, versionValue);
@@ -53,9 +56,12 @@ public class PropertiesUtilsTest {
     /**
      * Test set ofx version.
      *
-     * @param prefix the prefix
-     * @param key the key
-     * @param versionValue the version value
+     * @param prefix
+     *            the prefix
+     * @param key
+     *            the key
+     * @param versionValue
+     *            the version value
      */
     private void testSetOfxVersion(String prefix, String key, String versionValue) {
         Collection<String> keys = new ArrayList<String>();
@@ -73,5 +79,25 @@ public class PropertiesUtilsTest {
         PropertiesUtils.setProperties(prefix, keys, props, ofx, beanUtilsBean);
 
         Assert.assertEquals(versionValue, ofx.getVersion());
+    }
+
+    @Test
+    public void testCreateFromEmptyFile() throws IOException {
+        File propsFile = File.createTempFile("test", ".props");
+        propsFile.deleteOnExit();
+        VelocityContext context = PropertiesUtils.createVelocityContext(propsFile);
+        Assert.assertNotNull(context);
+        
+        FIBean fiBean = PropertiesUtils.getFiBean(context);
+        Assert.assertNotNull(fiBean);
+        
+        OFX ofx = PropertiesUtils.getOfx(context);
+        Assert.assertNotNull(ofx);
+        
+        HttpProperties httpProperties = PropertiesUtils.getHttpProperties(context);
+        Assert.assertNotNull(httpProperties);
+        
+        String requestType = PropertiesUtils.getRequestType(context);
+        Assert.assertNull(requestType);        
     }
 }

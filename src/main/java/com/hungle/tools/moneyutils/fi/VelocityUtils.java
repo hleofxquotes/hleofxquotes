@@ -12,6 +12,9 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
+import com.hungle.tools.moneyutils.fi.props.OFX;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class VelocityUtils.
@@ -19,7 +22,7 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 public class VelocityUtils {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(VelocityUtils.class);
+    private static final Logger LOGGER = Logger.getLogger(VelocityUtils.class);
     
     /**
      * Creates the velocity context.
@@ -79,10 +82,34 @@ public class VelocityUtils {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 }
             }
         }
+    }
+
+    /**
+     * Gets the template from context.
+     *
+     * @param context the context
+     * @return the template from context
+     */
+    static String getTemplateFromContext(VelocityContext context) {
+        String requestType = (String) context.get("requestType");
+        if (PropertiesUtils.isNull(requestType)) {
+            LOGGER.error("Cannot create template, requestType is null");
+            return null;
+        }
+        com.hungle.tools.moneyutils.fi.props.OFX ofx = PropertiesUtils.getOfx(context);
+        if (ofx == null) {
+            LOGGER.error("Cannot create template, OFX object is null");
+            return null;
+        }
+        String version = ofx.getVersion();
+        if (PropertiesUtils.isNull(version)) {
+            LOGGER.error("Cannot create template, OFX version is null");
+        }
+        return requestType + "-v" + version + ".vm";
     }
 
 }

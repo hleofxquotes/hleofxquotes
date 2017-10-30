@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.List;
 
 import javax.crypto.SecretKey;
 
@@ -23,13 +22,10 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.CookiePolicy;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
@@ -59,6 +55,10 @@ public class OfxPostClient {
      */
     public void sendRequest(OfxPostClientParams params) throws IOException {
         String uriString = params.getUriString();
+        if (StringUtils.isEmpty(uriString)) {
+            LOGGER.warn("urlString is empty.");
+            return;
+        }
         URI uri = URI.create(uriString);
 
         CloseableHttpClient httpClient = null;
@@ -203,7 +203,7 @@ public class OfxPostClient {
         } else {
             if (strictRespContentType) {
                 String contentType = contentTypeHeader.getValue();
-                if (contentType.compareToIgnoreCase(AbstractUpdateFiDir.APPLICATION_X_OFX) != 0) {
+                if (contentType.compareToIgnoreCase(AbstractFiDir.APPLICATION_X_OFX) != 0) {
                     throw new IOException("Not a valid ofx response. Bad contentType=" + contentTypeHeader);
                 }
             }
@@ -220,8 +220,8 @@ public class OfxPostClient {
     protected AbstractHttpEntity createRequestEntity(OfxPostClientParams params) {
         AbstractHttpEntity requestEntity = null;
         File reqFile = params.getReqFile();
-        requestEntity = new FileEntity(reqFile, ContentType.create(AbstractUpdateFiDir.APPLICATION_X_OFX));
-        requestEntity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, AbstractUpdateFiDir.APPLICATION_X_OFX));
+        requestEntity = new FileEntity(reqFile, ContentType.create(AbstractFiDir.APPLICATION_X_OFX));
+        requestEntity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, AbstractFiDir.APPLICATION_X_OFX));
         return requestEntity;
     }
 

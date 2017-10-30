@@ -92,7 +92,7 @@ public class HttpProperties {
      * @param beanUtilsBean the bean utils bean
      * @return the http properties
      */
-    public static HttpProperties parseHttpProperties(Properties props, BeanUtilsBean beanUtilsBean) {
+    public static HttpProperties parse(Properties props, BeanUtilsBean beanUtilsBean) {
         HttpProperties bean = new HttpProperties();
         String prefix = "http";
         Collection<String> keys = new ArrayList<String>();

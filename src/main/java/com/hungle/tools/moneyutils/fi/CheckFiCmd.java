@@ -10,10 +10,10 @@ import org.apache.log4j.Logger;
 /**
  * The Class CheckFi.
  */
-public class CheckFi {
+public class CheckFiCmd {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(CheckFi.class);
+    private static final Logger log = Logger.getLogger(CheckFiCmd.class);
 
     /** The frame. */
     private JFrame frame;
@@ -28,7 +28,7 @@ public class CheckFi {
             @Override
             public void run() {
                 try {
-                    CheckFi window = new CheckFi();
+                    CheckFiCmd window = new CheckFiCmd();
                     window.frame.setVisible(true);
                 } catch (Exception e) {
                     log.error(e, e);
@@ -40,7 +40,7 @@ public class CheckFi {
     /**
      * Create the application.
      */
-    public CheckFi() {
+    public CheckFiCmd() {
         initialize();
     }
 

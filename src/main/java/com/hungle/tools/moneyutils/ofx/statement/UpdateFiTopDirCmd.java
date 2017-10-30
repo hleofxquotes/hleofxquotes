@@ -5,8 +5,8 @@ import java.io.FileFilter;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
-import com.hungle.tools.moneyutils.fi.DefaultUpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractFiDir;
+import com.hungle.tools.moneyutils.fi.DefaultFiDir;
 import com.hungle.tools.moneyutils.fi.VelocityUtils;
 
 // TODO: Auto-generated Javadoc
@@ -60,10 +60,10 @@ public class UpdateFiTopDirCmd {
         for (File dir : dirs) {
             log.info("");
             log.info("> START updating dir=" + dir);
-            AbstractUpdateFiDir updater = null;
+            AbstractFiDir updater = null;
             try {
-                updater = new DefaultUpdateFiDir(dir);
-                updater.update();
+                updater = new DefaultFiDir(dir);
+                updater.sendRequest();
             } catch (Exception e) {
                 log.error("Failed to update dir=" + dir + ". Error:" + e.getMessage());
             } finally {

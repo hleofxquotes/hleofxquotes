@@ -43,7 +43,7 @@ public class OFX {
      * @param beanUtilsBean the bean utils bean
      * @return the ofx
      */
-    public static OFX parseOFX(Properties props, BeanUtilsBean beanUtilsBean) {
+    public static OFX parse(Properties props, BeanUtilsBean beanUtilsBean) {
         String prefix = PREFIX;
     
         OFX ofx = new OFX();

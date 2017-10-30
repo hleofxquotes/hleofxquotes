@@ -24,7 +24,7 @@ import javax.swing.WindowConstants;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractFiDir;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -103,7 +103,7 @@ public class ShowErrorDialog extends JDialog {
         scrollPane_1.setBorder(BorderFactory.createTitledBorder("OFX Response File:"));
         JTextArea txtrLower = new JTextArea();
         txtrLower.setWrapStyleWord(true);
-        AbstractUpdateFiDir updater = bean.getUpdater();
+        AbstractFiDir updater = bean.getUpdater();
         File respFile = updater.getRespFile();
         if (respFile == null) {
             respFile = new File(updater.getDir(), updater.getRespFileName());

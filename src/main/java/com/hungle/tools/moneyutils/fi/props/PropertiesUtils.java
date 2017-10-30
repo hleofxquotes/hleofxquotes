@@ -21,7 +21,6 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
 
-import com.hungle.tools.moneyutils.fi.Utils;
 import com.hungle.tools.moneyutils.scrubber.IngDirectScrubber;
 import com.hungle.tools.moneyutils.scrubber.OfxScrubber;
 import com.hungle.tools.moneyutils.scrubber.ResponseFilter;
@@ -32,8 +31,28 @@ import com.hungle.tools.moneyutils.scrubber.ResponseFilter;
  */
 public class PropertiesUtils {
 
+    private static final String KEY_UTILS = "utils";
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(PropertiesUtils.class);
+
+    private static final String KEY_FI = "fi";
+
+    private static final String KEY_OFX = "ofx";
+
+    private static final String KEY_REQUEST_TYPE = "requestType";
+
+    private static final String KEY_START_DATE = "startDate";
+
+    private static final String KEY_APP_ID = "appId";
+
+    private static final String KEY_APP_VER = "appVer";
+
+    private static final String KEY_AUTH_KEY = "auth";
+
+    private static final String KEY_ACCOUNTS = "accounts";
+
+    private static final String KEY_HTTP_PROPERTIES = "httpProperties";
 
     /** The Constant DEFAULT_APP_VER. */
     private static final String DEFAULT_APP_VER = "2500";
@@ -66,81 +85,82 @@ public class PropertiesUtils {
      */
     private static VelocityContext createVelocityContext(Properties props, BeanUtilsBean beanUtilsBean) {
         VelocityContext context = new VelocityContext();
+        
         // FI
-        FIBean fi = FIBean.parseFI(props, beanUtilsBean);
+        FIBean fi = FIBean.parse(props, beanUtilsBean);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("fi=" + fi);
         }
-        context.put("fi", fi);
+        context.put(KEY_FI, fi);
 
         // OFX
-        OFX ofx = OFX.parseOFX(props, beanUtilsBean);
+        OFX ofx = OFX.parse(props, beanUtilsBean);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("ofx=" + ofx);
             LOGGER.debug("ofx.version=" + ofx.getVersion());
         }
-        context.put("ofx", ofx);
+        context.put(KEY_OFX, ofx);
 
         // requestType
         String requestType = null;
-        String property = props.getProperty("requestType");
+        String property = props.getProperty(KEY_REQUEST_TYPE);
         if (!PropertiesUtils.isNull(property)) {
             requestType = property;
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("requestType=" + requestType);
         }
-        context.put("requestType", requestType);
+        context.put(KEY_REQUEST_TYPE, requestType);
 
         // startDate
         String startDate = parseStartDate(props);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("startDate=" + startDate);
         }
-        context.put("startDate", startDate);
+        context.put(KEY_START_DATE, startDate);
         fi.setStartDate(startDate);
 
         // DefaultAppID = 'QWIN'
         // DefaultAppVer = '1900'
-        String appID = props.getProperty("appId");
+        String appID = props.getProperty(KEY_APP_ID);
         if (PropertiesUtils.isNull(appID)) {
             appID = DEFAULT_APP_ID;
         }
-        context.put("appId", appID);
+        context.put(KEY_APP_ID, appID);
 
-        String appVer = props.getProperty("appVer");
+        String appVer = props.getProperty(KEY_APP_VER);
         if (PropertiesUtils.isNull(appVer)) {
             appVer = DEFAULT_APP_VER;
         }
-        context.put("appVer", appVer);
+        context.put(KEY_APP_VER, appVer);
 
         // Authentication
-        Authentication auth = Authentication.parseAuthentication(props, beanUtilsBean);
+        Authentication auth = Authentication.parse(props, beanUtilsBean);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("auth=" + auth);
         }
-        context.put("auth", auth);
+        context.put(KEY_AUTH_KEY, auth);
 
         // Filters
         List<ResponseFilter> responseFilters = createDefaultResponseFilters();
         context.put("filters.onResponse", responseFilters);
 
         // Accounts
-        List<Account> accounts = Account.parseAccounts(props, beanUtilsBean);
+        List<Account> accounts = Account.parse(props, beanUtilsBean);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("accounts=" + accounts);
         }
-        context.put("accounts", accounts);
+        context.put(KEY_ACCOUNTS, accounts);
 
         // Http connection
-        HttpProperties httpProperties = HttpProperties.parseHttpProperties(props, beanUtilsBean);
+        HttpProperties httpProperties = HttpProperties.parse(props, beanUtilsBean);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("httpProperties=" + httpProperties);
         }
-        context.put("httpProperties", httpProperties);
+        context.put(KEY_HTTP_PROPERTIES, httpProperties);
 
         Utils utils = new Utils();
-        context.put("utils", utils);
+        context.put(KEY_UTILS, utils);
 
         return context;
     }
@@ -165,7 +185,7 @@ public class PropertiesUtils {
      */
     private static String parseStartDate(Properties props) {
         String startDate = null;
-        String property = props.getProperty("startDate");
+        String property = props.getProperty(KEY_START_DATE);
         if (!PropertiesUtils.isNull(property)) {
             property = property.trim();
             if (property.charAt(0) == '-') {
@@ -205,7 +225,7 @@ public class PropertiesUtils {
 
             @Override
             public void filter(File respFile, VelocityContext context) {
-                FIBean fi = (FIBean) context.get("fi");
+                FIBean fi = (FIBean) context.get(KEY_FI);
                 if (fi == null) {
                     return;
                 }
@@ -217,7 +237,7 @@ public class PropertiesUtils {
                     return;
                 }
 
-                OFX ofx = (OFX) context.get("ofx");
+                OFX ofx = (OFX) context.get(KEY_OFX);
                 if (ofx == null) {
                     return;
                 }
@@ -269,7 +289,7 @@ public class PropertiesUtils {
      *            the offset
      * @return the string
      */
-    public static String parseStartDate(Long offset) {
+    private static String parseStartDate(Long offset) {
         String startDate;
         offset = offset * (1000L * 60 * 60 * 24);
         Date date = new Date(System.currentTimeMillis() + offset);
@@ -315,7 +335,7 @@ public class PropertiesUtils {
      * @param beanUtilsBean
      *            the bean utils bean
      */
-    public static void setProperties(String prefix, Collection<String> keys, Properties props, Object bean,
+    static void setProperties(String prefix, Collection<String> keys, Properties props, Object bean,
             BeanUtilsBean beanUtilsBean) {
         for (String key : keys) {
             String property = null;
@@ -368,5 +388,25 @@ public class PropertiesUtils {
             }
         }
         return props;
+    }
+
+    public static final OFX getOfx(VelocityContext context) {
+        return (com.hungle.tools.moneyutils.fi.props.OFX) context.get(KEY_OFX);
+    }
+
+    public static final List<ResponseFilter> getResponseFilters(VelocityContext context) {
+        return (List<ResponseFilter>) context.get("filters.onResponse");
+    }
+
+    public static final FIBean getFiBean(VelocityContext context) {
+        return (FIBean) context.get(KEY_FI);
+    }
+
+    public static final HttpProperties getHttpProperties(VelocityContext context) {
+        return (HttpProperties) context.get(KEY_HTTP_PROPERTIES);
+    }
+
+    public static final String getRequestType(VelocityContext context) {
+        return (String) context.get(KEY_REQUEST_TYPE);
     }
 }

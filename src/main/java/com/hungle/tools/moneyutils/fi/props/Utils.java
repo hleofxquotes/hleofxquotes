@@ -1,5 +1,6 @@
-package com.hungle.tools.moneyutils.fi;
+package com.hungle.tools.moneyutils.fi.props;
 
+import com.hungle.tools.moneyutils.fi.AbstractFiContext;
 
 // TODO: Auto-generated Javadoc
 /**

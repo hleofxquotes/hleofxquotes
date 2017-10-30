@@ -94,7 +94,7 @@ public class Authentication {
      * @param beanUtilsBean the bean utils bean
      * @return the authentication
      */
-    public static Authentication parseAuthentication(Properties props, BeanUtilsBean beanUtilsBean) {
+    public static Authentication parse(Properties props, BeanUtilsBean beanUtilsBean) {
         String prefix;
         Collection<String> keys;
         Authentication auth = new Authentication();

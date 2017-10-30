@@ -11,10 +11,10 @@ import com.hungle.tools.moneyutils.fi.props.HttpProperties;
 /**
  * The Class DefaultUpdateFiDir.
  */
-public class DefaultUpdateFiDir extends AbstractUpdateFiDir {
+public class DefaultFiDir extends AbstractFiDir {
     
     /** The Constant LOGGER. */
-    private static final Logger LOGGER = Logger.getLogger(DefaultUpdateFiDir.class);
+    private static final Logger LOGGER = Logger.getLogger(DefaultFiDir.class);
 
     /**
      * Instantiates a new default update fi dir.
@@ -22,7 +22,7 @@ public class DefaultUpdateFiDir extends AbstractUpdateFiDir {
      * @param dir the dir
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public DefaultUpdateFiDir(File dir) throws IOException {
+    public DefaultFiDir(File dir) throws IOException {
         super(dir);
     }
 
@@ -30,7 +30,7 @@ public class DefaultUpdateFiDir extends AbstractUpdateFiDir {
      * @see com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir#update(java.lang.String, java.io.File, java.io.File, com.hungle.tools.moneyutils.fi.props.HttpProperties)
      */
     @Override
-    protected void update(String url, File reqFile, File respFile, HttpProperties httpProperties) throws IOException {
+    protected void sendRequest(String url, File reqFile, File respFile, HttpProperties httpProperties) throws IOException {
         OfxPostClientParams params = new OfxPostClientParams(url, reqFile, respFile, httpProperties);
         OfxPostClient ofxPostClient = new OfxPostClient();
         ofxPostClient.sendRequest(params);

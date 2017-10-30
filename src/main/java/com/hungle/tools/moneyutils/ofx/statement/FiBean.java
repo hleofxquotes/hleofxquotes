@@ -17,7 +17,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractFiDir;
 import com.hungle.tools.moneyutils.fi.props.FIBean;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 
@@ -37,7 +37,7 @@ public class FiBean {
     private FIBean fi;
 
     /** The updater. */
-    private AbstractUpdateFiDir updater;
+    private AbstractFiDir updater;
 
     /** The status. */
     private String status;
@@ -157,7 +157,7 @@ public class FiBean {
      *
      * @return the updater
      */
-    public AbstractUpdateFiDir getUpdater() {
+    public AbstractFiDir getUpdater() {
         return updater;
     }
 
@@ -166,7 +166,7 @@ public class FiBean {
      *
      * @param updater the new updater
      */
-    public void setUpdater(AbstractUpdateFiDir updater) {
+    public void setUpdater(AbstractFiDir updater) {
         this.updater = updater;
         readDownloadData();
     }

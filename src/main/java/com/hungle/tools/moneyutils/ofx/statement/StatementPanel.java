@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dialog.ModalityType;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -16,19 +15,15 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -64,8 +59,8 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
-import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
-import com.hungle.tools.moneyutils.fi.DefaultUpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractFiDir;
+import com.hungle.tools.moneyutils.fi.DefaultFiDir;
 import com.hungle.tools.moneyutils.fi.props.FIBean;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.hungle.tools.moneyutils.gui.GUI;
@@ -73,7 +68,6 @@ import com.hungle.tools.moneyutils.gui.StripedTableRenderer;
 import com.hungle.tools.moneyutils.ofx.quotes.ImportUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.StreamConsumer;
 import com.hungle.tools.moneyutils.ofx.quotes.Utils;
-import com.hungle.tools.moneyutils.ofx.quotes.net.CheckOfxVersion;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -93,8 +87,6 @@ import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
-import difflib.Delta;
-import difflib.DiffUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -106,19 +98,19 @@ public class StatementPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     /** The Constant LOGGER. */
-    private static final Logger LOGGER = Logger.getLogger(StatementPanel.class);
+    static final Logger LOGGER = Logger.getLogger(StatementPanel.class);
 
     /** The Constant CURRENT_CERTIFICATES_TXT. */
-    private static final String CURRENT_CERTIFICATES_TXT = "currentCertificates.txt";
+    static final String CURRENT_CERTIFICATES_TXT = "currentCertificates.txt";
 
     /** The Constant SAVED_CERTIFICATES_TXT. */
-    private static final String SAVED_CERTIFICATES_TXT = "savedCertificates.txt";
+    static final String SAVED_CERTIFICATES_TXT = "savedCertificates.txt";
 
     /** The fi beans. */
     private EventList<FiBean> fiBeans = new BasicEventList<FiBean>();
 
     /** The fi beans selection model. */
-    private DefaultEventSelectionModel<FiBean> fiBeansSelectionModel;
+    DefaultEventSelectionModel<FiBean> fiBeansSelectionModel;
     
     /** The thread pool. */
     private final Executor threadPool = Executors.newCachedThreadPool();
@@ -127,10 +119,10 @@ public class StatementPanel extends JPanel {
     private JPanel commandView;
 
     /** The fi properties text area. */
-    private JTextArea fiPropertiesTextArea;
+    JTextArea fiPropertiesTextArea;
     
     /** The fi properties file. */
-    private File fiPropertiesFile;
+    File fiPropertiesFile;
 
     /** The fi request text area. */
     private JTextArea fiRequestTextArea;
@@ -145,7 +137,7 @@ public class StatementPanel extends JPanel {
     private JTextArea fiErrorTextArea;
 
     /** The details for bean. */
-    private FiBean detailsForBean;
+    FiBean detailsForBean;
 
     /** The saved certificates text area. */
     private JTextArea savedCertificatesTextArea;
@@ -174,245 +166,6 @@ public class StatementPanel extends JPanel {
     /** The fi dir. */
     // TODO_FI
     private File fiDir = new File(GUI.DEFAULT_FI_DIR);
-
-    /**
-     * The Class GetAccountsInfoAction.
-     */
-    private final class GetAccountsInfoAction extends AbstractAction {
-        
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Instantiates a new gets the accounts info action.
-         *
-         * @param name the name
-         */
-        private GetAccountsInfoAction(String name) {
-            super(name);
-        }
-
-        /* (non-Javadoc)
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            CheckOfxVersion checkOfxVersion = new CheckOfxVersion();
-            EventList<FiBean> beans = fiBeansSelectionModel.getSelected();
-            for (FiBean bean : beans) {
-                File dir = bean.getUpdater().getDir();
-                checkOfxVersion.check(dir);
-            }
-        }
-    }
-
-    /**
-     * The Class ShowLastErrorAction.
-     */
-    private final class ShowLastErrorAction extends AbstractAction {
-        
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-        
-        /** The popup menu. */
-        private final JPopupMenu popupMenu;
-
-        /**
-         * Instantiates a new show last error action.
-         *
-         * @param name the name
-         * @param popupMenu the popup menu
-         */
-        private ShowLastErrorAction(String name, JPopupMenu popupMenu) {
-            super(name);
-            this.popupMenu = popupMenu;
-        }
-
-        /* (non-Javadoc)
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            EventList<FiBean> beans = fiBeansSelectionModel.getSelected();
-            for (FiBean bean : beans) {
-                ShowErrorDialog dialog = null;
-                try {
-                    dialog = new ShowErrorDialog(JOptionPane.getFrameForComponent(StatementPanel.this), bean);
-                    dialog.setTitle(bean.getName());
-                    dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-                    dialog.showDialog(popupMenu);
-                } finally {
-                    if (dialog != null) {
-                        dialog.dispose();
-                        dialog = null;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * The Class SavePropertiesAction.
-     */
-    private final class SavePropertiesAction extends AbstractAction {
-        
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Instantiates a new save properties action.
-         *
-         * @param name the name
-         */
-        private SavePropertiesAction(String name) {
-            super(name);
-        }
-
-        /* (non-Javadoc)
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            LOGGER.info("> saving " + fiPropertiesFile);
-
-            JTextArea textArea = fiPropertiesTextArea;
-            if (textArea == null) {
-                return;
-            }
-            if (fiPropertiesFile == null) {
-                return;
-            }
-            Writer writer = null;
-            try {
-                writer = new BufferedWriter(new FileWriter(fiPropertiesFile));
-                textArea.write(writer);
-                Runnable doRun = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            File d = fiPropertiesFile.getAbsoluteFile().getParentFile();
-                            FiBean bean = detailsForBean;
-                            if (bean == null) {
-                                return;
-                            }
-                            AbstractUpdateFiDir updater = new DefaultUpdateFiDir(d);
-                            refreshBean(bean, updater);
-                        } catch (IOException e) {
-                            LOGGER.error(e, e);
-                        } finally {
-                        }
-                    }
-                };
-                SwingUtilities.invokeLater(doRun);
-            } catch (IOException e) {
-                LOGGER.error(e);
-            } finally {
-                if (writer != null) {
-                    try {
-                        writer.close();
-                    } catch (IOException e) {
-                        LOGGER.warn(e);
-                    } finally {
-                        writer = null;
-                    }
-                }
-                JOptionPane.showMessageDialog(StatementPanel.this,
-                        "File:\n" + fiPropertiesFile.getAbsolutePath() + " is saved.", "File saved",
-                        JOptionPane.PLAIN_MESSAGE);
-                LOGGER.info("< DONE saving " + fiPropertiesFile);
-            }
-        }
-    }
-
-    /**
-     * The Class DownloadStatementsTask.
-     */
-    private final class DownloadStatementsTask implements Runnable {
-        
-        /** The progress monitor. */
-        private final ProgressMonitor progressMonitor;
-        
-        /** The fi beans. */
-        private final EventList<FiBean> fiBeans;
-
-        /**
-         * Instantiates a new download statements task.
-         *
-         * @param progressMonitor the progress monitor
-         * @param fiBeans the fi beans
-         */
-        private DownloadStatementsTask(ProgressMonitor progressMonitor, EventList<FiBean> fiBeans) {
-            this.progressMonitor = progressMonitor;
-            this.fiBeans = fiBeans;
-        }
-
-        /* (non-Javadoc)
-         * @see java.lang.Runnable#run()
-         */
-        @Override
-        public void run() {
-            try {
-                int i = 0;
-                for (FiBean fiBean : fiBeans) {
-                    if (progressMonitor != null) {
-                        if (progressMonitor.isCanceled()) {
-                            LOGGER.info("User cancels before full completion.");
-                            break;
-                        }
-                    }
-                    final String note = fiBean.getName() + " (since " + fiBean.getFi().getStartDate() + ")";
-                    final int progress = i;
-                    Runnable doRun = new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (progressMonitor != null) {
-                                progressMonitor.setProgress(progress);
-                                progressMonitor.setNote(note);
-                            }
-                        }
-                    };
-                    SwingUtilities.invokeLater(doRun);
-
-                    Exception exception = null;
-                    boolean skip = false;
-                    LOGGER.info("> START updating fi=" + fiBean.getName());
-                    try {
-                        fiBean.setStatus("START");
-                        fiBean.setException(exception);
-                        skip = !fiBean.getUpdater().update();
-                    } catch (Exception e) {
-                        LOGGER.error(e);
-                        exception = e;
-                    } finally {
-                        fiBean.setException(exception);
-                        File respFile = fiBean.getUpdater().getRespFile();
-                        if ((respFile != null) && (respFile.exists())) {
-                            fiBean.setLastDownloaded(new Date(respFile.lastModified()));
-                        } else {
-                            fiBean.setLastDownloaded(null);
-                        }
-                        if (exception == null) {
-                            if (skip) {
-                                fiBean.setStatus("SKIP");
-                            } else {
-                                fiBean.setStatus("SUCCESS");
-                            }
-                        } else {
-                            // fiBean.setStatus("ERROR");
-                            fiBean.setStatus("ERROR - " + exception.toString());
-                        }
-                        fiBean.setDownloaded(true);
-
-                        LOGGER.info("< DONE updating fi=" + fiBean.getName());
-                    }
-                    i++;
-                }
-            } finally {
-                updateCompleted(fiBeans, progressMonitor);
-            }
-        }
-    }
 
     /**
      * Instantiates a new statement panel.
@@ -523,54 +276,7 @@ public class StatementPanel extends JPanel {
         xxx.add(saveCertificatesButton);
 
         xxx.add(Box.createHorizontalStrut(5));
-        showDiffsButton = new JButton(new AbstractAction("Show Diffs") {
-
-            /**
-             * 
-             */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                LOGGER.info("###");
-                LOGGER.info("> Show Diffs: " + detailsForBean.getFiUrl());
-                if (detailsForBean == null) {
-                    return;
-                }
-
-                File respFile = detailsForBean.getUpdater().getRespFile();
-                File savedCertificates = new File(respFile.getAbsoluteFile().getParentFile(), SAVED_CERTIFICATES_TXT);
-                File currentCertificates = new File(respFile.getAbsoluteFile().getParentFile(),
-                        CURRENT_CERTIFICATES_TXT);
-                try {
-                    List<String> original = fileToLines(savedCertificates.getAbsolutePath());
-                    List<String> revised = fileToLines(currentCertificates.getAbsolutePath());
-                    difflib.Patch<String> patch = DiffUtils.diff(original, revised);
-                    for (Delta<?> delta : patch.getDeltas()) {
-                        LOGGER.info(delta);
-                    }
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(StatementPanel.this, e.toString(),
-                            "Error generating diff for SSL Certificates", JOptionPane.ERROR_MESSAGE);
-                }
-
-            }
-
-            public List<String> fileToLines(String filename) {
-                List<String> lines = new LinkedList<String>();
-                String line = "";
-                try {
-                    BufferedReader in = new BufferedReader(new FileReader(filename));
-                    while ((line = in.readLine()) != null) {
-                        lines.add(line);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return lines;
-            }
-
-        });
+        showDiffsButton = new JButton(new ShowDiffTask(this, "Show Diffs"));
         showDiffsButton.setEnabled(false);
         xxx.add(showDiffsButton);
 
@@ -775,7 +481,7 @@ public class StatementPanel extends JPanel {
 
         JPopupMenu popupMenu = new JPopupMenu();
         JMenuItem menuItem = null;
-        SavePropertiesAction saveAction = new SavePropertiesAction("Save");
+        SavePropertiesAction saveAction = new SavePropertiesAction(this, "Save");
         menuItem = new JMenuItem(saveAction);
         popupMenu.add(menuItem);
 
@@ -1013,7 +719,7 @@ public class StatementPanel extends JPanel {
      * Refresh fi dir.
      */
     public void refreshFiDir() {
-        final List<AbstractUpdateFiDir> updaters = loadFiDir();
+        final List<AbstractFiDir> updaters = loadFiDir();
 
         Runnable doRun = new Runnable() {
 
@@ -1022,7 +728,7 @@ public class StatementPanel extends JPanel {
                 try {
                     fiBeans.getReadWriteLock().writeLock().lock();
                     fiBeans.clear();
-                    for (AbstractUpdateFiDir updater : updaters) {
+                    for (AbstractFiDir updater : updaters) {
                         FiBean bean = new FiBean();
                         try {
                             refreshBean(bean, updater);
@@ -1047,7 +753,7 @@ public class StatementPanel extends JPanel {
      * @param updater the updater
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    protected void refreshBean(FiBean bean, AbstractUpdateFiDir updater) throws IOException {
+    protected void refreshBean(FiBean bean, AbstractFiDir updater) throws IOException {
         bean.setUpdater(updater);
         bean.setName(updater.getDir().getName());
         FIBean fi = updater.getFiBean();
@@ -1070,7 +776,14 @@ public class StatementPanel extends JPanel {
         final ProgressMonitor progressMonitor = new ProgressMonitor(StatementPanel.this,
                 "Downloading ...                                           \t", "", 0, fiBeans.size());
         updateStarted(fiBeans, progressMonitor);
-        Runnable command = new DownloadStatementsTask(progressMonitor, fiBeans);
+        Runnable command = new DownloadStatementsTask(fiBeans, progressMonitor) {
+
+            @Override
+            protected void updateCompleted() {
+              StatementPanel.this.updateCompleted(fiBeans, progressMonitor);
+            }
+            
+        };
         threadPool.execute(command);
     }
 
@@ -1079,8 +792,8 @@ public class StatementPanel extends JPanel {
      *
      * @return the list
      */
-    private List<AbstractUpdateFiDir> loadFiDir() {
-        List<AbstractUpdateFiDir> updaters = new ArrayList<AbstractUpdateFiDir>();
+    private List<AbstractFiDir> loadFiDir() {
+        List<AbstractFiDir> updaters = new ArrayList<AbstractFiDir>();
 
         // TODO_FI
         // File topDir = new File("fi");
@@ -1120,7 +833,7 @@ public class StatementPanel extends JPanel {
         for (File dir : dirs) {
             try {
                 LOGGER.info("Loading dir=" + dir.getAbsolutePath());
-                AbstractUpdateFiDir updater = new DefaultUpdateFiDir(dir);
+                AbstractFiDir updater = new DefaultFiDir(dir);
                 updaters.add(updater);
             } catch (IOException e) {
                 LOGGER.error(e);
@@ -1162,7 +875,7 @@ public class StatementPanel extends JPanel {
      * @param fiBeans the fi beans
      * @param progressMonitor the progress monitor
      */
-    private void updateCompleted(final EventList<FiBean> fiBeans, final ProgressMonitor progressMonitor) {
+    void updateCompleted(final EventList<FiBean> fiBeans, final ProgressMonitor progressMonitor) {
         LOGGER.info("> updateCompleted");
         Runnable doRun = new Runnable() {
 
@@ -1352,7 +1065,7 @@ public class StatementPanel extends JPanel {
         if (popupMenu != null) {
             JMenuItem menuItem = null;
             
-            menuItem = new JMenuItem(new GetAccountsInfoAction("Get Accounts Info"));
+            menuItem = new JMenuItem(new GetAccountsInfoAction(this, "Get Accounts Info"));
             popupMenu.add(menuItem);
 
             MouseListener popupListener = new PopupListener(popupMenu);
@@ -1474,7 +1187,7 @@ public class StatementPanel extends JPanel {
                 if (bean == null) {
                     return;
                 }
-                AbstractUpdateFiDir updater = bean.getUpdater();
+                AbstractFiDir updater = bean.getUpdater();
                 if (updater == null) {
                     return;
                 }
@@ -1558,7 +1271,7 @@ public class StatementPanel extends JPanel {
      */
     private void updateFiPropertiesView(final FiBean bean) {
         final JTextArea textArea = fiPropertiesTextArea;
-        final String fileName = AbstractUpdateFiDir.DEFAULT_PROPERTIES_FILENAME;
+        final String fileName = AbstractFiDir.DEFAULT_PROPERTIES_FILENAME;
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
@@ -1638,7 +1351,7 @@ public class StatementPanel extends JPanel {
         if (bean == null) {
             return null;
         }
-        AbstractUpdateFiDir updater = bean.getUpdater();
+        AbstractFiDir updater = bean.getUpdater();
         if (updater == null) {
             return null;
         }
@@ -1658,20 +1371,20 @@ public class StatementPanel extends JPanel {
         }
 
         // setText(fiResponseTextArea, file);
-        Reader in = null;
+        Reader reader = null;
         try {
-            in = new BufferedReader(new FileReader(file));
-            textArea.read(in, fileName);
+            reader = new BufferedReader(new FileReader(file));
+            textArea.read(reader, fileName);
         } catch (IOException e) {
             LOGGER.error(e);
         } finally {
-            if (in != null) {
+            if (reader != null) {
                 try {
-                    in.close();
+                    reader.close();
                 } catch (IOException e) {
                     LOGGER.warn(e);
                 } finally {
-                    in = null;
+                    reader = null;
                 }
             }
         }

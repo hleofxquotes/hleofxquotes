@@ -5,16 +5,16 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
+import com.hungle.tools.moneyutils.fi.ResponseUtils;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class CheckRespFileV2Main.
  */
-public class CheckRespFileV2Main {
+public class CheckRespFileV2Cmd {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(CheckRespFileV2Main.class);
+    private static final Logger LOGGER = Logger.getLogger(CheckRespFileV2Cmd.class);
 
     /**
      * The main method.
@@ -27,14 +27,14 @@ public class CheckRespFileV2Main {
         if (args.length == 1) {
             respFile = new File(args[0]);
         } else {
-            Class<CheckRespFileV2Main> clz = CheckRespFileV2Main.class;
+            Class<CheckRespFileV2Cmd> clz = CheckRespFileV2Cmd.class;
             System.out.println("Usage: java " + clz.getName() + " resp.ofx");
             System.exit(1);
         }
         try {
-            AbstractUpdateFiDir.checkRespFileV2(respFile);
+            ResponseUtils.checkRespFileV2(respFile);
         } catch (IOException e) {
-            log.error(e, e);
+            LOGGER.error(e, e);
         }
     }
 

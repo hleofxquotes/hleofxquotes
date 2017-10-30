@@ -26,8 +26,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir;
-import com.hungle.tools.moneyutils.fi.DefaultUpdateFiDir;
+import com.hungle.tools.moneyutils.fi.AbstractFiDir;
+import com.hungle.tools.moneyutils.fi.DefaultFiDir;
 import com.hungle.tools.moneyutils.fi.VelocityUtils;
 import com.hungle.tools.moneyutils.fi.props.OFX;
 
@@ -43,7 +43,7 @@ public class CheckOfxVersion {
     /**
      * The Class MyUpdateFiDir.
      */
-    private final class MyUpdateFiDir extends DefaultUpdateFiDir {
+    private final class MyFiDir extends DefaultFiDir {
         
         /** The version. */
         private final String version;
@@ -55,7 +55,7 @@ public class CheckOfxVersion {
          * @param version the version
          * @throws IOException Signals that an I/O exception has occurred.
          */
-        private MyUpdateFiDir(File dir, String version) throws IOException {
+        private MyFiDir(File dir, String version) throws IOException {
             super(dir);
             this.version = version;
         }
@@ -295,7 +295,7 @@ public class CheckOfxVersion {
      * @param responseFile the response file
      * @param updater the updater
      */
-    protected void notifyVersionIsSupported(String version, File responseFile, AbstractUpdateFiDir updater) {
+    protected void notifyVersionIsSupported(String version, File responseFile, AbstractFiDir updater) {
         LOGGER.info("OK. version=" + version + " is supported.");
         try {
             parseAccountInquiryResponse(version, updater.getRespFile());
@@ -326,14 +326,14 @@ public class CheckOfxVersion {
         LOGGER.info("");
         LOGGER.info("Checking if FI supports version=" + version);
         boolean isSupported = false;
-        AbstractUpdateFiDir updater = null;
+        AbstractFiDir updater = null;
         try {
-            updater = new MyUpdateFiDir(dir, version);
+            updater = new MyFiDir(dir, version);
             String type = "accountInquiry-" + version;
             updater.setTemplate(type + ".vm");
             updater.setRequestFileName(type + "-req.ofx");
             updater.setRespFileName(type + "-resp.ofx");
-            updater.update();
+            updater.sendRequest();
             isSupported = true;
             notifyVersionIsSupported(version, updater.getRespFile(), updater);
         } catch (Exception e) {
