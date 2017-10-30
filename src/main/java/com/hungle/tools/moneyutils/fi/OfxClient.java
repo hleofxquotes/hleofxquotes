@@ -20,6 +20,8 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.AbstractHttpEntity;
@@ -40,10 +42,10 @@ import com.hungle.tools.moneyutils.ofx.quotes.net.HttpUtils;
 /**
  * The Class OfxPostClient.
  */
-public class OfxPostClient {
+public class OfxClient {
 
     /** The Constant LOGGER. */
-    private static final Logger LOGGER = Logger.getLogger(OfxPostClient.class);
+    private static final Logger LOGGER = Logger.getLogger(OfxClient.class);
 
     /**
      * Send request.
@@ -102,25 +104,32 @@ public class OfxPostClient {
      * @return the closeable http client
      */
     private CloseableHttpClient createHttpClient(OfxPostClientParams params) {
+
+
+
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setCookieSpec(CookieSpecs.STANDARD)
+                .build();
+        
+        httpClientBuilder.setDefaultRequestConfig(requestConfig);
+        
         HttpRequestInterceptor requestInterceptor = null;
-
-        CloseableHttpClient client = null;
-
         if (uriStringContains(params, "discovercard.com")) {
             requestInterceptor = new DiscoverHttpRequestInterceptor();
-        }
+        }        
         if (requestInterceptor != null) {
-            client = HttpClientBuilder.create().addInterceptorLast(requestInterceptor).build();
-        } else {
-            client = HttpClientBuilder.create().build();
+            httpClientBuilder = httpClientBuilder.addInterceptorLast(requestInterceptor);
         }
-        return client;
+
+        return httpClientBuilder.build();
     }
 
-    private boolean uriStringContains(OfxPostClientParams params, String string) {
+    private static final boolean uriStringContains(OfxPostClientParams params, String targetString) {
         String uriString = params.getUriString();
         if (StringUtils.isNotBlank(uriString)) {
-            if (uriString.contains(string)) {
+            if (uriString.contains(targetString)) {
                 return true;
             }
         }
@@ -148,7 +157,9 @@ public class OfxPostClient {
         try {
             InputStream in = responseEntity.getContent();
             Charset charset = HttpUtils.getCharset(responseEntity);
-            LOGGER.info("charset=" + charset);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("charset=" + charset);
+            }
             reader = new BufferedReader(new InputStreamReader(in, charset));
 
             saveResponse(reader, params);
@@ -174,7 +185,9 @@ public class OfxPostClient {
      *             Signals that an I/O exception has occurred.
      */
     protected void checkResponseStatus(HttpResponse response, HttpEntity responseEntity) throws IOException {
-        LOGGER.info("status=" + response.getStatusLine());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("status=" + response.getStatusLine());
+        }
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode != HttpStatus.SC_OK) {
             throw new IOException("Resonse is not valid, statusCode=" + statusCode);
@@ -241,7 +254,9 @@ public class OfxPostClient {
         EncryptionHelper encryptionHelper = params.getEncryptionHelper();
 
         if (encryptionHelper == null) {
-            LOGGER.warn("No encryptionHelper. Save response in plain text.");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("No encryptionHelper. Save response in plain text.");
+            }
             respFile = saveResponsePlain(reader, params);
         } else {
             respFile = params.getRespFile();
@@ -285,5 +300,21 @@ public class OfxPostClient {
             }
         }
         return respFile;
+    }
+
+    public void checkUrl(String uriString, OfxPostClientParams params) throws IOException {
+        URI uri = URI.create(uriString);
+
+        CloseableHttpClient httpClient = null;
+        try {
+
+            httpClient = createHttpClient(params);
+            sendHeadRequest(uri, httpClient);
+        } finally {
+            if (httpClient != null) {
+                httpClient.close();
+                httpClient = null;
+            }
+        }
     }
 }

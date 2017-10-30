@@ -8,8 +8,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class OfxUtilsTest.

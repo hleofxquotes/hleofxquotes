@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
  * The Class DiscoverHttpRequestInterceptor.
  */
 public class DiscoverHttpRequestInterceptor extends TransformHttpRequestInterceptor {
-    
+
     /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(DiscoverHttpRequestInterceptor.class);
 
@@ -37,8 +37,11 @@ public class DiscoverHttpRequestInterceptor extends TransformHttpRequestIntercep
 
     }
 
-    /* (non-Javadoc)
-     * @see com.hungle.tools.moneyutils.fi.TransformHttpRequestInterceptor#filterHeaders(org.apache.http.HttpRequest)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.hungle.tools.moneyutils.fi.TransformHttpRequestInterceptor#
+     * filterHeaders(org.apache.http.HttpRequest)
      */
     @Override
     protected Header[] filterHeaders(HttpRequest httpRequest) {
@@ -47,10 +50,14 @@ public class DiscoverHttpRequestInterceptor extends TransformHttpRequestIntercep
         for (Header header : headers) {
             Header transformRequestHeader = transformRequestHeader(header);
             if (transformRequestHeader != null) {
-                LOGGER.info("+" + transformRequestHeader);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("+" + transformRequestHeader);
+                }
                 filteredHeaders.add(transformRequestHeader);
             } else {
-                LOGGER.info("-" + header);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("-" + header);
+                }
             }
         }
         headers = new Header[0];
@@ -58,8 +65,11 @@ public class DiscoverHttpRequestInterceptor extends TransformHttpRequestIntercep
         return headers;
     }
 
-    /* (non-Javadoc)
-     * @see com.hungle.tools.moneyutils.fi.TransformHttpRequestInterceptor#sortHeaders(org.apache.http.Header[])
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.hungle.tools.moneyutils.fi.TransformHttpRequestInterceptor#
+     * sortHeaders(org.apache.http.Header[])
      */
     @Override
     protected Header[] sortHeaders(Header[] headers) {
@@ -77,8 +87,10 @@ public class DiscoverHttpRequestInterceptor extends TransformHttpRequestIntercep
     /**
      * Gets the header.
      *
-     * @param allowHeaderName the allow header name
-     * @param headers the headers
+     * @param allowHeaderName
+     *            the allow header name
+     * @param headers
+     *            the headers
      * @return the header
      */
     private Header getHeader(String allowHeaderName, Header[] headers) {
@@ -93,7 +105,8 @@ public class DiscoverHttpRequestInterceptor extends TransformHttpRequestIntercep
     /**
      * Transform request header.
      *
-     * @param header the header
+     * @param header
+     *            the header
      * @return the header
      */
     private Header transformRequestHeader(Header header) {

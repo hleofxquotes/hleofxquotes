@@ -1,8 +1,11 @@
 package com.hungle.tools.moneyutils.fi.props;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
+
+import javax.swing.filechooser.FileSystemView;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
 
@@ -14,6 +17,9 @@ import org.apache.commons.beanutils.BeanUtilsBean;
 public class FIBean {
     
     public static final String FI_PREFIX = "fi";
+
+    /** The Constant DEFAULT_FI_DIR. */
+    public static final String DEFAULT_FI_DIR = "fi";
 
     /** The name. */
     private String name;
@@ -140,6 +146,20 @@ public class FIBean {
      */
     public void setStartDate(String startDate) {
         this.startDate = startDate;
+    }
+
+    /**
+     * Gets the default fi dir.
+     *
+     * @return the default fi dir
+     */
+    public static final String getDefaultFiDir() {
+        File dir = FileSystemView.getFileSystemView().getDefaultDirectory();
+        if ((dir == null) || (! dir.exists()) || (! dir.isDirectory())) {
+            dir = new File(".");
+        }
+        File fiDir = new File(dir, FIBean.DEFAULT_FI_DIR);
+        return fiDir.getAbsolutePath();
     }
 
     /**

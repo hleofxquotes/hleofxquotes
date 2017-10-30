@@ -9,9 +9,6 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
-import com.hungle.tools.moneyutils.ofx.quotes.Utils;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class SplitToSubListsTest.

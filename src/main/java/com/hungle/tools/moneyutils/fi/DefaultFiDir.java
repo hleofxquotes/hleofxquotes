@@ -32,7 +32,7 @@ public class DefaultFiDir extends AbstractFiDir {
     @Override
     protected void sendRequest(String url, File reqFile, File respFile, HttpProperties httpProperties) throws IOException {
         OfxPostClientParams params = new OfxPostClientParams(url, reqFile, respFile, httpProperties);
-        OfxPostClient ofxPostClient = new OfxPostClient();
+        OfxClient ofxPostClient = new OfxClient();
         ofxPostClient.sendRequest(params);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Created respFile=" + respFile.getAbsolutePath());

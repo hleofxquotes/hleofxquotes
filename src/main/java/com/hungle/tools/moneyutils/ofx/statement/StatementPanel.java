@@ -63,7 +63,6 @@ import com.hungle.tools.moneyutils.fi.AbstractFiDir;
 import com.hungle.tools.moneyutils.fi.DefaultFiDir;
 import com.hungle.tools.moneyutils.fi.props.FIBean;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
-import com.hungle.tools.moneyutils.gui.GUI;
 import com.hungle.tools.moneyutils.gui.StripedTableRenderer;
 import com.hungle.tools.moneyutils.ofx.quotes.ImportUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.StreamConsumer;
@@ -165,7 +164,7 @@ public class StatementPanel extends JPanel {
 
     /** The fi dir. */
     // TODO_FI
-    private File fiDir = new File(GUI.DEFAULT_FI_DIR);
+    private File fiDir = new File(FIBean.DEFAULT_FI_DIR);
 
     /**
      * Instantiates a new statement panel.

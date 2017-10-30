@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +30,6 @@ import org.xml.sax.SAXException;
 
 import com.hungle.tools.moneyutils.fi.AbstractFiDir;
 import com.hungle.tools.moneyutils.fi.DefaultFiDir;
-import com.hungle.tools.moneyutils.fi.VelocityUtils;
 import com.hungle.tools.moneyutils.fi.props.OFX;
 
 // TODO: Auto-generated Javadoc
@@ -180,7 +181,9 @@ public class CheckOfxVersion {
                 nodes = (NodeList) result;
                 for (int i = 0; i < nodes.getLength(); i++) {
                     String bankId = nodes.item(i).getNodeValue();
-                    LOGGER.info("BANKID=" + bankId);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("BANKID=" + bankId);
+                    }
                     bankIds.add(bankId);
                 }
 
@@ -189,11 +192,14 @@ public class CheckOfxVersion {
                 nodes = (NodeList) result;
                 for (int i = 0; i < nodes.getLength(); i++) {
                     String accountId = nodes.item(i).getNodeValue();
-                    LOGGER.info("ACCTID=" + accountId);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("ACCTID=" + accountId);
+                    }
                     accountIds.add(accountId);
                 }
-
-                LOGGER.info("Writing account info to file=" + outFile);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Writing account info to file=" + outFile);
+                }
                 writeAccountInfo(bankIds, accountIds, writer);
             } catch (SAXException e) {
                 throw new IOException(e);
@@ -261,14 +267,39 @@ public class CheckOfxVersion {
      * Notify version is not supported.
      *
      * @param version the version
-     * @param respponseFile the respponse file
+     * @param responseFile the respponse file
      * @param e the e
      */
-    protected void notifyVersionIsNotSupported(String version, File respponseFile, Exception e) {
-        LOGGER.error("Not OK. version=" + version + " is NOT support. " + e.getMessage());
+    protected void notifyVersionIsNotSupported(String version, File responseFile, Exception e) {
+        String exceptionMessage = null;
+        if (e != null) {
+            exceptionMessage = e.getMessage();
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.warn("Not OK. version=" + version + " is NOT support. exception=" + exceptionMessage);
+        }
+        if (responseFile == null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.error("responseFile is null.");
+            }
+            return;
+        }
+        if (! responseFile.exists()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.warn("responseFile=" + responseFile + " does not exist.");
+            }
+            return;
+        }
+        
+        if (LOGGER.isDebugEnabled()) {
+            printFileContent(responseFile);
+        }
+    }
+
+    private void printFileContent(File responseFile) {
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(respponseFile));
+            reader = new BufferedReader(new FileReader(responseFile));
             String line = null;
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
@@ -296,7 +327,9 @@ public class CheckOfxVersion {
      * @param updater the updater
      */
     protected void notifyVersionIsSupported(String version, File responseFile, AbstractFiDir updater) {
-        LOGGER.info("OK. version=" + version + " is supported.");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.info("OK. version=" + version + " is supported.");
+        }
         try {
             parseAccountInquiryResponse(version, updater.getRespFile());
         } catch (IOException e) {
@@ -310,9 +343,15 @@ public class CheckOfxVersion {
      * @param dir the dir
      */
     public void check(File dir) {
+        Map<String, Boolean> resuts = new TreeMap<String, Boolean>();
         String[] versions = { "v2", "v1", };
         for (String version : versions) {
-            checkVersion(dir, version);
+            boolean isSupported = checkVersion(dir, version);
+            resuts.put(version, isSupported);
+        }
+        for(String version: resuts.keySet()) {
+            Boolean isSupported = resuts.get(version);
+            LOGGER.info(version + ", " + isSupported);
         }
     }
 
@@ -321,11 +360,14 @@ public class CheckOfxVersion {
      *
      * @param dir the dir
      * @param version the version
+     * @return 
      */
-    private void checkVersion(File dir, String version) {
-        LOGGER.info("");
-        LOGGER.info("Checking if FI supports version=" + version);
+    private boolean checkVersion(File dir, String version) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> START checking if FI supports version=" + version);
+        }
         boolean isSupported = false;
+        Exception exception = null;
         AbstractFiDir updater = null;
         try {
             updater = new MyFiDir(dir, version);
@@ -333,25 +375,32 @@ public class CheckOfxVersion {
             updater.setTemplate(type + ".vm");
             updater.setRequestFileName(type + "-req.ofx");
             updater.setRespFileName(type + "-resp.ofx");
-            updater.sendRequest();
-            isSupported = true;
-            notifyVersionIsSupported(version, updater.getRespFile(), updater);
+            if (updater.sendRequest()) {
+                isSupported = true;
+            } else {
+                exception = new IOException("SKIP sending request, fi.url is null.");
+                isSupported = false;
+            }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.error(e, e);
-            } else {
-                LOGGER.warn(e);
             }
-            if (isSupported) {
-                notifyVersionIsNotSupported(version, updater.getRespFile(), e);
-            }
+            exception = e;
         } finally {
+            if (isSupported) {            
+                notifyVersionIsSupported(version, updater.getRespFile(), updater);
+            } else {
+                notifyVersionIsNotSupported(version, updater.getRespFile(), exception);
+            }                
             if (updater != null) {
                 updater = null;
             }
-            LOGGER.info("");
-            LOGGER.info("< DONE checking dir=" + dir);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("< DONE checking dir=" + dir);
+            }
         }
+        
+        return isSupported;
     }
 
     /**
@@ -380,7 +429,7 @@ public class CheckOfxVersion {
             System.exit(1);
         }
 
-        VelocityUtils.initVelocity();
+//        VelocityUtils.initVelocity();
 
         CheckOfxVersion checker = new CheckOfxVersion();
         checker.check(args);

@@ -8,8 +8,6 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.VelocityUtils;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class StatementApp.
@@ -72,7 +70,7 @@ public class StatementApp extends JFrame {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        VelocityUtils.initVelocity();
+//        VelocityUtils.initVelocity();
 
         String title = "OFX Statement Downloader";
 

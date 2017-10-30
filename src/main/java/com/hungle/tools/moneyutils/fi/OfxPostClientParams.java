@@ -52,7 +52,9 @@ public class OfxPostClientParams {
         setHttpProperties(httpProperties);
 
         CertificatesChanges trustStrategy = null;
-        LOGGER.info("getCheckSSLCertificate=" + httpProperties.getCheckSSLCertificate());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("getCheckSSLCertificate=" + httpProperties.getCheckSSLCertificate());
+        }
         if (httpProperties.getCheckSSLCertificate()) {
             trustStrategy = new CertificatesChanges(url, respFile);
             trustStrategy.setErrorIfCertificatesChanged(httpProperties.getCheckSSLCertificate());

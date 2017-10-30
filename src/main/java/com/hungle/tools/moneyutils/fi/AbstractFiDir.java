@@ -60,6 +60,10 @@ public abstract class AbstractFiDir {
 
     /** The Constant RESP_FILE_OFX. */
     public static final String RESP_FILE_OFX = "resp.ofx";
+    
+    static {
+        VelocityUtils.initVelocity();
+    }
 
     /**
      * Instantiates a new update fi dir.
@@ -74,7 +78,9 @@ public abstract class AbstractFiDir {
 
     public File generateRequestFileContent() throws IOException {
         String workingTemplate = getWorkingTemplate();
-        LOGGER.info("template=" + workingTemplate);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("template=" + workingTemplate);
+        }
     
         File reqFile = new File(dir, requestFileName);
         generateRequestFileContent(workingTemplate, reqFile);
@@ -90,15 +96,18 @@ public abstract class AbstractFiDir {
     public boolean sendRequest() throws IOException {
         FIBean fi = PropertiesUtils.getFiBean(velocityContext);
         
+        LOGGER.info("FI.name=" + fi.getName());
+        
         String url = fi.getUrl();
         if (PropertiesUtils.isNull(url)) {
-            LOGGER.warn("Skip sending request, fi.url is null");
+            LOGGER.warn("SKIP sending request, fi.url is null");
             return false;
         }
         URI uri = URI.create(url);
 
-        LOGGER.info("FI.name=" + fi.getName());
-        LOGGER.info("Sending request to " + url);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Sending request to " + url);
+        }
 
         this.reqFile = generateRequestFileContent();
 
@@ -106,7 +115,9 @@ public abstract class AbstractFiDir {
         
         HttpProperties httpProperties = PropertiesUtils.getHttpProperties(velocityContext);
         boolean httpsOnly = httpProperties.getHttpsOnly();
-        LOGGER.info("httpsOnly=" + httpsOnly);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("httpsOnly=" + httpsOnly);
+        }
         if (httpsOnly) {
             ensureHttpsAlways(uri);
         }
@@ -168,7 +179,7 @@ public abstract class AbstractFiDir {
         if (!PropertiesUtils.isNull(this.template)) {
             workingTemplate = this.template;
         } else {
-            workingTemplate = VelocityUtils.getTemplateFromContext(velocityContext);
+            workingTemplate = VelocityUtils.getTemplateNameFromContext(velocityContext);
         }
         if (PropertiesUtils.isNull(workingTemplate)) {
             throw new IOException("template is null");
@@ -324,7 +335,9 @@ public abstract class AbstractFiDir {
         if (scheme.compareToIgnoreCase("https") != 0) {
             throw new IOException("URL must be https, uri=" + uri.toString());
         }
-        LOGGER.info("YES, url is https - " + uri.toString());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("YES, url is https - " + uri.toString());
+        }
     }
 
 }

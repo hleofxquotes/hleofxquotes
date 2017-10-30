@@ -72,7 +72,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.TableCellRenderer;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -90,7 +89,7 @@ import com.hungle.tools.moneyutils.bloomberg.BloombergQuoteSourcePanel;
 import com.hungle.tools.moneyutils.data.SymbolMapper;
 import com.hungle.tools.moneyutils.data.SymbolMapperEntry;
 import com.hungle.tools.moneyutils.fi.AbstractFiDir;
-import com.hungle.tools.moneyutils.fi.VelocityUtils;
+import com.hungle.tools.moneyutils.fi.props.FIBean;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.hungle.tools.moneyutils.ft.FtDotComQuoteSourcePanel;
 import com.hungle.tools.moneyutils.fx.UpdateFx;
@@ -149,9 +148,6 @@ public class GUI extends JFrame {
 
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(GUI.class);
-
-    /** The Constant DEFAULT_FI_DIR. */
-    public static final String DEFAULT_FI_DIR = "fi";
 
     /** The Constant VERSION_PREFIX. */
     private static final String VERSION_PREFIX = "Build";
@@ -314,7 +310,7 @@ public class GUI extends JFrame {
 
     /** The fi dir. */
     // TODO_FI
-    private File fiDir = new File(System.getProperty("fi.dir", getDefaultFiDir()));
+    private File fiDir = new File(System.getProperty("fi.dir", FIBean.getDefaultFiDir()));
 
     /**
      * The Class EditRandomizeShareCountAction.
@@ -1313,20 +1309,6 @@ public class GUI extends JFrame {
         if (priceFilterEdit != null) {
             priceFilterEdit.setText("");
         }
-    }
-
-    /**
-     * Gets the default fi dir.
-     *
-     * @return the default fi dir
-     */
-    private String getDefaultFiDir() {
-        File dir = FileSystemView.getFileSystemView().getDefaultDirectory();
-        if ((dir == null) || (! dir.exists()) || (! dir.isDirectory())) {
-            dir = new File(".");
-        }
-        File fiDir = new File(dir, DEFAULT_FI_DIR);
-        return fiDir.getAbsolutePath();
     }
 
     /**
@@ -3108,7 +3090,7 @@ public class GUI extends JFrame {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        VelocityUtils.initVelocity();
+//        VelocityUtils.initVelocity();
 
         String implementationVendorId = "com.le.tools.moneyutils";
         String buildNumber = BuildNumber.findBuilderNumber(implementationVendorId);

@@ -14,28 +14,42 @@ import org.apache.log4j.Logger;
  * The Class TransformHttpRequestInterceptor.
  */
 public class TransformHttpRequestInterceptor implements HttpRequestInterceptor {
-    
+
     /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(TransformHttpRequestInterceptor.class);
 
-    /* (non-Javadoc)
-     * @see org.apache.http.HttpRequestInterceptor#process(org.apache.http.HttpRequest, org.apache.http.protocol.HttpContext)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.http.HttpRequestInterceptor#process(org.apache.http.
+     * HttpRequest, org.apache.http.protocol.HttpContext)
      */
     @Override
     public void process(HttpRequest httpRequest, HttpContext httpContext) throws HttpException, IOException {
-        LOGGER.info("> HttpRequestInterceptor");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> HttpRequestInterceptor");
+        }
 
         Header[] headers = filterHeaders(httpRequest);
         headers = sortHeaders(headers);
-        
-        LOGGER.info("headers.length=" + headers.length);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("headers.length=" + headers.length);
+        }
+        for (int i = 0; i < headers.length; i++) {
+            Header header = headers[i];
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("  header=" + header);
+            }
+        }
         httpRequest.setHeaders(headers);
     }
 
     /**
      * Sort headers.
      *
-     * @param headers the headers
+     * @param headers
+     *            the headers
      * @return the header[]
      */
     protected Header[] sortHeaders(Header[] headers) {
@@ -45,7 +59,8 @@ public class TransformHttpRequestInterceptor implements HttpRequestInterceptor {
     /**
      * Filter headers.
      *
-     * @param httpRequest the http request
+     * @param httpRequest
+     *            the http request
      * @return the header[]
      */
     protected Header[] filterHeaders(HttpRequest httpRequest) {

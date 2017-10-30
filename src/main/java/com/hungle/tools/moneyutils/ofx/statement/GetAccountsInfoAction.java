@@ -5,6 +5,8 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 
+import org.apache.log4j.Logger;
+
 import com.hungle.tools.moneyutils.ofx.quotes.net.CheckOfxVersion;
 
 import ca.odell.glazedlists.EventList;
@@ -13,11 +15,13 @@ import ca.odell.glazedlists.EventList;
  * The Class GetAccountsInfoAction.
  */
 final class GetAccountsInfoAction extends AbstractAction {
-    
+    private static final Logger LOGGER = Logger.getLogger(GetAccountsInfoAction.class);
+
     /**
      * 
      */
     private final StatementPanel statementPanel;
+    
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
@@ -37,6 +41,8 @@ final class GetAccountsInfoAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
+        LOGGER.info("> actionPerformed");
+        
         CheckOfxVersion checkOfxVersion = new CheckOfxVersion();
         EventList<FiBean> beans = this.statementPanel.fiBeansSelectionModel.getSelected();
         for (FiBean bean : beans) {

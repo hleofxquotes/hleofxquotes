@@ -25,7 +25,7 @@ public class UpdateFiDirCmd {
             System.err.println("Usage: java " + clz.getName() + " fiDir1 ...");
             System.exit(1);
         }
-        VelocityUtils.initVelocity();
+//        VelocityUtils.initVelocity();
 
         for (String arg : args) {
             File dir = new File(arg);

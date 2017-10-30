@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.fi.AbstractFiDir;
 import com.hungle.tools.moneyutils.fi.DefaultFiDir;
-import com.hungle.tools.moneyutils.fi.VelocityUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -35,7 +34,7 @@ public class UpdateFiTopDirCmd {
             System.exit(1);
         }
 
-        VelocityUtils.initVelocity();
+//        VelocityUtils.initVelocity();
 
         FileFilter filter = new FileFilter() {
 

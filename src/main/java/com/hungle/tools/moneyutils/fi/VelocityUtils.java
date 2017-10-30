@@ -12,7 +12,6 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
-import com.hungle.tools.moneyutils.fi.props.OFX;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 
 // TODO: Auto-generated Javadoc
@@ -30,7 +29,7 @@ public class VelocityUtils {
      * @param fiContext the fi context
      * @return the velocity context
      */
-    public static VelocityContext createVelocityContext(AbstractFiContext fiContext) {
+    private static VelocityContext createVelocityContext(AbstractFiContext fiContext) {
         VelocityContext context = null;
     
         context = new VelocityContext();
@@ -53,7 +52,7 @@ public class VelocityUtils {
     /**
      * Inits the velocity.
      */
-    public static void initVelocity() {
+    static void initVelocity() {
         Properties props = new Properties();
         props.setProperty("resource.loader", "class");
         props.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
@@ -94,8 +93,8 @@ public class VelocityUtils {
      * @param context the context
      * @return the template from context
      */
-    static String getTemplateFromContext(VelocityContext context) {
-        String requestType = (String) context.get("requestType");
+    static String getTemplateNameFromContext(VelocityContext context) {
+        String requestType = PropertiesUtils.getRequestType(context);
         if (PropertiesUtils.isNull(requestType)) {
             LOGGER.error("Cannot create template, requestType is null");
             return null;

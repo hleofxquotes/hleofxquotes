@@ -40,7 +40,7 @@ public class PropertiesUtils {
 
     private static final String KEY_OFX = "ofx";
 
-    private static final String KEY_REQUEST_TYPE = "requestType";
+    public static final String KEY_REQUEST_TYPE = "requestType";
 
     private static final String KEY_START_DATE = "startDate";
 
