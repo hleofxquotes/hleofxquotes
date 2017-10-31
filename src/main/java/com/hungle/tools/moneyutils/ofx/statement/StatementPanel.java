@@ -97,7 +97,7 @@ public class StatementPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     /** The Constant LOGGER. */
-    static final Logger LOGGER = Logger.getLogger(StatementPanel.class);
+    private static final Logger LOGGER = Logger.getLogger(StatementPanel.class);
 
     /** The Constant CURRENT_CERTIFICATES_TXT. */
     static final String CURRENT_CERTIFICATES_TXT = "currentCertificates.txt";
@@ -163,8 +163,9 @@ public class StatementPanel extends JPanel {
     private JButton showDiffsButton;
 
     /** The fi dir. */
-    // TODO_FI
     private File fiDir = new File(FIBean.DEFAULT_FI_DIR);
+
+    private boolean showProgress = false;
 
     /**
      * Instantiates a new statement panel.
@@ -749,15 +750,18 @@ public class StatementPanel extends JPanel {
      * Refresh bean.
      *
      * @param bean the bean
-     * @param updater the updater
+     * @param fiDir the updater
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    protected void refreshBean(FiBean bean, AbstractFiDir updater) throws IOException {
-        bean.setUpdater(updater);
-        bean.setName(updater.getDir().getName());
-        FIBean fi = updater.getFiBean();
+    protected void refreshBean(FiBean bean, AbstractFiDir fiDir) throws IOException {
+        bean.setUpdater(fiDir);
+        
+        bean.setName(fiDir.getDir().getName());
+        
+        FIBean fi = fiDir.getFiBean();
         if (fi != null) {
             bean.setFi(fi);
+        
             String name = fi.getName();
             if (!PropertiesUtils.isNull(name)) {
                 bean.setName(name);
@@ -771,15 +775,19 @@ public class StatementPanel extends JPanel {
      * @param fiBeans the fi beans
      */
     protected void downloadStatements(final EventList<FiBean> fiBeans) {
-        // progress monitor to show the update progress
-        final ProgressMonitor progressMonitor = new ProgressMonitor(StatementPanel.this,
-                "Downloading ...                                           \t", "", 0, fiBeans.size());
+        ProgressMonitor progressMonitor = null;
+        if (showProgress) {
+            progressMonitor = new ProgressMonitor(StatementPanel.this,
+                    "Downloading ...                                           \t", "", 0, fiBeans.size());
+        }
+        
         updateStarted(fiBeans, progressMonitor);
+        
         Runnable command = new DownloadStatementsTask(fiBeans, progressMonitor) {
 
             @Override
             protected void updateCompleted() {
-              StatementPanel.this.updateCompleted(fiBeans, progressMonitor);
+              StatementPanel.this.updateCompleted(fiBeans, getProgressMonitor());
             }
             
         };
@@ -850,16 +858,12 @@ public class StatementPanel extends JPanel {
      */
     private void updateStarted(final EventList<FiBean> fiBeans, final ProgressMonitor progressMonitor) {
         LOGGER.info("> updateStarted");
-        Runnable doRun = new Runnable() {
 
+        Runnable doRun = new Runnable() {
             @Override
             public void run() {
-                // downloadAllButton.setEnabled(false);
-                // downloadSelectedButton.setEnabled(false);
-                // importAllButton.setEnabled(false);
-                // importSelectedButton.setEnabled(false);
-                // commandView.setEnabled(false);
                 setRecursiveEnabled(commandView, false);
+
                 if (progressMonitor != null) {
                     progressMonitor.setProgress(0);
                 }
@@ -884,14 +888,13 @@ public class StatementPanel extends JPanel {
                     progressMonitor.setProgress(fiBeans.size() + 10);
                 }
                 setRecursiveEnabled(commandView, true);
-                // downloadAllButton.setEnabled(true);
-                // downloadSelectedButton.setEnabled(true);
-                // importAllButton.setEnabled(true);
-                // importSelectedButton.setEnabled(true);
+ 
                 EventList<FiBean> selected = fiBeansSelectionModel.getSelected();
+                
                 if ((selected == null) || (selected.size() == 0)) {
                     updateDetailPane(null);
                 }
+                
                 FiBean lastSelected = null;
                 for (FiBean select : selected) {
                     lastSelected = select;
@@ -913,7 +916,7 @@ public class StatementPanel extends JPanel {
      * @param root the root
      * @param enable the enable
      */
-    protected void setRecursiveEnabled(Container root, boolean enable) {
+    private static final void setRecursiveEnabled(Container root, boolean enable) {
         Component children[] = root.getComponents();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(children.length);
@@ -1080,7 +1083,7 @@ public class StatementPanel extends JPanel {
      * @param tableModel the table model
      * @param table the table
      */
-    private void addStripe(final DefaultEventTableModel<FiBean> tableModel, JTable table) {
+    private static final void addStripe(final DefaultEventTableModel<FiBean> tableModel, JTable table) {
         int cols = table.getColumnModel().getColumnCount();
         for (int i = 0; i < cols; i++) {
             TableColumn column = table.getColumnModel().getColumn(i);
@@ -1164,10 +1167,23 @@ public class StatementPanel extends JPanel {
      * @param bean the bean
      */
     protected void updateDetailPane(FiBean bean) {
+        if (bean != null) {
+            AbstractFiDir updater = bean.getUpdater();
+            if (updater == null) {
+                return;
+            }
+            File dir = updater.getDir();
+            LOGGER.info("dir=" + dir);
+        }
+        
         updateFiPropertiesView(bean);
+        
         updateFiRequestView(bean);
+        
         updateFiResponseView(bean);
+        
         updateFiErrorView(bean);
+        
         updateCertificatesView(bean);
     }
 
@@ -1274,7 +1290,8 @@ public class StatementPanel extends JPanel {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
-                File file = updateToFile(textArea, bean, fileName, false);
+                boolean checkDownloaded = false;
+                File file = updateToFile(fileName, textArea, bean, checkDownloaded);
                 fiPropertiesFile = file;
             }
         };
@@ -1332,19 +1349,19 @@ public class StatementPanel extends JPanel {
      * @return the file
      */
     private File updateToFile(JTextArea textArea, FiBean bean, String fileName) {
-        return updateToFile(textArea, bean, fileName, true);
+        return updateToFile(fileName, textArea, bean, true);
     }
 
     /**
      * Update to file.
-     *
+     * @param fileName the file name
      * @param textArea the text area
      * @param bean the bean
-     * @param fileName the file name
      * @param checkDownloaded the check downloaded
+     *
      * @return the file
      */
-    private File updateToFile(JTextArea textArea, final FiBean bean, String fileName, boolean checkDownloaded) {
+    private File updateToFile(String fileName, JTextArea textArea, final FiBean bean, boolean checkDownloaded) {
         textArea.setText("");
 
         if (bean == null) {
@@ -1370,10 +1387,19 @@ public class StatementPanel extends JPanel {
         }
 
         // setText(fiResponseTextArea, file);
+        String desc = fileName;
+        setFileContentToTextArea(file, desc, textArea);
+
+        textArea.setCaretPosition(0);
+
+        return file;
+    }
+
+    private void setFileContentToTextArea(File file, String desc, JTextArea textArea) {
         Reader reader = null;
         try {
             reader = new BufferedReader(new FileReader(file));
-            textArea.read(reader, fileName);
+            textArea.read(reader, desc);
         } catch (IOException e) {
             LOGGER.error(e);
         } finally {
@@ -1387,10 +1413,6 @@ public class StatementPanel extends JPanel {
                 }
             }
         }
-
-        textArea.setCaretPosition(0);
-
-        return file;
     }
 
     /**
@@ -1453,6 +1475,14 @@ public class StatementPanel extends JPanel {
     public void setFiDir(File fiDir) {
         this.fiDir = fiDir;
         LOGGER.info("fi.dir=" + this.fiDir);
+    }
+
+    public boolean isShowProgress() {
+        return showProgress;
+    }
+
+    public void setShowProgress(boolean showProgress) {
+        this.showProgress = showProgress;
     }
 
 }

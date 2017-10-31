@@ -19,6 +19,10 @@ abstract class DownloadStatementsTask implements Runnable {
     /** The progress monitor. */
     private final ProgressMonitor progressMonitor;
 
+    public ProgressMonitor getProgressMonitor() {
+        return progressMonitor;
+    }
+
     /** The fi beans. */
     private final EventList<FiBean> fiBeans;
 

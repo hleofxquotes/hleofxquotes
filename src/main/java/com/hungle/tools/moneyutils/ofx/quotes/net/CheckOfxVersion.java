@@ -3,6 +3,7 @@ package com.hungle.tools.moneyutils.ofx.quotes.net;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -37,35 +38,47 @@ import com.hungle.tools.moneyutils.fi.props.OFX;
  * The Class CheckOfxVersion.
  */
 public class CheckOfxVersion {
-    
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(CheckOfxVersion.class);
-    
+
     /**
      * The Class MyUpdateFiDir.
      */
     private final class MyFiDir extends DefaultFiDir {
-        
+
         /** The version. */
         private final String version;
-    
+
         /**
          * Instantiates a new my update fi dir.
          *
-         * @param dir the dir
-         * @param version the version
-         * @throws IOException Signals that an I/O exception has occurred.
+         * @param dir
+         *            the dir
+         * @param version
+         *            the version
+         * @throws IOException
+         *             Signals that an I/O exception has occurred.
          */
         private MyFiDir(File dir, String version) throws IOException {
             super(dir);
             this.version = version;
         }
-    
-        /* (non-Javadoc)
-         * @see com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir#checkRespFile(java.io.File, com.hungle.tools.moneyutils.fi.props.OFX)
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see
+         * com.hungle.tools.moneyutils.fi.AbstractUpdateFiDir#checkRespFile(java
+         * .io.File, com.hungle.tools.moneyutils.fi.props.OFX)
          */
         @Override
         protected void checkRespFile(File respFile, OFX ofx) throws IOException {
+            setOfxVersion(ofx);
+            super.checkRespFile(respFile, ofx);
+        }
+
+        private void setOfxVersion(OFX ofx) {
             if (version.compareToIgnoreCase("v1") == 0) {
                 ofx.setVersion("1");
             } else if (version.compareToIgnoreCase("v2") == 0) {
@@ -73,148 +86,183 @@ public class CheckOfxVersion {
             } else {
                 ofx.setVersion("1");
             }
-            super.checkRespFile(respFile, ofx);
         }
     }
 
     /** The account id pattern. */
     private Pattern accountIdPattern = Pattern.compile("\\<ACCTID\\>" + "([a-zA-Z0-9]+)");
-    
+
     /** The bank id pattern. */
     private Pattern bankIdPattern = Pattern.compile("\\<BANKID\\>" + "([a-zA-Z0-9]+)");
 
     /**
      * Parses the account inquiry response.
      *
-     * @param version the version
-     * @param respFile the resp file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param version
+     *            the version
+     * @param respFile
+     *            the resp file
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     protected void parseAccountInquiryResponse(String version, File respFile) throws IOException {
         List<String> bankIds = new ArrayList<String>();
         List<String> accountIds = new ArrayList<String>();
 
         if (version.equals("v1")) {
+            parseAccountInquiryResponseV1(version, respFile, bankIds, accountIds);
+        } else if (version.equals("v2")) {
+            parseAccountInquiryResponseV2(version, respFile, bankIds, accountIds);
+        }
+    }
+
+    private void parseAccountInquiryResponseV2(String version, File respFile, List<String> bankIds,
+            List<String> accountIds) throws IOException {
+        PrintWriter writer = null;
+        try {
             bankIds.clear();
             accountIds.clear();
 
-            File outFile = new File(respFile.getAbsoluteFile().getParentFile(), "accountInquiry-" + version + "-info.txt");
-            PrintWriter writer = null;
-            BufferedReader reader = null;
+            File outFile = new File(respFile.getAbsoluteFile().getParentFile(),
+                    "accountInquiry-" + version + "-info.txt");
 
-            Matcher matcher = null;
-            try {
-                reader = new BufferedReader(new FileReader(respFile));
-                writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(line);
-                    }
-                    matcher = bankIdPattern.matcher(line);
-                    while (matcher.find()) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("MATCHED=" + matcher.group());
-                        }
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(respFile);
+            doc.getDocumentElement().normalize();
 
-                        if (matcher.groupCount() != 1) {
-                            LOGGER.warn("Matcher found more than one group");
-                        } else {
-                            String bankId = matcher.group(1);
-                            LOGGER.info("BANKID=" + bankId);
-                            bankIds.add(bankId);
-                        }
-                    }
+            writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
 
-                    matcher = accountIdPattern.matcher(line);
-                    while (matcher.find()) {
-                        LOGGER.info("MATCHED=" + matcher.group());
-                        if (matcher.groupCount() != 1) {
-                            LOGGER.warn("Matcher found more than one group");
-                        } else {
-                            String accountId = matcher.group(1);
-                            LOGGER.info("ACCTID=" + accountId);
-                            accountIds.add(accountId);
-                        }
-                    }
-                }
-                LOGGER.info("Writing account info to file=" + outFile);
-                writeAccountInfo(bankIds, accountIds, writer);
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        reader = null;
-                    }
-                }
-                if (writer != null) {
-                    try {
-                        writer.close();
-                    } finally {
-                        writer = null;
-                    }
+            XPathFactory factory = XPathFactory.newInstance();
+            XPath xpath = factory.newXPath();
+
+            findBANKIDV2(doc, xpath, bankIds);
+
+            findACCTIDV2(doc, xpath, accountIds);
+
+            LOGGER.info("Writing account info to file=" + outFile);
+            writeAccountInfo(bankIds, accountIds, writer);
+        } catch (SAXException e) {
+            throw new IOException(e);
+        } catch (ParserConfigurationException e) {
+            throw new IOException(e);
+        } catch (XPathExpressionException e) {
+            throw new IOException(e);
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } finally {
+                    writer = null;
                 }
             }
-        } else if (version.equals("v2")) {
-            PrintWriter writer = null;
-            try {
-                bankIds.clear();
-                accountIds.clear();
+        }
+    }
 
-                File outFile = new File(respFile.getAbsoluteFile().getParentFile(), "accountInquiry-" + version + "-info.txt");
+    private void findACCTIDV2(Document doc, XPath xpath, List<String> accountIds) throws XPathExpressionException {
+        Object result;
+        NodeList nodes;
+        XPathExpression accountIdExpression = xpath.compile("//ACCTID/text()");
+        result = accountIdExpression.evaluate(doc, XPathConstants.NODESET);
+        nodes = (NodeList) result;
+        for (int i = 0; i < nodes.getLength(); i++) {
+            String accountId = nodes.item(i).getNodeValue();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("ACCTID=" + accountId);
+            }
+            accountIds.add(accountId);
+        }
+    }
 
-                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-                Document doc = dBuilder.parse(respFile);
-                doc.getDocumentElement().normalize();
+    private void findBANKIDV2(Document doc, XPath xpath, List<String> bankIds) throws XPathExpressionException {
+        Object result;
+        NodeList nodes;
+        XPathExpression bankIdExpression = xpath.compile("//BANKID/text()");
+        result = bankIdExpression.evaluate(doc, XPathConstants.NODESET);
+        nodes = (NodeList) result;
+        for (int i = 0; i < nodes.getLength(); i++) {
+            String bankId = nodes.item(i).getNodeValue();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("BANKID=" + bankId);
+            }
+            bankIds.add(bankId);
+        }
+    }
 
-                writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
+    private void parseAccountInquiryResponseV1(String version, File respFile, List<String> bankIds,
+            List<String> accountIds) throws FileNotFoundException, IOException {
+        bankIds.clear();
+        accountIds.clear();
 
-                Object result = null;
-                NodeList nodes = null;
-                XPathFactory factory = XPathFactory.newInstance();
-                XPath xpath = factory.newXPath();
+        File outFile = new File(respFile.getAbsoluteFile().getParentFile(), "accountInquiry-" + version + "-info.txt");
+        PrintWriter writer = null;
+        BufferedReader reader = null;
 
-                XPathExpression bankIdExpression = xpath.compile("//BANKID/text()");
-                result = bankIdExpression.evaluate(doc, XPathConstants.NODESET);
-                nodes = (NodeList) result;
-                for (int i = 0; i < nodes.getLength(); i++) {
-                    String bankId = nodes.item(i).getNodeValue();
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("BANKID=" + bankId);
-                    }
-                    bankIds.add(bankId);
-                }
-
-                XPathExpression accountIdExpression = xpath.compile("//ACCTID/text()");
-                result = accountIdExpression.evaluate(doc, XPathConstants.NODESET);
-                nodes = (NodeList) result;
-                for (int i = 0; i < nodes.getLength(); i++) {
-                    String accountId = nodes.item(i).getNodeValue();
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("ACCTID=" + accountId);
-                    }
-                    accountIds.add(accountId);
-                }
+        try {
+            reader = new BufferedReader(new FileReader(respFile));
+            writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Writing account info to file=" + outFile);
+                    LOGGER.debug(line);
                 }
-                writeAccountInfo(bankIds, accountIds, writer);
-            } catch (SAXException e) {
-                throw new IOException(e);
-            } catch (ParserConfigurationException e) {
-                throw new IOException(e);
-            } catch (XPathExpressionException e) {
-                throw new IOException(e);
-            } finally {
-                if (writer != null) {
-                    try {
-                        writer.close();
-                    } finally {
-                        writer = null;
-                    }
+
+                findBANKIDV1(line, bankIds);
+
+                findACCTIDV1(line, accountIds);
+            }
+
+            LOGGER.info("Writing account info to file=" + outFile);
+            writeAccountInfo(bankIds, accountIds, writer);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    reader = null;
                 }
+            }
+            if (writer != null) {
+                try {
+                    writer.close();
+                } finally {
+                    writer = null;
+                }
+            }
+        }
+    }
+
+    private void findACCTIDV1(String line, List<String> accountIds) {
+        Matcher matcher;
+        matcher = accountIdPattern.matcher(line);
+        while (matcher.find()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("MATCHED=" + matcher.group());
+            }
+            if (matcher.groupCount() != 1) {
+                LOGGER.warn("Matcher found more than one group");
+            } else {
+                String accountId = matcher.group(1);
+                LOGGER.info("ACCTID=" + accountId);
+                accountIds.add(accountId);
+            }
+        }
+    }
+
+    private void findBANKIDV1(String line, List<String> bankIds) {
+        Matcher matcher;
+        matcher = bankIdPattern.matcher(line);
+        while (matcher.find()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("MATCHED=" + matcher.group());
+            }
+
+            if (matcher.groupCount() != 1) {
+                LOGGER.warn("Matcher found more than one group");
+            } else {
+                String bankId = matcher.group(1);
+                LOGGER.info("BANKID=" + bankId);
+                bankIds.add(bankId);
             }
         }
     }
@@ -222,9 +270,12 @@ public class CheckOfxVersion {
     /**
      * Write account info.
      *
-     * @param bankIds the bank ids
-     * @param accountIds the account ids
-     * @param writer the writer
+     * @param bankIds
+     *            the bank ids
+     * @param accountIds
+     *            the account ids
+     * @param writer
+     *            the writer
      */
     private void writeAccountInfo(List<String> bankIds, List<String> accountIds, PrintWriter writer) {
         int bankIdsCount = bankIds.size();
@@ -260,15 +311,19 @@ public class CheckOfxVersion {
                 writer.println("account." + (i + 1) + ".id=" + lastAccountId);
             }
 
+            writer.flush();
         }
     }
 
     /**
      * Notify version is not supported.
      *
-     * @param version the version
-     * @param responseFile the respponse file
-     * @param e the e
+     * @param version
+     *            the version
+     * @param responseFile
+     *            the respponse file
+     * @param e
+     *            the e
      */
     protected void notifyVersionIsNotSupported(String version, File responseFile, Exception e) {
         String exceptionMessage = null;
@@ -284,13 +339,13 @@ public class CheckOfxVersion {
             }
             return;
         }
-        if (! responseFile.exists()) {
+        if (!responseFile.exists()) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.warn("responseFile=" + responseFile + " does not exist.");
             }
             return;
         }
-        
+
         if (LOGGER.isDebugEnabled()) {
             printFileContent(responseFile);
         }
@@ -322,9 +377,12 @@ public class CheckOfxVersion {
     /**
      * Notify version is supported.
      *
-     * @param version the version
-     * @param responseFile the response file
-     * @param updater the updater
+     * @param version
+     *            the version
+     * @param responseFile
+     *            the response file
+     * @param updater
+     *            the updater
      */
     protected void notifyVersionIsSupported(String version, File responseFile, AbstractFiDir updater) {
         if (LOGGER.isDebugEnabled()) {
@@ -340,7 +398,8 @@ public class CheckOfxVersion {
     /**
      * Check.
      *
-     * @param dir the dir
+     * @param dir
+     *            the dir
      */
     public void check(File dir) {
         Map<String, Boolean> resuts = new TreeMap<String, Boolean>();
@@ -349,7 +408,7 @@ public class CheckOfxVersion {
             boolean isSupported = checkVersion(dir, version);
             resuts.put(version, isSupported);
         }
-        for(String version: resuts.keySet()) {
+        for (String version : resuts.keySet()) {
             Boolean isSupported = resuts.get(version);
             LOGGER.info(version + ", " + isSupported);
         }
@@ -358,9 +417,11 @@ public class CheckOfxVersion {
     /**
      * Check version.
      *
-     * @param dir the dir
-     * @param version the version
-     * @return 
+     * @param dir
+     *            the dir
+     * @param version
+     *            the version
+     * @return
      */
     private boolean checkVersion(File dir, String version) {
         if (LOGGER.isDebugEnabled()) {
@@ -387,11 +448,11 @@ public class CheckOfxVersion {
             }
             exception = e;
         } finally {
-            if (isSupported) {            
+            if (isSupported) {
                 notifyVersionIsSupported(version, updater.getRespFile(), updater);
             } else {
                 notifyVersionIsNotSupported(version, updater.getRespFile(), exception);
-            }                
+            }
             if (updater != null) {
                 updater = null;
             }
@@ -399,17 +460,18 @@ public class CheckOfxVersion {
                 LOGGER.debug("< DONE checking dir=" + dir);
             }
         }
-        
+
         return isSupported;
     }
 
     /**
      * Check.
      *
-     * @param args the args
+     * @param args
+     *            the args
      */
     public void check(String[] args) {
-    
+
         for (String arg : args) {
             File dir = new File(arg);
             LOGGER.info("> START checking dir=" + dir);
@@ -420,7 +482,8 @@ public class CheckOfxVersion {
     /**
      * The main method.
      *
-     * @param args the arguments
+     * @param args
+     *            the arguments
      */
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -429,7 +492,7 @@ public class CheckOfxVersion {
             System.exit(1);
         }
 
-//        VelocityUtils.initVelocity();
+        // VelocityUtils.initVelocity();
 
         CheckOfxVersion checker = new CheckOfxVersion();
         checker.check(args);

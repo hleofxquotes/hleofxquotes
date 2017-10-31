@@ -192,6 +192,8 @@ public class GUI extends JFrame {
 
     /** The Constant PREF_IMPORT_DIALOG_AUTO_CLICK. */
     private static final String PREF_IMPORT_DIALOG_AUTO_CLICK = "importDialogAutoClick";
+    
+    private static final String PREF_SHOW_STATEMENT_PROGRESS = "showStatementProgress";
 
     /** The thread pool. */
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -280,6 +282,8 @@ public class GUI extends JFrame {
 
     /** The account id. */
     private String accountId = PREFS.get(PREF_ACCOUNT_ID, OfxPriceInfo.DEFAULT_ACCOUNT_ID);
+
+    private boolean showStatementProgress = PREFS.getBoolean(PREF_SHOW_STATEMENT_PROGRESS, Boolean.FALSE);
 
     /** The account id label. */
     private JLabel accountIdLabel;
@@ -1676,13 +1680,47 @@ public class GUI extends JFrame {
      */
     private void addToolsMenu(JMenuBar menubar) {
         JMenu menu = null;
-        // JMenuItem menuItem = null;
 
         menu = new JMenu("Tools");
 
+        addAutoClickToolMenuItem(menu);
+        
+        addShowStatementProgressMenuItem(menu);
+
+        menubar.add(menu);
+    }
+
+    private void addShowStatementProgressMenuItem(JMenu menu) {
+        JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem("Show statement progress");
+        ActionListener listener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                AbstractButton aButton = (AbstractButton) event.getSource();
+                boolean selected = aButton.getModel().isSelected();
+                if (selected) {
+                    showStatementProgress = Boolean.TRUE;
+                } else {
+                    showStatementProgress = Boolean.FALSE;
+                }
+                PREFS.putBoolean(PREF_SHOW_STATEMENT_PROGRESS, showStatementProgress);
+                if (downloadView != null) {
+                    downloadView.setShowProgress(showStatementProgress);
+                }
+            }
+        };
+        menuItem.addActionListener(listener);
+        
+        if (downloadView != null) {
+            downloadView.setShowProgress(showStatementProgress);
+        }
+        menuItem.setSelected(showStatementProgress);
+        menu.add(menuItem);       
+    }
+
+    private void addAutoClickToolMenuItem(JMenu menu) {
         importDialogAutoClickService = new ImportDialogAutoClickService();
 
-        JCheckBoxMenuItem importAutoClick = new JCheckBoxMenuItem("Import dialog auto-click");
+        JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem("Import dialog auto-click");
         ActionListener listener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -1697,13 +1735,11 @@ public class GUI extends JFrame {
                 }
             }
         };
-        importAutoClick.addActionListener(listener);
+        menuItem.addActionListener(listener);
         Boolean autoClick = PREFS.getBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
-        importAutoClick.setSelected(autoClick);
+        menuItem.setSelected(autoClick);
         importDialogAutoClickService.setEnable(autoClick);
-        menu.add(importAutoClick);
-
-        menubar.add(menu);
+        menu.add(menuItem);
     }
 
     /**
@@ -2088,6 +2124,7 @@ public class GUI extends JFrame {
 
         // TAB: #2
         downloadView = new StatementPanel();
+        downloadView.setShowProgress(showStatementProgress);
         downloadView.setFiDir(getFiDir());
         downloadView.refreshFiDir();
         mainTabbed.addTab("Statements", downloadView);

@@ -11,10 +11,14 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
+
 import difflib.Delta;
 import difflib.DiffUtils;
 
 final class ShowDiffTask extends AbstractAction {
+    private static final Logger LOGGER = Logger.getLogger(ShowDiffTask.class);
+
     /**
      * 
      */
@@ -31,8 +35,8 @@ final class ShowDiffTask extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        StatementPanel.LOGGER.info("###");
-        StatementPanel.LOGGER.info("> Show Diffs: " + this.statementPanel.detailsForBean.getFiUrl());
+        LOGGER.info("###");
+        LOGGER.info("> Show Diffs: " + this.statementPanel.detailsForBean.getFiUrl());
         if (this.statementPanel.detailsForBean == null) {
             return;
         }
@@ -46,7 +50,7 @@ final class ShowDiffTask extends AbstractAction {
             List<String> revised = fileToLines(currentCertificates.getAbsolutePath());
             difflib.Patch<String> patch = DiffUtils.diff(original, revised);
             for (Delta<?> delta : patch.getDeltas()) {
-                StatementPanel.LOGGER.info(delta);
+                LOGGER.info(delta);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this.statementPanel, e.toString(),

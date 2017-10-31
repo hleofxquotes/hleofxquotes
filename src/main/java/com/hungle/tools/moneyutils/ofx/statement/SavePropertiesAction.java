@@ -12,6 +12,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Logger;
+
 import com.hungle.tools.moneyutils.fi.AbstractFiDir;
 import com.hungle.tools.moneyutils.fi.DefaultFiDir;
 
@@ -19,6 +21,8 @@ import com.hungle.tools.moneyutils.fi.DefaultFiDir;
  * The Class SavePropertiesAction.
  */
 final class SavePropertiesAction extends AbstractAction {
+    private static final Logger LOGGER = Logger.getLogger(SavePropertiesAction.class);
+
     
     /**
      * 
@@ -43,7 +47,7 @@ final class SavePropertiesAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent event) {
-        StatementPanel.LOGGER.info("> saving " + this.statementPanel.fiPropertiesFile);
+        LOGGER.info("> saving " + this.statementPanel.fiPropertiesFile);
 
         JTextArea textArea = this.statementPanel.fiPropertiesTextArea;
         if (textArea == null) {
@@ -56,40 +60,48 @@ final class SavePropertiesAction extends AbstractAction {
         try {
             writer = new BufferedWriter(new FileWriter(this.statementPanel.fiPropertiesFile));
             textArea.write(writer);
+            
             Runnable doRun = new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        File d = SavePropertiesAction.this.statementPanel.fiPropertiesFile.getAbsoluteFile().getParentFile();
-                        FiBean bean = SavePropertiesAction.this.statementPanel.detailsForBean;
+                        StatementPanel panel = SavePropertiesAction.this.statementPanel;
+                        
+                        File d = panel.fiPropertiesFile.getAbsoluteFile().getParentFile();
+                        FiBean bean = panel.detailsForBean;
                         if (bean == null) {
                             return;
                         }
-                        AbstractFiDir updater = new DefaultFiDir(d);
-                        SavePropertiesAction.this.statementPanel.refreshBean(bean, updater);
+                        AbstractFiDir fiDir = new DefaultFiDir(d);
+                        panel.refreshBean(bean, fiDir);
                     } catch (IOException e) {
-                        StatementPanel.LOGGER.error(e, e);
+                        LOGGER.error(e, e);
                     } finally {
                     }
                 }
             };
             SwingUtilities.invokeLater(doRun);
         } catch (IOException e) {
-            StatementPanel.LOGGER.error(e);
+            LOGGER.error(e);
         } finally {
             if (writer != null) {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    StatementPanel.LOGGER.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     writer = null;
                 }
             }
-            JOptionPane.showMessageDialog(this.statementPanel,
-                    "File:\n" + this.statementPanel.fiPropertiesFile.getAbsolutePath() + " is saved.", "File saved",
-                    JOptionPane.PLAIN_MESSAGE);
-            StatementPanel.LOGGER.info("< DONE saving " + this.statementPanel.fiPropertiesFile);
+            
+            boolean showMessageDialog = true;
+            if (showMessageDialog) {
+                JOptionPane.showMessageDialog(this.statementPanel,
+                        "File:\n" + this.statementPanel.fiPropertiesFile.getAbsolutePath() + " is saved.", "File saved",
+                        JOptionPane.PLAIN_MESSAGE);
+            }
+            
+            LOGGER.info("< DONE saving " + this.statementPanel.fiPropertiesFile);
         }
     }
 }
