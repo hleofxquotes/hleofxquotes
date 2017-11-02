@@ -7,11 +7,12 @@ import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
-import junit.framework.Assert;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -30,6 +31,7 @@ public class YahooQuotesGetterTest {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	@Test
+	@Ignore
 	public void testGet() throws ClientProtocolException, URISyntaxException, IOException {
 		YahooQuotesGetter quoteGetter = new YahooQuotesGetter();
 		try {

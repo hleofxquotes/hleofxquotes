@@ -181,7 +181,7 @@ public class OfxUtils {
      * @param obj the obj
      * @return the resource
      */
-    private static URL getResource(String name, Object obj) {
+    public static URL getResource(String name, Object obj) {
         if (obj == null) {
             obj = name;
         }
