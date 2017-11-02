@@ -115,6 +115,7 @@ import com.hungle.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel;
 import com.hungle.tools.moneyutils.yahoo.YahooHistoricalSourcePanel;
 import com.hungle.tools.moneyutils.yahoo.YahooQuoteSourcePanel;
 import com.hungle.tools.moneyutils.yahoo.YahooQuotesGetter;
+import com.hungle.tools.moneyutils.yahoo.YahooScreenScrapper2SourcePanel;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -315,6 +316,8 @@ public class GUI extends JFrame {
     /** The fi dir. */
     // TODO_FI
     private File fiDir = new File(System.getProperty("fi.dir", FIBean.getDefaultFiDir()));
+
+	private YahooScreenScrapper2SourcePanel yahooScreenScrapper2SourcePanel;
 
     /**
      * The Class EditRandomizeShareCountAction.
@@ -2248,7 +2251,12 @@ public class GUI extends JFrame {
 //            LOGGER.debug("> creating createBloombergSourceView");
 //        }
 //        tabbedPane.addTab("Bloomberg", createBloombergSourceView());
-//
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("> creating createYahooScreenScrapper2SourceView");
+		}
+		tabbedPane.addTab("Yahoo2", createYahooScreenScrapper2SourceView());
+        
 //        if (LOGGER.isDebugEnabled()) {
 //            LOGGER.debug("> creating createTIAACREFQuoteSourceView");
 //        }
@@ -2313,6 +2321,12 @@ public class GUI extends JFrame {
         return view;
     }
 
+    private Component createYahooScreenScrapper2SourceView() {
+        final YahooScreenScrapper2SourcePanel view = new YahooScreenScrapper2SourcePanel(this);
+        this.yahooScreenScrapper2SourcePanel = view;
+        return view;
+    }
+    
     /**
      * Creates the TIAACREF quote source view.
      *

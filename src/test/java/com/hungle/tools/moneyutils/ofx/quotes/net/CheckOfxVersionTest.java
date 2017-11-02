@@ -19,8 +19,14 @@ public class CheckOfxVersionTest {
         CheckOfxVersion checker = new CheckOfxVersion();
 
         File fiDir = new File(FIBean.getDefaultFiDir());
-
+        if (fiDir == null) {
+        	return;
+        }
+        
         File[] dirs = fiDir.listFiles();
+        if (dirs == null) {
+        	return;
+        }
         for (File dir : dirs) {
             if (!dir.isDirectory()) {
                 continue;
