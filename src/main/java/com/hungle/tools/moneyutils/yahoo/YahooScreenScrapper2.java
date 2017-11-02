@@ -78,34 +78,39 @@ public class YahooScreenScrapper2 implements Closeable {
 				throw new IOException("Cannot find stockInfo JsonNode");
 			}
 
-			String fieldName = "currentPrice";
+			String fieldName = "price";
 			List<JsonNode> parents = nodes.findParents(fieldName);
 			if (parents == null) {
-				throw new IOException("Cannot find stockInfo JsonNode parents");
+				throw new IOException("Cannot find stockInfo JsonNode fielName=" + fieldName);
 			}
 			if (parents.size() != 1) {
-				throw new IOException("Cannot find stockInfo JsonNode parents");
+				throw new IOException("Cannot find stockInfo JsonNode fielName="  + fieldName + ", size=" + parents.size());
 			}
 			
 			JsonNode parent = parents.get(0);
 			if (parent == null) {
-				throw new IOException("Cannot find stockInfo JsonNode parent");
+				throw new IOException("Cannot find stockInfo JsonNode fielName=" + fieldName + ". Got null.");
 			}
-			JsonNode currentPrice = parent.get(fieldName);
-			if (currentPrice == null) {
-				throw new IOException("Cannot find stockInfo JsonNode currentPrice");
+			JsonNode price = parent.get(fieldName);
+			if (price == null) {
+				throw new IOException("Cannot find stockInfo JsonNode price");
 			}
 
-			String raw = currentPrice.get("raw").asText();
-			if (raw == null) {
-				throw new IOException("Cannot find stockInfo JsonNode currentPrice.raw");
+			fieldName = "regularMarketPrice";
+			JsonNode regularMarketPrice = price.get("regularMarketPrice");
+			if (regularMarketPrice == null) {
+				throw new IOException("Cannot find stockInfo JsonNode fielName=" + fieldName);
 			}
-			Double price = Double.parseDouble(raw);
+			String raw = regularMarketPrice.get("raw").asText();
+			if (raw == null) {
+				throw new IOException("Cannot find stockInfo JsonNode regularMarketPrice.raw");
+			}
+			Double priceValue = Double.parseDouble(raw);
 			// String fmt = currentPrice.get("fmt").asText();
 
 			stockInfo = new YahooScreenScrapper2StockInfo();
 			stockInfo.setSymbol(stockSymbol);
-			stockInfo.setPrice(price);
+			stockInfo.setPrice(priceValue);
 
 		} catch (UnsupportedOperationException e) {
 			throw new IOException(e);
