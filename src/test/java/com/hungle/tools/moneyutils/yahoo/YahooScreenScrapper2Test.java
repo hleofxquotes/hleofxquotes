@@ -150,8 +150,10 @@ public class YahooScreenScrapper2Test {
 		try {
 			scrapper = new YahooScreenScrapper2();
 
-			String[] stockSymbols = { "TSLA", "AAPL", "INVALID", };
+			String[] stockSymbols1 = { "TSLA", "AAPL", "VWINX", "INVALID", };
+			String[] stockSymbols2 = { "VWINX",};
 
+			String[] stockSymbols = stockSymbols1;
 			for (String stockSymbol : stockSymbols) {
 				try {
 					YahooScreenScrapper2StockInfo stockInfo = scrapper.getStockInfo(stockSymbol);
