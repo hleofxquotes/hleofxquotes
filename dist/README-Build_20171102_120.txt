@@ -1,0 +1,43 @@
+Thu Nov  2 16:32:20 PDT 2017
+
+  File: 
+20211857 Nov  2 16:30 hleOfxQuotes-Build_20171102_120-app.jar
+
+  This is an emergency build to support an alternate Yahoo quote source. (Yahoo2)
+
+  Caveat
+
+  * You will need Java 1.8 (see below)
+
+  * It has not been much tested. It works for me and I am sharing ;-)
+
+  * It will be a bit slower than the "original Yahoo quote source" if you have a lot of symbols: 
+    we have to look up the symbol one at the time.
+
+  * Double-click on the jar file might work. Otherwise, open a command-line window and type in
+   java -jar hleOfxQuotes-Build_20171102_120-app.jar
+
+   You can rename hleOfxQuotes-Build_20171102_120-app.jar to something shorter if you like
+
+  * Once started, select the tab label 'Yahoo2', enter symbols (you can copy and paste from the 'original'
+    Yahoo tab.
+
+Java 1.8
+
+  You will need Java 1.8 or later. Otherwise, you will get error looking something like this
+
+Exception in thread "main" java.lang.UnsupportedClassVersionError: app/GUI : Unsupported major.minor version 52.0
+	at java.lang.ClassLoader.defineClass1(Native Method)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:803)
+	at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:142)
+	at java.net.URLClassLoader.defineClass(URLClassLoader.java:442)
+	at java.net.URLClassLoader.access$100(URLClassLoader.java:64)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:354)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:348)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:347)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:425)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:312)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:358)
+	at sun.launcher.LauncherHelper.checkAndLoadMain(LauncherHelper.java:482)
+
