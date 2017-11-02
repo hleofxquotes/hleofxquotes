@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,6 +37,7 @@ public class YahooScreenScrapper2Test {
 	}
 
 	@Test
+	@Ignore
 	public void testParseLocalFile() throws IOException {
 		String name = "TSLA.html";
 		URL url = OfxUtils.getResource(name, this);
