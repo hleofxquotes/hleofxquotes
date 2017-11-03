@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -107,10 +108,15 @@ public class YahooScreenScrapper2 implements Closeable {
 			}
 			Double priceValue = Double.parseDouble(raw);
 			// String fmt = currentPrice.get("fmt").asText();
+			
+			String shortName = price.get("shortName").asText();
 
 			stockInfo = new YahooScreenScrapper2StockInfo();
 			stockInfo.setSymbol(stockSymbol);
 			stockInfo.setPrice(priceValue);
+			Date lastTrade = null;
+			stockInfo.setLastTrade(lastTrade);
+			stockInfo.setName(shortName);
 
 		} catch (UnsupportedOperationException e) {
 			throw new IOException(e);

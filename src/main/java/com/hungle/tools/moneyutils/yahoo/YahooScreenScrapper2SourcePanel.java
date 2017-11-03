@@ -1,7 +1,9 @@
 package com.hungle.tools.moneyutils.yahoo;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -14,6 +16,12 @@ import com.hungle.tools.moneyutils.stockprice.StockPrice;
 
 public class YahooScreenScrapper2SourcePanel extends YahooApiQuoteSourcePanel {
 	private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2SourcePanel.class);
+	
+    /** The last trade date formatter. */
+    private SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+    
+    /** The last trade time formatter. */
+    private SimpleDateFormat lastTradeTimeFormatter = new SimpleDateFormat("hh:mm");
 
 	@Override
 	protected List<AbstractStockPrice> getStockQuotes(List<String> stockSymbols) throws IOException {
@@ -41,8 +49,17 @@ public class YahooScreenScrapper2SourcePanel extends YahooApiQuoteSourcePanel {
 						} else {
 							AbstractStockPrice stockPrice = new StockPrice();
 							stockPrice.setStockSymbol(stockSymbol);
-							stockPrice.setStockName(stockSymbol);
+							stockPrice.setStockName(info.getName());
 							stockPrice.setLastPrice(new Price(info.getPrice()));
+							stockPrice.setCurrency(info.getCurrency());
+							
+							Date date = info.getLastTrade();
+							if (date != null) {
+				                stockPrice.setLastTradeDate(lastTradeDateFormatter.format(date));
+				                stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(date));
+				                stockPrice.setLastTrade(date);
+							}
+			                
 							stockPrices.add(stockPrice);
 						}
 					} catch (Exception e) {
