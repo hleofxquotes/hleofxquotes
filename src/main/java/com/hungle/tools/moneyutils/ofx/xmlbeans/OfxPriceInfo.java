@@ -69,11 +69,15 @@ public class OfxPriceInfo {
     /** The Constant log. */
     private final static Logger LOGGER = Logger.getLogger(OfxPriceInfo.class);
 
+    private static final String CUSIP = "CUSIP";
+
+    private static final String TICKER = "TICKER";
+
     /** The Constant DEFAULT_LAST_TRADE_DATE_PATTERN. */
     public static final String DEFAULT_LAST_TRADE_DATE_PATTERN = "MM/dd/yyyy";
 
     /** The Constant DEFAULT_UNIQUE_ID_TYPE. */
-    private static final String DEFAULT_UNIQUE_ID_TYPE = "TICKER";
+    private static final String DEFAULT_UNIQUE_ID_TYPE = TICKER;
 
     /** The Constant DEFAULT_CURRATE. */
     private static final String DEFAULT_CURRATE = "1.00";
@@ -819,8 +823,9 @@ public class OfxPriceInfo {
             String dtAsOf, String currency) {
         MutualFundInfo root = securityList.addNewMFINFO();
 
-        addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
-
+        GeneralSecurityInfo secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
+        insertComment(secInfo, "Security is treated as Mutual Fund");
+        
         root.setMFTYPE(MutualFundTypeEnum.OPENEND);
 
         return root;
@@ -840,7 +845,11 @@ public class OfxPriceInfo {
     private void addOptionsInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName, String unitPrice, String dtAsOf,
             String currency) {
         OptionInfo root = securityList.addNewOPTINFO();
-        addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
+        
+        GeneralSecurityInfo secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
+
+        insertComment(secInfo, "Security is treated as Options");
+
         // <OPTTYPE>PUT</OPTTYPE>
         // <STRIKEPRICE>35.00</STRIKEPRICE><!--Strike price $35/share-->
         // <DTEXPIRE>20050121</DTEXPIRE><!--Option expires Jan 21, 2005-->
@@ -895,7 +904,8 @@ public class OfxPriceInfo {
             String currency) {
         OtherInfo root = securityList.addNewOTHERINFO();
 
-        addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
+        XmlObject secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
+        insertComment(secInfo, "Security is treated as Bond");
 
         // root.setMFTYPE(MutualFundTypeEnum.OPENEND);
 
@@ -918,7 +928,8 @@ public class OfxPriceInfo {
             String currency) {
         StockInfo root = securityList.addNewSTOCKINFO();
 
-        addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
+        GeneralSecurityInfo secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
+        insertComment(secInfo, "Security is treated as Stock");
 
         // root.setMFTYPE(MutualFundTypeEnum.OPENEND);
 

@@ -43,23 +43,10 @@ public class YahooScreenScrapper2SourcePanel extends YahooApiQuoteSourcePanel {
 				scrapper = new YahooScreenScrapper2();
 				for (String stockSymbol : stockSymbols) {
 					try {
-						YahooScreenScrapper2StockInfo info = scrapper.getStockInfo(stockSymbol);
-						if (info == null) {
+						AbstractStockPrice stockPrice = scrapper.getStockPrice(stockSymbol);
+						if (stockPrice == null) {
 							LOGGER.warn("Cannot get stock price for symbol=" + stockSymbol);
 						} else {
-							AbstractStockPrice stockPrice = new StockPrice();
-							stockPrice.setStockSymbol(stockSymbol);
-							stockPrice.setStockName(info.getName());
-							stockPrice.setLastPrice(new Price(info.getPrice()));
-							stockPrice.setCurrency(info.getCurrency());
-							
-							Date date = info.getLastTrade();
-							if (date != null) {
-				                stockPrice.setLastTradeDate(lastTradeDateFormatter.format(date));
-				                stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(date));
-				                stockPrice.setLastTrade(date);
-							}
-			                
 							stockPrices.add(stockPrice);
 						}
 					} catch (Exception e) {

@@ -114,7 +114,7 @@ public class StockPrice extends AbstractStockPrice {
     public StockPrice(CsvRow row, Set<FieldInfo> properties) throws IOException {
         super(row, properties);
 
-        init();
+        postSetProperties();
     }
 
     /**
@@ -126,13 +126,13 @@ public class StockPrice extends AbstractStockPrice {
     public StockPrice(CsvRow row) throws IOException {
         super(row);
 
-        init();
+        postSetProperties();
     }
 
     /**
      * Inits the.
      */
-    public void init() {
+    public void postSetProperties() {
         String stockSymbol = getStockSymbol();
 
         if (PropertiesUtils.isNull(getStockName())) {
@@ -369,18 +369,18 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Checks if is mutual fund.
      *
-     * @param bean the bean
+     * @param stockPrice the bean
      * @return true, if is mutual fund
      */
-    private boolean isMutualFund(StockPrice bean) {
-        if (bean == null) {
+    private boolean isMutualFund(StockPrice stockPrice) {
+        if (stockPrice == null) {
             return false;
         }
-        Price dayLow = bean.getDayLow();
+        Price dayLow = stockPrice.getDayLow();
         if (dayLow == null) {
             return false;
         }
-        Price dayHigh = bean.getDayHigh();
+        Price dayHigh = stockPrice.getDayHigh();
         if (dayHigh == null) {
             return false;
         }

@@ -354,7 +354,7 @@ public class GetYahooHistoricalQuotes extends YahooQuotesGetter {
         bean.setLastTradeDate(priceInfoLastTradeDateFormatter.format(lastTrade));
 
         // TODO:
-        bean.init();
+        bean.postSetProperties();
 
         return bean;
     }
