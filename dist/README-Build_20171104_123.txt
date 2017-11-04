@@ -2,6 +2,17 @@
 Sat Nov  4 01:21:06 PDT 2017
 
   File: 20214695 Nov  4 01:20 hleOfxQuotes-Build_20171104_123-app.jar
+  https://github.com/hleofxquotes/hleofxquotes/blob/master/dist/hleOfxQuotes-Build_20171104_123-app.jar
+  Click on 'View Raw' to download
+  Your browser might warn that "This type of file can harm your computer. Do you want to keep ...". Browser will show this warning for all files with suffix .jar.
+
+  Once downloaded,
+     * You can double-click to start
+     * OR open command-line and run
+       java -jar hleOfxQuotes-Build_20171104_123-app.jar
+
+     You can rename hleOfxQuotes-Build_20171104_123-app.jar to a shorter name if you like.
+     See a note on Java 8 below.
 
   Caveat:
 
