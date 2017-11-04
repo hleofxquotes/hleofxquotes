@@ -29,7 +29,7 @@ As noted by john.b_
 provide last trade date, DTASOF is set to current date.  Therefore, I use the Date Offset of -1 to insure it 
 imports with the correct trade date in my scenario.  
 
-If you suggestion for better default, I am all ear.
+If you have suggestion for better default, I am all ear.
 
 
   Fixes:
