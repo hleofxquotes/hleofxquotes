@@ -25,7 +25,9 @@ https://social.microsoft.com/Forums/mvpforum/en-US/home?forum=money
 to make due with the fall-back values which the current time when the quotes were fetched.
 
 As noted by john.b_ 
-... I typically download MF quotes in the morning for the prior trading day.  Since the Yahoo2 source doesn't provide last trade date, DTASOF is set to current date.  Therefore, I use the Date Offset of -1 to insure it imports with the correct trade date in my scenario.  
+... I typically download MF quotes in the morning for the prior trading day.  Since the Yahoo2 source doesn't 
+provide last trade date, DTASOF is set to current date.  Therefore, I use the Date Offset of -1 to insure it 
+imports with the correct trade date in my scenario.  
 
 If you suggestion for better default, I am all ear.
 
