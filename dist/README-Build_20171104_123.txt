@@ -1,7 +1,51 @@
+###
+Sat Nov  4 01:21:06 PDT 2017
+
+  File: 20214695 Nov  4 01:20 hleOfxQuotes-Build_20171104_123-app.jar
+
+  Caveat:
+
+  * Proceed with caution. I try to get this out quickly so that folks won't have to deal with quotes outage BUT that means little testing. If you see something not working, post a message on
+https://social.microsoft.com/Forums/mvpforum/en-US/home?forum=money
+
+  * Traded date and time - Yahoo2 source quote: does not appear to have a way to get the info. So we will have to make due with the fall-back values which the current time when the quotes were fetched.
+
+  Fixes:
+
+  * Mutual fund has wrong SECTYPE (was STOCKINFO, should be MFINFO) - Thanks BobSmiley
+  Example:
+      <MFINFO>
+        <!--Ticker from quote source is: PRBLX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Sat Nov 04 01:16:59 PDT 2017-->
+          <SECID>
+            <UNIQUEID>PRBLX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Parnassus Core Equity Fund-Inve</SECNAME>
+          <TICKER>PRBLX</TICKER>
+          <UNITPRICE>44.14</UNITPRICE>
+          <DTASOF>20171104081659</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+
+  * If you have large number of symbols, should be faster now (Enable multi-thread fetch)
+
+  * Remember the last tab. So if you had last selected the Yahoo2 tab, you will get the same tab selected on next startup. 
+
+  * Fix wrong build number displayed on Window's title.
+  
+###
 Thu Nov  2 16:32:20 PDT 2017
 
-  File: 
-20211857 Nov  2 16:30 hleOfxQuotes-Build_20171102_120-app.jar
+  File: 20211857 Nov  2 16:30 hleOfxQuotes-Build_20171102_120-app.jar
 
   This is an emergency build to support an alternate Yahoo quote source. (Yahoo2)
 
