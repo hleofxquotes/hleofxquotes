@@ -4,7 +4,8 @@ Sat Nov  4 01:21:06 PDT 2017
   File: 20214695 Nov  4 01:20 hleOfxQuotes-Build_20171104_123-app.jar
   https://github.com/hleofxquotes/hleofxquotes/blob/master/dist/hleOfxQuotes-Build_20171104_123-app.jar
   Click on 'View Raw' to download
-  Your browser might warn that "This type of file can harm your computer. Do you want to keep ...". Browser will show this warning for all files with suffix .jar.
+  Your browser might warn that "This type of file can harm your computer. Do you want to keep ...". Browser 
+  will show this warning for all files with suffix .jar.
 
   Once downloaded,
      * You can double-click to start
@@ -16,10 +17,18 @@ Sat Nov  4 01:21:06 PDT 2017
 
   Caveat:
 
-  * Proceed with caution. I try to get this out quickly so that folks won't have to deal with quotes outage BUT that means little testing. If you see something not working, post a message on
+  * Proceed with caution. I try to get this out quickly so that folks won't have to deal with quotes outage BUT 
+    that means little testing. If you see something not working, post a message on
 https://social.microsoft.com/Forums/mvpforum/en-US/home?forum=money
 
-  * Traded date and time - Yahoo2 source quote: does not appear to have a way to get the info. So we will have to make due with the fall-back values which the current time when the quotes were fetched.
+  * Traded date and time - Yahoo2 source quote: does not appear to have a way to get the info. So we will have 
+to make due with the fall-back values which the current time when the quotes were fetched.
+
+As noted by john.b_ 
+... I typically download MF quotes in the morning for the prior trading day.  Since the Yahoo2 source doesn't provide last trade date, DTASOF is set to current date.  Therefore, I use the Date Offset of -1 to insure it imports with the correct trade date in my scenario.  
+
+If you suggestion for better default, I am all ear.
+
 
   Fixes:
 
