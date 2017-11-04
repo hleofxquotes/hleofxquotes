@@ -1,17 +1,11 @@
 package com.hungle.tools.moneyutils.yahoo;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.ofx.quotes.net.AbstractHttpQuoteGetter;
-import com.hungle.tools.moneyutils.ofx.quotes.net.GetQuotesListener;
-import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -49,37 +43,5 @@ public class YahooQuotesGetter extends AbstractHttpQuoteGetter {
         QUOTE_HOSTS.put("Spanish", "espanol.finance.yahoo.com");
         QUOTE_HOSTS.put("Taiwan", "tw.stock.yahoo.com");
         QUOTE_HOSTS.put("UK & Ireland", "uk.finance.yahoo.com");
-    }
-
-    /**
-     * Gets the quotes.
-     *
-     * @param stocks the stocks
-     * @return the quotes
-     * @throws ClientProtocolException the client protocol exception
-     * @throws URISyntaxException the URI syntax exception
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    public List<AbstractStockPrice> getQuotes(List<String> stocks) throws ClientProtocolException, URISyntaxException, IOException {
-        GetQuotesListener listener = null;
-        boolean skipNoPrice = true;
-        List<AbstractStockPrice> quotes = getQuotes(stocks, listener, skipNoPrice);
-        return quotes;
-    }
-
-    /**
-     * Gets the quotes.
-     *
-     * @param stocks the stocks
-     * @param listener the listener
-     * @return the quotes
-     * @throws ClientProtocolException the client protocol exception
-     * @throws URISyntaxException the URI syntax exception
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    public List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener) throws IOException {
-        boolean skipNoPrice = true;
-        List<AbstractStockPrice> quotes = getQuotes(stocks, listener, skipNoPrice);
-        return quotes;
     }
 }

@@ -1,7 +1,6 @@
 package com.hungle.tools.moneyutils.yahoo;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.gui.GUI;
 import com.hungle.tools.moneyutils.gui.GetHistoricalQuotesDialog;
+import com.hungle.tools.moneyutils.ofx.quotes.net.AbstractHttpQuoteGetter;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
 // TODO: Auto-generated Javadoc
@@ -76,7 +76,7 @@ public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
         LOGGER.info("user selected, limitToFriday=" + dialog.getLimitToFriday());
         LOGGER.info("user selected, limitToEOM=" + dialog.getLimitToEOM());
         
-        YahooQuotesGetter quoteGetter = new GetYahooHistoricalQuotes(fromDate, toDate, dialog.getLimitToFriday(), dialog.getLimitToEOM());
+        AbstractHttpQuoteGetter quoteGetter = new GetYahooHistoricalQuotes(fromDate, toDate, dialog.getLimitToFriday(), dialog.getLimitToEOM());
         if (quoteServer != null) {
             quoteGetter.setHost(quoteServer);
         }

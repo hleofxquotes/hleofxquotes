@@ -2,11 +2,9 @@ package com.hungle.tools.moneyutils.yahoo;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.data.SymbolMapper;
@@ -49,10 +47,6 @@ public class GetYahooHistoricalQuotesCmd {
                 OfxPriceInfo.save(prices, outputFile, params, symbolMapper, fxTable);
                 i++;
             }
-        } catch (ClientProtocolException e) {
-            LOGGER.error(e, e);
-        } catch (URISyntaxException e) {
-            LOGGER.error(e, e);
         } catch (IOException e) {
             LOGGER.error(e, e);
         } finally {
