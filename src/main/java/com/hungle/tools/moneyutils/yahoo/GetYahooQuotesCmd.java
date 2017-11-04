@@ -2,13 +2,13 @@ package com.hungle.tools.moneyutils.yahoo;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.tools.moneyutils.ofx.quotes.net.AbstractHttpQuoteGetter;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
@@ -40,15 +40,13 @@ public class GetYahooQuotesCmd {
         File outFile = new File("quotes.xml");
         LOGGER.info("outFile=" + outFile.getAbsolutePath());
 
-        YahooQuotesGetter quoteGetter = new YahooQuotesGetter();
+        AbstractHttpQuoteGetter quoteGetter = new YahooQuotesGetter();
         quoteGetter.setHost(sourceHostName);
         try {
             List<AbstractStockPrice> stockPrices = quoteGetter.getQuotes(stockNames);
 
             OfxPriceInfo.save(stockPrices, outFile);
         } catch (IOException e) {
-            LOGGER.error(e, e);
-        } catch (URISyntaxException e) {
             LOGGER.error(e, e);
         } finally {
             quoteGetter.shutdown();

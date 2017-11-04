@@ -2,13 +2,13 @@ package com.hungle.tools.moneyutils.misc;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.tools.moneyutils.ofx.quotes.net.AbstractHttpQuoteGetter;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 import com.hungle.tools.moneyutils.yahoo.YahooQuotesGetter;
@@ -53,15 +53,13 @@ public class CreateExample {
         File outFile = new File(args[0]);
         LOGGER.info("outFile=" + outFile);
 
-        YahooQuotesGetter quoteGetter = new YahooQuotesGetter();
+        AbstractHttpQuoteGetter quoteGetter = new YahooQuotesGetter();
         try {
             List<AbstractStockPrice> stockPrices = quoteGetter.getQuotes(stockNames);
             double stockPriceOffset = 1000.00;
             OfxPriceInfo ofxPriceInfo = new OfxPriceInfo(stockPrices, stockPriceOffset);
             ofxPriceInfo.save(outFile);
         } catch (IOException e) {
-            LOGGER.warn(e);
-        } catch (URISyntaxException e) {
             LOGGER.warn(e);
         } finally {
             if (quoteGetter != null) {

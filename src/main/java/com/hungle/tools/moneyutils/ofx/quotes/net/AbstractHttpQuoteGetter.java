@@ -256,6 +256,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
             }
 
             LOGGER.info("stocks.size=" + stocks.size());
+            LOGGER.info("bucketSize=" + bucketSize);
 
             if (stocks.size() <= 0) {
                 return prices;
@@ -491,5 +492,43 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
         this.keepFxSymbols = keepFxSymbols;
     }
 
-    public abstract List<AbstractStockPrice> getQuotes(List<String> stockSymbols, GetQuotesListener listener) throws IOException;
+    /**
+     * Gets the quotes.
+     *
+     * @param stocks the stocks
+     * @return the quotes
+     * @throws ClientProtocolException the client protocol exception
+     * @throws URISyntaxException the URI syntax exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public List<AbstractStockPrice> getQuotes(List<String> stocks) throws IOException {
+        GetQuotesListener listener = null;
+        boolean skipNoPrice = true;
+        List<AbstractStockPrice> quotes = getQuotes(stocks, listener, skipNoPrice);
+        return quotes;
+    }
+
+    /**
+     * Gets the quotes.
+     *
+     * @param stocks the stocks
+     * @param listener the listener
+     * @return the quotes
+     * @throws ClientProtocolException the client protocol exception
+     * @throws URISyntaxException the URI syntax exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener) throws IOException {
+        boolean skipNoPrice = true;
+        List<AbstractStockPrice> quotes = getQuotes(stocks, listener, skipNoPrice);
+        return quotes;
+    }
+
+    public int getBucketSize() {
+        return bucketSize;
+    }
+
+    public void setBucketSize(int bucketSize) {
+        this.bucketSize = bucketSize;
+    }
 }

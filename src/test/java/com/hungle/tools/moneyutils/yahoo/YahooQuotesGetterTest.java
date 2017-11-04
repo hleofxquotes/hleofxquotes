@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.hungle.tools.moneyutils.ofx.quotes.net.AbstractHttpQuoteGetter;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
 
@@ -33,7 +34,7 @@ public class YahooQuotesGetterTest {
 	@Test
 	@Ignore
 	public void testGet() throws ClientProtocolException, URISyntaxException, IOException {
-		YahooQuotesGetter quoteGetter = new YahooQuotesGetter();
+		AbstractHttpQuoteGetter quoteGetter = new YahooQuotesGetter();
 		try {
 			List<String> stockNames = new ArrayList<String>();
 			List<AbstractStockPrice> stockPrices = null;

@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -876,7 +875,7 @@ public class YahooQuoteSourcePanel extends JPanel {
         return stockPrices;
     }
 
-    protected YahooQuotesGetter getHttpQuoteGetter() {
+    protected AbstractHttpQuoteGetter getHttpQuoteGetter() {
         return new YahooQuotesGetter();
     }
 

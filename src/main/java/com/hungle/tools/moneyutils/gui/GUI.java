@@ -155,11 +155,11 @@ public class GUI extends JFrame {
     // private static final String VERSION_PREFIX = "SNAPSHOT";
 
     /** The Constant VERSION_SUFFIX. */
-    private static final String VERSION_SUFFIX = "01";
+    private static final String VERSION_SUFFIX = "122";
 
     /** The version. */
-    // Build_20110706_31
-    public static String VERSION = VERSION_PREFIX + "_" + "20111104" + "_" + VERSION_SUFFIX;
+    // 20171104_122
+    public static String VERSION = VERSION_PREFIX + "_" + "20171104_122" + "_" + VERSION_SUFFIX;
 
     /** The Constant PREF_DEFAULT_CURRENCY. */
     private static final String PREF_DEFAULT_CURRENCY = "defaultCurrency";
@@ -195,6 +195,8 @@ public class GUI extends JFrame {
     private static final String PREF_IMPORT_DIALOG_AUTO_CLICK = "importDialogAutoClick";
     
     private static final String PREF_SHOW_STATEMENT_PROGRESS = "showStatementProgress";
+
+    private static final String PREF_SELECTED_QUOTE_SOURCE = "selectedQuoteSource";
 
     /** The thread pool. */
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -2197,16 +2199,7 @@ public class GUI extends JFrame {
      */
     private JTabbedPane createQuoteSourceTabsX() {
         final JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                JTabbedPane p = (JTabbedPane) event.getSource();
-                selectedQuoteSource = p.getSelectedIndex();
-                LOGGER.info("selectedQuoteSource=" + selectedQuoteSource);
-                QuoteSource quoteSource = null;
-                stockPricesLookupStarted(quoteSource);
-            }
-        });
+
         // JPopupMenu popup = new JPopupMenu();
         // popup.addPopupMenuListener(new PopupMenuListener() {
         // public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
@@ -2262,8 +2255,30 @@ public class GUI extends JFrame {
 //        }
 //        tabbedPane.addTab("Scholarshare", createTIAACREFQuoteSourceView());
 
-        tabbedPane.setSelectedIndex(0);
+        int initialIndex = PREFS.getInt(PREF_SELECTED_QUOTE_SOURCE, 0);
+        LOGGER.info("RESTORE selectedQuoteSource, index=" + initialIndex);
+        if (initialIndex >= tabbedPane.getTabCount()) {
+            initialIndex = 0;
+        }
+        tabbedPane.setSelectedIndex(initialIndex);
+        
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                JTabbedPane p = (JTabbedPane) event.getSource();
+                selectedQuoteSource = p.getSelectedIndex();
+                LOGGER.info("selectedQuoteSource=" + selectedQuoteSource);
+                saveSelectedQuoteSource(selectedQuoteSource);
+                QuoteSource quoteSource = null;
+                stockPricesLookupStarted(quoteSource);
+            }
+        });
         return tabbedPane;
+    }
+
+    protected void saveSelectedQuoteSource(int index) {
+        LOGGER.info("SAVE selectedQuoteSource, index=" + index);
+        PREFS.putInt(PREF_SELECTED_QUOTE_SOURCE, index);        
     }
 
     /**
@@ -3143,7 +3158,9 @@ public class GUI extends JFrame {
     public static void main(String[] args) {
 //        VelocityUtils.initVelocity();
 
-        String implementationVendorId = "com.le.tools.moneyutils";
+//        String implementationVendorId = "com.le.tools.moneyutils";
+        // com.hungle.tools.moneyutils
+        String implementationVendorId = "com.hungle.tools.moneyutils";
         String buildNumber = BuildNumber.findBuilderNumber(implementationVendorId);
         if (buildNumber == null) {
             LOGGER.warn("Cannot find buildNumber from Manifest.");
