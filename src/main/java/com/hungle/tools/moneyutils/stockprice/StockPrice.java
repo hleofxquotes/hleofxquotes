@@ -372,18 +372,21 @@ public class StockPrice extends AbstractStockPrice {
      * @param stockPrice the bean
      * @return true, if is mutual fund
      */
-    private boolean isMutualFund(StockPrice stockPrice) {
+    public static final boolean isMutualFund(StockPrice stockPrice) {
         if (stockPrice == null) {
             return false;
         }
+        
         Price dayLow = stockPrice.getDayLow();
         if (dayLow == null) {
-            return false;
+            return true;
         }
+        
         Price dayHigh = stockPrice.getDayHigh();
         if (dayHigh == null) {
-            return false;
+            return true;
         }
+        
         return (dayLow.getPrice() <= 0.0) && (dayHigh.getPrice() <= 0.0);
     }
 

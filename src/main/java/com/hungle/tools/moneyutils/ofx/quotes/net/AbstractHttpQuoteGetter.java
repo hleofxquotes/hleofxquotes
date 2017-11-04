@@ -38,7 +38,7 @@ import com.hungle.tools.moneyutils.stockprice.FxSymbol;
 /**
  * The Class AbstractHttpQuoteGetter.
  */
-public class AbstractHttpQuoteGetter implements HttpQuoteGetter {
+public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     
     /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(AbstractHttpQuoteGetter.class);
@@ -243,7 +243,7 @@ public class AbstractHttpQuoteGetter implements HttpQuoteGetter {
      *             Signals that an I/O exception has occurred.
      */
     protected List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener, boolean skipNoPrice)
-            throws URISyntaxException, ClientProtocolException, IOException {
+            throws IOException {
         LOGGER.info("> getQuotes");
 
         fxSymbols = new ArrayList<AbstractStockPrice>();
@@ -490,4 +490,6 @@ public class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     public void setKeepFxSymbols(boolean keepFxSymbols) {
         this.keepFxSymbols = keepFxSymbols;
     }
+
+    public abstract List<AbstractStockPrice> getQuotes(List<String> stockSymbols, GetQuotesListener listener) throws IOException;
 }

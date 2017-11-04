@@ -10,7 +10,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -18,7 +17,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -132,6 +130,7 @@ public class YahooScreenScrapper2 implements Closeable {
             String currency = price.get("currency").asText();
 
             String shortName = price.get("shortName").asText();
+            LOGGER.info("stockName=" + shortName);
 
             Date lastTrade = null;
 
@@ -155,6 +154,12 @@ public class YahooScreenScrapper2 implements Closeable {
             stockPrice.setStockSymbol(stockSymbol);
             
             stockPrice.postSetProperties();
+            
+            LOGGER.info("isMutualFund=" + StockPrice.isMutualFund(stockPrice));
+            LOGGER.info("getSecType=" + stockPrice.getSecType());
+            LOGGER.info("isMf=" + stockPrice.isMf());
+            LOGGER.info("isBond=" + stockPrice.isBond());
+            
         } catch (UnsupportedOperationException e) {
             throw new IOException(e);
         } catch (URISyntaxException e) {

@@ -83,8 +83,6 @@ public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
         try {
             stockPrices = quoteGetter.getQuotes(stockSymbols, listener);
             this.fxSymbols = quoteGetter.getFxSymbols();
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
         } finally {
         }
         return stockPrices;

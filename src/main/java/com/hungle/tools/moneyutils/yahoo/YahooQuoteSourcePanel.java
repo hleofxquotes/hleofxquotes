@@ -52,6 +52,7 @@ import com.hungle.tools.moneyutils.ofx.quotes.DefaultQuoteSource;
 import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.QuoteSource;
 import com.hungle.tools.moneyutils.ofx.quotes.QuoteSourceListener;
+import com.hungle.tools.moneyutils.ofx.quotes.net.AbstractHttpQuoteGetter;
 import com.hungle.tools.moneyutils.ofx.quotes.net.GetQuotesListener;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
@@ -862,17 +863,21 @@ public class YahooQuoteSourcePanel extends JPanel {
      */
     protected List<AbstractStockPrice> getStockQuotes(final List<String> stockSymbols) throws IOException {
         List<AbstractStockPrice> stockPrices;
-        YahooQuotesGetter quoteGetter = new YahooQuotesGetter();
+        AbstractHttpQuoteGetter quoteGetter = getHttpQuoteGetter();
         if (quoteServer != null) {
             quoteGetter.setHost(quoteServer);
         }
         try {
             stockPrices = quoteGetter.getQuotes(stockSymbols, listener);
             this.fxSymbols = quoteGetter.getFxSymbols();
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
+        } finally {
+            
         }
         return stockPrices;
+    }
+
+    protected YahooQuotesGetter getHttpQuoteGetter() {
+        return new YahooQuotesGetter();
     }
 
     /**

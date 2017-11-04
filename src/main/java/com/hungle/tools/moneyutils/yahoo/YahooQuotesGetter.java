@@ -77,7 +77,7 @@ public class YahooQuotesGetter extends AbstractHttpQuoteGetter {
      * @throws URISyntaxException the URI syntax exception
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener) throws ClientProtocolException, URISyntaxException, IOException {
+    public List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener) throws IOException {
         boolean skipNoPrice = true;
         List<AbstractStockPrice> quotes = getQuotes(stocks, listener, skipNoPrice);
         return quotes;

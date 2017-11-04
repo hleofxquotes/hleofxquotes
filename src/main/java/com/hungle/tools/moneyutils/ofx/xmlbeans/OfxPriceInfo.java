@@ -415,11 +415,11 @@ public class OfxPriceInfo {
                 LOGGER.warn("Failed to parse lastTradeDate=" + lastTradeDate + ", tickerName=" + quoteSourceSymbol);
             }
         }
-        if (isMutualFund(stockPrice)) {
+        if (isMutualFund(stockPrice, symbolMapper)) {
             addPositionMutualFund(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue, dtPriceAsOfString, currency);
-        } else if (isOptions(stockPrice)) {
+        } else if (isOptions(stockPrice, symbolMapper)) {
             addPositionOptions(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue, dtPriceAsOfString, currency);
-        } else if (isBond(stockPrice)) {
+        } else if (isBond(stockPrice, symbolMapper)) {
             addPositionBond(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue, dtPriceAsOfString, currency);
         } else {
             addPositionStock(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue, dtPriceAsOfString, currency);
@@ -729,11 +729,11 @@ public class OfxPriceInfo {
                 LOGGER.warn("Failed to parse lastTradeDate=" + lastTradeDate + ", tickerName=" + quoteSourceSymbol);
             }
         }
-        if (isMutualFund(stockPrice)) {
+        if (isMutualFund(stockPrice, symbolMapper)) {
             addMutualFundInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOf, currency);
-        } else if (isOptions(stockPrice)) {
+        } else if (isOptions(stockPrice, symbolMapper)) {
             addOptionsInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOf, currency);
-        } else if (isBond(stockPrice)) {
+        } else if (isBond(stockPrice, symbolMapper)) {
             addBondInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOf, currency);
         } else {
             addStockInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOf, currency);
@@ -746,10 +746,12 @@ public class OfxPriceInfo {
      * @param stockPrice the stock price
      * @return true, if is mutual fund
      */
-    private boolean isMutualFund(AbstractStockPrice stockPrice) {
+    public static boolean isMutualFund(AbstractStockPrice stockPrice, SymbolMapper symbolMapper) {
         String ticker = stockPrice.getStockSymbol();
-        if (symbolMapper.hasEntry(ticker)) {
-            return symbolMapper.getIsMutualFund(ticker);
+        if (symbolMapper != null) {
+            if (symbolMapper.hasEntry(ticker)) {
+                return symbolMapper.getIsMutualFund(ticker);
+            }
         }
         return stockPrice.isMf();
     }
@@ -760,10 +762,12 @@ public class OfxPriceInfo {
      * @param stockPrice the stock price
      * @return true, if is options
      */
-    private boolean isOptions(AbstractStockPrice stockPrice) {
+    public static boolean isOptions(AbstractStockPrice stockPrice, SymbolMapper symbolMapper) {
         String ticker = stockPrice.getStockSymbol();
-        if (symbolMapper.hasEntry(ticker)) {
-            return symbolMapper.getIsOptions(ticker);
+        if (symbolMapper != null) {
+            if (symbolMapper.hasEntry(ticker)) {
+                return symbolMapper.getIsOptions(ticker);
+            }
         }
         return false;
     }
@@ -774,10 +778,12 @@ public class OfxPriceInfo {
      * @param stockPrice the stock price
      * @return true, if is bond
      */
-    private boolean isBond(AbstractStockPrice stockPrice) {
+    public static boolean isBond(AbstractStockPrice stockPrice, SymbolMapper symbolMapper) {
         String ticker = stockPrice.getStockSymbol();
-        if (symbolMapper.hasEntry(ticker)) {
-            return symbolMapper.getIsBond(ticker);
+        if (symbolMapper != null) {
+            if (symbolMapper.hasEntry(ticker)) {
+                return symbolMapper.getIsBond(ticker);
+            }
         }
         return false;
     }
@@ -795,7 +801,7 @@ public class OfxPriceInfo {
         Double price = stockPrice.getLastPrice().getPrice();
         
         // TODO: bond is quoted in 100 unit
-        boolean isBond = isBond(stockPrice); 
+        boolean isBond = isBond(stockPrice, symbolMapper); 
         if (isBond) {
             price = price / 100.0;
             if (LOGGER.isDebugEnabled()) {
