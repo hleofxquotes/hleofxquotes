@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.http.HttpEntity;
@@ -29,6 +30,8 @@ public class YahooScreenScrapper2 implements Closeable {
     private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2.class);
 
     private CloseableHttpClient client;
+
+    private SimpleDateFormat priceInfoLastTradeDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
 
     public YahooScreenScrapper2() {
         this.client = HttpClientBuilder.create().build();
@@ -149,6 +152,8 @@ public class YahooScreenScrapper2 implements Closeable {
             stockPrice.setLastPrice(regularMarketPricePrice);
 
             stockPrice.setLastTrade(lastTrade);
+            stockPrice.setLastTradeDate(priceInfoLastTradeDateFormatter.format(lastTrade));
+
 
             stockPrice.setStockName(shortName);
             stockPrice.setStockSymbol(stockSymbol);

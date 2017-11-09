@@ -350,7 +350,6 @@ public class GetYahooHistoricalQuotes extends YahooQuotesGetter {
         // Date
         // 2011-10-28
         bean.setLastTrade(lastTrade);
-
         bean.setLastTradeDate(priceInfoLastTradeDateFormatter.format(lastTrade));
 
         // TODO:

@@ -1,8 +1,5 @@
 package app;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.data.SymbolMapper;
@@ -12,26 +9,23 @@ import com.hungle.tools.moneyutils.data.SymbolMapper;
  * The Class SymbolMapperCmd.
  */
 public class SymbolMapperCmd {
-    
+
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(SymbolMapperCmd.class);
+    private static final Logger LOGGER = Logger.getLogger(SymbolMapperCmd.class);
 
     /**
      * The main method.
      *
-     * @param args the arguments
+     * @param args
+     *            the arguments
      */
     public static void main(String[] args) {
-        File file = new File("mapper.csv");
-        log.info("> START");
-        log.info("file=" + file);
-        SymbolMapper mapper = new SymbolMapper();
-        try {
-            mapper.load(file);
-        } catch (IOException e) {
-            log.error(e);
-        } finally {
-            log.info("< DONE");
+        SymbolMapper mapper = null;
+
+        if (args.length == 1) {
+            mapper = SymbolMapper.loadMapperFile(args[0]);
+        } else {
+            mapper = SymbolMapper.loadMapperFile();
         }
     }
 

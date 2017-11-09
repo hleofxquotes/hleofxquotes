@@ -1,14 +1,9 @@
 package com.hungle.tools.moneyutils.ofx.quotes.net;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -27,6 +22,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 
+import com.hungle.tools.moneyutils.gui.FxTableUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.GetQuotesTask;
 import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.StopWatch;
@@ -39,9 +35,9 @@ import com.hungle.tools.moneyutils.stockprice.FxSymbol;
  * The Class AbstractHttpQuoteGetter.
  */
 public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
-    
+
     /** The Constant LOGGER. */
-    private static final Logger LOGGER = Logger.getLogger(AbstractHttpQuoteGetter.class);
+    public static final Logger LOGGER = Logger.getLogger(AbstractHttpQuoteGetter.class);
 
     /** The Constant DEFAULT_SCHEME. */
     private static final String DEFAULT_SCHEME = "http";
@@ -60,13 +56,13 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
 
     /** The Constant DEFAULT_TIMEOUT. */
     private static final long DEFAULT_TIMEOUT = 120L;
-    
+
     /** The Constant DEFAULT_FX_FILENAME. */
     private static final String DEFAULT_FX_FILENAME = "fx.csv";
 
     /** The Constant threadPool. */
     private static final ExecutorService threadPool = Executors.newFixedThreadPool(3);
-    
+
     /** The scheme. */
     private String scheme = DEFAULT_SCHEME;
 
@@ -95,7 +91,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     private List<AbstractStockPrice> fxSymbols;
 
     /** The fx file name. */
-    private String fxFileName = DEFAULT_FX_FILENAME;
+    private String fxFileName = FxTableUtils.DEFAULT_FX_FILENAME;
 
     /** The keep fx symbols. */
     private boolean keepFxSymbols = true;
@@ -287,7 +283,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
 
             for (Future<List<AbstractStockPrice>> future : futures) {
                 if (future.isCancelled()) {
-                    LOGGER.warn("One of the tasks was timeout.");
+                    LOGGER.warn("One of the tasks has timeout.");
                     continue;
                 }
                 try {
@@ -301,7 +297,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
             }
 
             if (fxSymbols != null) {
-                writeFxFile(fxSymbols, fxFileName);
+                FxTableUtils.writeFxFile(fxSymbols, fxFileName);
             }
         } finally {
             long delta = stopWatch.click();
@@ -319,8 +315,8 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     }
 
     /**
-     * Adds the prices we received to the all price list.
-     * Filter out fx as needed.
+     * Adds the prices we received to the all price list. Filter out fx as
+     * needed.
      *
      * @param prices
      *            the beans
@@ -328,6 +324,10 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
      *            the received from quote source
      */
     protected void addPrices(List<AbstractStockPrice> prices, List<AbstractStockPrice> newPrices) {
+        if (newPrices == null) {
+            return;
+        }
+        
         List<AbstractStockPrice> filtered = newPrices;
         if (filterFxQuotes) {
             filtered = new ArrayList<AbstractStockPrice>();
@@ -344,86 +344,6 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
             }
         }
         prices.addAll(filtered);
-    }
-
-    /**
-     * Write fx file.
-     *
-     * @param fxStockPrices
-     *            the fx stock prices
-     * @param fileName
-     *            the file name
-     * @throws IOException
-     *             Signals that an I/O exception has occurred.
-     */
-    private static void writeFxFile(List<AbstractStockPrice> fxStockPrices, String fileName) throws IOException {
-        if (fxStockPrices == null) {
-            return;
-        }
-
-        if (fxStockPrices.size() <= 0) {
-            return;
-        }
-
-        if (fileName == null) {
-            return;
-        }
-
-        // String fileName = "fx.csv";
-        File backupFile = new File(fileName + ".bak");
-        if (backupFile.exists()) {
-            if (!backupFile.delete()) {
-                LOGGER.warn("Cannot delete file=" + backupFile);
-            }
-        }
-
-        File file = new File(fileName);
-        if (file.exists()) {
-            if (!file.renameTo(backupFile)) {
-                LOGGER.warn("Cannot rename from " + file + " to " + backupFile);
-            }
-        }
-
-        LOGGER.info("Writing fx rates to " + file);
-
-        PrintWriter writer = null;
-        try {
-            Date now = new Date();
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            writer.println("FromCurrency,ToCurrency,Rate, Date");
-            writer.println();
-            for (AbstractStockPrice fxStockPrice : fxStockPrices) {
-                FxSymbol fxSymbol = fxStockPrice.getFxSymbol();
-                if (fxSymbol == null) {
-                    continue;
-                }
-
-                writeFxCsvEntry(writer, fxSymbol, now);
-            }
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } finally {
-                    writer = null;
-                }
-            }
-        }
-    }
-
-    /**
-     * Write fx csv entry.
-     *
-     * @param writer
-     *            the writer
-     * @param fxSymbol
-     *            the fx symbol
-     * @param now
-     *            the now
-     */
-    private static void writeFxCsvEntry(PrintWriter writer, FxSymbol fxSymbol, Date now) {
-        writer.println(
-                fxSymbol.getFromCurrency() + ", " + fxSymbol.getToCurrency() + ", " + fxSymbol.getRate() + ", " + now);
     }
 
     /**
@@ -495,11 +415,15 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     /**
      * Gets the quotes.
      *
-     * @param stocks the stocks
+     * @param stocks
+     *            the stocks
      * @return the quotes
-     * @throws ClientProtocolException the client protocol exception
-     * @throws URISyntaxException the URI syntax exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClientProtocolException
+     *             the client protocol exception
+     * @throws URISyntaxException
+     *             the URI syntax exception
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public List<AbstractStockPrice> getQuotes(List<String> stocks) throws IOException {
         GetQuotesListener listener = null;
@@ -511,12 +435,17 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     /**
      * Gets the quotes.
      *
-     * @param stocks the stocks
-     * @param listener the listener
+     * @param stocks
+     *            the stocks
+     * @param listener
+     *            the listener
      * @return the quotes
-     * @throws ClientProtocolException the client protocol exception
-     * @throws URISyntaxException the URI syntax exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClientProtocolException
+     *             the client protocol exception
+     * @throws URISyntaxException
+     *             the URI syntax exception
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener) throws IOException {
         boolean skipNoPrice = true;

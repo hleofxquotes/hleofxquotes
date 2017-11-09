@@ -12,11 +12,7 @@ public class YahooScreenScrapper2SourcePanel extends YahooQuoteSourcePanel {
 
     private static final String STOCK_SYMBOLS_PREF_KEY = "yahooScreenScrapper2";
 
-    /** The last trade date formatter. */
-    private SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
 
-    /** The last trade time formatter. */
-    private SimpleDateFormat lastTradeTimeFormatter = new SimpleDateFormat("hh:mm");
 
     // @Override
     // protected List<AbstractStockPrice> getStockQuotes(List<String>

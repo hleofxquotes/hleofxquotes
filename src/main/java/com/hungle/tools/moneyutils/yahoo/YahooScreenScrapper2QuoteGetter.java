@@ -8,9 +8,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -32,6 +37,14 @@ import com.hungle.tools.moneyutils.stockprice.StockPrice;
 final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
     private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2QuoteGetter.class);
 
+    private ThreadLocal<String> stockSymbol = new ThreadLocal<String>();
+
+    /** The last trade date formatter. */
+    private SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+
+    /** The last trade time formatter. */
+    private SimpleDateFormat lastTradeTimeFormatter = new SimpleDateFormat("hh:mm");
+
     public YahooScreenScrapper2QuoteGetter() {
         super();
         setBucketSize(1);
@@ -41,8 +54,8 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
     public HttpResponse httpGet(List<String> stocks, String format)
             throws URISyntaxException, IOException, ClientProtocolException {
 
-        String stockSymbol = stocks.get(0);
-        URI uri = new URL("https://finance.yahoo.com/quote/" + stockSymbol + "?p=" + stockSymbol).toURI();
+        this.stockSymbol.set(stocks.get(0));
+        URI uri = new URL("https://finance.yahoo.com/quote/" + stockSymbol.get() + "?p=" + stockSymbol.get()).toURI();
 
         HttpGet httpGet = new HttpGet(uri);
         if (LOGGER.isDebugEnabled()) {
@@ -54,11 +67,270 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
     }
 
     @Override
-    public List<AbstractStockPrice> httpEntityToStockPriceBean(HttpEntity entity, boolean skipIfNoPrice) throws IOException {
+    public List<AbstractStockPrice> httpEntityToStockPriceBean(HttpEntity entity, boolean skipIfNoPrice)
+            throws IOException {
         InputStream stream = entity.getContent();
 
-        String prefix = "root.App.main =";
+        List<AbstractStockPrice> prices = null;
+
+        try {
+            prices = parseInputStream(stream);
+        } catch (OfxDataNotFound e) {
+            LOGGER.warn("Cannot parse stream data, symbol=" + this.stockSymbol.get() + ", msg=" + e.getMessage());
+        }
+
+        return prices;
+    }
+
+    private List<AbstractStockPrice> parseInputStream(InputStream stream) throws IOException, OfxDataNotFound {
+        String data = getData(stream);
+
+        JsonNode treeTop = getTreeTop(data);
+
+        JsonNode priceNode = getPriceNode(treeTop);
+
+        // String stockSymbol = getSymbol(priceNode);
+
+        String shortName = getShortName(priceNode);
+        if (shortName == null) {
+            shortName = stockSymbol.get();
+        }
+
+        Price regularMarketPricePrice = getRegularMarketPricePrice(priceNode);
+
+        Price regularMarketDayLowPrice = getRegularMarketDayLowPrice(priceNode);
+
+        Price regularMarketDayHighPrice = getRegularMarketDayHighPrice(priceNode);
+
+        String currency = getCurrency(priceNode);
+        LOGGER.info("currency=" + currency);
+
+        Date lastTrade = null;
+
+        String regularMarketTime = getRegularMarketTime(priceNode);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("    regularMarketTime=" + regularMarketTime);
+        }
+
+        JsonNode quoteTypeNode = getQuoteTypeNode(treeTop);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("    quoteTypeNode=" + quoteTypeNode);
+        }
+        String exchangeTimezoneName = null;
+        if (quoteTypeNode != null) {
+            exchangeTimezoneName = getExchangeTimezoneName(quoteTypeNode);
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("    exchangeTimezoneName=" + exchangeTimezoneName);
+        }
+
+        if ((regularMarketTime != null) && (exchangeTimezoneName != null)) {
+            long longValue;
+            try {
+                longValue = Long.valueOf(regularMarketTime);
+                ZonedDateTime marketZonedDateTime = getMarketZonedDateTime(longValue, exchangeTimezoneName);
+                java.util.Date utilDate = java.util.Date.from(marketZonedDateTime.toInstant());
+
+                lastTrade = utilDate;
+            } catch (NumberFormatException e) {
+                LOGGER.warn(e);
+            }
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("    lastTrade=" + lastTrade);
+        }
+
+        StockPrice stockPrice = new StockPrice();
+
+        stockPrice.setStockSymbol(stockSymbol.get());
+
+        stockPrice.setStockName(shortName);
+
+        stockPrice.setLastPrice(regularMarketPricePrice);
+
+        if (currency != null) {
+            stockPrice.setCurrency(currency);
+        }
+
+        if (regularMarketDayHighPrice != null) {
+            stockPrice.setDayHigh(regularMarketDayHighPrice);
+        }
+
+        if (regularMarketDayLowPrice != null) {
+            stockPrice.setDayLow(regularMarketDayLowPrice);
+        }
+
+        stockPrice.setLastTrade(lastTrade);
+        if (lastTrade != null) {
+            stockPrice.setLastTradeDate(lastTradeDateFormatter.format(lastTrade));
+            stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(lastTrade));
+        }
+
+        stockPrice.postSetProperties();
+
+        LOGGER.info(stockSymbol.get() + ", " + stockPrice.getSecType());
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("isMutualFund=" + StockPrice.isMutualFund(stockPrice));
+            LOGGER.debug("isMf=" + stockPrice.isMf());
+            LOGGER.debug("isBond=" + stockPrice.isBond());
+        }
+
+        List<AbstractStockPrice> stockPrices = new ArrayList<AbstractStockPrice>();
+        stockPrices.add(stockPrice);
+
+        return stockPrices;
+    }
+
+    private String getExchangeTimezoneName(JsonNode fromJsonNode) {
+        String fieldName = "exchangeTimezoneName";
+        JsonNode jsonNode = getOptionalJsonNode(fromJsonNode, fieldName);
+        if (jsonNode == null) {
+            return null;
+        }
+
+        return jsonNode.asText();
+    }
+
+    private JsonNode getTreeTop(String data) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode treeTop = mapper.readTree(data);
+        if (treeTop == null) {
+            throw new OfxDataNotFound("Cannot find stockPrice treeTop");
+        }
+        return treeTop;
+    }
+
+    private JsonNode getPriceNode(JsonNode fromJsonNode) throws OfxDataNotFound {
+        String fieldName = "price";
+        return getRequiredJsonNode(fromJsonNode, fieldName);
+    }
+
+    private JsonNode getQuoteTypeNode(JsonNode fromJsonNode) {
+        String fieldName = "QuoteSummaryStore";
+        JsonNode jsonNode = getOptionalJsonNode(fromJsonNode, fieldName);
+        if (jsonNode != null) {
+            jsonNode = jsonNode.path("quoteType");
+            if (!jsonNode.isMissingNode()) {
+                return jsonNode;
+            }
+        }
+
+        return jsonNode;
+    }
+
+    private String getSymbol(JsonNode fromJsonNode) throws OfxDataNotFound {
+        String fieldName = "symbol";
+        JsonNode jsonNode = getRequiredJsonNode(fromJsonNode, fieldName);
+        return jsonNode.asText();
+    }
+
+    private String getShortName(JsonNode fromJsonNode) {
+        String fieldName = "shortName";
+        JsonNode jsonNode = getOptionalJsonNode(fromJsonNode, fieldName);
+        if (jsonNode == null) {
+            return null;
+        }
+
+        return jsonNode.asText();
+    }
+
+    private Price getRegularMarketPricePrice(JsonNode priceNode) throws OfxDataNotFound {
+        String fieldName = "regularMarketPrice";
+        JsonNode node = getRequiredJsonNode(priceNode, fieldName);
+
+        Price price = null;
+
+        node = node.path("raw");
+        if (node.isMissingNode()) {
+            throw new OfxDataNotFound("Cannot find JsonNode " + fieldName + ".raw");
+        }
+        price = new Price(node.asDouble());
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("regularMarketPricePrice=" + price);
+        }
+
+        return price;
+    }
+
+    private Price getRegularMarketDayLowPrice(JsonNode fromJsonNode) {
+        String fieldName = "regularMarketDayLow";
+        JsonNode node = getOptionalJsonNode(fromJsonNode, fieldName);
+
+        Price price = null;
+        if (node != null) {
+            node = node.path("raw");
+            if (!node.isMissingNode()) {
+                price = new Price(node.asDouble());
+            }
+        }
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("regularMarketDayLowPrice=" + price);
+        }
+
+        return price;
+    }
+
+    private String getCurrency(JsonNode fromJsonNode) {
+        String fieldName = "currency";
+        JsonNode jsonNode = getOptionalJsonNode(fromJsonNode, fieldName);
+        if (jsonNode == null) {
+            return null;
+        }
+
+        return jsonNode.asText();
+    }
+
+    private Price getRegularMarketDayHighPrice(JsonNode fromJsonNode) {
+        String fieldName = "regularMarketDayHigh";
+        JsonNode node = getOptionalJsonNode(fromJsonNode, fieldName);
+
+        Price price = null;
+        if (node != null) {
+            node = node.path("raw");
+            if (!node.isMissingNode()) {
+                price = new Price(node.asDouble());
+            }
+        }
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("regularMarketDayHighPrice=" + price);
+        }
+
+        return price;
+    }
+
+    private String getRegularMarketTime(JsonNode fromJsonNode) {
+        String fieldName = "regularMarketTime";
+        JsonNode node = getOptionalJsonNode(fromJsonNode, fieldName);
+        if (node == null) {
+            return null;
+        }
+
+        return node.asText();
+    }
+
+    private static final JsonNode getRequiredJsonNode(JsonNode fromJsonNode, String fieldName) throws OfxDataNotFound {
+        JsonNode jsonNode = fromJsonNode.findPath(fieldName);
+        if (jsonNode.isMissingNode()) {
+            throw new OfxDataNotFound("Cannot find JsonNode=" + fieldName);
+        }
+        return jsonNode;
+    }
+
+    private static final JsonNode getOptionalJsonNode(JsonNode fromJsonNode, String fieldName) {
+        JsonNode jsonNode = fromJsonNode.findPath(fieldName);
+        if (jsonNode.isMissingNode()) {
+            return null;
+        }
+        return jsonNode;
+    }
+
+    private String getData(InputStream stream) throws IOException {
         String data = null;
+        String prefix = "root.App.main =";
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
@@ -77,116 +349,14 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         }
 
         if (data == null) {
-            throw new IOException("Cannot find stockPrice data");
+            throw new OfxDataNotFound("Cannot find stockPrice data");
         }
 
         data = data.substring(prefix.length());
         if (data == null) {
-            throw new IOException("Cannot find stockPrice data");
+            throw new OfxDataNotFound("Cannot find stockPrice data");
         }
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode treeTop = mapper.readTree(data);
-        if (treeTop == null) {
-            throw new IOException("Cannot find stockPrice tree");
-        }
-
-        String fieldName = null;
-
-        fieldName = "price";
-        JsonNode price = treeTop.findPath(fieldName);
-        if (price.isMissingNode()) {
-            throw new IOException("Cannot find JsonNode " + fieldName);
-        }
-
-        JsonNode node = null;
-
-        fieldName = "regularMarketPrice";
-        Price regularMarketPricePrice = null;
-        node = price.findPath(fieldName);
-        if (node.isMissingNode()) {
-            throw new IOException("Cannot find JsonNode " + fieldName);
-        } else {
-            node = node.path("raw");
-            if (node.isMissingNode()) {
-                throw new IOException("Cannot find JsonNode " + fieldName + ".raw");
-            }
-            regularMarketPricePrice = new Price(node.asDouble());
-        }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("regularMarketPricePrice=" + regularMarketPricePrice);
-        }
-
-        fieldName = "regularMarketDayLow";
-        Price regularMarketDayLowPrice = null;
-        node = price.findPath(fieldName);
-        if (!node.isMissingNode()) {
-            node = node.path("raw");
-            if (!node.isMissingNode()) {
-                regularMarketDayLowPrice = new Price(node.asDouble());
-            }
-        }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("regularMarketDayLowPrice=" + regularMarketDayLowPrice);
-        }
-
-        fieldName = "regularMarketDayHigh";
-        Price regularMarketDayHighPrice = null;
-        node = price.findPath(fieldName);
-        if (!node.isMissingNode()) {
-            node = node.path("raw");
-            if (!node.isMissingNode()) {
-                regularMarketDayHighPrice = new Price(node.asDouble());
-            }
-        }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("regularMarketDayHighPrice=" + regularMarketDayHighPrice);
-        }
-
-        String currency = price.get("currency").asText();
-
-        String shortName = price.get("shortName").asText();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("stockName=" + shortName);
-        }
-
-        Date lastTrade = null;
-
-        String stockSymbol = price.get("symbol").asText();
-
-        StockPrice stockPrice = new StockPrice();
-
-        stockPrice.setCurrency(currency);
-
-        if (regularMarketDayHighPrice != null) {
-            stockPrice.setDayHigh(regularMarketDayHighPrice);
-        }
-
-        if (regularMarketDayLowPrice != null) {
-            stockPrice.setDayLow(regularMarketDayLowPrice);
-        }
-
-        stockPrice.setLastPrice(regularMarketPricePrice);
-
-        stockPrice.setLastTrade(lastTrade);
-
-        stockPrice.setStockName(shortName);
-        stockPrice.setStockSymbol(stockSymbol);
-
-        stockPrice.postSetProperties();
-
-        LOGGER.info(stockSymbol + ", " + stockPrice.getSecType());
-        
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("isMutualFund=" + StockPrice.isMutualFund(stockPrice));
-            LOGGER.debug("isMf=" + stockPrice.isMf());
-            LOGGER.debug("isBond=" + stockPrice.isBond());
-        }
-
-        List<AbstractStockPrice> stockPrices = new ArrayList<AbstractStockPrice>();
-        stockPrices.add(stockPrice);
-
-        return stockPrices;
+        return data;
     }
 
     private List<AbstractStockPrice> getStockQuotesSingleThread(List<String> stockSymbols, GetQuotesListener listener)
@@ -234,6 +404,15 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         }
 
         return stockPrices;
+    }
+
+    public static final ZonedDateTime getMarketZonedDateTime(long regularMarketTime, String exchangeTimezoneName) {
+        long epoch = regularMarketTime;
+        Instant instant = Instant.ofEpochSecond(epoch);
+        TimeZone timeZone = TimeZone.getTimeZone(exchangeTimezoneName);
+        ZoneId zoneId = timeZone.toZoneId();
+        ZonedDateTime zoneDateTime = ZonedDateTime.ofInstant(instant, zoneId);
+        return zoneDateTime;
     }
 
 }

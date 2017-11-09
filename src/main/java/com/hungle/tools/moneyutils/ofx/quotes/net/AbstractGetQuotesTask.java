@@ -29,7 +29,7 @@ public abstract class AbstractGetQuotesTask<V> implements Callable<V> {
     private final HttpQuoteGetter httpQuoteGetter;
     
     /** The stocks. */
-    private List<String> stocks;
+    private final List<String> stocks;
     
     /** The listener. */
     private GetQuotesListener listener;
@@ -143,15 +143,6 @@ public abstract class AbstractGetQuotesTask<V> implements Callable<V> {
      */
     public List<String> getStocks() {
         return stocks;
-    }
-
-    /**
-     * Sets the stocks.
-     *
-     * @param stocks the new stocks
-     */
-    public void setStocks(List<String> stocks) {
-        this.stocks = stocks;
     }
 
     /**

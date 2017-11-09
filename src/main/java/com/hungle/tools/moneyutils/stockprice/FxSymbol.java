@@ -81,6 +81,7 @@ public class FxSymbol {
         FxSymbol fxSymbol = null;
 
         // ALLUSD=X
+        // EURUSD=X
         if (symbol == null) {
             return null;
         }

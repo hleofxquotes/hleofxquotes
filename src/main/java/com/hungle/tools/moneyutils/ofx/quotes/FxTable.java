@@ -21,7 +21,7 @@ import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 public class FxTable {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(FxTable.class);
+    public static final Logger LOGGER = Logger.getLogger(FxTable.class);
 
     /** The entries. */
     private List<FxTableEntry> entries = new ArrayList<FxTableEntry>();
@@ -48,15 +48,15 @@ public class FxTable {
      * @return the rate string
      */
     public Double getRateString(String fromCurrency, String toCurrency) {
-        if (log.isDebugEnabled()) {
-            log.debug("getRateString: " + fromCurrency + ", " + toCurrency);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("getRateString: " + fromCurrency + ", " + toCurrency);
         }
 
         for (FxTableEntry entry : entries) {
             String fCurr = entry.getFromCurrency();
             String toCurr = entry.getToCurrency();
-            if (log.isDebugEnabled()) {
-                log.debug("getRateString: fCur=" + fCurr + ", toCurr=" + toCurr);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("getRateString: fCur=" + fCurr + ", toCurr=" + toCurr);
             }
 
             if (fCurr.compareToIgnoreCase(fromCurrency) != 0) {
@@ -66,8 +66,8 @@ public class FxTable {
                 continue;
             }
             Double value = Double.valueOf(entry.getRate());
-            if (log.isDebugEnabled()) {
-                log.debug("getRateString: " + fromCurrency + ", " + toCurrency + ", rate=" + value);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("getRateString: " + fromCurrency + ", " + toCurrency + ", rate=" + value);
             }
             return value;
         }
@@ -76,8 +76,8 @@ public class FxTable {
         for (FxTableEntry entry : entries) {
             String fCurr = entry.getFromCurrency();
             String toCurr = entry.getToCurrency();
-            if (log.isDebugEnabled()) {
-                log.debug("getRateString (derived): fCur=" + fCurr + ", toCurr=" + toCurr);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("getRateString (derived): fCur=" + fCurr + ", toCurr=" + toCurr);
             }
             if (fCurr.compareToIgnoreCase(toCurrency) != 0) {
                 continue;
@@ -87,13 +87,13 @@ public class FxTable {
             }
             Double value = Double.valueOf(entry.getRate());
             value = 1.00 / value;
-            if (log.isDebugEnabled()) {
-                log.debug("getRateString (derived): " + fromCurrency + ", " + toCurrency + ", rate=" + value);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("getRateString (derived): " + fromCurrency + ", " + toCurrency + ", rate=" + value);
             }
             return value;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("getRateString (NOT_FOUND): " + fromCurrency + ", " + toCurrency + ", rate=" + null);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("getRateString (NOT_FOUND): " + fromCurrency + ", " + toCurrency + ", rate=" + null);
         }
         return null;
     }
@@ -120,39 +120,39 @@ public class FxTable {
                 columnName = "FromCurrency";
                 String fromCurrency = csvReader.get(columnName);
                 if (PropertiesUtils.isNull(fromCurrency)) {
-                    log.warn("Value for column=" + columnName + " is null.");
+                    LOGGER.warn("Value for column=" + columnName + " is null.");
                     continue;
                 }
                 if (fromCurrency != null) {
                     fromCurrency = fromCurrency.trim();
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug("fromCurrency=" + fromCurrency);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("fromCurrency=" + fromCurrency);
                 }
                 entry.setFromCurrency(fromCurrency);
 
                 columnName = "ToCurrency";
                 String toCurrency = csvReader.get(columnName);
                 if (PropertiesUtils.isNull(toCurrency)) {
-                    log.warn("Value for column=" + columnName + " is null.");
+                    LOGGER.warn("Value for column=" + columnName + " is null.");
                     continue;
                 }
                 if (toCurrency != null) {
                     toCurrency = toCurrency.trim();
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug("toCurrency=" + toCurrency);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("toCurrency=" + toCurrency);
                 }
                 entry.setToCurrency(toCurrency);
 
                 columnName = "Rate";
                 String rate = csvReader.get(columnName);
                 if (PropertiesUtils.isNull(rate)) {
-                    log.warn("Value for column=" + columnName + " is null.");
+                    LOGGER.warn("Value for column=" + columnName + " is null.");
                     continue;
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug("rate=" + rate);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("rate=" + rate);
                 }
                 if (rate != null) {
                     rate = rate.trim();
@@ -171,34 +171,11 @@ public class FxTable {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
             }
         }
-    }
-
-    /**
-     * Creates the default fx table.
-     *
-     * @return the fx table
-     */
-    public static FxTable createDefaultFxTable() {
-        FxTable fxTable = new FxTable();
-        String fileName = "fx.csv";
-        File fxTableFile = new File(fileName);
-        log.info("Looking for fxTable=" + fxTableFile.getAbsoluteFile().getAbsolutePath());
-        if (fxTableFile.exists()) {
-            try {
-                fxTable.load(fxTableFile);
-                log.info("Loaded fxTableFile=" + fxTableFile);
-            } catch (IOException e) {
-                log.warn("Cannot load fxTableFile=" + fxTableFile);
-            }
-        } else {
-            log.info("No " + fileName + " file.");
-        }
-        return fxTable;
     }
 }

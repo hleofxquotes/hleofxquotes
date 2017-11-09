@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.data.SymbolMapper;
+import com.hungle.tools.moneyutils.gui.FxTableUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
@@ -41,8 +42,8 @@ public class GetYahooHistoricalQuotesCmd {
                 List<AbstractStockPrice> prices = new ArrayList<AbstractStockPrice>();
                 prices.add(stockPrice);
                 File outputFile = new File("target/" + i + ".ofx");
-                SymbolMapper symbolMapper = new SymbolMapper();
-                FxTable fxTable = new FxTable();
+                SymbolMapper symbolMapper = SymbolMapper.loadMapperFile();
+                FxTable fxTable = FxTableUtils.loadFxFile();
                 OfxSaveParameter params = new OfxSaveParameter();
                 OfxPriceInfo.save(prices, outputFile, params, symbolMapper, fxTable);
                 i++;

@@ -1,10 +1,8 @@
 package app;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 
+import com.hungle.tools.moneyutils.gui.FxTableUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
 
 // TODO: Auto-generated Javadoc
@@ -12,9 +10,9 @@ import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
  * The Class FxTableCmd.
  */
 public class FxTableCmd {
-    
+
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(FxTableCmd.class);
+    private static final Logger LOGGER = Logger.getLogger(FxTableCmd.class);
 
     /**
      * The main method.
@@ -22,17 +20,12 @@ public class FxTableCmd {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        File file = null;
-
-        file = new File(args[0]);
-        FxTable fxTable = new FxTable();
-        log.info("file=" + file.getName());
-        try {
-            fxTable.load(file);
-        } catch (IOException e) {
-            log.error(e, e);
-        } finally {
-            log.info("< DONE");
+        FxTable fxTable = null;
+        
+        if (args.length == 1) {
+            fxTable = FxTableUtils.loadFxFile(args[0]);
+        } else {
+            fxTable = FxTableUtils.loadFxFile();
         }
     }
 

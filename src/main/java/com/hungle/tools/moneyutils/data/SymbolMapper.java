@@ -23,6 +23,8 @@ public class SymbolMapper {
     /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(SymbolMapper.class);
 
+    private static final String DEFAULT_MAPPER_FILE = "mapper.csv";
+
     /** The map by ms money symbol. */
     private final Map<String, List<SymbolMapperEntry>> mapByMsMoneySymbol = new HashMap<String, List<SymbolMapperEntry>>();
     
@@ -252,9 +254,13 @@ public class SymbolMapper {
      *
      * @return the symbol mapper
      */
-    public static SymbolMapper createDefaultSymbolMapper() {
+    public static SymbolMapper loadMapperFile() {
+        String fileName = DEFAULT_MAPPER_FILE;
+        return loadMapperFile(fileName);
+    }
+
+    public static SymbolMapper loadMapperFile(String fileName) {
         SymbolMapper symbolMapper = new SymbolMapper();
-        String fileName = "mapper.csv";
         File symbolMapperFile = new File(fileName);
         LOGGER.info("Looking for mapper=" + symbolMapperFile.getAbsoluteFile().getAbsolutePath());
         if (symbolMapperFile.exists()) {

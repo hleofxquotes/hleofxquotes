@@ -18,6 +18,7 @@ import org.apache.xmlbeans.XmlOptions;
 import com.hungle.tools.moneyutils.data.SymbolMapper;
 import com.hungle.tools.moneyutils.data.SymbolMapperEntry;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
+import com.hungle.tools.moneyutils.gui.FxTableUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
 import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.XmlBeansUtils;
@@ -1031,8 +1032,8 @@ public class OfxPriceInfo {
         params.setDefaultCurrency(defaultCurrency);
         params.setForceGeneratingINVTRANLIST(forceGeneratingINVTRANLIST);
     
-        SymbolMapper symbolMapper = new SymbolMapper();
-        FxTable fxTable = new FxTable();
+        SymbolMapper symbolMapper = SymbolMapper.loadMapperFile();
+        FxTable fxTable = FxTableUtils.loadFxFile();
     
         save(stockPrices, outFile, params, symbolMapper, fxTable);
     }

@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import com.csvreader.CsvReader;
 import com.hungle.tools.moneyutils.data.SymbolMapper;
 import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
+import com.hungle.tools.moneyutils.gui.FxTableUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.CurrencyUtils;
 import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
@@ -35,7 +36,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
     private static final Logger LOGGER = Logger.getLogger(AbstractCsvConverter.class);
 
     /** The symbol mapper. */
-    private SymbolMapper symbolMapper = new SymbolMapper();
+    private SymbolMapper symbolMapper = SymbolMapper.loadMapperFile();
 
     /** The decimal locale. */
     private Locale decimalLocale = null;
@@ -113,7 +114,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
                 params.setForceGeneratingINVTRANLIST(forceGeneratingINVTRANLIST);
                 Integer dateOffset = 0;
                 params.setDateOffset(dateOffset);
-                FxTable fxTable = new FxTable();
+                FxTable fxTable = FxTableUtils.loadFxFile();
                 OfxPriceInfo.save(beans, outFile, params, this.symbolMapper, fxTable);
             }
         } finally {
