@@ -203,6 +203,13 @@ public abstract class AbstractStockPrice {
         addAnnotatedPropertyFields();
     }
 
+    @Override
+    public String toString() {
+        return "AbstractStockPrice [getCurrency()=" + getCurrency() + ", getStockSymbol()=" + getStockSymbol() + ", getLastPrice()="
+                + getLastPrice() + ", getStockName()=" + getStockName() + ", getLastTrade()=" + getLastTrade() + ", getFxSymbol()="
+                + getFxSymbol() + ", getUnits()=" + getUnits() + ", isMf()=" + isMf() + ", isBond()=" + isBond() + "]";
+    }
+
     /**
      * Gets the format.
      *

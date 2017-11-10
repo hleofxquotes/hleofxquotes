@@ -677,8 +677,13 @@ public class OfxPriceInfo {
         investmentPosition.setUNITPRICE(unitPrice);
         investmentPosition.setMKTVAL(marketValue);
         investmentPosition.setDTPRICEASOF(dtPriceAsOf);
+        
         try {
-            String comment = "DTPRICEASOF local time is " + XmlBeansUtils.parseGmt(dtPriceAsOf).toString();
+            String comment = null;
+
+            comment = "DTPRICEASOF local time is " + XmlBeansUtils.parseGmt(dtPriceAsOf).toString();
+            insertComment(secId, comment);
+            comment = "DTPRICEASOF GMT time is " + dtPriceAsOf;
             insertComment(secId, comment);
         } catch (ParseException e) {
             LOGGER.warn(e);

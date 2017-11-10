@@ -18,6 +18,10 @@ public class StockPriceCsvUtils {
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(StockPriceCsvUtils.class);
 
+    public static final char CSV_DELIMITER_TAB_CHAR = '\t';
+
+    public static final char CSV_DELIMITER_COMMA_CHAR = ',';
+
     /**
      * Parses the current record.
      *
@@ -81,15 +85,24 @@ public class StockPriceCsvUtils {
             String line = csvReader.getRawRecord();
             LOGGER.info(line);
             
-            AbstractStockPrice bean = parseCurrentRecord(csvReader);
-            if (bean != null) {
-                if ((bean.getLastPrice().getPrice() <= 0.0) && (skipIfNoPrice)) {
+            if (line != null) {
+                line = line.trim();
+            }
+            if (line.startsWith("#") ) {
+                continue;
+            }
+            
+            AbstractStockPrice price = parseCurrentRecord(csvReader);
+            LOGGER.info(price);
+            
+            if (price != null) {
+                if ((price.getLastPrice().getPrice() <= 0.0) && (skipIfNoPrice)) {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.warn("SKIP: " + line);
                     }
                 } else {
                     if (beans != null) {
-                        beans.add(bean);
+                        beans.add(price);
                     }
                 }
             } else {
@@ -107,12 +120,12 @@ public class StockPriceCsvUtils {
      * @return the list
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public static List<AbstractStockPrice> toStockPrices(Reader reader, boolean skipIfNoPrice) throws IOException {
+    public static List<AbstractStockPrice> toStockPrices(Reader reader, boolean skipIfNoPrice, char delimiter) throws IOException {
         List<AbstractStockPrice> stockPrices = null;
 
         CsvReader csvReader = null;
         try {
-            csvReader = new CsvReader(reader);
+            csvReader = new CsvReader(reader, delimiter);
             stockPrices = toStockPrices(csvReader, skipIfNoPrice);
         } finally {
             if (csvReader != null) {
@@ -133,9 +146,9 @@ public class StockPriceCsvUtils {
      * @return the list
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public static List<AbstractStockPrice> toStockPrices(Reader reader) throws IOException {
+    public static List<AbstractStockPrice> toStockPrices(Reader reader, char delimiter) throws IOException {
         boolean skipIfNoPrice = true;
-        return toStockPrices(reader, skipIfNoPrice);
+        return toStockPrices(reader, skipIfNoPrice, delimiter);
     }
 
 }

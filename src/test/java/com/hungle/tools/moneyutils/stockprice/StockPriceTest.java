@@ -35,7 +35,8 @@ public class StockPriceTest {
         reader = new FileReader(new File("src/test/data/quotes_001.csv"));
         // "YHOO","Yahoo! Inc.",12.76,"8/2/2011","4:00pm",12.75,13.18
 
-        List<AbstractStockPrice> stockPrices = StockPriceCsvUtils.toStockPrices(reader);
+        char delimiter = StockPriceCsvUtils.CSV_DELIMITER_COMMA_CHAR;
+        List<AbstractStockPrice> stockPrices = StockPriceCsvUtils.toStockPrices(reader, delimiter);
 
         Assert.assertNotNull(stockPrices);
         Assert.assertEquals(1, stockPrices.size());

@@ -162,7 +162,6 @@ public class StockPrice extends AbstractStockPrice {
      */
     private void updateLastTrade(String stockSymbol) {
         Date date = getLastTrade();
-        LOGGER.info("XXX date=" + date);
         if (date == null) {
             try {
                 date = createLastTradeDate(lastTradeDate, lastTradeTime, lastTradeDateTimeFormatter, lastTradeDateFormatter,
@@ -172,7 +171,6 @@ public class StockPrice extends AbstractStockPrice {
             }
             setLastTrade(date);
         }
-        LOGGER.info("XXX getLastTrade=" + getLastTrade());
     }
 
     /*

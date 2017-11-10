@@ -288,7 +288,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
                 }
                 try {
                     List<AbstractStockPrice> receivedFromQuoteSource = future.get();
-                    addPrices(prices, receivedFromQuoteSource);
+                    addPrices(receivedFromQuoteSource, prices);
                 } catch (InterruptedException e) {
                     LOGGER.warn(e);
                 } catch (ExecutionException e) {
@@ -317,13 +317,12 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     /**
      * Adds the prices we received to the all price list. Filter out fx as
      * needed.
-     *
-     * @param prices
-     *            the beans
      * @param newPrices
      *            the received from quote source
+     * @param prices
+     *            the beans
      */
-    protected void addPrices(List<AbstractStockPrice> prices, List<AbstractStockPrice> newPrices) {
+    protected void addPrices(List<AbstractStockPrice> newPrices, List<AbstractStockPrice> prices) {
         if (newPrices == null) {
             return;
         }

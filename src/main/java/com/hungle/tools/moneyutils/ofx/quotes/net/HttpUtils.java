@@ -38,7 +38,8 @@ public class HttpUtils {
         Reader reader = null;
         try {
             reader = entityToReader(entity);
-            beans = StockPriceCsvUtils.toStockPrices(reader, skipIfNoPrice);
+            char delimiter = StockPriceCsvUtils.CSV_DELIMITER_COMMA_CHAR;
+            beans = StockPriceCsvUtils.toStockPrices(reader, skipIfNoPrice, delimiter);
         } finally {
             if (reader != null) {
                 try {

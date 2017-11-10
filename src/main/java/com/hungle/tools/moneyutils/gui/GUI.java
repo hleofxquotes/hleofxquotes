@@ -15,6 +15,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -72,6 +73,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableCellRenderer;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -111,6 +113,7 @@ import com.hungle.tools.moneyutils.scholarshare.TIAACREFQuoteSourcePanel;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 import com.hungle.tools.moneyutils.stockprice.Price;
 import com.hungle.tools.moneyutils.stockprice.StockPrice;
+import com.hungle.tools.moneyutils.stockprice.StockPriceCsvUtils;
 import com.hungle.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel;
 import com.hungle.tools.moneyutils.yahoo.YahooHistoricalSourcePanel;
 import com.hungle.tools.moneyutils.yahoo.YahooQuoteSourcePanel;
@@ -928,7 +931,7 @@ public class GUI extends JFrame {
     private final class StockPricesReceivedTask implements Runnable {
 
         /** The beans. */
-        private final List<AbstractStockPrice> beans;
+        private final List<AbstractStockPrice> prices;
 
         /** The bad price. */
         private final Double badPrice;
@@ -948,7 +951,7 @@ public class GUI extends JFrame {
         /**
          * Instantiates a new stock prices received task.
          *
-         * @param beans
+         * @param prices
          *            the beans
          * @param badPrice
          *            the bad price
@@ -961,9 +964,9 @@ public class GUI extends JFrame {
          * @param quoteSource
          *            the quote source
          */
-        private StockPricesReceivedTask(List<AbstractStockPrice> beans, Double badPrice, FxTable fxTable,
+        private StockPricesReceivedTask(List<AbstractStockPrice> prices, Double badPrice, FxTable fxTable,
                 boolean hasWrappedShareCount, SymbolMapper symbolMapper, QuoteSource quoteSource) {
-            this.beans = beans;
+            this.prices = prices;
             this.badPrice = badPrice;
             this.fxTable = fxTable;
             this.hasWrappedShareCount = hasWrappedShareCount;
@@ -979,13 +982,13 @@ public class GUI extends JFrame {
         @Override
         public void run() {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("> stockPricesReceived, size=" + beans.size());
+                LOGGER.debug("> stockPricesReceived, size=" + prices.size());
             }
 
             priceList.getReadWriteLock().writeLock().lock();
             try {
                 priceList.clear();
-                priceList.addAll(beans);
+                priceList.addAll(prices);
             } finally {
                 priceList.getReadWriteLock().writeLock().unlock();
                 if (LOGGER.isDebugEnabled()) {
@@ -1001,14 +1004,14 @@ public class GUI extends JFrame {
 
             try {
                 boolean onePerFile = quoteSource.isHistoricalQuotes();
-                List<File> ofxFiles = saveToOFX(beans, symbolMapper, fxTable, onePerFile);
+                List<File> ofxFiles = saveToOFX(prices, symbolMapper, fxTable, onePerFile);
                 for (File ofxFile : ofxFiles) {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("ofxFile=" + ofxFile);
                     }
                 }
 
-                File csvFile = saveToCsv(beans);
+                File csvFile = saveToCsv(prices);
                 LOGGER.info("csvFile=" + csvFile);
 
                 MapperTableUtils.updateMapperTable(symbolMapper, mapper);
@@ -1405,16 +1408,16 @@ public class GUI extends JFrame {
         symbolMapper = SymbolMapper.loadMapperFile();
         fxTable = FxTableUtils.loadFxFile();
 
-        final List<AbstractStockPrice> beans = (stockPrices != null) ? stockPrices : new ArrayList<AbstractStockPrice>();
-        updateLastPriceCurrency(beans, defaultCurrency, symbolMapper);
+        final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices : new ArrayList<AbstractStockPrice>();
+        updateLastPriceCurrency(prices, defaultCurrency, symbolMapper);
 
         if (randomizeShareCount) {
             int randomInt = random.nextInt(998);
             randomInt = randomInt + 1;
             double value = randomInt / 1000.00;
             LOGGER.info("randomizeShareCount=" + randomizeShareCount + ", value=" + value);
-            for (AbstractStockPrice bean : beans) {
-                bean.setUnits(value);
+            for (AbstractStockPrice price : prices) {
+                price.setUnits(value);
             }
         }
 
@@ -1429,7 +1432,7 @@ public class GUI extends JFrame {
                 hasWrappedShareCount = true;
             }
             value = value + 0.001;
-            for (AbstractStockPrice bean : beans) {
+            for (AbstractStockPrice bean : prices) {
                 bean.setUnits(value);
             }
             if (LOGGER.isDebugEnabled()) {
@@ -1454,7 +1457,7 @@ public class GUI extends JFrame {
         Double badPrice = null;
         if (suspiciousPrice > -1L) {
             Double d = new Double(suspiciousPrice);
-            for (AbstractStockPrice bean : beans) {
+            for (AbstractStockPrice bean : prices) {
                 String stockSymbol = bean.getStockSymbol();
                 if ((stockSymbol != null) && (stockSymbol.startsWith("^"))) {
                     // index
@@ -1471,7 +1474,7 @@ public class GUI extends JFrame {
             }
         }
 
-        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(beans, badPrice, fxTable, hasWrappedShareCount, symbolMapper,
+        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(prices, badPrice, fxTable, hasWrappedShareCount, symbolMapper,
                 quoteSource);
         // doRun.run();
         SwingUtilities.invokeLater(stockPricesReceivedTask);
@@ -1553,32 +1556,40 @@ public class GUI extends JFrame {
     /**
      * Save to csv.
      *
-     * @param beans
+     * @param stockPrices
      *            the beans
      * @return the file
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    private File saveToCsv(List<AbstractStockPrice> beans) throws IOException {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+    private File saveToCsv(List<AbstractStockPrice> stockPrices) throws IOException {
+        SimpleDateFormat tradeDateFormatter = new SimpleDateFormat(AbstractStockPrice.DEFAULT_LAST_TRADE_DATE_PATTERN);
+        SimpleDateFormat tradeTimeFormatter = new SimpleDateFormat(AbstractStockPrice.DEFAULT_LAST_TRADE_TIME_PATTERN);
+
         File outFile = null;
         outFile = new File("quotes.csv");
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
-            writer.println("symbol,name,price,date");
+            // "YHOO","Yahoo! Inc.",12.76,"8/2/2011","4:00pm",12.75,13.18
+            writer.println("#symbol,name,price,date,time,priceDayLow,priceDayHigh");
+            writer.println("#\"YHOO\",\"Yahoo! Inc.\",12.76,\"8/2/2011\",\"4:00pm\",12.75,13.18");
             writer.println("");
-            for (AbstractStockPrice bean : beans) {
-                writer.print(bean.getStockSymbol());
+            for (AbstractStockPrice stockPrice : stockPrices) {
+                // symbol
+                writer.print(stockPrice.getStockSymbol());
 
-                writer.print(",");
-                writer.print(bean.getStockName().replace(",", ""));
+                // name
+                String delimiter = ",";
+                writer.print(delimiter);
+                writer.print(stockPrice.getStockName().replace(delimiter, ""));
 
-                writer.print(",");
-                Double price = bean.getLastPrice().getPrice();
+                // price
+                writer.print(delimiter);
+                Double price = stockPrice.getLastPrice().getPrice();
                 // TODO: assume that portfolio currency is going to be
                 // GBP
-                String currency = bean.getCurrency();
+                String currency = stockPrice.getCurrency();
                 if (currency != null) {
                     if (currency.compareToIgnoreCase("GBX") == 0) {
                         price = price / 100.0;
@@ -1586,13 +1597,31 @@ public class GUI extends JFrame {
                 }
                 writer.print(priceFormatter.format(price));
 
-                writer.print(",");
-                Date lastTrade = bean.getLastTrade();
+                Date lastTrade = stockPrice.getLastTrade();
+
+                // date
+                writer.print(delimiter);
                 if (lastTrade == null) {
                     writer.print("");
                 } else {
-                    writer.print(formatter.format(lastTrade));
+                    writer.print(tradeDateFormatter.format(lastTrade));
                 }
+                
+                // time
+                writer.print(delimiter);
+                if (lastTrade == null) {
+                    writer.print("");
+                } else {
+                    writer.print(tradeTimeFormatter.format(lastTrade));
+                }
+                
+                // priceDayLow
+                writer.print(delimiter);
+                writer.print("");
+
+                // priceDayHigh
+                writer.print(delimiter);
+                writer.print("");
 
                 writer.println();
             }
@@ -2564,12 +2593,63 @@ public class GUI extends JFrame {
              * 
              */
             private static final long serialVersionUID = 1L;
+            
+            private JFileChooser fc = null;
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                QuoteSource quoteSource = new DefaultQuoteSource();
-                List<AbstractStockPrice> stockPrices = new ArrayList<AbstractStockPrice>();
-                getQuoteSourceListener().stockPricesReceived(quoteSource, stockPrices);
+                if (fc == null) {
+                    initFileChooser();
+                }
+                if (fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+                    return;
+                }
+                File file = fc.getSelectedFile();
+                BufferedReader reader = null;
+                try {
+                    reader = new BufferedReader(new FileReader(file));
+                    char delimiter = StockPriceCsvUtils.CSV_DELIMITER_COMMA_CHAR;
+                    List<AbstractStockPrice> stockPrices = StockPriceCsvUtils.toStockPrices(reader, delimiter);
+                    LOGGER.info("From file=" + file + ", count=" + stockPrices.size());
+                    
+                    QuoteSource quoteSource = new DefaultQuoteSource();
+                    getQuoteSourceListener().stockPricesReceived(quoteSource, stockPrices);
+                } catch (IOException e1) {
+                    LOGGER.warn(e);
+                } finally {
+                    if (reader != null) {
+                        try {
+                            reader.close();
+                        } catch (IOException e1) {
+                            LOGGER.warn(e);
+                        } finally {
+                            reader = null;
+                        }
+                    }
+                }
+
+            }
+
+            private void initFileChooser() {
+                String key = SaveOfxAction.PREF_SAVE_OFX_DIR;
+                fc = new JFileChooser(PREFS.get(key, "."));  
+                FileFilter filter = new FileFilter() {
+
+                    @Override
+                    public String getDescription() {
+                        return "yahoo.com CSV";
+                    }
+
+                    @Override
+                    public boolean accept(File file) {
+                        if (file.isDirectory()) {
+                            return true;
+                        }
+                        String name = file.getName();
+                        return name.endsWith(".csv");
+                    }
+                };
+                this.fc.setFileFilter(filter);
             }
         }));
         MouseListener listener = new PopupListener(popupMenu) {
@@ -2642,11 +2722,14 @@ public class GUI extends JFrame {
         view.add(commandView, BorderLayout.SOUTH);
 
         JMenu menu = null;
+        
         // OFX
         menu = new JMenu("OFX");
         priceScrollPane.getPopupMenu().add(menu);
+        
         action = new ImportAction("Open as *.ofx");
         menu.add(action);
+        
         action = new SaveOfxAction(this, "Save");
         menu.add(action);
 

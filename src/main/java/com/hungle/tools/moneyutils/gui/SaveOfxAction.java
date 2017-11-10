@@ -35,10 +35,10 @@ public final class SaveOfxAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(SaveOfxAction.class);
+    private static final Logger LOGGER = Logger.getLogger(SaveOfxAction.class);
 
     /** The Constant PREF_SAVE_OFX_DIR. */
-    static final String PREF_SAVE_OFX_DIR = "saveOfxDir";
+    public static final String PREF_SAVE_OFX_DIR = "saveOfxDir";
 
     /** The Constant DEFAULT_OFX_OUTPUT_FILENAME. */
     private static final String DEFAULT_OFX_OUTPUT_FILENAME = "quotes.ofx";
@@ -72,7 +72,7 @@ public final class SaveOfxAction extends AbstractAction {
         List<File> files = this.gui.getOutputFiles();
         
         if ((files == null) || (files.size() <= 0)) {
-            log.warn("No OFX content to save");
+            LOGGER.warn("No OFX content to save");
             return;
         }
 
@@ -93,19 +93,19 @@ public final class SaveOfxAction extends AbstractAction {
         prefs.put(PREF_SAVE_OFX_DIR, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
         try {
             copyFile(fromFile, toFile);
-            log.info("Save to outputFile=" + toFile);
+            LOGGER.info("Save to outputFile=" + toFile);
             boolean checkForShiftKey = false;
             if (checkForShiftKey) {
                 int modifiers = event.getModifiers();
                 if ((modifiers & InputEvent.SHIFT_MASK) == InputEvent.SHIFT_MASK) {
-                    log.info("SHIFT key is enable. Will auto-import into Microsoft Money");
+                    LOGGER.info("SHIFT key is enable. Will auto-import into Microsoft Money");
                     List<File> list = new ArrayList<File>();
                     list.add(fromFile);
                     ImportUtils.doImport(this.gui.getThreadPool(), list);
                 }
             }
         } catch (IOException e) {
-            log.error("Cannot save to file=" + toFile, e);
+            LOGGER.error("Cannot save to file=" + toFile, e);
         }
     }
 
@@ -113,13 +113,13 @@ public final class SaveOfxAction extends AbstractAction {
      * Inits the file chooser.
      */
     private void initFileChooser() {
-        if (log.isDebugEnabled()) {
-            log.debug("> creating FileChooser");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> creating FileChooser");
         }
         String key = PREF_SAVE_OFX_DIR;
         fc = new JFileChooser(prefs.get(key, "."));
-        if (log.isDebugEnabled()) {
-            log.debug("< creating FileChooser");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("< creating FileChooser");
         }
     }
 
@@ -142,7 +142,7 @@ public final class SaveOfxAction extends AbstractAction {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
@@ -152,7 +152,7 @@ public final class SaveOfxAction extends AbstractAction {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     writer = null;
                 }
