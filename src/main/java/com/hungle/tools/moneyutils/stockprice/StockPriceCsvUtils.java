@@ -74,7 +74,7 @@ public class StockPriceCsvUtils {
      * @return the list
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private static List<AbstractStockPrice> toStockPriceBeans(CsvReader csvReader, boolean skipIfNoPrice) throws IOException {
+    private static List<AbstractStockPrice> toStockPrices(CsvReader csvReader, boolean skipIfNoPrice) throws IOException {
         List<AbstractStockPrice> beans = new ArrayList<AbstractStockPrice>();
         // reader.readHeaders();
         while (csvReader.readRecord()) {
@@ -113,7 +113,7 @@ public class StockPriceCsvUtils {
         CsvReader csvReader = null;
         try {
             csvReader = new CsvReader(reader);
-            stockPrices = toStockPriceBeans(csvReader, skipIfNoPrice);
+            stockPrices = toStockPrices(csvReader, skipIfNoPrice);
         } finally {
             if (csvReader != null) {
                 try {

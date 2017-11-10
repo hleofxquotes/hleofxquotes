@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
@@ -14,6 +15,7 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.annotation.PropertyAnnotation;
+import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -27,6 +29,11 @@ public abstract class AbstractStockPrice {
     /** The Constant DEFAULT_LAST_TRADE_DATE_PATTERN. */
     public static final String DEFAULT_LAST_TRADE_DATE_PATTERN = "MM/dd/yyyy";
 
+    public static final String DEFAULT_LAST_TRADE_TIME_PATTERN = "hh:mma";
+
+    public static final String DEFAULT_LAST_TRADE_DATE_TIME_PATTERN = DEFAULT_LAST_TRADE_DATE_PATTERN + " "
+            + DEFAULT_LAST_TRADE_TIME_PATTERN;
+
     /** The bean utils bean. */
     private static BeanUtilsBean beanUtilsBean;
 
@@ -36,12 +43,17 @@ public abstract class AbstractStockPrice {
     /** The last trade date pattern. */
     private String lastTradeDatePattern = DEFAULT_LAST_TRADE_DATE_PATTERN;
 
+    private String lastTradeTimePattern = DEFAULT_LAST_TRADE_TIME_PATTERN;
+
+    private String lastTradeDateTimePattern = DEFAULT_LAST_TRADE_DATE_TIME_PATTERN;
+
     /** The last trade date formatter. */
     protected SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat(lastTradeDatePattern);
-    
-    protected SimpleDateFormat lastTradeTimeFormatter = new SimpleDateFormat("hh:mm");
 
-    
+    protected SimpleDateFormat lastTradeTimeFormatter = new SimpleDateFormat(lastTradeTimePattern);
+
+    protected SimpleDateFormat lastTradeDateTimeFormatter = new SimpleDateFormat(lastTradeDateTimePattern);
+
     static {
         ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
 
@@ -50,6 +62,30 @@ public abstract class AbstractStockPrice {
         convertUtilsBean.register(new PriceConverter(), Price.class);
 
         AbstractStockPrice.beanUtilsBean = new BeanUtilsBean(convertUtilsBean, new PropertyUtilsBean());
+    }
+
+    public static final Date createLastTradeDate(String lastTradeDate, String lastTradeTime,
+            SimpleDateFormat lastTradeDateTimeFormatter, SimpleDateFormat lastTradeDateFormatter,
+            SimpleDateFormat lastTradeTimeFormatter) throws ParseException {
+        Date date = null;
+        String dateString = lastTradeDate + " " + lastTradeTime;
+        if ((!PropertiesUtils.isNull(lastTradeDate)) && (!PropertiesUtils.isNull(lastTradeTime))) {
+            dateString = lastTradeDate + " " + lastTradeTime;
+            date = lastTradeDateTimeFormatter.parse(dateString);
+        } else if (!PropertiesUtils.isNull(lastTradeDate)) {
+            dateString = lastTradeDate;
+            date = lastTradeDateFormatter.parse(dateString);
+        } else if (!PropertiesUtils.isNull(lastTradeTime)) {
+            dateString = lastTradeTime;
+            date = lastTradeTimeFormatter.parse(lastTradeTime);
+        } else {
+            date = null;
+        }
+        
+        LOGGER.info("dateString=" + dateString);
+        LOGGER.info("date=" + date);
+        
+        return date;
     }
 
     /**
@@ -272,7 +308,7 @@ public abstract class AbstractStockPrice {
      * @param dateString
      *            the new last trade date string
      */
-//    public abstract void setLastTradeDate(String dateString);
+     public abstract void setLastTradeDate(String dateString);
 
     /**
      * Gets the last trade.
@@ -294,7 +330,7 @@ public abstract class AbstractStockPrice {
      *
      * @return the last trade time
      */
-    public abstract String getLastTradeTime();
+     public abstract String getLastTradeTime();
 
     /**
      * Sets the last trade time string.
@@ -302,7 +338,7 @@ public abstract class AbstractStockPrice {
      * @param timeString
      *            the new last trade time string
      */
-//    public abstract void setLastTradeTime(String timeString);
+     public abstract void setLastTradeTime(String timeString);
 
     /**
      * Sets the units.
