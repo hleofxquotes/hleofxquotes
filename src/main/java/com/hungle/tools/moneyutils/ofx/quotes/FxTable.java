@@ -47,7 +47,7 @@ public class FxTable {
      * @param toCurrency the to currency
      * @return the rate string
      */
-    public Double getRateString(String fromCurrency, String toCurrency) {
+    public Double getCurrencyRate(String fromCurrency, String toCurrency) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("getRateString: " + fromCurrency + ", " + toCurrency);
         }

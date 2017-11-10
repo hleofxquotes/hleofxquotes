@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -55,7 +57,16 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
             throws URISyntaxException, IOException, ClientProtocolException {
 
         this.stockSymbol.set(stocks.get(0));
-        URI uri = new URL("https://finance.yahoo.com/quote/" + stockSymbol.get() + "?p=" + stockSymbol.get()).toURI();
+        Charset enc = Charset.forName("UTF-8");
+        if (enc == null) {
+            enc = Charset.defaultCharset();
+        }
+        String stockSymbolStr = stockSymbol.get();
+        stockSymbolStr = URLEncoder.encode(stockSymbolStr, enc.toString());
+
+        String urlString = "https://finance.yahoo.com/quote/" + stockSymbolStr + "?p=" + stockSymbolStr;
+        
+        URI uri = new URL(urlString).toURI();
 
         HttpGet httpGet = new HttpGet(uri);
         if (LOGGER.isDebugEnabled()) {
@@ -106,7 +117,7 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("    currency=" + currency);
         }
-        
+
         if (currency != null) {
             if (regularMarketPricePrice != null) {
                 regularMarketPricePrice.setCurrency(currency);
@@ -116,7 +127,7 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
             }
             if (regularMarketDayLowPrice != null) {
                 regularMarketDayLowPrice.setCurrency(currency);
-            }    
+            }
         }
 
         Date lastTrade = null;
@@ -176,8 +187,8 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
 
         stockPrice.setLastTrade(lastTrade);
         if (lastTrade != null) {
-//            stockPrice.setLastTradeDate(lastTradeDateFormatter.format(lastTrade));
-//            stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(lastTrade));
+            // stockPrice.setLastTradeDate(lastTradeDateFormatter.format(lastTrade));
+            // stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(lastTrade));
         }
 
         stockPrice.postSetProperties();
