@@ -142,11 +142,6 @@ public class GUI extends JFrame {
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    /** The Constant prefs. */
-    // TODO: le.com.tools.moneyutils.ofx.quotes.GUI
-    private static final Preferences PREFS = Preferences
-            .userNodeForPackage(le.com.tools.moneyutils.ofx.quotes.GUI.class);
-
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(GUI.class);
 
@@ -160,6 +155,12 @@ public class GUI extends JFrame {
     /** The version. */
     // 20171104_122
     public static String VERSION = VERSION_PREFIX + "_" + "20171104_122" + "_" + VERSION_SUFFIX;
+
+    private static final Class<le.com.tools.moneyutils.ofx.quotes.GUI> PREFS_CLASS = le.com.tools.moneyutils.ofx.quotes.GUI.class;
+
+    /** The Constant prefs. */
+    // TODO: le.com.tools.moneyutils.ofx.quotes.GUI
+    private static final Preferences PREFS = Preferences.userNodeForPackage(PREFS_CLASS);
 
     /** The Constant PREF_DEFAULT_CURRENCY. */
     private static final String PREF_DEFAULT_CURRENCY = "defaultCurrency";
@@ -354,9 +355,8 @@ public class GUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             String[] possibilities = { "true", "false" };
             Icon icon = null;
-            String s = (String) JOptionPane.showInputDialog(GUI.this,
-                    "Current: " + randomizeShareCount + "\n" + "Choices:", "Set Randomize Share Count",
-                    JOptionPane.PLAIN_MESSAGE, icon, possibilities, null);
+            String s = (String) JOptionPane.showInputDialog(GUI.this, "Current: " + randomizeShareCount + "\n" + "Choices:",
+                    "Set Randomize Share Count", JOptionPane.PLAIN_MESSAGE, icon, possibilities, null);
 
             // If a string was returned, say so.
             if ((s != null) && (s.length() > 0)) {
@@ -405,8 +405,8 @@ public class GUI extends JFrame {
             Icon icon = null;
             String s = (String) JOptionPane.showInputDialog(GUI.this,
                     "To guard against bad price from quote source,\n"
-                            + "you can set a value above which will trigger a warning dialog.\n"
-                            + "To disable: set to -1.\n" + "\n" + "Current: " + suspiciousPrice + "\n" + "Price:",
+                            + "you can set a value above which will trigger a warning dialog.\n" + "To disable: set to -1.\n" + "\n"
+                            + "Current: " + suspiciousPrice + "\n" + "Price:",
                     "Set a price", JOptionPane.PLAIN_MESSAGE, icon, possibilities, suspiciousPrice.toString());
 
             // If a string was returned, say so.
@@ -458,9 +458,8 @@ public class GUI extends JFrame {
         public void actionPerformed(ActionEvent event) {
             String[] possibilities = null;
             Icon icon = null;
-            String s = (String) JOptionPane.showInputDialog(GUI.this,
-                    "Current: " + accountId + "\n" + "OFX Account Id:", "Set OFX Account Id", JOptionPane.PLAIN_MESSAGE,
-                    icon, possibilities, accountId);
+            String s = (String) JOptionPane.showInputDialog(GUI.this, "Current: " + accountId + "\n" + "OFX Account Id:",
+                    "Set OFX Account Id", JOptionPane.PLAIN_MESSAGE, icon, possibilities, accountId);
 
             // If a string was returned, say so.
             if ((s != null) && (s.length() > 0)) {
@@ -504,9 +503,8 @@ public class GUI extends JFrame {
                 possibilities[i++] = key;
             }
             Icon icon = null;
-            String s = (String) JOptionPane.showInputDialog(GUI.this,
-                    "Current: " + defaultCurrency + "\n" + "Available:", "Set Currency", JOptionPane.PLAIN_MESSAGE,
-                    icon, possibilities, null);
+            String s = (String) JOptionPane.showInputDialog(GUI.this, "Current: " + defaultCurrency + "\n" + "Available:",
+                    "Set Currency", JOptionPane.PLAIN_MESSAGE, icon, possibilities, null);
 
             // If a string was returned, say so.
             if ((s != null) && (s.length() > 0)) {
@@ -575,8 +573,7 @@ public class GUI extends JFrame {
          * @return the jar file
          */
         private void getJarFile(final ActionEvent event) {
-            final ProgressMonitor progressMonitor = new ProgressMonitor(GUI.this, "Downloading sunriise plugin ...", "",
-                    0, 100);
+            final ProgressMonitor progressMonitor = new ProgressMonitor(GUI.this, "Downloading sunriise plugin ...", "", 0, 100);
             final String jarFileName = "sunriise-0.0.3-20111220.210334-1-jar-with-dependencies.jar";
 
             Callable<String> task = new Callable<String>() {
@@ -633,8 +630,7 @@ public class GUI extends JFrame {
          * @throws IOException
          *             Signals that an I/O exception has occurred.
          */
-        private boolean getJarFile(String uri, File toJarFile, final ProgressMonitor progressMonitor)
-                throws IOException {
+        private boolean getJarFile(String uri, File toJarFile, final ProgressMonitor progressMonitor) throws IOException {
             boolean canceled = false;
             HttpClient client = HttpClientBuilder.create().build();
             HttpGet httpGet = new HttpGet(uri);
@@ -1040,8 +1036,8 @@ public class GUI extends JFrame {
                         @Override
                         public void run() {
                             JOptionPane.showMessageDialog(GUI.this,
-                                    "Incoming price from quote source has\n" + "suspicious price: " + badPrice,
-                                    "Suspicious Price", JOptionPane.WARNING_MESSAGE, null);
+                                    "Incoming price from quote source has\n" + "suspicious price: " + badPrice, "Suspicious Price",
+                                    JOptionPane.WARNING_MESSAGE, null);
                         }
                     };
                     SwingUtilities.invokeLater(doRun);
@@ -1113,8 +1109,8 @@ public class GUI extends JFrame {
             }
             File fiDir = new File(topDir, fiName);
             if (fiDir.exists()) {
-                JOptionPane.showMessageDialog(parentComponent, "Directory exist\ndir=" + fiDir.getAbsolutePath(),
-                        "Error creating", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parentComponent, "Directory exist\ndir=" + fiDir.getAbsolutePath(), "Error creating",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (!fiDir.mkdirs()) {
@@ -1128,8 +1124,8 @@ public class GUI extends JFrame {
             String sampleFileName = "samples" + "/" + fiPropertiesFileName;
             URL url = OfxUtils.getResource(sampleFileName);
             if (url == null) {
-                JOptionPane.showMessageDialog(parentComponent, "Cannot find sample file\nfile=" + sampleFileName,
-                        "Error creating", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parentComponent, "Cannot find sample file\nfile=" + sampleFileName, "Error creating",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -1138,16 +1134,13 @@ public class GUI extends JFrame {
                 fiPropertiesFile = new File(fiDir, fiPropertiesFileName);
                 Utils.copyToFile(url, fiPropertiesFile);
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(parentComponent, "Error creating " + fiPropertiesFileName,
-                        "Error creating", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parentComponent, "Error creating " + fiPropertiesFileName, "Error creating",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            JOptionPane
-                    .showMessageDialog(parentComponent,
-                            "Succesfully created dirctory for fi=" + fiName + "\n" + "Please edit file\n"
-                                    + fiPropertiesFile.getAbsolutePath(),
-                            "FI Created", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(parentComponent, "Succesfully created dirctory for fi=" + fiName + "\n"
+                    + "Please edit file\n" + fiPropertiesFile.getAbsolutePath(), "FI Created", JOptionPane.INFORMATION_MESSAGE);
 
             postCreated();
         }
@@ -1412,8 +1405,7 @@ public class GUI extends JFrame {
         symbolMapper = SymbolMapper.loadMapperFile();
         fxTable = FxTableUtils.loadFxFile();
 
-        final List<AbstractStockPrice> beans = (stockPrices != null) ? stockPrices
-                : new ArrayList<AbstractStockPrice>();
+        final List<AbstractStockPrice> beans = (stockPrices != null) ? stockPrices : new ArrayList<AbstractStockPrice>();
         updateLastPriceCurrency(beans, defaultCurrency, symbolMapper);
 
         if (randomizeShareCount) {
@@ -1441,8 +1433,7 @@ public class GUI extends JFrame {
                 bean.setUnits(value);
             }
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(
-                        "incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
+                LOGGER.debug("incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
             }
             PREFS.putDouble(key, value);
         }
@@ -1480,8 +1471,8 @@ public class GUI extends JFrame {
             }
         }
 
-        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(beans, badPrice, fxTable, hasWrappedShareCount,
-                symbolMapper, quoteSource);
+        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(beans, badPrice, fxTable, hasWrappedShareCount, symbolMapper,
+                quoteSource);
         // doRun.run();
         SwingUtilities.invokeLater(stockPricesReceivedTask);
     }
@@ -1663,8 +1654,7 @@ public class GUI extends JFrame {
      * @param symbolMapper
      *            the symbol mapper
      */
-    private void updateLastPriceCurrency(List<AbstractStockPrice> stockPrices, String defaultCurrency,
-            SymbolMapper symbolMapper) {
+    private void updateLastPriceCurrency(List<AbstractStockPrice> stockPrices, String defaultCurrency, SymbolMapper symbolMapper) {
         for (AbstractStockPrice stockPrice : stockPrices) {
             Price price = stockPrice.getLastPrice();
             if ((defaultCurrency != null) && (price.getCurrency() == null)) {
@@ -1752,7 +1742,7 @@ public class GUI extends JFrame {
             public void run() {
                 clearPriceTable();
                 clearFxTable();
-                
+
                 clearMapperTable();
             }
         };
@@ -2117,8 +2107,7 @@ public class GUI extends JFrame {
                 Icon icon = null;
                 String s = (String) JOptionPane.showInputDialog(GUI.this,
                         "Current: " + incrementallyIncreasedShareCount + "\n" + "Choices:",
-                        "Set Incrementally Increased Share Count", JOptionPane.PLAIN_MESSAGE, icon, possibilities,
-                        null);
+                        "Set Incrementally Increased Share Count", JOptionPane.PLAIN_MESSAGE, icon, possibilities, null);
 
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
@@ -2127,8 +2116,7 @@ public class GUI extends JFrame {
                     Boolean newValue = Boolean.valueOf(value);
                     if (newValue.compareTo(incrementallyIncreasedShareCount) != 0) {
                         incrementallyIncreasedShareCount = newValue;
-                        PREFS.put(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT,
-                                incrementallyIncreasedShareCount.toString());
+                        PREFS.put(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT, incrementallyIncreasedShareCount.toString());
                         // to clear the pricing table
                         QuoteSource quoteSource = null;
                         stockSymbolsStringReceived(quoteSource, null);
@@ -2181,9 +2169,8 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent event) {
                 String[] possibilities = null;
                 Icon icon = null;
-                String s = (String) JOptionPane.showInputDialog(GUI.this,
-                        "Current: " + dateOffset + "\n" + "Number of days:", "Set number of date to offset",
-                        JOptionPane.PLAIN_MESSAGE, icon, possibilities, dateOffset.toString());
+                String s = (String) JOptionPane.showInputDialog(GUI.this, "Current: " + dateOffset + "\n" + "Number of days:",
+                        "Set number of date to offset", JOptionPane.PLAIN_MESSAGE, icon, possibilities, dateOffset.toString());
 
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
@@ -2617,8 +2604,8 @@ public class GUI extends JFrame {
         view.setLayout(new BorderLayout());
 
         priceFilterEdit = new JTextField(10);
-        PriceTableView<AbstractStockPrice> priceScrollPane = new PriceTableView<AbstractStockPrice>(priceFilterEdit,
-                priceList, AbstractStockPrice.class);
+        PriceTableView<AbstractStockPrice> priceScrollPane = new PriceTableView<AbstractStockPrice>(priceFilterEdit, priceList,
+                AbstractStockPrice.class);
         view.add(priceScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -2743,8 +2730,8 @@ public class GUI extends JFrame {
         view.setLayout(new BorderLayout());
 
         JTextField filterEdit = new JTextField(10);
-        PriceTableView<AbstractStockPrice> fxScrollPane = new PriceTableView<AbstractStockPrice>(filterEdit,
-                exchangeRates, AbstractStockPrice.class);
+        PriceTableView<AbstractStockPrice> fxScrollPane = new PriceTableView<AbstractStockPrice>(filterEdit, exchangeRates,
+                AbstractStockPrice.class);
         view.add(fxScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -2855,8 +2842,8 @@ public class GUI extends JFrame {
      * @return the j table
      */
     private static JTable createPriceTable(EventList<AbstractStockPrice> priceList,
-            Comparator<? super AbstractStockPrice> comparator, JTextField filterEdit,
-            TextFilterator<AbstractStockPrice> filter, boolean addStripe) {
+            Comparator<? super AbstractStockPrice> comparator, JTextField filterEdit, TextFilterator<AbstractStockPrice> filter,
+            boolean addStripe) {
         EventList<AbstractStockPrice> source = priceList;
 
         SortedList<AbstractStockPrice> sortedList = null;
@@ -2868,8 +2855,8 @@ public class GUI extends JFrame {
 
         if ((filterEdit != null) && (filter != null)) {
             FilterList<AbstractStockPrice> filterList = null;
-            MatcherEditor<AbstractStockPrice> textMatcherEditor = new TextComponentMatcherEditor<AbstractStockPrice>(
-                    filterEdit, filter);
+            MatcherEditor<AbstractStockPrice> textMatcherEditor = new TextComponentMatcherEditor<AbstractStockPrice>(filterEdit,
+                    filter);
             filterList = new FilterList<AbstractStockPrice>(source, textMatcherEditor);
             source = filterList;
         }
@@ -2878,10 +2865,9 @@ public class GUI extends JFrame {
         String propertyNames[] = { "stockSymbol", "stockName", "lastPrice", "lastTradeDate", "lastTradeTime" };
         String columnLabels[] = { "Symbol", "Name", "Price", "Last Trade Date", "Last Trade Time" };
         AdvancedTableFormat tableFormat = new BeanTableFormat(beanClass, propertyNames, columnLabels);
-        TransformedList<AbstractStockPrice, AbstractStockPrice> sourceProxyList = GlazedListsSwing
-                .swingThreadProxyList(source);
-        DefaultEventTableModel<AbstractStockPrice> tableModel = new DefaultEventTableModel<AbstractStockPrice>(
-                sourceProxyList, tableFormat);
+        TransformedList<AbstractStockPrice, AbstractStockPrice> sourceProxyList = GlazedListsSwing.swingThreadProxyList(source);
+        DefaultEventTableModel<AbstractStockPrice> tableModel = new DefaultEventTableModel<AbstractStockPrice>(sourceProxyList,
+                tableFormat);
 
         JTable table = new JTable(tableModel);
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
@@ -23,11 +24,24 @@ public abstract class AbstractStockPrice {
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(AbstractStockPrice.class);
 
+    /** The Constant DEFAULT_LAST_TRADE_DATE_PATTERN. */
+    public static final String DEFAULT_LAST_TRADE_DATE_PATTERN = "MM/dd/yyyy";
+
     /** The bean utils bean. */
     private static BeanUtilsBean beanUtilsBean;
 
     /** The properties. */
     private Set<FieldInfo> properties;
+
+    /** The last trade date pattern. */
+    private String lastTradeDatePattern = DEFAULT_LAST_TRADE_DATE_PATTERN;
+
+    /** The last trade date formatter. */
+    protected SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat(lastTradeDatePattern);
+    
+    protected SimpleDateFormat lastTradeTimeFormatter = new SimpleDateFormat("hh:mm");
+
+    
     static {
         ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
 
@@ -258,7 +272,7 @@ public abstract class AbstractStockPrice {
      * @param dateString
      *            the new last trade date string
      */
-    public abstract void setLastTradeDate(String dateString);
+//    public abstract void setLastTradeDate(String dateString);
 
     /**
      * Gets the last trade.
@@ -288,7 +302,7 @@ public abstract class AbstractStockPrice {
      * @param timeString
      *            the new last trade time string
      */
-    public abstract void setLastTradeTime(String timeString);
+//    public abstract void setLastTradeTime(String timeString);
 
     /**
      * Sets the units.

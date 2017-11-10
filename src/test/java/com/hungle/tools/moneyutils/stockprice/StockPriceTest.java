@@ -43,7 +43,7 @@ public class StockPriceTest {
         Assert.assertEquals(expected, price.getPrice());
 
         Date lastTrade = stockPrice.getLastTrade();
-        SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat(StockPrice.DEFAULT_LAST_TRADE_DATE_PATTERN);
+        SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat(AbstractStockPrice.DEFAULT_LAST_TRADE_DATE_PATTERN);
         Date expectedDate = lastTradeDateFormatter.parse("8/2/2011");
         Assert.assertEquals(expectedDate, lastTrade);
     }
@@ -66,7 +66,7 @@ public class StockPriceTest {
                 return columns.toString();
             }
         };
-        StockPrice stockPrice = new StockPrice(row);
+        AbstractStockPrice stockPrice = new StockPrice(row);
         Assert.assertNotNull(stockPrice);
         String expected = "snl1d1t1gh";
         Assert.assertEquals(expected, stockPrice.getFormat());
@@ -96,7 +96,7 @@ public class StockPriceTest {
     @Test
     public void testFieldInfo() throws IOException {
         CsvRow row;
-        StockPrice stockPrice;
+        AbstractStockPrice stockPrice;
         String expected;
         Set<FieldInfo> properties = FieldInfo.createFieldInfoSet();
         // format = "snl1d1t1gh";

@@ -152,7 +152,9 @@ public class YahooScreenScrapper2 implements Closeable {
             stockPrice.setLastPrice(regularMarketPricePrice);
 
             stockPrice.setLastTrade(lastTrade);
-            stockPrice.setLastTradeDate(priceInfoLastTradeDateFormatter.format(lastTrade));
+            if (lastTrade != null) {
+//                stockPrice.setLastTradeDate(priceInfoLastTradeDateFormatter.format(lastTrade));
+            }
 
 
             stockPrice.setStockName(shortName);

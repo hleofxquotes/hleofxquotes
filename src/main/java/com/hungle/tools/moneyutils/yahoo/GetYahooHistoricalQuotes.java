@@ -243,7 +243,7 @@ public class GetYahooHistoricalQuotes extends YahooQuotesGetter {
             Comparator<AbstractStockPrice> c = new Comparator<AbstractStockPrice>() {
                 @Override
                 public int compare(AbstractStockPrice o1, AbstractStockPrice o2) {
-                    return o1.getLastTradeDate().compareTo(o2.getLastTradeDate());
+                    return o1.getLastTrade().compareTo(o2.getLastTrade());
                 }
             };
             Collections.sort(beans, c);
@@ -350,7 +350,7 @@ public class GetYahooHistoricalQuotes extends YahooQuotesGetter {
         // Date
         // 2011-10-28
         bean.setLastTrade(lastTrade);
-        bean.setLastTradeDate(priceInfoLastTradeDateFormatter.format(lastTrade));
+//        bean.setLastTradeDate(priceInfoLastTradeDateFormatter.format(lastTrade));
 
         // TODO:
         bean.postSetProperties();

@@ -4,7 +4,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
@@ -18,12 +17,9 @@ import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
  * The Class StockPrice.
  */
 public class StockPrice extends AbstractStockPrice {
-    
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(StockPrice.class);
-
-    /** The Constant DEFAULT_LAST_TRADE_DATE_PATTERN. */
-    public static final String DEFAULT_LAST_TRADE_DATE_PATTERN = "MM/dd/yyyy";
 
     /** The stock symbol. */
     // http://dirk.eddelbuettel.com/code/yahooquote.html
@@ -72,17 +68,11 @@ public class StockPrice extends AbstractStockPrice {
     /** The last trade. */
     private Date lastTrade;
 
-    /** The last trade date pattern. */
-    //
-    private String lastTradeDatePattern = DEFAULT_LAST_TRADE_DATE_PATTERN;
-    
-    /** The last trade date formatter. */
-    private SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat(lastTradeDatePattern);
-
     /**
      * Adds the property change listener.
      *
-     * @param listener the listener
+     * @param listener
+     *            the listener
      */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
@@ -91,7 +81,8 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Removes the property change listener.
      *
-     * @param listener the listener
+     * @param listener
+     *            the listener
      */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         support.removePropertyChangeListener(listener);
@@ -107,9 +98,12 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Instantiates a new stock price.
      *
-     * @param row the row
-     * @param properties the properties
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param row
+     *            the row
+     * @param properties
+     *            the properties
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public StockPrice(CsvRow row, Set<FieldInfo> properties) throws IOException {
         super(row, properties);
@@ -120,8 +114,10 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Instantiates a new stock price.
      *
-     * @param row the row
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param row
+     *            the row
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public StockPrice(CsvRow row) throws IOException {
         super(row);
@@ -161,24 +157,31 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Update last trade.
      *
-     * @param stockSymbol the stock symbol
+     * @param stockSymbol
+     *            the stock symbol
      */
     private void updateLastTrade(String stockSymbol) {
-        String lastTradeDate = getLastTradeDate();
-        if (!PropertiesUtils.isNull(lastTradeDate)) {
-            try {
-                Date date = lastTradeDateFormatter.parse(lastTradeDate);
-                setLastTrade(date);
-            } catch (ParseException e) {
-                LOGGER.warn("stockSymbol: " + stockSymbol + " - " + e);
-            }
-        }
+//        String lastTradeDate = getLastTradeDate();
+//        Date date = getLastTrade();
+//        if (date == null) {
+//            if (!PropertiesUtils.isNull(lastTradeDate)) {
+//                try {
+//                    date = lastTradeDateFormatter.parse(lastTradeDate);
+//                    setLastTrade(date);
+//                } catch (ParseException e) {
+//                    LOGGER.warn("stockSymbol: " + stockSymbol + " - " + e);
+//                }
+//            }
+//        }
         // hh:mm am/pm
         // String lastTradeTime = getLastTradeTime();
     }
 
-    /* (non-Javadoc)
-     * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#updateLastPriceCurrency()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#
+     * updateLastPriceCurrency()
      */
     @Override
     public void updateLastPriceCurrency() {
@@ -200,8 +203,11 @@ public class StockPrice extends AbstractStockPrice {
         }
     }
 
-    /* (non-Javadoc)
-     * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#getStockSymbol()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.le.tools.moneyutils.stockprice.AbstractStockPrice#getStockSymbol()
      */
     @Override
     public String getStockSymbol() {
@@ -211,14 +217,17 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Sets the stock symbol.
      *
-     * @param stockSymbol the new stock symbol
+     * @param stockSymbol
+     *            the new stock symbol
      */
     @Override
     public void setStockSymbol(String stockSymbol) {
         this.stockSymbol = stockSymbol;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#getStockName()
      */
     @Override
@@ -229,7 +238,8 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Sets the stock name.
      *
-     * @param stockName the new stock name
+     * @param stockName
+     *            the new stock name
      */
     @Override
     public void setStockName(String stockName) {
@@ -248,13 +258,16 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Sets the sec type.
      *
-     * @param secType the new sec type
+     * @param secType
+     *            the new sec type
      */
     public void setSecType(String secType) {
         this.secType = secType;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#isMf()
      */
     @Override
@@ -266,7 +279,9 @@ public class StockPrice extends AbstractStockPrice {
         return secType.equals("MFINFO");
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#getLastPrice()
      */
     @Override
@@ -277,7 +292,8 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Sets the last price.
      *
-     * @param lastPrice the new last price
+     * @param lastPrice
+     *            the new last price
      */
     @Override
     public void setLastPrice(Price lastPrice) {
@@ -296,7 +312,8 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Sets the day low.
      *
-     * @param dayLow the new day low
+     * @param dayLow
+     *            the new day low
      */
     public void setDayLow(Price dayLow) {
         this.dayLow = dayLow;
@@ -314,29 +331,34 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Sets the day high.
      *
-     * @param dayHigh the new day high
+     * @param dayHigh
+     *            the new day high
      */
     public void setDayHigh(Price dayHigh) {
         this.dayHigh = dayHigh;
     }
 
-    /* (non-Javadoc)
-     * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#getLastTradeDate()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.le.tools.moneyutils.stockprice.AbstractStockPrice#getLastTradeDate()
      */
     @Override
     public String getLastTradeDate() {
-        return lastTradeDate;
+        return lastTradeDateFormatter.format(getLastTrade());
     }
 
     /**
      * Sets the last trade date.
      *
-     * @param lastTradeDate the new last trade date
+     * @param lastTradeDate
+     *            the new last trade date
      */
-    @Override
-    public void setLastTradeDate(String lastTradeDate) {
-        this.lastTradeDate = lastTradeDate;
-    }
+//    @Override
+//    public void setLastTradeDate(String lastTradeDate) {
+//        this.lastTradeDate = lastTradeDate;
+//    }
 
     /**
      * Gets the last trade time.
@@ -345,21 +367,25 @@ public class StockPrice extends AbstractStockPrice {
      */
     @Override
     public String getLastTradeTime() {
-        return lastTradeTime;
+        return lastTradeTimeFormatter.format(getLastTrade());
     }
 
     /**
      * Sets the last trade time.
      *
-     * @param lastTradeTime the new last trade time
+     * @param lastTradeTime
+     *            the new last trade time
      */
-    @Override
-    public void setLastTradeTime(String lastTradeTime) {
-        this.lastTradeTime = lastTradeTime;
-    }
+//    @Override
+//    public void setLastTradeTime(String lastTradeTime) {
+//        this.lastTradeTime = lastTradeTime;
+//    }
 
-    /* (non-Javadoc)
-     * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#addAnnotatedPropertyFields()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#
+     * addAnnotatedPropertyFields()
      */
     @Override
     protected void addAnnotatedPropertyFields() {
@@ -369,28 +395,31 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Checks if is mutual fund.
      *
-     * @param stockPrice the bean
+     * @param stockPrice
+     *            the bean
      * @return true, if is mutual fund
      */
     public static final boolean isMutualFund(StockPrice stockPrice) {
         if (stockPrice == null) {
             return false;
         }
-        
+
         Price dayLow = stockPrice.getDayLow();
         if (dayLow == null) {
             return true;
         }
-        
+
         Price dayHigh = stockPrice.getDayHigh();
         if (dayHigh == null) {
             return true;
         }
-        
+
         return (dayLow.getPrice() <= 0.0) && (dayHigh.getPrice() <= 0.0);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#getCurrency()
      */
     @Override
@@ -398,15 +427,21 @@ public class StockPrice extends AbstractStockPrice {
         return currency;
     }
 
-    /* (non-Javadoc)
-     * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#setCurrency(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.le.tools.moneyutils.stockprice.AbstractStockPrice#setCurrency(java.
+     * lang.String)
      */
     @Override
     public void setCurrency(String currency) {
         this.currency = currency;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#getUnits()
      */
     @Override
@@ -414,15 +449,20 @@ public class StockPrice extends AbstractStockPrice {
         return this.units;
     }
 
-    /* (non-Javadoc)
-     * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#setUnits(double)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.le.tools.moneyutils.stockprice.AbstractStockPrice#setUnits(double)
      */
     @Override
     public void setUnits(double units) {
         this.units = units;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#getFxSymbol()
      */
     @Override
@@ -430,7 +470,9 @@ public class StockPrice extends AbstractStockPrice {
         return fxSymbol;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#getLastTrade()
      */
     @Override
@@ -441,14 +483,17 @@ public class StockPrice extends AbstractStockPrice {
     /**
      * Sets the last trade.
      *
-     * @param lastTrade the new last trade
+     * @param lastTrade
+     *            the new last trade
      */
     @Override
     public void setLastTrade(Date lastTrade) {
         this.lastTrade = lastTrade;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.le.tools.moneyutils.stockprice.AbstractStockPrice#isBond()
      */
     @Override

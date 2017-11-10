@@ -66,11 +66,9 @@ import net.ofx.types.x2003.x04.SubAccountEnum;
  * The Class OfxPriceInfo.
  */
 public class OfxPriceInfo {
-    
+
     /** The Constant log. */
     private final static Logger LOGGER = Logger.getLogger(OfxPriceInfo.class);
-
-    private static final String CUSIP = "CUSIP";
 
     private static final String TICKER = "TICKER";
 
@@ -100,7 +98,7 @@ public class OfxPriceInfo {
 
     /** The Constant DEFAULT_BROKER_ID. */
     private static final String DEFAULT_BROKER_ID = "hungle.com";
-    
+
     /** The Constant DEFAULT_ACCOUNT_ID. */
     public static final String DEFAULT_ACCOUNT_ID = "0123456789";
 
@@ -170,8 +168,10 @@ public class OfxPriceInfo {
     /**
      * Instantiates a new ofx price info.
      *
-     * @param stockPrices the stock prices
-     * @param stockPriceOffset the stock price offset
+     * @param stockPrices
+     *            the stock prices
+     * @param stockPriceOffset
+     *            the stock price offset
      */
     public OfxPriceInfo(List<AbstractStockPrice> stockPrices, Double stockPriceOffset) {
         this.priceFormatter = NumberFormat.getNumberInstance();
@@ -195,7 +195,8 @@ public class OfxPriceInfo {
     /**
      * Creates the ofx response document.
      *
-     * @param stockPrices the stock prices
+     * @param stockPrices
+     *            the stock prices
      * @return the OFX document
      */
     public OFXDocument createOfxResponseDocument(List<AbstractStockPrice> stockPrices) {
@@ -222,25 +223,32 @@ public class OfxPriceInfo {
     /**
      * Calculate min max dates.
      *
-     * @param stockPrices the stock prices
+     * @param stockPrices
+     *            the stock prices
      */
     private void calculateMinMaxDates(List<AbstractStockPrice> stockPrices) {
         minLastTradeDate = null;
         maxLastTradeDate = null;
+
         for (AbstractStockPrice stockPrice : stockPrices) {
             Date date = null;
 
+            LOGGER.info(stockPrice.getStockSymbol());
+
             date = stockPrice.getLastTrade();
+            LOGGER.info("    lastTradeDate=" + date);
             if (date == null) {
-                String lastTradeDate = stockPrice.getLastTradeDate();
-                if (!PropertiesUtils.isNull(lastTradeDate)) {
-                    try {
-                        date = lastTradeDateFormatter.parse(lastTradeDate);
-                    } catch (ParseException e) {
-                        LOGGER.warn(e);
-                    }
-                }
+//                String lastTradeDate = stockPrice.getLastTradeDate();
+//                if (!PropertiesUtils.isNull(lastTradeDate)) {
+//                    try {
+//                        date = lastTradeDateFormatter.parse(lastTradeDate);
+//                    } catch (ParseException e) {
+//                        LOGGER.warn(e);
+//                    }
+//                }
+                continue;
             }
+
             if (date != null) {
                 if (minLastTradeDate == null) {
                     minLastTradeDate = date;
@@ -249,6 +257,7 @@ public class OfxPriceInfo {
                         minLastTradeDate = date;
                     }
                 }
+
                 if (maxLastTradeDate == null) {
                     maxLastTradeDate = date;
                 } else {
@@ -266,7 +275,8 @@ public class OfxPriceInfo {
     /**
      * Adds the investment statement response message set V 1.
      *
-     * @param ofx the ofx
+     * @param ofx
+     *            the ofx
      */
     private void addInvestmentStatementResponseMessageSetV1(OFX ofx) {
         addInvestmentStatementResponseMessageSetV1(ofx, brokerId, accountId);
@@ -275,12 +285,16 @@ public class OfxPriceInfo {
     /**
      * Investment Statement Message Set Response Messages.
      *
-     * @param ofx the ofx
-     * @param brokerId the broker id
-     * @param accountId the account id
+     * @param ofx
+     *            the ofx
+     * @param brokerId
+     *            the broker id
+     * @param accountId
+     *            the account id
      * @return the investment statement response message set V 1
      */
-    private InvestmentStatementResponseMessageSetV1 addInvestmentStatementResponseMessageSetV1(OFX ofx, String brokerId, String accountId) {
+    private InvestmentStatementResponseMessageSetV1 addInvestmentStatementResponseMessageSetV1(OFX ofx, String brokerId,
+            String accountId) {
         InvestmentStatementResponseMessageSetV1 root = ofx.addNewINVSTMTMSGSRSV1();
 
         // Investment Statement Response
@@ -296,10 +310,10 @@ public class OfxPriceInfo {
         status.setSEVERITY(SeverityEnum.INFO);
 
         InvestmentStatementResponse statementResponse = transactionResponse.addNewINVSTMTRS();
-        Date dtAsOfDate = getDtAsOfDate();
-        statementResponse.setDTASOF(XmlBeansUtils.formatGmt(dtAsOfDate));
-        String comment = "DTASOF local time is " + XmlBeansUtils.formatLocal(dtAsOfDate);
-        insertComment(statementResponse, comment);
+//        Date dtAsOfDate = getDtAsOfDate();
+//        statementResponse.setDTASOF(XmlBeansUtils.formatGmt(dtAsOfDate));
+//        String comment = "DTASOF local time is " + XmlBeansUtils.formatLocal(dtAsOfDate);
+//        insertComment(statementResponse, comment);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("setCURDEF to " + curDef);
         }
@@ -309,6 +323,7 @@ public class OfxPriceInfo {
         investmentAccount.setACCTID(accountId);
 
         if (forceGeneratingINVTRANLIST) {
+            Date dtAsOfDate = getDtAsOfDate();
             // work-around for MM2005UK, which want INVTRANLIST/{DTSTART, DTEND}
             // to set the download statement date
             InvestmentTransactionList investmentTransactionList = statementResponse.addNewINVTRANLIST();
@@ -321,7 +336,7 @@ public class OfxPriceInfo {
 
         InvestmentPositionList investmentPositions = statementResponse.addNewINVPOSLIST();
         for (AbstractStockPrice stockPrice : stockPrices) {
-            addPosition(investmentPositions, stockPrice, dtAsOfDate);
+            addPosition(investmentPositions, stockPrice);
         }
 
         return root;
@@ -330,35 +345,39 @@ public class OfxPriceInfo {
     /**
      * Adds the position.
      *
-     * @param investmentPositions the investment positions
-     * @param stockPrice the stock price
-     * @param dtAsOfDate the dt as of date
+     * @param investmentPositions
+     *            the investment positions
+     * @param stockPrice
+     *            the stock price
      */
-    private void addPosition(InvestmentPositionList investmentPositions, AbstractStockPrice stockPrice, Date dtAsOfDate) {
+    private void addPosition(InvestmentPositionList investmentPositions, AbstractStockPrice stockPrice) {
         String quoteSourceSymbol = stockPrice.getStockSymbol();
         List<SymbolMapperEntry> list = symbolMapper.entriesByQuoteSource(quoteSourceSymbol);
         String msMoneySymbol = null;
         if (list != null) {
             for (SymbolMapperEntry entry : list) {
                 msMoneySymbol = entry.getMsMoneySymbol();
-                addPosition(investmentPositions, stockPrice, dtAsOfDate, quoteSourceSymbol, msMoneySymbol);
+                addPosition(investmentPositions, stockPrice, quoteSourceSymbol, msMoneySymbol);
             }
         } else {
             msMoneySymbol = quoteSourceSymbol;
-            addPosition(investmentPositions, stockPrice, dtAsOfDate, quoteSourceSymbol, msMoneySymbol);
+            addPosition(investmentPositions, stockPrice, quoteSourceSymbol, msMoneySymbol);
         }
     }
 
     /**
      * Adds the position.
      *
-     * @param investmentPositions the investment positions
-     * @param stockPrice the stock price
-     * @param dtAsOfDate the dt as of date
-     * @param quoteSourceSymbol the quote source symbol
-     * @param msMoneySymbol the ms money symbol
+     * @param investmentPositions
+     *            the investment positions
+     * @param stockPrice
+     *            the stock price
+     * @param quoteSourceSymbol
+     *            the quote source symbol
+     * @param msMoneySymbol
+     *            the ms money symbol
      */
-    private void addPosition(InvestmentPositionList investmentPositions, AbstractStockPrice stockPrice, Date dtAsOfDate, String quoteSourceSymbol,
+    private void addPosition(InvestmentPositionList investmentPositions, AbstractStockPrice stockPrice, String quoteSourceSymbol,
             String msMoneySymbol) {
         // String stockSourceTicker = null;
         // if (msMoneySymbol != null) {
@@ -382,7 +401,7 @@ public class OfxPriceInfo {
                 convertedFromGBX = true;
             }
         }
-        boolean convertToBase = false;
+        boolean convertedToBase = false;
         if (convertToBaseCurrency) {
             if (currency != null) {
                 String defaultCurrency = curDef.toString();
@@ -393,57 +412,88 @@ public class OfxPriceInfo {
                             unitPrice = unitPrice * rate;
                             LOGGER.info("Currency conversion: " + currency + "->" + defaultCurrency + ", rate=" + rate);
                             currency = defaultCurrency;
-                            convertToBase = true;
+                            convertedToBase = true;
                         }
                     }
                 }
             }
         }
+        if (convertedToBase) {
+            LOGGER.info("convertedToBase" + convertedToBase);
+        }
 
         String unitPriceStr = priceFormatter.format(unitPrice);
         String marketValue = priceFormatter.format(units * unitPrice);
         // DTPRICEASOF
+        Date dtAsOfDate = getDtAsOfDate(stockPrice);
         String dtPriceAsOfString = null;
         dtPriceAsOfString = XmlBeansUtils.formatGmt(dtAsOfDate);
-        String lastTradeDate = stockPrice.getLastTradeDate();
-        if (lastTradeDate != null) {
-            try {
-                dtPriceAsOfString = convertLastTradeDateToDtPriceAsOf(lastTradeDate);
-                if (dtPriceAsOfString == null) {
-                    dtPriceAsOfString = XmlBeansUtils.formatGmt(dtAsOfDate);
-                }
-            } catch (ParseException e) {
-                LOGGER.warn("Failed to parse lastTradeDate=" + lastTradeDate + ", tickerName=" + quoteSourceSymbol);
-            }
-        }
+//        String lastTradeDate = stockPrice.getLastTradeDate();
+//        if (lastTradeDate != null) {
+//            try {
+//                dtPriceAsOfString = convertLastTradeDateToDtPriceAsOf(lastTradeDate);
+//                if (dtPriceAsOfString == null) {
+//                    dtPriceAsOfString = XmlBeansUtils.formatGmt(dtAsOfDate);
+//                }
+//            } catch (ParseException e) {
+//                LOGGER.warn("Failed to parse lastTradeDate=" + lastTradeDate + ", tickerName=" + quoteSourceSymbol);
+//            }
+//        }
         if (isMutualFund(stockPrice, symbolMapper)) {
-            addPositionMutualFund(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue, dtPriceAsOfString, currency);
+            addPositionMutualFund(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
+                    dtPriceAsOfString, currency);
         } else if (isOptions(stockPrice, symbolMapper)) {
-            addPositionOptions(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue, dtPriceAsOfString, currency);
+            addPositionOptions(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
+                    dtPriceAsOfString, currency);
         } else if (isBond(stockPrice, symbolMapper)) {
-            addPositionBond(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue, dtPriceAsOfString, currency);
+            addPositionBond(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
+                    dtPriceAsOfString, currency);
         } else {
-            addPositionStock(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue, dtPriceAsOfString, currency);
+            addPositionStock(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
+                    dtPriceAsOfString, currency);
         }
     }
 
+
+    private Date getDtAsOfDate() {
+        return getDtAsOfDate(null);
+    }
+    
     /**
      * Gets the dt as of date.
+     * 
+     * @param stockPrice
      *
      * @return the dt as of date
      */
-    private Date getDtAsOfDate() {
-        Date dtAsOfDate = currentDateTime;
-        if (maxLastTradeDate != null) {
-            dtAsOfDate = maxLastTradeDate;
-        } else if (minLastTradeDate != null) {
-            dtAsOfDate = minLastTradeDate;
+    private Date getDtAsOfDate(AbstractStockPrice stockPrice) {
+        LOGGER.info("> getDtAsOfDate, minLastTradeDate=" + minLastTradeDate);
+        LOGGER.info("> getDtAsOfDate, maxLastTradeDate=" + maxLastTradeDate);
+
+        // TODO: ???
+        Date dtAsOfDate = null;
+        
+        if (stockPrice != null) {
+            dtAsOfDate = stockPrice.getLastTrade();
         }
 
+        if (dtAsOfDate == null) {
+            if (maxLastTradeDate != null) {
+                dtAsOfDate = maxLastTradeDate;
+            } else if (minLastTradeDate != null) {
+                dtAsOfDate = minLastTradeDate;
+            }
+        }
+        if (dtAsOfDate == null) {
+            dtAsOfDate = currentDateTime;
+        }
+        
         if (dateOffset != 0) {
             long offset = dateOffset * OFFSET_DAY;
             dtAsOfDate = new Date(dtAsOfDate.getTime() + offset);
         }
+
+        LOGGER.info("< getDtAsOfDate, " + dtAsOfDate);
 
         return dtAsOfDate;
     }
@@ -461,9 +511,11 @@ public class OfxPriceInfo {
     /**
      * Convert last trade date to dt price as of.
      *
-     * @param lastTradeDate the last trade date
+     * @param lastTradeDate
+     *            the last trade date
      * @return the string
-     * @throws ParseException the parse exception
+     * @throws ParseException
+     *             the parse exception
      */
     private String convertLastTradeDateToDtPriceAsOf(String lastTradeDate) throws ParseException {
         Date date = lastTradeDateFormatter.parse(lastTradeDate);
@@ -480,17 +532,25 @@ public class OfxPriceInfo {
     /**
      * Adds the position mutual fund.
      *
-     * @param investmentPositions the investment positions
-     * @param ticker the ticker
-     * @param quoteSourceSymbol the quote source symbol
-     * @param units the units
-     * @param unitPrice the unit price
-     * @param marketValue the market value
-     * @param dtPriceAsOf the dt price as of
-     * @param currency the currency
+     * @param investmentPositions
+     *            the investment positions
+     * @param ticker
+     *            the ticker
+     * @param quoteSourceSymbol
+     *            the quote source symbol
+     * @param units
+     *            the units
+     * @param unitPrice
+     *            the unit price
+     * @param marketValue
+     *            the market value
+     * @param dtPriceAsOf
+     *            the dt price as of
+     * @param currency
+     *            the currency
      */
-    private void addPositionMutualFund(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol, String units, String unitPrice,
-            String marketValue, String dtPriceAsOf, String currency) {
+    private void addPositionMutualFund(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol,
+            String units, String unitPrice, String marketValue, String dtPriceAsOf, String currency) {
         PositionMutualFund mf = investmentPositions.addNewPOSMF();
         addPosition(mf, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOf, currency);
         mf.setREINVDIV(BooleanType.Y);
@@ -500,17 +560,25 @@ public class OfxPriceInfo {
     /**
      * Adds the position bond.
      *
-     * @param investmentPositions the investment positions
-     * @param ticker the ticker
-     * @param quoteSourceSymbol the quote source symbol
-     * @param units the units
-     * @param unitPrice the unit price
-     * @param marketValue the market value
-     * @param dtPriceAsOf the dt price as of
-     * @param currency the currency
+     * @param investmentPositions
+     *            the investment positions
+     * @param ticker
+     *            the ticker
+     * @param quoteSourceSymbol
+     *            the quote source symbol
+     * @param units
+     *            the units
+     * @param unitPrice
+     *            the unit price
+     * @param marketValue
+     *            the market value
+     * @param dtPriceAsOf
+     *            the dt price as of
+     * @param currency
+     *            the currency
      */
-    private void addPositionBond(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol, String units, String unitPrice,
-            String marketValue, String dtPriceAsOf, String currency) {
+    private void addPositionBond(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol, String units,
+            String unitPrice, String marketValue, String dtPriceAsOf, String currency) {
         PositionOther other = investmentPositions.addNewPOSOTHER();
         addPosition(other, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOf, currency);
     }
@@ -518,17 +586,25 @@ public class OfxPriceInfo {
     /**
      * Adds the position options.
      *
-     * @param investmentPositions the investment positions
-     * @param ticker the ticker
-     * @param quoteSourceSymbol the quote source symbol
-     * @param units the units
-     * @param unitPrice the unit price
-     * @param marketValue the market value
-     * @param dtPriceAsOf the dt price as of
-     * @param currency the currency
+     * @param investmentPositions
+     *            the investment positions
+     * @param ticker
+     *            the ticker
+     * @param quoteSourceSymbol
+     *            the quote source symbol
+     * @param units
+     *            the units
+     * @param unitPrice
+     *            the unit price
+     * @param marketValue
+     *            the market value
+     * @param dtPriceAsOf
+     *            the dt price as of
+     * @param currency
+     *            the currency
      */
-    private void addPositionOptions(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol, String units, String unitPrice,
-            String marketValue, String dtPriceAsOf, String currency) {
+    private void addPositionOptions(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol,
+            String units, String unitPrice, String marketValue, String dtPriceAsOf, String currency) {
         PositionOption options = investmentPositions.addNewPOSOPT();
         addPosition(options, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOf, currency);
     }
@@ -536,17 +612,25 @@ public class OfxPriceInfo {
     /**
      * Adds the position stock.
      *
-     * @param investmentPositions the investment positions
-     * @param ticker the ticker
-     * @param quoteSourceSymbol the quote source symbol
-     * @param units the units
-     * @param unitPrice the unit price
-     * @param marketValue the market value
-     * @param dtPriceAsOf the dt price as of
-     * @param currency the currency
+     * @param investmentPositions
+     *            the investment positions
+     * @param ticker
+     *            the ticker
+     * @param quoteSourceSymbol
+     *            the quote source symbol
+     * @param units
+     *            the units
+     * @param unitPrice
+     *            the unit price
+     * @param marketValue
+     *            the market value
+     * @param dtPriceAsOf
+     *            the dt price as of
+     * @param currency
+     *            the currency
      */
-    private void addPositionStock(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol, String units, String unitPrice,
-            String marketValue, String dtPriceAsOf, String currency) {
+    private void addPositionStock(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol, String units,
+            String unitPrice, String marketValue, String dtPriceAsOf, String currency) {
         PositionStock stock = investmentPositions.addNewPOSSTOCK();
         addPosition(stock, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOf, currency);
         stock.setREINVDIV(BooleanType.Y);
@@ -556,18 +640,26 @@ public class OfxPriceInfo {
     /**
      * Adds the position.
      *
-     * @param position the position
-     * @param ticker the ticker
-     * @param quoteSourceSymbol the quote source symbol
-     * @param units the units
-     * @param unitPrice the unit price
-     * @param marketValue the market value
-     * @param dtPriceAsOf the dt price as of
-     * @param currency the currency
+     * @param position
+     *            the position
+     * @param ticker
+     *            the ticker
+     * @param quoteSourceSymbol
+     *            the quote source symbol
+     * @param units
+     *            the units
+     * @param unitPrice
+     *            the unit price
+     * @param marketValue
+     *            the market value
+     * @param dtPriceAsOf
+     *            the dt price as of
+     * @param currency
+     *            the currency
      * @return the investment position
      */
-    private InvestmentPosition addPosition(AbstractPositionBase position, String ticker, String quoteSourceSymbol, String units, String unitPrice,
-            String marketValue, String dtPriceAsOf, String currency) {
+    private InvestmentPosition addPosition(AbstractPositionBase position, String ticker, String quoteSourceSymbol, String units,
+            String unitPrice, String marketValue, String dtPriceAsOf, String currency) {
         InvestmentPosition investmentPosition = position.addNewINVPOS();
         SecurityId secId = investmentPosition.addNewSECID();
 
@@ -609,8 +701,10 @@ public class OfxPriceInfo {
     /**
      * Insert comment.
      *
-     * @param xmlObject the xml object
-     * @param comment the comment
+     * @param xmlObject
+     *            the xml object
+     * @param comment
+     *            the comment
      */
     private void insertComment(XmlObject xmlObject, String comment) {
         if (!allowInsertComment) {
@@ -634,7 +728,8 @@ public class OfxPriceInfo {
     /**
      * Adds the security list.
      *
-     * @param ofx the ofx
+     * @param ofx
+     *            the ofx
      * @return the security list
      */
     private SecurityList addSecurityList(OFX ofx) {
@@ -648,8 +743,10 @@ public class OfxPriceInfo {
     /**
      * Adds the general security info.
      *
-     * @param securityList the security list
-     * @param stockPrice the stock price
+     * @param securityList
+     *            the security list
+     * @param stockPrice
+     *            the stock price
      */
     private void addGeneralSecurityInfo(SecurityList securityList, AbstractStockPrice stockPrice) {
         String quoteSourceSymbol = stockPrice.getStockSymbol();
@@ -669,12 +766,17 @@ public class OfxPriceInfo {
     /**
      * Adds the general security info.
      *
-     * @param securityList the security list
-     * @param stockPrice the stock price
-     * @param quoteSourceSymbol the quote source symbol
-     * @param msMoneySymbol the ms money symbol
+     * @param securityList
+     *            the security list
+     * @param stockPrice
+     *            the stock price
+     * @param quoteSourceSymbol
+     *            the quote source symbol
+     * @param msMoneySymbol
+     *            the ms money symbol
      */
-    private void addGeneralSecurityInfo(SecurityList securityList, AbstractStockPrice stockPrice, String quoteSourceSymbol, String msMoneySymbol) {
+    private void addGeneralSecurityInfo(SecurityList securityList, AbstractStockPrice stockPrice, String quoteSourceSymbol,
+            String msMoneySymbol) {
         if (PropertiesUtils.isNull(msMoneySymbol)) {
             msMoneySymbol = quoteSourceSymbol;
         }
@@ -695,7 +797,7 @@ public class OfxPriceInfo {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("convertedFromGBX=" + convertedFromGBX);
         }
-        boolean convertToBase = false;
+        boolean convertedToBase = false;
         if (convertToBaseCurrency) {
             if (currency != null) {
                 String defaultCurrency = curDef.toString();
@@ -706,30 +808,32 @@ public class OfxPriceInfo {
                             LOGGER.info("Currency conversion: " + currency + "->" + defaultCurrency + ", rate=" + rate);
                             stockPriceValue = stockPriceValue * rate;
                             currency = defaultCurrency;
-                            convertToBase = true;
+                            convertedToBase = true;
                         }
                     }
                 }
             }
         }
+        if (convertedToBase) {
+            LOGGER.info("convertedToBase=" + convertedToBase);
+        }
 
         String unitPrice = priceFormatter.format(stockPriceValue);
 
         // DTASOF
-        Date dtAsOfDate = getDtAsOfDate();
-        String dtAsOf = null;
-        dtAsOf = XmlBeansUtils.formatGmt(dtAsOfDate);
-        String lastTradeDate = stockPrice.getLastTradeDate();
-        if (lastTradeDate != null) {
-            try {
-                dtAsOf = convertLastTradeDateToDtPriceAsOf(lastTradeDate);
-                if (dtAsOf == null) {
-                    dtAsOf = XmlBeansUtils.formatGmt(dtAsOfDate);
-                }
-            } catch (ParseException e) {
-                LOGGER.warn("Failed to parse lastTradeDate=" + lastTradeDate + ", tickerName=" + quoteSourceSymbol);
-            }
-        }
+        Date dtAsOfDate = getDtAsOfDate(stockPrice);
+        String dtAsOf = XmlBeansUtils.formatGmt(dtAsOfDate);
+//        String lastTradeDate = stockPrice.getLastTradeDate();
+//        if (lastTradeDate != null) {
+//            try {
+//                dtAsOf = convertLastTradeDateToDtPriceAsOf(lastTradeDate);
+//                if (dtAsOf == null) {
+//                    dtAsOf = XmlBeansUtils.formatGmt(dtAsOfDate);
+//                }
+//            } catch (ParseException e) {
+//                LOGGER.warn("Failed to parse lastTradeDate=" + lastTradeDate + ", tickerName=" + quoteSourceSymbol);
+//            }
+//        }
         if (isMutualFund(stockPrice, symbolMapper)) {
             addMutualFundInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOf, currency);
         } else if (isOptions(stockPrice, symbolMapper)) {
@@ -744,7 +848,8 @@ public class OfxPriceInfo {
     /**
      * Checks if is mutual fund.
      *
-     * @param stockPrice the stock price
+     * @param stockPrice
+     *            the stock price
      * @return true, if is mutual fund
      */
     public static boolean isMutualFund(AbstractStockPrice stockPrice, SymbolMapper symbolMapper) {
@@ -760,7 +865,8 @@ public class OfxPriceInfo {
     /**
      * Checks if is options.
      *
-     * @param stockPrice the stock price
+     * @param stockPrice
+     *            the stock price
      * @return true, if is options
      */
     public static boolean isOptions(AbstractStockPrice stockPrice, SymbolMapper symbolMapper) {
@@ -776,7 +882,8 @@ public class OfxPriceInfo {
     /**
      * Checks if is bond.
      *
-     * @param stockPrice the stock price
+     * @param stockPrice
+     *            the stock price
      * @return true, if is bond
      */
     public static boolean isBond(AbstractStockPrice stockPrice, SymbolMapper symbolMapper) {
@@ -788,11 +895,12 @@ public class OfxPriceInfo {
         }
         return false;
     }
-    
+
     /**
      * Gets the stock price.
      *
-     * @param stockPrice the stock price
+     * @param stockPrice
+     *            the stock price
      * @return the stock price
      */
     private Double getStockPrice(AbstractStockPrice stockPrice) {
@@ -800,9 +908,9 @@ public class OfxPriceInfo {
             LOGGER.info("> stockPriceOffset=" + this.stockPriceOffset);
         }
         Double price = stockPrice.getLastPrice().getPrice();
-        
+
         // TODO: bond is quoted in 100 unit
-        boolean isBond = isBond(stockPrice, symbolMapper); 
+        boolean isBond = isBond(stockPrice, symbolMapper);
         if (isBond) {
             price = price / 100.0;
             if (LOGGER.isDebugEnabled()) {
@@ -810,29 +918,36 @@ public class OfxPriceInfo {
                 LOGGER.debug("  new price=" + price);
             }
         }
-        
+
         return price + stockPriceOffset;
     }
 
     /**
      * Adds the mutual fund info.
      *
-     * @param securityList the security list
-     * @param ticker the ticker
-     * @param quoteSourceTicker the quote source ticker
-     * @param secName the sec name
-     * @param unitPrice the unit price
-     * @param dtAsOf the dt as of
-     * @param currency the currency
+     * @param securityList
+     *            the security list
+     * @param ticker
+     *            the ticker
+     * @param quoteSourceTicker
+     *            the quote source ticker
+     * @param secName
+     *            the sec name
+     * @param unitPrice
+     *            the unit price
+     * @param dtAsOf
+     *            the dt as of
+     * @param currency
+     *            the currency
      * @return the mutual fund info
      */
-    private MutualFundInfo addMutualFundInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName, String unitPrice,
-            String dtAsOf, String currency) {
+    private MutualFundInfo addMutualFundInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName,
+            String unitPrice, String dtAsOf, String currency) {
         MutualFundInfo root = securityList.addNewMFINFO();
 
         GeneralSecurityInfo secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
         insertComment(secInfo, "Security is treated as Mutual Fund");
-        
+
         root.setMFTYPE(MutualFundTypeEnum.OPENEND);
 
         return root;
@@ -841,18 +956,25 @@ public class OfxPriceInfo {
     /**
      * Adds the options info.
      *
-     * @param securityList the security list
-     * @param ticker the ticker
-     * @param quoteSourceTicker the quote source ticker
-     * @param secName the sec name
-     * @param unitPrice the unit price
-     * @param dtAsOf the dt as of
-     * @param currency the currency
+     * @param securityList
+     *            the security list
+     * @param ticker
+     *            the ticker
+     * @param quoteSourceTicker
+     *            the quote source ticker
+     * @param secName
+     *            the sec name
+     * @param unitPrice
+     *            the unit price
+     * @param dtAsOf
+     *            the dt as of
+     * @param currency
+     *            the currency
      */
-    private void addOptionsInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName, String unitPrice, String dtAsOf,
-            String currency) {
+    private void addOptionsInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName,
+            String unitPrice, String dtAsOf, String currency) {
         OptionInfo root = securityList.addNewOPTINFO();
-        
+
         GeneralSecurityInfo secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
 
         insertComment(secInfo, "Security is treated as Options");
@@ -898,17 +1020,24 @@ public class OfxPriceInfo {
     /**
      * Adds the bond info.
      *
-     * @param securityList the security list
-     * @param ticker the ticker
-     * @param quoteSourceTicker the quote source ticker
-     * @param secName the sec name
-     * @param unitPrice the unit price
-     * @param dtAsOf the dt as of
-     * @param currency the currency
+     * @param securityList
+     *            the security list
+     * @param ticker
+     *            the ticker
+     * @param quoteSourceTicker
+     *            the quote source ticker
+     * @param secName
+     *            the sec name
+     * @param unitPrice
+     *            the unit price
+     * @param dtAsOf
+     *            the dt as of
+     * @param currency
+     *            the currency
      * @return the other info
      */
-    private OtherInfo addBondInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName, String unitPrice, String dtAsOf,
-            String currency) {
+    private OtherInfo addBondInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName,
+            String unitPrice, String dtAsOf, String currency) {
         OtherInfo root = securityList.addNewOTHERINFO();
 
         XmlObject secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
@@ -918,21 +1047,28 @@ public class OfxPriceInfo {
 
         return root;
     }
-    
+
     /**
      * Adds the stock info.
      *
-     * @param securityList the security list
-     * @param ticker the ticker
-     * @param quoteSourceTicker the quote source ticker
-     * @param secName the sec name
-     * @param unitPrice the unit price
-     * @param dtAsOf the dt as of
-     * @param currency the currency
+     * @param securityList
+     *            the security list
+     * @param ticker
+     *            the ticker
+     * @param quoteSourceTicker
+     *            the quote source ticker
+     * @param secName
+     *            the sec name
+     * @param unitPrice
+     *            the unit price
+     * @param dtAsOf
+     *            the dt as of
+     * @param currency
+     *            the currency
      * @return the stock info
      */
-    private StockInfo addStockInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName, String unitPrice, String dtAsOf,
-            String currency) {
+    private StockInfo addStockInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName,
+            String unitPrice, String dtAsOf, String currency) {
         StockInfo root = securityList.addNewSTOCKINFO();
 
         GeneralSecurityInfo secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf, currency);
@@ -946,17 +1082,24 @@ public class OfxPriceInfo {
     /**
      * Adds the general security info.
      *
-     * @param securityInfo the security info
-     * @param ticker the ticker
-     * @param quoteSourceTicker the quote source ticker
-     * @param secName the sec name
-     * @param unitPrice the unit price
-     * @param dtAsOf the dt as of
-     * @param currency the currency
+     * @param securityInfo
+     *            the security info
+     * @param ticker
+     *            the ticker
+     * @param quoteSourceTicker
+     *            the quote source ticker
+     * @param secName
+     *            the sec name
+     * @param unitPrice
+     *            the unit price
+     * @param dtAsOf
+     *            the dt as of
+     * @param currency
+     *            the currency
      * @return the general security info
      */
-    private GeneralSecurityInfo addGeneralSecurityInfo(AbstractSecurityInfo securityInfo, String ticker, String quoteSourceTicker, String secName,
-            String unitPrice, String dtAsOf, String currency) {
+    private GeneralSecurityInfo addGeneralSecurityInfo(AbstractSecurityInfo securityInfo, String ticker, String quoteSourceTicker,
+            String secName, String unitPrice, String dtAsOf, String currency) {
         GeneralSecurityInfo secInfo = securityInfo.addNewSECINFO();
         SecurityId secId = secInfo.addNewSECID();
         String uniqueId = ticker;
@@ -1007,8 +1150,10 @@ public class OfxPriceInfo {
     /**
      * Save.
      *
-     * @param file the file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param file
+     *            the file
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void save(File file) throws IOException {
         if (file == null) {
@@ -1020,36 +1165,45 @@ public class OfxPriceInfo {
     /**
      * Save.
      *
-     * @param stockPrices the stock prices
-     * @param outFile the out file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param stockPrices
+     *            the stock prices
+     * @param outFile
+     *            the out file
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public static void save(List<AbstractStockPrice> stockPrices, File outFile) throws IOException {
         String defaultCurrency = CurrencyUtils.getDefaultCurrency();
         boolean forceGeneratingINVTRANLIST = false;
-    
+
         OfxSaveParameter params = new OfxSaveParameter();
         params.setDefaultCurrency(defaultCurrency);
         params.setForceGeneratingINVTRANLIST(forceGeneratingINVTRANLIST);
-    
+
         SymbolMapper symbolMapper = SymbolMapper.loadMapperFile();
         FxTable fxTable = FxTableUtils.loadFxFile();
-    
+
         save(stockPrices, outFile, params, symbolMapper, fxTable);
     }
 
     /**
      * Save.
      *
-     * @param stockPrices the stock prices
-     * @param outFile the out file
-     * @param params the params
-     * @param symbolMapper the symbol mapper
-     * @param fxTable the fx table
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param stockPrices
+     *            the stock prices
+     * @param outFile
+     *            the out file
+     * @param params
+     *            the params
+     * @param symbolMapper
+     *            the symbol mapper
+     * @param fxTable
+     *            the fx table
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    public static void save(List<AbstractStockPrice> stockPrices, File outFile, OfxSaveParameter params, SymbolMapper symbolMapper, FxTable fxTable)
-            throws IOException {
+    public static void save(List<AbstractStockPrice> stockPrices, File outFile, OfxSaveParameter params, SymbolMapper symbolMapper,
+            FxTable fxTable) throws IOException {
         double stockPriceOffset = 0.00;
 
         OfxPriceInfo ofxPriceInfo = new OfxPriceInfo(stockPrices, stockPriceOffset);
@@ -1082,8 +1236,10 @@ public class OfxPriceInfo {
     /**
      * Removes the fx symbols.
      *
-     * @param stockPrices the stock prices
-     * @param ignoredStockPrices the ignored stock prices
+     * @param stockPrices
+     *            the stock prices
+     * @param ignoredStockPrices
+     *            the ignored stock prices
      * @return the list
      */
     private static List<StockPrice> removeFxSymbols(List<StockPrice> stockPrices, List<StockPrice> ignoredStockPrices) {
@@ -1113,7 +1269,8 @@ public class OfxPriceInfo {
     /**
      * Sets the broker id.
      *
-     * @param brokerId the new broker id
+     * @param brokerId
+     *            the new broker id
      */
     public void setBrokerId(String brokerId) {
         this.brokerId = brokerId;
@@ -1131,7 +1288,8 @@ public class OfxPriceInfo {
     /**
      * Sets the account id.
      *
-     * @param accountId the new account id
+     * @param accountId
+     *            the new account id
      */
     public void setAccountId(String accountId) {
         this.accountId = accountId;
@@ -1140,7 +1298,8 @@ public class OfxPriceInfo {
     /**
      * Adds the signon response message set V 1.
      *
-     * @param ofx the ofx
+     * @param ofx
+     *            the ofx
      * @return the signon response message set V 1
      */
     public SignonResponseMessageSetV1 addSignonResponseMessageSetV1(OFX ofx) {
@@ -1196,7 +1355,8 @@ public class OfxPriceInfo {
     /**
      * Sets the cur def.
      *
-     * @param curDef the new cur def
+     * @param curDef
+     *            the new cur def
      */
     public void setCurDef(CurrencyEnum.Enum curDef) {
         this.curDef = curDef;
@@ -1208,7 +1368,8 @@ public class OfxPriceInfo {
     /**
      * Sets the ofx document.
      *
-     * @param ofxDocument the new ofx document
+     * @param ofxDocument
+     *            the new ofx document
      */
     public void setOfxDocument(OFXDocument ofxDocument) {
         this.ofxDocument = ofxDocument;
@@ -1226,7 +1387,8 @@ public class OfxPriceInfo {
     /**
      * Sets the symbol mapper.
      *
-     * @param symbolMapper the new symbol mapper
+     * @param symbolMapper
+     *            the new symbol mapper
      */
     public void setSymbolMapper(SymbolMapper symbolMapper) {
         this.symbolMapper = symbolMapper;
@@ -1244,7 +1406,8 @@ public class OfxPriceInfo {
     /**
      * Sets the allow insert comment.
      *
-     * @param allowInsertComment the new allow insert comment
+     * @param allowInsertComment
+     *            the new allow insert comment
      */
     public void setAllowInsertComment(boolean allowInsertComment) {
         this.allowInsertComment = allowInsertComment;
@@ -1262,7 +1425,8 @@ public class OfxPriceInfo {
     /**
      * Sets the force generating INVTRANLIST.
      *
-     * @param forceGeneratingINVTRANLIST the new force generating INVTRANLIST
+     * @param forceGeneratingINVTRANLIST
+     *            the new force generating INVTRANLIST
      */
     public void setForceGeneratingINVTRANLIST(boolean forceGeneratingINVTRANLIST) {
         this.forceGeneratingINVTRANLIST = forceGeneratingINVTRANLIST;
@@ -1280,7 +1444,8 @@ public class OfxPriceInfo {
     /**
      * Sets the date offset.
      *
-     * @param dateOffset the new date offset
+     * @param dateOffset
+     *            the new date offset
      */
     public void setDateOffset(Integer dateOffset) {
         this.dateOffset = dateOffset;
@@ -1298,7 +1463,8 @@ public class OfxPriceInfo {
     /**
      * Sets the fx table.
      *
-     * @param fxTable the new fx table
+     * @param fxTable
+     *            the new fx table
      */
     public void setFxTable(FxTable fxTable) {
         this.fxTable = fxTable;

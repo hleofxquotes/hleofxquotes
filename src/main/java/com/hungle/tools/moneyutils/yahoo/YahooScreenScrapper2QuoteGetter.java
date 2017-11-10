@@ -103,7 +103,21 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         Price regularMarketDayHighPrice = getRegularMarketDayHighPrice(priceNode);
 
         String currency = getCurrency(priceNode);
-        LOGGER.info("currency=" + currency);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("    currency=" + currency);
+        }
+        
+        if (currency != null) {
+            if (regularMarketPricePrice != null) {
+                regularMarketPricePrice.setCurrency(currency);
+            }
+            if (regularMarketDayLowPrice != null) {
+                regularMarketDayLowPrice.setCurrency(currency);
+            }
+            if (regularMarketDayLowPrice != null) {
+                regularMarketDayLowPrice.setCurrency(currency);
+            }    
+        }
 
         Date lastTrade = null;
 
@@ -162,8 +176,8 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
 
         stockPrice.setLastTrade(lastTrade);
         if (lastTrade != null) {
-            stockPrice.setLastTradeDate(lastTradeDateFormatter.format(lastTrade));
-            stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(lastTrade));
+//            stockPrice.setLastTradeDate(lastTradeDateFormatter.format(lastTrade));
+//            stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(lastTrade));
         }
 
         stockPrice.postSetProperties();
@@ -171,9 +185,9 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         LOGGER.info(stockSymbol.get() + ", " + stockPrice.getSecType());
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("isMutualFund=" + StockPrice.isMutualFund(stockPrice));
-            LOGGER.debug("isMf=" + stockPrice.isMf());
-            LOGGER.debug("isBond=" + stockPrice.isBond());
+            LOGGER.debug("    isMutualFund=" + StockPrice.isMutualFund(stockPrice));
+            LOGGER.debug("    isMf=" + stockPrice.isMf());
+            LOGGER.debug("    isBond=" + stockPrice.isBond());
         }
 
         List<AbstractStockPrice> stockPrices = new ArrayList<AbstractStockPrice>();

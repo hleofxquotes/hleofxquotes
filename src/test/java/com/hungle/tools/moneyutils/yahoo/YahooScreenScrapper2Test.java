@@ -32,61 +32,61 @@ import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 
 public class YahooScreenScrapper2Test {
-	private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2Test.class);
+    private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2Test.class);
 
-	public YahooScreenScrapper2Test() {
-		// TODO Auto-generated constructor stub
-	}
+    public YahooScreenScrapper2Test() {
+        // TODO Auto-generated constructor stub
+    }
 
-	@Test
-	@Ignore
-	public void testParseLocalFile() throws IOException {
-		String name = "TSLA.html";
-		URL url = OfxUtils.getResource(name, this);
-		Assert.assertNotNull(url);
+    @Test
+    @Ignore
+    public void testParseLocalFile() throws IOException {
+        String name = "TSLA.html";
+        URL url = OfxUtils.getResource(name, this);
+        Assert.assertNotNull(url);
 
-		String fileName = url.getFile();
-		Assert.assertNotNull(fileName);
+        String fileName = url.getFile();
+        Assert.assertNotNull(fileName);
 
-		List<String> list = new ArrayList<>();
-		try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
+        List<String> list = new ArrayList<>();
+        try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
 
-			// 1. filter line 3
-			// 2. convert all content to upper case
-			// 3. convert it into a List
-			list = stream.filter(line -> {
-				String prefix = "root.App.main =";
-				return line.startsWith(prefix);
-			}).collect(Collectors.toList());
-		} catch (IOException e) {
-			throw e;
-		}
-		Assert.assertEquals(1, list.size());
+            // 1. filter line 3
+            // 2. convert all content to upper case
+            // 3. convert it into a List
+            list = stream.filter(line -> {
+                String prefix = "root.App.main =";
+                return line.startsWith(prefix);
+            }).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw e;
+        }
+        Assert.assertEquals(1, list.size());
 
-		String data = list.get(0);
-		data = data.substring("root.App.main =".length());
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode nodes = mapper.readTree(data);
-		Assert.assertNotNull(nodes);
+        String data = list.get(0);
+        data = data.substring("root.App.main =".length());
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode nodes = mapper.readTree(data);
+        Assert.assertNotNull(nodes);
 
-		String fieldName = "price";
-		List<JsonNode> parents = nodes.findParents(fieldName);
-		Assert.assertNotNull(parents);
-		Assert.assertTrue(parents.size() == 1);
+        String fieldName = "price";
+        List<JsonNode> parents = nodes.findParents(fieldName);
+        Assert.assertNotNull(parents);
+        Assert.assertTrue(parents.size() == 1);
 
-		JsonNode parent = parents.get(0);
-		Assert.assertNotNull(parent);
+        JsonNode parent = parents.get(0);
+        Assert.assertNotNull(parent);
 
-		JsonNode price = parent.get(fieldName);
-		Assert.assertNotNull(price);
-		
-		LOGGER.info("XXX " + price.toString());
+        JsonNode price = parent.get(fieldName);
+        Assert.assertNotNull(price);
 
-//		String raw = price.get("raw").asText();
-//		Assert.assertEquals("297.5151", raw);
-//		String fmt = price.get("fmt").asText();
-//		Assert.assertEquals("297.52", fmt);
-	}
+        LOGGER.info("XXX " + price.toString());
+
+        // String raw = price.get("raw").asText();
+        // Assert.assertEquals("297.5151", raw);
+        // String fmt = price.get("fmt").asText();
+        // Assert.assertEquals("297.52", fmt);
+    }
 
     @Test
     public void testParseViaUrl() throws IOException, URISyntaxException {
@@ -143,53 +143,55 @@ public class YahooScreenScrapper2Test {
         LOGGER.info("findPath regularMarketDayHigh=" + regularMarketDayHigh);
     }
 
-	public String prettyPrintJsonString(JsonNode jsonNode) {
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			Object json = mapper.readValue(jsonNode.toString(), Object.class);
-			return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-		} catch (Exception e) {
-			return "Sorry, pretty print didn't work";
-		}
-	}
+    public String prettyPrintJsonString(JsonNode jsonNode) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Object json = mapper.readValue(jsonNode.toString(), Object.class);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
+        } catch (Exception e) {
+            return "Sorry, pretty print didn't work";
+        }
+    }
 
-	@Test
-	public void testYahooScreenScrapper2() throws IOException {
-		YahooScreenScrapper2 scrapper = null;
+    @Test
+    @Ignore
+    public void testYahooScreenScrapper2() throws IOException {
+        YahooScreenScrapper2 scrapper = null;
 
-		int errors = 0;
-		try {
-			scrapper = new YahooScreenScrapper2();
+        int errors = 0;
+        try {
+            scrapper = new YahooScreenScrapper2();
 
-			String[] stockSymbols1 = { "TSLA", "AAPL", "VWINX", "INVALID", };
-			String[] stockSymbols2 = { "VWINX",};
+            String[] stockSymbols1 = { "TSLA", "AAPL", "VWINX", "INVALID", };
+            String[] stockSymbols2 = { "VWINX", };
 
-			String[] stockSymbols = stockSymbols1;
-			for (String stockSymbol : stockSymbols) {
-				try {
-					 AbstractStockPrice stockPrice = scrapper.getStockPrice(stockSymbol);
-					Assert.assertNotNull(stockPrice);
-					LOGGER.info(stockPrice);
-				} catch (Exception e) {
-					errors++;
-					LOGGER.warn(e);
-				}
-			}
-		} finally {
-			if (scrapper != null) {
-				scrapper.close();
-			}
-		}
+            String[] stockSymbols = stockSymbols1;
+            for (String stockSymbol : stockSymbols) {
+                try {
+                    AbstractStockPrice stockPrice = scrapper.getStockPrice(stockSymbol);
+                    Assert.assertNotNull(stockPrice);
+                    LOGGER.info(stockPrice);
+                } catch (Exception e) {
+                    errors++;
+                    LOGGER.warn(e, e);
+                }
+            }
+        } finally {
+            if (scrapper != null) {
+                scrapper.close();
+            }
+        }
 
-		Assert.assertTrue(errors == 1);
+        Assert.assertEquals(1, errors);
 
-	}
-	
-	@Test
+    }
+
+    @Test
     public void testParseJson() throws IOException {
         InputStream jsonStream = OfxUtils.getResource("TSLA.json", this).openStream();
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         YahooScreenScrapper2Json json = mapper.readValue(jsonStream, YahooScreenScrapper2Json.class);
+        json = null;
     }
 
 }

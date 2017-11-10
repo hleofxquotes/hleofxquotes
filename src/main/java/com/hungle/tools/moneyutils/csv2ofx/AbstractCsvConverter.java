@@ -255,8 +255,8 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         if (!PropertiesUtils.isNull(quoteDateAndTime)) {
             try {
                 Date date = quoteDateAndTimeFormatter.parse(quoteDateAndTime);
-                stockPrice.setLastTradeDate(lastTradeDateFormatter.format(date));
-                stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(date));
+//                stockPrice.setLastTradeDate(lastTradeDateFormatter.format(date));
+//                stockPrice.setLastTradeTime(lastTradeTimeFormatter.format(date));
                 stockPrice.setLastTrade(date);
             } catch (ParseException e) {
                 LOGGER.warn(e);
