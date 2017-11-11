@@ -103,7 +103,9 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         
         String marketState = getMarketState(priceNode);
         // PREPRE, REGULAR, POST, CLOSED
-        LOGGER.info("  marketState=" + marketState);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("  marketState=" + marketState);
+        }
 
         Price regularMarketPricePrice = getRegularMarketPricePrice(priceNode);
         if (regularMarketPricePrice != null) {
