@@ -7,23 +7,26 @@ import java.text.NumberFormat;
  * The Class Price.
  */
 public class Price extends Number implements Comparable<Price> {
-    
+
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
-    
+
     /** The price. */
     private Double price;
-    
+
     /** The currency. */
     private String currency;
-    
+
     /** The price formatter. */
     private final NumberFormat priceFormatter;
+
+    private String marketState;
 
     /**
      * Instantiates a new price.
      *
-     * @param price the price
+     * @param price
+     *            the price
      */
     public Price(double price) {
         this.price = price;
@@ -45,25 +48,47 @@ public class Price extends Number implements Comparable<Price> {
     /**
      * Sets the price.
      *
-     * @param price the new price
+     * @param price
+     *            the new price
      */
     public void setPrice(Double price) {
         this.price = price;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        if (currency == null) {
-            return this.priceFormatter.format(this.price);
-        } else {
-            return this.priceFormatter.format(this.price) + " " + currency;
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(this.priceFormatter.format(this.price));
+
+        if (currency != null) {
+            sb.append(" ");
+            sb.append(currency);
         }
+
+        // PREPRE, REGULAR, POST, CLOSED
+        String marketState = getMarketState();
+        if (marketState != null) {
+            if (marketState.compareTo("REGULAR") == 0) {
+                sb.append(" ");
+                sb.append("(O)");
+            } else {
+                sb.append(" ");
+                sb.append("(C)");
+            }
+        }
+
+        return sb.toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Number#doubleValue()
      */
     @Override
@@ -71,7 +96,9 @@ public class Price extends Number implements Comparable<Price> {
         return price.doubleValue();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Number#floatValue()
      */
     @Override
@@ -79,7 +106,9 @@ public class Price extends Number implements Comparable<Price> {
         return price.floatValue();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Number#intValue()
      */
     @Override
@@ -87,7 +116,9 @@ public class Price extends Number implements Comparable<Price> {
         return price.intValue();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Number#longValue()
      */
     @Override
@@ -95,7 +126,9 @@ public class Price extends Number implements Comparable<Price> {
         return price.longValue();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
@@ -115,7 +148,8 @@ public class Price extends Number implements Comparable<Price> {
     /**
      * Sets the currency.
      *
-     * @param currency the new currency
+     * @param currency
+     *            the new currency
      */
     public void setCurrency(String currency) {
         this.currency = currency;
@@ -128,5 +162,13 @@ public class Price extends Number implements Comparable<Price> {
      */
     public NumberFormat getPriceFormatter() {
         return priceFormatter;
+    }
+
+    public String getMarketState() {
+        return marketState;
+    }
+
+    public void setMarketState(String marketState) {
+        this.marketState = marketState;
     }
 }
