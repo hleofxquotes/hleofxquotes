@@ -41,12 +41,6 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
 
     private ThreadLocal<String> stockSymbol = new ThreadLocal<String>();
 
-    /** The last trade date formatter. */
-    private SimpleDateFormat lastTradeDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
-
-    /** The last trade time formatter. */
-    private SimpleDateFormat lastTradeTimeFormatter = new SimpleDateFormat("hh:mm");
-
     public YahooScreenScrapper2QuoteGetter() {
         super();
         setBucketSize(1);
@@ -106,13 +100,26 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         if (shortName == null) {
             shortName = stockSymbol.get();
         }
+        
+        String marketState = getMarketState(priceNode);
+        // PREPRE, REGULAR, POST, CLOSED
+        LOGGER.info("  marketState=" + marketState);
 
         Price regularMarketPricePrice = getRegularMarketPricePrice(priceNode);
+        if (regularMarketPricePrice != null) {
+            regularMarketPricePrice.setMarketState(marketState);
+        }
 
         Price regularMarketDayLowPrice = getRegularMarketDayLowPrice(priceNode);
-
+        if (regularMarketDayLowPrice != null) {
+            regularMarketDayLowPrice.setMarketState(marketState);
+        }
+        
         Price regularMarketDayHighPrice = getRegularMarketDayHighPrice(priceNode);
-
+        if (regularMarketDayHighPrice != null) {
+            regularMarketDayHighPrice.setMarketState(marketState);
+        }
+        
         String currency = getCurrency(priceNode);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("    currency=" + currency);
@@ -205,6 +212,17 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         stockPrices.add(stockPrice);
 
         return stockPrices;
+    }
+
+    private String getMarketState(JsonNode fromJsonNode) {
+        String fieldName = "marketState";
+        JsonNode node = getOptionalJsonNode(fromJsonNode, fieldName);
+
+        if (node != null) {
+            return node.asText();
+        }
+
+        return null;
     }
 
     private String getExchangeTimezoneName(JsonNode fromJsonNode) {
