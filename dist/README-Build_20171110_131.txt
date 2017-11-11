@@ -1,0 +1,53 @@
+###
+Fri Nov 10 23:08:23 PST 2017
+
+  File: hleOfxQuotes-Build_20171110_131.zip (17563092 Nov 10 23:06)
+  https://github.com/hleofxquotes/hleofxquotes/blob/master/dist/hleOfxQuotes-Build_20171110_131.zip
+  Click on 'View Raw' to download
+
+  Once downloaded,
+    * Unzip hleOfxQuotes-Build_20171110_131.zip to get file hleOfxQuotes-Build_20171110_131-app.jar 
+    * You can double-click hleOfxQuotes-Build_20171110_131-app.jar to start
+    * OR open command-line and run
+      java -jar hleOfxQuotes-Build_20171110_131-app.jar
+    You can rename hleOfxQuotes-Build_20171110_131-app.jar to a shorter name if you like.
+    See a note on Java 8 below.
+
+Java 1.8
+
+  You will need Java 1.8 or later. Otherwise, you will get error looking something like this
+
+Exception in thread "main" java.lang.UnsupportedClassVersionError: app/GUI : Unsupported major.minor version 52.0
+	at java.lang.ClassLoader.defineClass1(Native Method)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:803)
+	at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:142)
+	at java.net.URLClassLoader.defineClass(URLClassLoader.java:442)
+	at java.net.URLClassLoader.access$100(URLClassLoader.java:64)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:354)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:348)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:347)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:425)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:312)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:358)
+	at sun.launcher.LauncherHelper.checkAndLoadMain(LauncherHelper.java:482)
+
+Tips:
+
+  * Be cautious. Have a plan to get back to a known state. You might want to try this version on a COPY of your *.mny file first. 
+
+  * If you see something not working, post a message on
+https://social.microsoft.com/Forums/mvpforum/en-US/home?forum=money
+
+
+Fixes:
+
+  * For Yahoo2, add Trade Date and Time values.
+
+  * Show mapper at load time. Previously, the mapper window is only updated after the prices are updated.
+
+  * Add an indicator in the Price column
+
+    ** (O) means price is from an exchange that is still OPEN
+    ** (C) means price is from an exchange that has CLOSED 
+
