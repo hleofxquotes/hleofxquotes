@@ -37,6 +37,16 @@ public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    private static final int COL_SYMBOL = 0;
+
+    private static final int COL_NAME = 1;
+
+    private static final int COL_PRICE = 2;
+
+    private static final int COL_LAST_TRADE_DATE = 3;
+
+    private static final int COL_LAST_TRADE_TIME = 4;
+
     /** The popup menu. */
     private final JPopupMenu popupMenu;
 
@@ -140,6 +150,8 @@ public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
         if (addStripe) {
             addStripeToTable(table);
         }
+        
+        setPreferredWidth(table);
 
         return table;
     }
@@ -241,6 +253,14 @@ public class PriceTableView<T extends AbstractStockPrice> extends JScrollPane {
         DefaultEventTableModel<T> tableModel = new DefaultEventTableModel<T>(
                 GlazedListsSwing.swingThreadProxyList(source), tableFormat);
         return tableModel;
+    }
+
+    private void setPreferredWidth(JTable table) {
+        table.getColumnModel().getColumn(COL_SYMBOL).setPreferredWidth(25);
+        table.getColumnModel().getColumn(COL_NAME).setPreferredWidth(90);
+        table.getColumnModel().getColumn(COL_PRICE).setPreferredWidth(80);
+        table.getColumnModel().getColumn(COL_LAST_TRADE_DATE).setPreferredWidth(50);
+        table.getColumnModel().getColumn(COL_LAST_TRADE_TIME).setPreferredWidth(50);
     }
 
     /**

@@ -72,6 +72,10 @@ public class OfxPriceInfo {
 
     private static final String TICKER = "TICKER";
 
+    private static final String POUND_STERLING_SYMBOL = "GBP";
+
+    private static final String PENCE_STERLING_SYMBOL = "GBX";
+
     /** The Constant DEFAULT_LAST_TRADE_DATE_PATTERN. */
     public static final String DEFAULT_LAST_TRADE_DATE_PATTERN = "MM/dd/yyyy";
 
@@ -235,10 +239,14 @@ public class OfxPriceInfo {
         for (AbstractStockPrice stockPrice : stockPrices) {
             Date date = null;
 
-            LOGGER.info(stockPrice.getStockSymbol());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(stockPrice.getStockSymbol());
+            }
 
             date = stockPrice.getLastTrade();
-            LOGGER.info("    lastTradeDate=" + date);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("    lastTradeDate=" + date);
+            }
             if (date == null) {
                 // String lastTradeDate = stockPrice.getLastTradeDate();
                 // if (!PropertiesUtils.isNull(lastTradeDate)) {
@@ -406,12 +414,13 @@ public class OfxPriceInfo {
         // currency conversion
         boolean convertedFromGBX = false;
         if (currency != null) {
-            if (currency.compareToIgnoreCase("GBX") == 0) {
+            if (currency.compareToIgnoreCase(PENCE_STERLING_SYMBOL) == 0) {
                 unitPrice = unitPrice / 100.00;
-                currency = "GBP";
+                currency = POUND_STERLING_SYMBOL;
                 convertedFromGBX = true;
             }
         }
+        
         boolean convertedToBase = false;
         if (convertToBaseCurrency) {
             if (currency != null) {
@@ -451,12 +460,13 @@ public class OfxPriceInfo {
         // tickerName=" + quoteSourceSymbol);
         // }
         // }
+        
         if (isMutualFund(stockPrice, symbolMapper)) {
-            addPositionMutualFund(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr,
-                    marketValue, dtPriceAsOfString, currency);
+            addPositionMutualFund(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
+                    dtPriceAsOfString, currency);
         } else if (isOptions(stockPrice, symbolMapper)) {
-            addPositionOptions(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr,
-                    marketValue, dtPriceAsOfString, currency);
+            addPositionOptions(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
+                    dtPriceAsOfString, currency);
         } else if (isBond(stockPrice, symbolMapper)) {
             addPositionBond(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
                     dtPriceAsOfString, currency);
@@ -478,8 +488,10 @@ public class OfxPriceInfo {
      * @return the dt as of date
      */
     private Date getDtAsOfDate(AbstractStockPrice stockPrice) {
-        LOGGER.info("> getDtAsOfDate, minLastTradeDate=" + minLastTradeDate);
-        LOGGER.info("> getDtAsOfDate, maxLastTradeDate=" + maxLastTradeDate);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> getDtAsOfDate, minLastTradeDate=" + minLastTradeDate);
+            LOGGER.debug("> getDtAsOfDate, maxLastTradeDate=" + maxLastTradeDate);
+        }
 
         // TODO: ???
         Date dtAsOfDate = null;
@@ -504,7 +516,9 @@ public class OfxPriceInfo {
             dtAsOfDate = new Date(dtAsOfDate.getTime() + offset);
         }
 
-        LOGGER.info("< getDtAsOfDate, " + dtAsOfDate);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("< getDtAsOfDate, " + dtAsOfDate);
+        }
 
         return dtAsOfDate;
     }
@@ -813,9 +827,9 @@ public class OfxPriceInfo {
         // currency conversion
         boolean convertedFromGBX = false;
         if (currency != null) {
-            if (currency.compareToIgnoreCase("GBX") == 0) {
+            if (currency.compareToIgnoreCase(PENCE_STERLING_SYMBOL) == 0) {
                 stockPriceValue = stockPriceValue / 100.00;
-                currency = "GBP";
+                currency = POUND_STERLING_SYMBOL;
                 convertedFromGBX = true;
             }
         }
@@ -1155,19 +1169,23 @@ public class OfxPriceInfo {
         }
         if (currency != null) {
             Enum currencyEnum = CurrencyEnum.Enum.forString(currency);
+            if (currencyEnum == null) {
+                // let's try all upper case
+                currencyEnum = CurrencyEnum.Enum.forString(currency.toUpperCase());
+            }
             if (currencyEnum != null) {
-                Currency c = secInfo.addNewCURRENCY();
-                c.setCURSYM(currencyEnum);
+                Currency ofxCurrency = secInfo.addNewCURRENCY();
+                ofxCurrency.setCURSYM(currencyEnum);
                 String curRate = getCurRate(currency);
                 if (curRate == null) {
                     curRate = DEFAULT_CURRATE;
                     String comment = "Using default currency rate of " + curRate + " which is likely WRONG";
-                    insertComment(c, comment);
+                    insertComment(ofxCurrency, comment);
                     comment = "Suggesting using fx.cvs file or add symbol " + currency + "USD=X";
-                    insertComment(c, comment);
+                    insertComment(ofxCurrency, comment);
                 }
-                c.setCURRATE(curRate);
-                secInfo.setCURRENCY(c);
+                ofxCurrency.setCURRATE(curRate);
+                secInfo.setCURRENCY(ofxCurrency);
             } else {
                 LOGGER.warn("Cannot lookup CurrencyEnum for currency=" + currency);
             }
@@ -1192,6 +1210,9 @@ public class OfxPriceInfo {
             }
         }
 
+        if (curRateStr == null) {
+            LOGGER.warn("Currency conversion: " + currency + "->" + defaultCurrency + ", found NO rate.");
+        }
         return curRateStr;
     }
 
