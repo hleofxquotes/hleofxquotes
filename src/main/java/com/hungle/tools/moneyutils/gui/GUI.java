@@ -15,7 +15,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -75,6 +74,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.http.Header;
@@ -142,6 +142,7 @@ import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
  */
 public class GUI extends JFrame {
 
+
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
@@ -152,12 +153,14 @@ public class GUI extends JFrame {
     private static final String VERSION_PREFIX = "Build";
     // private static final String VERSION_PREFIX = "SNAPSHOT";
 
+    private static final String VERSION_DATE = "20171110";
+
     /** The Constant VERSION_SUFFIX. */
-    private static final String VERSION_SUFFIX = "122";
+    private static final String VERSION_SUFFIX = "129";
 
     /** The version. */
     // 20171104_122
-    public static String VERSION = VERSION_PREFIX + "_" + "20171104_122" + "_" + VERSION_SUFFIX;
+    public static String VERSION = VERSION_PREFIX + "_" + VERSION_DATE + "_" + VERSION_SUFFIX;
 
     private static final Class<le.com.tools.moneyutils.ofx.quotes.GUI> PREFS_CLASS = le.com.tools.moneyutils.ofx.quotes.GUI.class;
 
@@ -1010,9 +1013,11 @@ public class GUI extends JFrame {
                         LOGGER.debug("ofxFile=" + ofxFile);
                     }
                 }
-
-                File csvFile = saveToCsv(prices);
-                LOGGER.info("csvFile=" + csvFile);
+                
+                if (LOGGER.isDebugEnabled()) {
+                    File csvFile = saveToCsv(prices);
+                    LOGGER.debug("Saved csvFile=" + csvFile);
+                }
 
                 MapperTableUtils.updateMapperTable(symbolMapper, mapper);
             } catch (IOException e) {
@@ -3011,18 +3016,18 @@ public class GUI extends JFrame {
         // DateTableCellRenderer(dateFormat);
         // table.getColumnModel().getColumn(2).setCellRenderer(renderer);
         //
-        // final int columnCount = 3;
-        // int[] colWidths = new int[columnCount];
-        // for (int i = 0; i < colWidths.length; i++) {
-        // colWidths[i] = -1;
-        // }
-        // colWidths = null;
-        // if (colWidths != null) {
-        // log.info("colWidths=" + colWidths);
-        // Object[] maxWidthValues =
-        // TableUtils.calculateMaxWidthValues(colWidths);
-        // TableUtils.adjustColumnSizes(table, maxWidthValues);
-        // }
+        
+//        int columnCount = table.getColumnModel().getColumnCount();
+//        int[] colWidths = new int[columnCount];
+//        for (int i = 0; i < colWidths.length; i++) {
+//            colWidths[i] = -1;
+//        }
+//        // colWidths = null;
+//        if (colWidths != null) {
+//            LOGGER.info("colWidths=" + colWidths);
+//            Object[] maxWidthValues = TableUtils.calculateMaxWidthValues(colWidths);
+//            TableUtils.adjustColumnSizes(table, maxWidthValues);
+//        }
 
         return table;
     }

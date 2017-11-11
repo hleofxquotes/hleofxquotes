@@ -1169,19 +1169,23 @@ public class OfxPriceInfo {
         }
         if (currency != null) {
             Enum currencyEnum = CurrencyEnum.Enum.forString(currency);
+            if (currencyEnum == null) {
+                // let's try all upper case
+                currencyEnum = CurrencyEnum.Enum.forString(currency.toUpperCase());
+            }
             if (currencyEnum != null) {
-                Currency c = secInfo.addNewCURRENCY();
-                c.setCURSYM(currencyEnum);
+                Currency ofxCurrency = secInfo.addNewCURRENCY();
+                ofxCurrency.setCURSYM(currencyEnum);
                 String curRate = getCurRate(currency);
                 if (curRate == null) {
                     curRate = DEFAULT_CURRATE;
                     String comment = "Using default currency rate of " + curRate + " which is likely WRONG";
-                    insertComment(c, comment);
+                    insertComment(ofxCurrency, comment);
                     comment = "Suggesting using fx.cvs file or add symbol " + currency + "USD=X";
-                    insertComment(c, comment);
+                    insertComment(ofxCurrency, comment);
                 }
-                c.setCURRATE(curRate);
-                secInfo.setCURRENCY(c);
+                ofxCurrency.setCURRATE(curRate);
+                secInfo.setCURRENCY(ofxCurrency);
             } else {
                 LOGGER.warn("Cannot lookup CurrencyEnum for currency=" + currency);
             }
@@ -1206,6 +1210,9 @@ public class OfxPriceInfo {
             }
         }
 
+        if (curRateStr == null) {
+            LOGGER.warn("Currency conversion: " + currency + "->" + defaultCurrency + ", found NO rate.");
+        }
         return curRateStr;
     }
 
