@@ -209,15 +209,6 @@ public class XmlBeansUtils {
     }
 
     /**
-     * Gets the dt client.
-     *
-     * @return the dt client
-     */
-    public static String getDtClient() {
-        return formatGmt(new Date());
-    }
-
-    /**
      * Last trade date to dt as of.
      *
      * @param maxLastTradeDate the max last trade date

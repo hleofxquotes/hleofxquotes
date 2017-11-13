@@ -322,8 +322,10 @@ public class OfxPriceInfo {
         InvestmentStatementResponse statementResponse = transactionResponse.addNewINVSTMTRS();
 
         Date dtAsOfDate = getDtAsOfDate();
-        statementResponse.setDTASOF(XmlBeansUtils.formatGmt(dtAsOfDate));
-        String comment = "DTASOF local time is " + XmlBeansUtils.formatLocal(dtAsOfDate);
+        statementResponse.setDTASOF(OfxDateTimeUtils.getStatementResponseDtAsOf(dtAsOfDate));
+        // String comment = "DTASOF local time is " +
+        // XmlBeansUtils.formatLocal(dtAsOfDate);
+        String comment = "DTASOF local time is " + dtAsOfDate;
         insertComment(statementResponse, comment);
 
         if (LOGGER.isDebugEnabled()) {
@@ -353,9 +355,9 @@ public class OfxPriceInfo {
         // to set the download statement date
         InvestmentTransactionList investmentTransactionList = statementResponse.addNewINVTRANLIST();
         insertComment(investmentTransactionList, "work-around for MM2005UK to set the download statement date");
-        String dtStart = XmlBeansUtils.formatGmt(dtAsOfDate);
+        String dtStart = OfxDateTimeUtils.getforceGeneratingINVTRANLISTDtStart(dtAsOfDate);
         investmentTransactionList.setDTSTART(dtStart);
-        String dtEnd = XmlBeansUtils.formatGmt(dtAsOfDate);
+        String dtEnd = OfxDateTimeUtils.getforceGeneratingINVTRANLISTDtEnd(dtAsOfDate);
         investmentTransactionList.setDTEND(dtEnd);
     }
 
@@ -420,7 +422,7 @@ public class OfxPriceInfo {
                 convertedFromGBX = true;
             }
         }
-        
+
         boolean convertedToBase = false;
         if (convertToBaseCurrency) {
             if (currency != null) {
@@ -445,9 +447,8 @@ public class OfxPriceInfo {
         String unitPriceStr = priceFormatter.format(unitPrice);
         String marketValue = priceFormatter.format(units * unitPrice);
         // DTPRICEASOF
-        Date dtAsOfDate = getDtAsOfDate(stockPrice);
-        String dtPriceAsOfString = null;
-        dtPriceAsOfString = XmlBeansUtils.formatGmt(dtAsOfDate);
+        Date dtPriceAsOf = getDtAsOfDate(stockPrice);
+        String dtPriceAsOfString = OfxDateTimeUtils.getInvestmentPositionListDtPriceAsOf(dtPriceAsOf);
         // String lastTradeDate = stockPrice.getLastTradeDate();
         // if (lastTradeDate != null) {
         // try {
@@ -460,19 +461,19 @@ public class OfxPriceInfo {
         // tickerName=" + quoteSourceSymbol);
         // }
         // }
-        
+
         if (isMutualFund(stockPrice, symbolMapper)) {
-            addPositionMutualFund(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
-                    dtPriceAsOfString, currency);
+            addPositionMutualFund(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr,
+                    marketValue, dtPriceAsOfString, dtPriceAsOf, currency);
         } else if (isOptions(stockPrice, symbolMapper)) {
-            addPositionOptions(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
-                    dtPriceAsOfString, currency);
+            addPositionOptions(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr,
+                    marketValue, dtPriceAsOfString, dtPriceAsOf, currency);
         } else if (isBond(stockPrice, symbolMapper)) {
             addPositionBond(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
-                    dtPriceAsOfString, currency);
+                    dtPriceAsOfString, dtPriceAsOf, currency);
         } else {
             addPositionStock(investmentPositions, msMoneySymbol, quoteSourceSymbol, unitsStr, unitPriceStr, marketValue,
-                    dtPriceAsOfString, currency);
+                    dtPriceAsOfString, dtPriceAsOf, currency);
         }
     }
 
@@ -534,27 +535,6 @@ public class OfxPriceInfo {
     }
 
     /**
-     * Convert last trade date to dt price as of.
-     *
-     * @param lastTradeDate
-     *            the last trade date
-     * @return the string
-     * @throws ParseException
-     *             the parse exception
-     */
-    private String convertLastTradeDateToDtPriceAsOf(String lastTradeDate) throws ParseException {
-        Date date = lastTradeDateFormatter.parse(lastTradeDate);
-
-        if (dateOffset != 0) {
-            long offset = dateOffset * OFFSET_DAY;
-            date = new Date(date.getTime() + offset);
-        }
-
-        String str = XmlBeansUtils.formatGmt(date);
-        return str;
-    }
-
-    /**
      * Adds the position mutual fund.
      *
      * @param investmentPositions
@@ -569,16 +549,18 @@ public class OfxPriceInfo {
      *            the unit price
      * @param marketValue
      *            the market value
-     * @param dtPriceAsOf
+     * @param dtPriceAsOfString
      *            the dt price as of
+     * @param dtPriceAsOf
      * @param currency
      *            the currency
      */
     private void addPositionMutualFund(InvestmentPositionList investmentPositions, String ticker,
-            String quoteSourceSymbol, String units, String unitPrice, String marketValue, String dtPriceAsOf,
-            String currency) {
+            String quoteSourceSymbol, String units, String unitPrice, String marketValue, String dtPriceAsOfString,
+            Date dtPriceAsOf, String currency) {
         PositionMutualFund mf = investmentPositions.addNewPOSMF();
-        addPosition(mf, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOf, currency);
+        addPosition(mf, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOfString, dtPriceAsOf,
+                currency);
         mf.setREINVDIV(BooleanType.Y);
         mf.setREINVCG(BooleanType.Y);
     }
@@ -598,15 +580,18 @@ public class OfxPriceInfo {
      *            the unit price
      * @param marketValue
      *            the market value
-     * @param dtPriceAsOf
+     * @param dtPriceAsOfString
      *            the dt price as of
+     * @param dtPriceAsOf
      * @param currency
      *            the currency
      */
     private void addPositionBond(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol,
-            String units, String unitPrice, String marketValue, String dtPriceAsOf, String currency) {
+            String units, String unitPrice, String marketValue, String dtPriceAsOfString, Date dtPriceAsOf,
+            String currency) {
         PositionOther other = investmentPositions.addNewPOSOTHER();
-        addPosition(other, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOf, currency);
+        addPosition(other, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOfString, dtPriceAsOf,
+                currency);
     }
 
     /**
@@ -624,15 +609,18 @@ public class OfxPriceInfo {
      *            the unit price
      * @param marketValue
      *            the market value
-     * @param dtPriceAsOf
+     * @param dtPriceAsOfString
      *            the dt price as of
+     * @param dtPriceAsOf
      * @param currency
      *            the currency
      */
     private void addPositionOptions(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol,
-            String units, String unitPrice, String marketValue, String dtPriceAsOf, String currency) {
+            String units, String unitPrice, String marketValue, String dtPriceAsOfString, Date dtPriceAsOf,
+            String currency) {
         PositionOption options = investmentPositions.addNewPOSOPT();
-        addPosition(options, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOf, currency);
+        addPosition(options, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOfString, dtPriceAsOf,
+                currency);
     }
 
     /**
@@ -650,15 +638,18 @@ public class OfxPriceInfo {
      *            the unit price
      * @param marketValue
      *            the market value
-     * @param dtPriceAsOf
+     * @param dtPriceAsOfString
      *            the dt price as of
+     * @param dtPriceAsOf
      * @param currency
      *            the currency
      */
     private void addPositionStock(InvestmentPositionList investmentPositions, String ticker, String quoteSourceSymbol,
-            String units, String unitPrice, String marketValue, String dtPriceAsOf, String currency) {
+            String units, String unitPrice, String marketValue, String dtPriceAsOfString, Date dtPriceAsOf,
+            String currency) {
         PositionStock stock = investmentPositions.addNewPOSSTOCK();
-        addPosition(stock, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOf, currency);
+        addPosition(stock, ticker, quoteSourceSymbol, units, unitPrice, marketValue, dtPriceAsOfString, dtPriceAsOf,
+                currency);
         stock.setREINVDIV(BooleanType.Y);
         // stock.setREINVCG(BooleanType.Y);
     }
@@ -678,14 +669,16 @@ public class OfxPriceInfo {
      *            the unit price
      * @param marketValue
      *            the market value
-     * @param dtPriceAsOf
+     * @param dtPriceAsOfString
      *            the dt price as of
+     * @param dtPriceAsOf
      * @param currency
      *            the currency
      * @return the investment position
      */
     private InvestmentPosition addPosition(AbstractPositionBase position, String ticker, String quoteSourceSymbol,
-            String units, String unitPrice, String marketValue, String dtPriceAsOf, String currency) {
+            String units, String unitPrice, String marketValue, String dtPriceAsOfString, Date dtPriceAsOf,
+            String currency) {
         InvestmentPosition investmentPosition = position.addNewINVPOS();
         SecurityId secId = investmentPosition.addNewSECID();
 
@@ -702,17 +695,22 @@ public class OfxPriceInfo {
         investmentPosition.setUNITS(units);
         investmentPosition.setUNITPRICE(unitPrice);
         investmentPosition.setMKTVAL(marketValue);
-        investmentPosition.setDTPRICEASOF(dtPriceAsOf);
+        investmentPosition.setDTPRICEASOF(dtPriceAsOfString);
 
         try {
             String comment = null;
 
-            comment = "DTPRICEASOF local time is " + XmlBeansUtils.parseGmt(dtPriceAsOf).toString();
+            // comment = "DTPRICEASOF local time is " +
+            // XmlBeansUtils.parseGmt(dtPriceAsOf).toString();
+            comment = "DTPRICEASOF local time is " + dtPriceAsOf;
             insertComment(investmentPosition, comment);
-            comment = "DTPRICEASOF GMT time is " + dtPriceAsOf;
-            insertComment(investmentPosition, comment);
-        } catch (ParseException e) {
-            LOGGER.warn(e);
+            // comment = "DTPRICEASOF GMT time is " + dtPriceAsOf;
+            // insertComment(investmentPosition, comment);
+            // } catch (ParseException e) {
+            // LOGGER.warn(e);
+            // }
+        } finally {
+
         }
         if (currency != null) {
             Enum currencyEnum = CurrencyEnum.Enum.forString(currency);
@@ -860,8 +858,8 @@ public class OfxPriceInfo {
         String unitPrice = priceFormatter.format(stockPriceValue);
 
         // DTASOF
-        Date dtAsOfDate = getDtAsOfDate(stockPrice);
-        String dtAsOf = XmlBeansUtils.formatGmt(dtAsOfDate);
+        Date dtAsOf = getDtAsOfDate(stockPrice);
+        String dtAsOfString = OfxDateTimeUtils.getGeneralSecurityInfoDateAsOf(dtAsOf);
         // String lastTradeDate = stockPrice.getLastTradeDate();
         // if (lastTradeDate != null) {
         // try {
@@ -875,13 +873,17 @@ public class OfxPriceInfo {
         // }
         // }
         if (isMutualFund(stockPrice, symbolMapper)) {
-            addMutualFundInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOf, currency);
+            addMutualFundInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOfString, dtAsOf,
+                    currency);
         } else if (isOptions(stockPrice, symbolMapper)) {
-            addOptionsInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOf, currency);
+            addOptionsInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOfString, dtAsOf,
+                    currency);
         } else if (isBond(stockPrice, symbolMapper)) {
-            addBondInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOf, currency);
+            addBondInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOfString, dtAsOf,
+                    currency);
         } else {
-            addStockInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOf, currency);
+            addStockInfo(securityList, msMoneySymbol, quoteSourceSymbol, secName, unitPrice, dtAsOfString, dtAsOf,
+                    currency);
         }
     }
 
@@ -975,18 +977,19 @@ public class OfxPriceInfo {
      *            the sec name
      * @param unitPrice
      *            the unit price
-     * @param dtAsOf
+     * @param dtAsOfString
      *            the dt as of
+     * @param dtAsOf
      * @param currency
      *            the currency
      * @return the mutual fund info
      */
     private MutualFundInfo addMutualFundInfo(SecurityList securityList, String ticker, String quoteSourceTicker,
-            String secName, String unitPrice, String dtAsOf, String currency) {
+            String secName, String unitPrice, String dtAsOfString, Date dtAsOf, String currency) {
         MutualFundInfo root = securityList.addNewMFINFO();
 
         GeneralSecurityInfo secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice,
-                dtAsOf, currency);
+                dtAsOfString, dtAsOf, currency);
         insertComment(secInfo, "Security is treated as Mutual Fund");
 
         root.setMFTYPE(MutualFundTypeEnum.OPENEND);
@@ -1007,17 +1010,18 @@ public class OfxPriceInfo {
      *            the sec name
      * @param unitPrice
      *            the unit price
-     * @param dtAsOf
+     * @param dtAsOfString
      *            the dt as of
+     * @param dtAsOf
      * @param currency
      *            the currency
      */
     private void addOptionsInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName,
-            String unitPrice, String dtAsOf, String currency) {
+            String unitPrice, String dtAsOfString, Date dtAsOf, String currency) {
         OptionInfo root = securityList.addNewOPTINFO();
 
         GeneralSecurityInfo secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice,
-                dtAsOf, currency);
+                dtAsOfString, dtAsOf, currency);
         insertComment(secInfo, "Security is treated as Options");
 
         // <OPTTYPE>PUT</OPTTYPE>
@@ -1054,7 +1058,7 @@ public class OfxPriceInfo {
                 value = 1.0;
             }
             root.setSTRIKEPRICE(priceFormatter.format(value));
-            root.setDTEXPIRE(dtAsOf);
+            root.setDTEXPIRE(dtAsOfString);
             root.setSHPERCTRCT(sharesPerContract);
         }
     }
@@ -1072,18 +1076,19 @@ public class OfxPriceInfo {
      *            the sec name
      * @param unitPrice
      *            the unit price
-     * @param dtAsOf
+     * @param dtAsOfString
      *            the dt as of
+     * @param dtAsOf
      * @param currency
      *            the currency
      * @return the other info
      */
     private OtherInfo addBondInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName,
-            String unitPrice, String dtAsOf, String currency) {
+            String unitPrice, String dtAsOfString, Date dtAsOf, String currency) {
         OtherInfo root = securityList.addNewOTHERINFO();
 
-        XmlObject secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOf,
-                currency);
+        XmlObject secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOfString,
+                dtAsOf, currency);
         insertComment(secInfo, "Security is treated as Bond");
 
         // root.setMFTYPE(MutualFundTypeEnum.OPENEND);
@@ -1104,18 +1109,19 @@ public class OfxPriceInfo {
      *            the sec name
      * @param unitPrice
      *            the unit price
-     * @param dtAsOf
+     * @param dtAsOfString
      *            the dt as of
+     * @param dtAsOf
      * @param currency
      *            the currency
      * @return the stock info
      */
     private StockInfo addStockInfo(SecurityList securityList, String ticker, String quoteSourceTicker, String secName,
-            String unitPrice, String dtAsOf, String currency) {
+            String unitPrice, String dtAsOfString, Date dtAsOf, String currency) {
         StockInfo root = securityList.addNewSTOCKINFO();
 
         GeneralSecurityInfo secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice,
-                dtAsOf, currency);
+                dtAsOfString, dtAsOf, currency);
         insertComment(secInfo, "Security is treated as Stock");
 
         // root.setMFTYPE(MutualFundTypeEnum.OPENEND);
@@ -1136,14 +1142,16 @@ public class OfxPriceInfo {
      *            the sec name
      * @param unitPrice
      *            the unit price
-     * @param dtAsOf
+     * @param dtAsOfString
      *            the dt as of
+     * @param dtAsOf
      * @param currency
      *            the currency
      * @return the general security info
      */
     private GeneralSecurityInfo addGeneralSecurityInfo(AbstractSecurityInfo securityInfo, String ticker,
-            String quoteSourceTicker, String secName, String unitPrice, String dtAsOf, String currency) {
+            String quoteSourceTicker, String secName, String unitPrice, String dtAsOfString, Date dtAsOf,
+            String currency) {
         GeneralSecurityInfo secInfo = securityInfo.addNewSECINFO();
         SecurityId secId = secInfo.addNewSECID();
         String uniqueId = ticker;
@@ -1160,12 +1168,17 @@ public class OfxPriceInfo {
         secInfo.setSECNAME(secName);
         secInfo.setTICKER(ticker);
         secInfo.setUNITPRICE(unitPrice);
-        secInfo.setDTASOF(dtAsOf);
+        secInfo.setDTASOF(dtAsOfString);
         try {
-            String comment = "DTASOF local time is " + XmlBeansUtils.parseGmt(dtAsOf).toString();
+            // String comment = "DTASOF local time is " +
+            // XmlBeansUtils.parseGmt(dtAsOf).toString();
+            String comment = "DTASOF local time is " + dtAsOf;
             insertComment(secInfo, comment);
-        } catch (ParseException e) {
-            LOGGER.warn(e);
+            // } catch (ParseException e) {
+            // LOGGER.warn(e);
+            // }
+        } finally {
+
         }
         if (currency != null) {
             Enum currencyEnum = CurrencyEnum.Enum.forString(currency);
@@ -1401,8 +1414,9 @@ public class OfxPriceInfo {
          * 124 milliseconds p.m., in Eastern Standard Time
          */
         // String dateTime = getCurrentDateTime();
-        sonrs.setDTSERVER(XmlBeansUtils.formatGmt(currentDateTime));
-        String comment = "DTSERVER local time is " + XmlBeansUtils.formatLocal(currentDateTime);
+        sonrs.setDTSERVER(OfxDateTimeUtils.getDtServer(currentDateTime));
+//        String comment = "DTSERVER local time is " + XmlBeansUtils.formatLocal(currentDateTime);
+        String comment = "DTSERVER local time is " + currentDateTime;
         insertComment(status, comment);
         if (dateOffset != 0) {
             comment = "User requests to set trade date offset to: " + dateOffset;
