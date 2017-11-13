@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?OFX OFXHEADER="200" VERSION="200" SECURITY="NONE" OLDFILEUID="NONE" NEWFILEUID="NONE"?>
+<OFX>
+  <!--Created by hleOfxQuotes on: Sun Nov 12 10:57:17 PST 2017-->
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+        <MESSAGE>Successful Sign On</MESSAGE>
+      </STATUS>
+      <DTSERVER>20171112185717</DTSERVER>
+      <LANGUAGE>ENG</LANGUAGE>
+    </SONRS>
+  </SIGNONMSGSRSV1>
+  <INVSTMTMSGSRSV1>
+    <INVSTMTTRNRS>
+      <TRNUID>052407BB-3498-4D0C-8A88-A2C50353A289</TRNUID>
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+      </STATUS>
+      <INVSTMTRS>
+        <DTASOF>20171111010001</DTASOF>
+        <CURDEF>USD</CURDEF>
+        <INVACCTFROM>
+          <BROKERID>hungle.com</BROKERID>
+          <ACCTID>0123456789</ACCTID>
+        </INVACCTFROM>
+        <INVPOSLIST>
+          <POSSTOCK>
+            <INVPOS>
+              <!--Ticker from quote source is: AAPL-->
+              <SECID>
+                <UNIQUEID>AAPL</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>174.67</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171110010001</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+          </POSSTOCK>
+        </INVPOSLIST>
+      </INVSTMTRS>
+    </INVSTMTTRNRS>
+  </INVSTMTMSGSRSV1>
+  <SECLISTMSGSRSV1>
+    <SECLIST>
+      <STOCKINFO>
+        <!--Ticker from quote source is: AAPL-->
+        <!--Security is treated as Stock-->
+        <SECINFO>
+          <SECID>
+            <UNIQUEID>AAPL</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Apple Inc.</SECNAME>
+          <TICKER>AAPL</TICKER>
+          <UNITPRICE>174.67</UNITPRICE>
+          <DTASOF>20171109010001</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+      </STOCKINFO>
+    </SECLIST>
+  </SECLISTMSGSRSV1>
+</OFX>
