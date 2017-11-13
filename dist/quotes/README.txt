@@ -1,4 +1,6 @@
-I am in California (PST) time
+I am in California (PST) time. 
+
+I created a brand new *.mny test file to try each of these tests. Best if you don't try testing on your date-to-date copy.
 
 ##
 quotes-test-01.ofx
