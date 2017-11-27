@@ -36,3 +36,4 @@ Hope this helps.
 See also:
   * http://help.infinitekind.com/discussions/investments/2706-updating-share-prices
   * I've created a pull request for IK. It is up to them to merge if they like.
+https://bitbucket.org/infinitekind/moneydance_open/pull-requests/8/version-1003-change-prices-and-fx-url-to/diff
