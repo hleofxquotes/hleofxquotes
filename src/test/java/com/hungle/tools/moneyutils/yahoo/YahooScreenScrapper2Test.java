@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.tools.moneyutils.stockprice.Price;
 
 public class YahooScreenScrapper2Test {
     private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2Test.class);
@@ -191,7 +192,27 @@ public class YahooScreenScrapper2Test {
         InputStream jsonStream = OfxUtils.getResource("TSLA.json", this).openStream();
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         YahooScreenScrapper2Json json = mapper.readValue(jsonStream, YahooScreenScrapper2Json.class);
-        json = null;
+        Assert.assertNotNull(json);
     }
 
+    @Test
+    public void testParseHtmlContent() throws IOException {
+        InputStream stream = OfxUtils.getResource("TSLA.html", this).openStream();
+        YahooScreenScrapper2QuoteGetter getter = new YahooScreenScrapper2QuoteGetter();
+        getter.setStockSymbol("TSLA");
+        List<AbstractStockPrice> stockPrices = getter.parseInputStream(stream);
+        
+        Assert.assertNotNull(stockPrices);
+        
+        Assert.assertEquals(1, stockPrices.size());
+        
+        AbstractStockPrice stockPrice = stockPrices.get(0);
+        Assert.assertNotNull(stockPrice);
+        
+        Price price = stockPrice.getLastPrice();
+        Assert.assertNotNull(price);
+        
+        Assert.assertEquals(297.5151, price.doubleValue(), 0.1);
+        
+    }
 }

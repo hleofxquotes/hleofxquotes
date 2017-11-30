@@ -10,7 +10,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -36,7 +35,7 @@ import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
 import com.hungle.tools.moneyutils.stockprice.Price;
 import com.hungle.tools.moneyutils.stockprice.StockPrice;
 
-final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
+public class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
     private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2QuoteGetter.class);
 
     private ThreadLocal<String> stockSymbol = new ThreadLocal<String>();
@@ -50,7 +49,8 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
     public HttpResponse httpGet(List<String> stocks, String format)
             throws URISyntaxException, IOException, ClientProtocolException {
 
-        this.stockSymbol.set(stocks.get(0));
+        setStockSymbol(stocks.get(0));
+
         Charset enc = Charset.forName("UTF-8");
         if (enc == null) {
             enc = Charset.defaultCharset();
@@ -58,17 +58,25 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         String stockSymbolStr = stockSymbol.get();
         stockSymbolStr = URLEncoder.encode(stockSymbolStr, enc.toString());
 
-        String urlString = "https://finance.yahoo.com/quote/" + stockSymbolStr + "?p=" + stockSymbolStr;
-        
+        String urlString = getUrlString(stockSymbolStr);
+
         URI uri = new URL(urlString).toURI();
 
         HttpGet httpGet = new HttpGet(uri);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("uri=" + uri);
         }
-        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpClient httpClient = createHttpClient();
         HttpResponse response = httpClient.execute(httpGet);
         return response;
+    }
+
+    protected void setStockSymbol(String symbol) {
+        this.stockSymbol.set(symbol);
+    }
+
+    protected String getUrlString(String symbol) {
+        return "https://finance.yahoo.com/quote/" + symbol + "?p=" + symbol;
     }
 
     @Override
@@ -87,10 +95,14 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         return prices;
     }
 
-    private List<AbstractStockPrice> parseInputStream(InputStream stream) throws IOException, OfxDataNotFound {
-        String data = getData(stream);
+    protected List<AbstractStockPrice> parseInputStream(InputStream stream) throws IOException, OfxDataNotFound {
+        String jsonString = getJsonString(stream);
 
-        JsonNode treeTop = getTreeTop(data);
+        return parseJsonString(jsonString);
+    }
+
+    protected List<AbstractStockPrice> parseJsonString(String jsonString) throws IOException, OfxDataNotFound {
+        JsonNode treeTop = getTreeTop(jsonString);
 
         JsonNode priceNode = getPriceNode(treeTop);
 
@@ -100,7 +112,7 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         if (shortName == null) {
             shortName = stockSymbol.get();
         }
-        
+
         String marketState = getMarketState(priceNode);
         // PREPRE, REGULAR, POST, CLOSED
         if (LOGGER.isDebugEnabled()) {
@@ -116,13 +128,13 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         if (regularMarketDayLowPrice != null) {
             regularMarketDayLowPrice.setMarketState(marketState);
         }
-        
+
         Price regularMarketDayHighPrice = getRegularMarketDayHighPrice(priceNode);
         if (regularMarketDayHighPrice != null) {
             regularMarketDayHighPrice.setMarketState(marketState);
         }
-        
-        String currency = getCurrency(priceNode);
+
+        String currency = getCurrency(priceNode, treeTop);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("    currency=" + currency);
         }
@@ -186,13 +198,7 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
             stockPrice.setCurrency(currency);
         }
 
-        if (regularMarketDayHighPrice != null) {
-            stockPrice.setDayHigh(regularMarketDayHighPrice);
-        }
-
-        if (regularMarketDayLowPrice != null) {
-            stockPrice.setDayLow(regularMarketDayLowPrice);
-        }
+        setDayHighLow(regularMarketDayHighPrice, regularMarketDayLowPrice, stockPrice);
 
         stockPrice.setLastTrade(lastTrade);
         if (lastTrade != null) {
@@ -216,44 +222,42 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         return stockPrices;
     }
 
-    private String getMarketState(JsonNode fromJsonNode) {
-        String fieldName = "marketState";
-        JsonNode node = getOptionalJsonNode(fromJsonNode, fieldName);
-
-        if (node != null) {
-            return node.asText();
+    protected void setDayHighLow(Price regularMarketDayHighPrice, Price regularMarketDayLowPrice,
+            StockPrice stockPrice) {
+        if (regularMarketDayHighPrice != null) {
+            stockPrice.setDayHigh(regularMarketDayHighPrice);
         }
 
-        return null;
+        if (regularMarketDayLowPrice != null) {
+            stockPrice.setDayLow(regularMarketDayLowPrice);
+        }
+    }
+
+    protected String getMarketState(JsonNode fromJsonNode) {
+        return JsonNodeUtils.getMarketState(fromJsonNode);
     }
 
     private String getExchangeTimezoneName(JsonNode fromJsonNode) {
-        String fieldName = "exchangeTimezoneName";
-        JsonNode jsonNode = getOptionalJsonNode(fromJsonNode, fieldName);
-        if (jsonNode == null) {
-            return null;
-        }
-
-        return jsonNode.asText();
+        return JsonNodeUtils.getExchangeTimezoneName(fromJsonNode);
     }
 
-    private JsonNode getTreeTop(String data) throws IOException {
+    private JsonNode getTreeTop(String jsonString) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode treeTop = mapper.readTree(data);
-        if (treeTop == null) {
+        JsonNode node = mapper.readTree(jsonString);
+        if (node == null) {
             throw new OfxDataNotFound("Cannot find stockPrice treeTop");
         }
-        return treeTop;
+        return node;
     }
 
-    private JsonNode getPriceNode(JsonNode fromJsonNode) throws OfxDataNotFound {
+    protected JsonNode getPriceNode(JsonNode fromJsonNode) throws OfxDataNotFound {
         String fieldName = "price";
-        return getRequiredJsonNode(fromJsonNode, fieldName);
+        return JsonNodeUtils.getRequiredJsonNode(fromJsonNode, fieldName);
     }
 
     private JsonNode getQuoteTypeNode(JsonNode fromJsonNode) {
         String fieldName = "QuoteSummaryStore";
-        JsonNode jsonNode = getOptionalJsonNode(fromJsonNode, fieldName);
+        JsonNode jsonNode = JsonNodeUtils.getOptionalJsonNode(fromJsonNode, fieldName);
         if (jsonNode != null) {
             jsonNode = jsonNode.path("quoteType");
             if (!jsonNode.isMissingNode()) {
@@ -264,125 +268,48 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
         return jsonNode;
     }
 
-    private String getSymbol(JsonNode fromJsonNode) throws OfxDataNotFound {
-        String fieldName = "symbol";
-        JsonNode jsonNode = getRequiredJsonNode(fromJsonNode, fieldName);
-        return jsonNode.asText();
+    protected String getSymbol(JsonNode fromJsonNode) throws OfxDataNotFound {
+        return JsonNodeUtils.getSymbol(fromJsonNode);
     }
 
-    private String getShortName(JsonNode fromJsonNode) {
-        String fieldName = "shortName";
-        JsonNode jsonNode = getOptionalJsonNode(fromJsonNode, fieldName);
-        if (jsonNode == null) {
-            return null;
-        }
-
-        return jsonNode.asText();
+    protected String getShortName(JsonNode fromJsonNode) {
+        return JsonNodeUtils.getShortName(fromJsonNode);
     }
 
-    private Price getRegularMarketPricePrice(JsonNode priceNode) throws OfxDataNotFound {
-        String fieldName = "regularMarketPrice";
-        JsonNode node = getRequiredJsonNode(priceNode, fieldName);
-
-        Price price = null;
-
-        node = node.path("raw");
-        if (node.isMissingNode()) {
-            throw new OfxDataNotFound("Cannot find JsonNode " + fieldName + ".raw");
-        }
-        price = new Price(node.asDouble());
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("regularMarketPricePrice=" + price);
-        }
-
-        return price;
+    protected Price getRegularMarketPricePrice(JsonNode priceNode) throws OfxDataNotFound {
+        return JsonNodeUtils.getRegularMarketPricePrice(priceNode);
     }
 
-    private Price getRegularMarketDayLowPrice(JsonNode fromJsonNode) {
-        String fieldName = "regularMarketDayLow";
-        JsonNode node = getOptionalJsonNode(fromJsonNode, fieldName);
-
-        Price price = null;
-        if (node != null) {
-            node = node.path("raw");
-            if (!node.isMissingNode()) {
-                price = new Price(node.asDouble());
-            }
-        }
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("regularMarketDayLowPrice=" + price);
-        }
-
-        return price;
+    protected Price getRegularMarketDayLowPrice(JsonNode fromJsonNode) {
+        return JsonNodeUtils.getRegularMarketDayLowPrice(fromJsonNode);
     }
 
-    private String getCurrency(JsonNode fromJsonNode) {
-        String fieldName = "currency";
-        JsonNode jsonNode = getOptionalJsonNode(fromJsonNode, fieldName);
-        if (jsonNode == null) {
-            return null;
-        }
-
-        return jsonNode.asText();
+    protected String getCurrency(JsonNode fromJsonNode, JsonNode treeTop) {
+        return JsonNodeUtils.getCurrency(fromJsonNode);
     }
 
-    private Price getRegularMarketDayHighPrice(JsonNode fromJsonNode) {
-        String fieldName = "regularMarketDayHigh";
-        JsonNode node = getOptionalJsonNode(fromJsonNode, fieldName);
-
-        Price price = null;
-        if (node != null) {
-            node = node.path("raw");
-            if (!node.isMissingNode()) {
-                price = new Price(node.asDouble());
-            }
-        }
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("regularMarketDayHighPrice=" + price);
-        }
-
-        return price;
+    protected Price getRegularMarketDayHighPrice(JsonNode fromJsonNode) {
+        return JsonNodeUtils.getRegularMarketDayHighPrice(fromJsonNode);
     }
 
-    private String getRegularMarketTime(JsonNode fromJsonNode) {
-        String fieldName = "regularMarketTime";
-        JsonNode node = getOptionalJsonNode(fromJsonNode, fieldName);
-        if (node == null) {
-            return null;
-        }
-
-        return node.asText();
+    protected String getRegularMarketTime(JsonNode fromJsonNode) {
+        return JsonNodeUtils.getRegularMarketTime(fromJsonNode);
     }
 
-    private static final JsonNode getRequiredJsonNode(JsonNode fromJsonNode, String fieldName) throws OfxDataNotFound {
-        JsonNode jsonNode = fromJsonNode.findPath(fieldName);
-        if (jsonNode.isMissingNode()) {
-            throw new OfxDataNotFound("Cannot find JsonNode=" + fieldName);
-        }
-        return jsonNode;
-    }
-
-    private static final JsonNode getOptionalJsonNode(JsonNode fromJsonNode, String fieldName) {
-        JsonNode jsonNode = fromJsonNode.findPath(fieldName);
-        if (jsonNode.isMissingNode()) {
-            return null;
-        }
-        return jsonNode;
-    }
-
-    private String getData(InputStream stream) throws IOException {
-        String data = null;
+    protected String getJsonString(InputStream stream) throws IOException {
         String prefix = "root.App.main =";
+        return getJsonString(stream, prefix);
+    }
+
+    private String getJsonString(InputStream stream, String prefix) throws IOException, OfxDataNotFound {
+        String jsonString = null;
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
             String line = null;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(prefix)) {
-                    data = line;
+                    jsonString = line;
                     break;
                 }
             }
@@ -393,15 +320,15 @@ final class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
             }
         }
 
-        if (data == null) {
+        if (jsonString == null) {
             throw new OfxDataNotFound("Cannot find stockPrice data");
         }
 
-        data = data.substring(prefix.length());
-        if (data == null) {
+        jsonString = jsonString.substring(prefix.length());
+        if (jsonString == null) {
             throw new OfxDataNotFound("Cannot find stockPrice data");
         }
-        return data;
+        return jsonString;
     }
 
     private List<AbstractStockPrice> getStockQuotesSingleThread(List<String> stockSymbols, GetQuotesListener listener)
