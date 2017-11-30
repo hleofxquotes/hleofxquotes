@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -30,6 +31,81 @@ public class BuildNumber {
      * @return the string
      */
     public static String findBuilderNumber(String implementationVendorId, String resourceName,
+            ClassLoader classLoader) {
+        String buildNumber = findBuilderNumberFromManifest(implementationVendorId, resourceName, classLoader);
+
+        if (buildNumber == null) {
+            buildNumber = findBuilderNumberFromProperties("build.number", "META-INF/build-info.properties",
+                    classLoader);
+        }
+        return buildNumber;
+    }
+
+    private static String findBuilderNumberFromProperties(String propertyName, String resourceName,
+            ClassLoader classLoader) {
+        String buildNumber = null;
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> findBuilderNumber: resourceName=" + resourceName + ", classLoader=" + classLoader);
+        }
+
+        if (classLoader == null) {
+            return null;
+        }
+        Enumeration<URL> resources = null;
+        try {
+            resources = classLoader.getResources(resourceName);
+            if (resources == null) {
+                LOGGER.warn("classLoader.getResources return null");
+                return null;
+            }
+        } catch (IOException e) {
+            LOGGER.warn(e);
+            return null;
+        }
+
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("  resource=" + resource);
+            }
+            if (resource == null) {
+                break;
+            }
+
+            InputStream stream = null;
+            try {
+                stream = resource.openStream();
+                if (stream == null) {
+                    LOGGER.warn("  stream is null.");
+                    break;
+                }
+
+                // properties stream
+                Properties props = new Properties();
+                props.load(stream);
+                String value = props.getProperty(propertyName);
+                if (value != null) {
+                    buildNumber = value;
+                    break;
+                }
+            } catch (IOException e) {
+                LOGGER.warn(e);
+            } finally {
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (IOException e) {
+                        LOGGER.warn(e);
+                    } finally {
+                        stream = null;
+                    }
+                }
+            }
+        }
+        return buildNumber;
+    }
+
+    private static String findBuilderNumberFromManifest(String implementationVendorId, String resourceName,
             ClassLoader classLoader) {
         String buildNumber = null;
         if (LOGGER.isDebugEnabled()) {
@@ -161,6 +237,9 @@ public class BuildNumber {
             }
             buildNumber = findBuilderNumber(implementationVendorId, resourceName, classLoader);
         }
+
+        LOGGER.info("< findBuilderNumber: buildNumber=" + buildNumber);
+
         return buildNumber;
     }
 

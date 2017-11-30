@@ -1,7 +1,5 @@
 package com.hungle.tools.moneyutils.yahoo;
 
-import java.text.SimpleDateFormat;
-
 import org.apache.log4j.Logger;
 
 import com.hungle.tools.moneyutils.gui.GUI;
@@ -11,14 +9,6 @@ public class YahooScreenScrapper2SourcePanel extends YahooQuoteSourcePanel {
     private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2SourcePanel.class);
 
     private static final String STOCK_SYMBOLS_PREF_KEY = "yahooScreenScrapper2";
-
-
-
-    // @Override
-    // protected List<AbstractStockPrice> getStockQuotes(List<String>
-    // stockSymbols) throws IOException {
-    // return getStockQuotesSingleThread(stockSymbols);
-    // }
 
     @Override
     protected AbstractHttpQuoteGetter getHttpQuoteGetter() {

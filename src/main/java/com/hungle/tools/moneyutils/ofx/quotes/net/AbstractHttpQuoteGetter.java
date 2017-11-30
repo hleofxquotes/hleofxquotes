@@ -116,9 +116,17 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
         URI uri = createURI(stocks, format);
         HttpGet httpGet = new HttpGet(uri);
         LOGGER.info("uri=" + uri);
-        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpClient httpClient = createHttpClient();
         HttpResponse response = httpClient.execute(httpGet);
         return response;
+    }
+
+    protected HttpClient createHttpClient() {
+        String userAgent = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36";
+        HttpClient httpClient = HttpClientBuilder.create()
+                .setUserAgent(userAgent)
+                .build();
+        return httpClient;
     }
 
     /*
