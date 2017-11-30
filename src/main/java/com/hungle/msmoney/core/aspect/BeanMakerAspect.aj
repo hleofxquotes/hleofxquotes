@@ -9,7 +9,7 @@ import org.apache.commons.beanutils.BeanUtils;
 public aspect BeanMakerAspect {
     // package com.hungle.tools.moneyutils.fi.model.bean;
 //    declare parents: com.hungle.msmoney.statements.fi.model.bean.* implements BeanSupport;
-    declare parents: com.hungle.msmoney.statements.fi.model.bean.* implements BeanSupport;
+    declare parents: com.hungle.msmoney.stmt.fi.model.bean.* implements BeanSupport;
 
     // introduces a member propertyChangeSupport
     private PropertyChangeSupport BeanSupport.propertyChangeSupport;

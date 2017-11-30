@@ -119,9 +119,9 @@ import com.hungle.msmoney.qs.yahoo.YahooHistoricalSourcePanel;
 import com.hungle.msmoney.qs.yahoo.YahooQuoteSourcePanel;
 import com.hungle.msmoney.qs.yahoo.YahooQuotesGetter;
 import com.hungle.msmoney.qs.yahoo.YahooScreenScrapper2SourcePanel;
-import com.hungle.msmoney.statements.StatementPanel;
-import com.hungle.msmoney.statements.fi.AbstractFiDir;
-import com.hungle.msmoney.statements.fi.props.FIBean;
+import com.hungle.msmoney.stmt.StatementPanel;
+import com.hungle.msmoney.stmt.fi.AbstractFiDir;
+import com.hungle.msmoney.stmt.fi.props.FIBean;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;

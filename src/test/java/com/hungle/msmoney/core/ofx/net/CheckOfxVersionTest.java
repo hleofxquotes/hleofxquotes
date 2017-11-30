@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.hungle.msmoney.qs.net.CheckOfxVersion;
-import com.hungle.msmoney.statements.fi.props.FIBean;
+import com.hungle.msmoney.stmt.fi.props.FIBean;
 
 public class CheckOfxVersionTest {
     @Test

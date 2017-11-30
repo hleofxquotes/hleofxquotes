@@ -3,8 +3,6 @@ package com.hungle.msmoney.core.stockprice;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.hungle.msmoney.core.stockprice.FxSymbol;
-
 public class FxSymbolTest {
 
     @Test

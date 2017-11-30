@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.hungle.msmoney.statements.fi.model.bean.FiInfoBean;
+import com.hungle.msmoney.stmt.fi.model.bean.FiInfoBean;
 
 // TODO: Auto-generated Javadoc
 /**

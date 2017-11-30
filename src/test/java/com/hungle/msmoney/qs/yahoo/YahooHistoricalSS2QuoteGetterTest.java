@@ -12,7 +12,6 @@ import org.junit.Test;
 import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
-import com.hungle.msmoney.qs.yahoo.YahooHistoricalSS2QuoteGetter;
 
 public class YahooHistoricalSS2QuoteGetterTest {
     private static final Logger LOGGER = Logger.getLogger(YahooHistoricalSS2QuoteGetterTest.class);

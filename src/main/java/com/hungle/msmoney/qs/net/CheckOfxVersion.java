@@ -29,9 +29,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.hungle.msmoney.statements.fi.AbstractFiDir;
-import com.hungle.msmoney.statements.fi.DefaultFiDir;
-import com.hungle.msmoney.statements.fi.props.OFX;
+import com.hungle.msmoney.stmt.fi.AbstractFiDir;
+import com.hungle.msmoney.stmt.fi.DefaultFiDir;
+import com.hungle.msmoney.stmt.fi.props.OFX;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -6,8 +6,6 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.hungle.msmoney.qs.yahoo.YahooScreenScrapper2QuoteGetter;
-
 
 public class YahooScreenScrapper2QuoteGetterTest {
     private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2QuoteGetterTest.class);
