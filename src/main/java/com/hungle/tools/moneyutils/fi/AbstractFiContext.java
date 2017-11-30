@@ -1,11 +1,9 @@
 package com.hungle.tools.moneyutils.fi;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Random;
-import java.util.SimpleTimeZone;
 import java.util.UUID;
+
+import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxDateTimeUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -87,7 +85,7 @@ public class AbstractFiContext {
      * @return the string
      */
     public static String createDtClient() {
-        return createDtClient(null);
+        return OfxDateTimeUtils.createDtClient(null);
     }
 
     /**
@@ -358,24 +356,6 @@ public class AbstractFiContext {
      */
     public void setTemplate(String template) {
         this.template = template;
-    }
-
-    /**
-     * Creates the dt client.
-     *
-     * @param pattern the pattern
-     * @return the string
-     */
-    public static String createDtClient(String pattern) {
-        // example: A8C53164-B771-42EA-944F-05ADCF517D9E
-        if ((pattern == null) || (pattern.length() <= 0)) {
-            pattern = "yyyyMMddHHmmss.SSS";
-        }
-        // <DTCLIENT>19961029101000 <!-- Oct. 29, 1996, 10:10:00 am -->
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        Calendar cal = Calendar.getInstance(new SimpleTimeZone(0, "GMT"));
-        formatter.setCalendar(cal);
-        return formatter.format(new Date());
     }
 
     /**
