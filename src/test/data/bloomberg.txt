@@ -1,0 +1,47 @@
+cbfunc({
+ "query": {
+  "count": 1,
+  "created": "2011-11-08T15:53:48Z",
+  "lang": "en-US",
+  "diagnostics": {
+   "publiclyCallable": "true",
+   "url": {
+    "execution-start-time": "1",
+    "execution-stop-time": "232",
+    "execution-time": "231",
+    "proxy": "DEFAULT",
+    "content": "http://www.bloomberg.com/apps/quote?ticker=AAPL:US"
+   },
+   "user-time": "257",
+   "service-time": "231",
+   "build-version": "23377"
+  },
+  "results": {
+   "div": {
+    "id": "price_info",
+    "div": [
+     {
+      "class": "delta",
+      "p": {
+       "span": {
+        "class": "sign",
+        "content": "%"
+       },
+       "content": "1.228"
+      }
+     },
+     {
+      "class": "price",
+      "p": {
+       "span": {
+        "class": "amount",
+        "content": "404.640"
+       },
+       "content": "PRICE:  USD"
+      }
+     }
+    ]
+   }
+  }
+ }
+});
