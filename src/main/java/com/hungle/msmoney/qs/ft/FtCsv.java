@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
+import com.hungle.msmoney.core.csv2ofx.AbstractCsvConverter;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
-import com.hungle.tools.moneyutils.csv2ofx.AbstractCsvConverter;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -31,7 +31,7 @@ import org.xml.sax.SAXException;
 
 import com.hungle.msmoney.statements.fi.AbstractFiDir;
 import com.hungle.msmoney.statements.fi.DefaultFiDir;
-import com.hungle.tools.moneyutils.fi.props.OFX;
+import com.hungle.msmoney.statements.fi.props.OFX;
 
 // TODO: Auto-generated Javadoc
 /**

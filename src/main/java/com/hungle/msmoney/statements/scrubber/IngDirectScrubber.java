@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.ofx.quotes.OfxDate;
+import com.hungle.msmoney.core.ofx.OfxDate;
 
 // TODO: Auto-generated Javadoc
 /**

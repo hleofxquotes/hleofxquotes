@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource;
+import com.hungle.msmoney.core.ofx.AbstractScreenScrapSource;
 
 // TODO: Auto-generated Javadoc
 /**

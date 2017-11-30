@@ -6,8 +6,8 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.encryption.EncryptionHelper;
-import com.hungle.tools.moneyutils.fi.props.HttpProperties;
-import com.hungle.tools.moneyutils.ssl.CertificatesChanges;
+import com.hungle.msmoney.core.ssl.CertificatesChanges;
+import com.hungle.msmoney.statements.fi.props.HttpProperties;
 
 // TODO: Auto-generated Javadoc
 /**

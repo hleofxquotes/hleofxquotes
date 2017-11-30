@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.core.ofx.AbstractScreenScrapSource;
 import com.hungle.msmoney.qs.scholarshare.TIAACREFPriceInfo;
-import com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource;
 
 // TODO: Auto-generated Javadoc
 /**

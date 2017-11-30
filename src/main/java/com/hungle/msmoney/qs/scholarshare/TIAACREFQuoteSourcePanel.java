@@ -13,11 +13,11 @@ import javax.swing.JTextArea;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.core.ofx.AbstractScreenScrapSource;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.qs.yahoo.YahooApiQuoteSourcePanel;
-import com.hungle.tools.moneyutils.gui.GUI;
-import com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource;
 
 // TODO: Auto-generated Javadoc
 /**

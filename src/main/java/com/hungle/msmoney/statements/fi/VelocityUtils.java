@@ -13,7 +13,7 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
 import com.hungle.msmoney.core.misc.CheckNullUtils;
-import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
+import com.hungle.msmoney.statements.fi.props.PropertiesUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -100,7 +100,7 @@ public class VelocityUtils {
             LOGGER.error("Cannot create template, requestType is null");
             return null;
         }
-        com.hungle.tools.moneyutils.fi.props.OFX ofx = PropertiesUtils.getOfx(context);
+        com.hungle.msmoney.statements.fi.props.OFX ofx = PropertiesUtils.getOfx(context);
         if (ofx == null) {
             LOGGER.error("Cannot create template, OFX object is null");
             return null;

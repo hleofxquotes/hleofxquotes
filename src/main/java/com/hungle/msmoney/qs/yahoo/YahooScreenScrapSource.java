@@ -20,8 +20,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.hungle.msmoney.core.ofx.AbstractScreenScrapSource;
 import com.hungle.msmoney.qs.scholarshare.TIAACREFPriceInfo;
-import com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource;
 
 // TODO: Auto-generated Javadoc
 /**

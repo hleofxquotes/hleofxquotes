@@ -10,9 +10,9 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.gui.GUI;
+import com.hungle.msmoney.gui.GetHistoricalQuotesDialog;
 import com.hungle.msmoney.qs.net.AbstractHttpQuoteGetter;
-import com.hungle.tools.moneyutils.gui.GUI;
-import com.hungle.tools.moneyutils.gui.GetHistoricalQuotesDialog;
 
 // TODO: Auto-generated Javadoc
 /**

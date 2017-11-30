@@ -254,7 +254,7 @@ public class ResponseUtils {
      * @param ofx the ofx
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    static void checkRespFile(File respFile, com.hungle.tools.moneyutils.fi.props.OFX ofx) throws IOException {
+    static void checkRespFile(File respFile, com.hungle.msmoney.statements.fi.props.OFX ofx) throws IOException {
         int version = 1;
         String ofxVersion = null;
     

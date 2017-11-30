@@ -45,15 +45,15 @@ import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.gui.AbstractLoadStockSymbolsTask;
+import com.hungle.msmoney.gui.GUI;
+import com.hungle.msmoney.gui.PopupListener;
+import com.hungle.msmoney.gui.ShowDialogTask;
 import com.hungle.msmoney.qs.DefaultQuoteSource;
 import com.hungle.msmoney.qs.QuoteSource;
 import com.hungle.msmoney.qs.QuoteSourceListener;
 import com.hungle.msmoney.qs.net.AbstractHttpQuoteGetter;
 import com.hungle.msmoney.qs.net.GetQuotesListener;
-import com.hungle.tools.moneyutils.gui.AbstractLoadStockSymbolsTask;
-import com.hungle.tools.moneyutils.gui.GUI;
-import com.hungle.tools.moneyutils.gui.PopupListener;
-import com.hungle.tools.moneyutils.gui.ShowDialogTask;
 
 // TODO: Auto-generated Javadoc
 /**

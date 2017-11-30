@@ -9,10 +9,10 @@ import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
 
 import com.hungle.msmoney.core.misc.CheckNullUtils;
+import com.hungle.msmoney.statements.fi.props.FIBean;
+import com.hungle.msmoney.statements.fi.props.HttpProperties;
+import com.hungle.msmoney.statements.fi.props.PropertiesUtils;
 import com.hungle.msmoney.statements.scrubber.ResponseFilter;
-import com.hungle.tools.moneyutils.fi.props.FIBean;
-import com.hungle.tools.moneyutils.fi.props.HttpProperties;
-import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -138,7 +138,7 @@ public abstract class AbstractFiDir {
     }
 
     public void checkRespFile(File respFile) throws IOException {
-        com.hungle.tools.moneyutils.fi.props.OFX ofx = PropertiesUtils.getOfx(velocityContext);
+        com.hungle.msmoney.statements.fi.props.OFX ofx = PropertiesUtils.getOfx(velocityContext);
         checkRespFile(respFile, ofx);
     }
 
@@ -197,7 +197,7 @@ public abstract class AbstractFiDir {
      * @param ofx the ofx
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    protected void checkRespFile(File respFile, com.hungle.tools.moneyutils.fi.props.OFX ofx) throws IOException {
+    protected void checkRespFile(File respFile, com.hungle.msmoney.statements.fi.props.OFX ofx) throws IOException {
         ResponseUtils.checkRespFile(respFile, ofx);
     }
 

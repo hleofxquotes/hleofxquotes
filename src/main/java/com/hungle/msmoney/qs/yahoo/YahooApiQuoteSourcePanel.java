@@ -8,9 +8,9 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.misc.StopWatch;
+import com.hungle.msmoney.core.ofx.AbstractScreenScrapSource;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
-import com.hungle.tools.moneyutils.gui.GUI;
-import com.hungle.tools.moneyutils.ofx.quotes.AbstractScreenScrapSource;
+import com.hungle.msmoney.gui.GUI;
 
 // TODO: Auto-generated Javadoc
 /**

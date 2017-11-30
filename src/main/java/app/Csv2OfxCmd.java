@@ -12,7 +12,7 @@ public class Csv2OfxCmd {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        com.hungle.tools.moneyutils.csv2ofx.Csv2OfxCmd.main(args);
+        com.hungle.msmoney.core.csv2ofx.Csv2OfxCmd.main(args);
     }
 
 }
