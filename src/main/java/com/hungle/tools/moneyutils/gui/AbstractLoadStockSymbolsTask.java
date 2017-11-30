@@ -10,9 +10,9 @@ import java.util.concurrent.ExecutorService;
 
 import javax.swing.AbstractAction;
 
-import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
-import com.hungle.tools.moneyutils.ofx.quotes.QuoteSource;
-import com.hungle.tools.moneyutils.ofx.quotes.QuoteSourceListener;
+import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.qs.QuoteSource;
+import com.hungle.msmoney.qs.QuoteSourceListener;
 
 // TODO: Auto-generated Javadoc
 /**

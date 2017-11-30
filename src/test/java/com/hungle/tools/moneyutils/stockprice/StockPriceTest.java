@@ -16,6 +16,13 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.CsvRow;
+import com.hungle.msmoney.core.stockprice.FieldInfo;
+import com.hungle.msmoney.core.stockprice.Price;
+import com.hungle.msmoney.core.stockprice.StockPrice;
+import com.hungle.msmoney.core.stockprice.StockPriceCsvUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class StockPriceTest.

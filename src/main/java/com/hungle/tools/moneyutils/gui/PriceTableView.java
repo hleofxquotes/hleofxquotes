@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
-import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;

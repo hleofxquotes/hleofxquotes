@@ -7,7 +7,7 @@ import javax.swing.AbstractAction;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.ofx.quotes.net.CheckOfxVersion;
+import com.hungle.msmoney.qs.net.CheckOfxVersion;
 
 import ca.odell.glazedlists.EventList;
 

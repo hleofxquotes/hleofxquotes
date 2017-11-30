@@ -5,6 +5,7 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.hungle.msmoney.qs.net.CheckOfxVersion;
 import com.hungle.tools.moneyutils.fi.props.FIBean;
 
 public class CheckOfxVersionTest {

@@ -21,9 +21,10 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
 
-import com.hungle.tools.moneyutils.scrubber.IngDirectScrubber;
-import com.hungle.tools.moneyutils.scrubber.OfxScrubber;
-import com.hungle.tools.moneyutils.scrubber.ResponseFilter;
+import com.hungle.msmoney.core.misc.CheckNullUtils;
+import com.hungle.msmoney.statements.scrubber.IngDirectScrubber;
+import com.hungle.msmoney.statements.scrubber.OfxScrubber;
+import com.hungle.msmoney.statements.scrubber.ResponseFilter;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -104,7 +105,7 @@ public class PropertiesUtils {
         // requestType
         String requestType = null;
         String property = props.getProperty(KEY_REQUEST_TYPE);
-        if (!PropertiesUtils.isNull(property)) {
+        if (!CheckNullUtils.isNull(property)) {
             requestType = property;
         }
         if (LOGGER.isDebugEnabled()) {
@@ -123,13 +124,13 @@ public class PropertiesUtils {
         // DefaultAppID = 'QWIN'
         // DefaultAppVer = '1900'
         String appID = props.getProperty(KEY_APP_ID);
-        if (PropertiesUtils.isNull(appID)) {
+        if (CheckNullUtils.isNull(appID)) {
             appID = DEFAULT_APP_ID;
         }
         context.put(KEY_APP_ID, appID);
 
         String appVer = props.getProperty(KEY_APP_VER);
-        if (PropertiesUtils.isNull(appVer)) {
+        if (CheckNullUtils.isNull(appVer)) {
             appVer = DEFAULT_APP_VER;
         }
         context.put(KEY_APP_VER, appVer);
@@ -186,7 +187,7 @@ public class PropertiesUtils {
     private static String parseStartDate(Properties props) {
         String startDate = null;
         String property = props.getProperty(KEY_START_DATE);
-        if (!PropertiesUtils.isNull(property)) {
+        if (!CheckNullUtils.isNull(property)) {
             property = property.trim();
             if (property.charAt(0) == '-') {
                 try {
@@ -230,7 +231,7 @@ public class PropertiesUtils {
                     return;
                 }
                 String url = fi.getUrl();
-                if (PropertiesUtils.isNull(url)) {
+                if (CheckNullUtils.isNull(url)) {
                     return;
                 }
                 if (!url.contains("ofx.ingdirect.com")) {
@@ -242,7 +243,7 @@ public class PropertiesUtils {
                     return;
                 }
                 String version = ofx.getVersion();
-                if (PropertiesUtils.isNull(version)) {
+                if (CheckNullUtils.isNull(version)) {
                     return;
                 }
                 int v = 0;
@@ -276,7 +277,7 @@ public class PropertiesUtils {
             }
 
             private void copyFile(File srcFile, File destFile) throws IOException {
-                com.hungle.tools.moneyutils.ofx.quotes.Utils.copyFile(srcFile, destFile);
+                com.hungle.msmoney.core.misc.Utils.copyFile(srcFile, destFile);
             }
         };
         return responseFilter;
@@ -302,25 +303,6 @@ public class PropertiesUtils {
     }
 
     /**
-     * Checks if is null.
-     *
-     * @param property
-     *            the property
-     * @return true, if is null
-     */
-    public static boolean isNull(String property) {
-        if (property == null) {
-            return true;
-        }
-
-        if (property.length() <= 0) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Pre jackson/json date. For given prefix.key, get the value in props and
      * set the matching property in 'bean'.
      * 
@@ -339,12 +321,12 @@ public class PropertiesUtils {
             BeanUtilsBean beanUtilsBean) {
         for (String key : keys) {
             String property = null;
-            if (PropertiesUtils.isNull(prefix)) {
+            if (CheckNullUtils.isNull(prefix)) {
                 property = props.getProperty(key);
             } else {
                 property = props.getProperty(prefix + "." + key);
             }
-            if (!PropertiesUtils.isNull(property)) {
+            if (!CheckNullUtils.isNull(property)) {
                 try {
                     property = property.trim();
                     beanUtilsBean.setProperty(bean, key, property);

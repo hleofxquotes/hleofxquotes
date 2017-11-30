@@ -10,8 +10,8 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
-import com.hungle.tools.moneyutils.ofx.quotes.StopWatch;
+import com.hungle.msmoney.core.misc.StopWatch;
+import com.hungle.msmoney.core.ofx.OfxUtils;
 
 // TODO: Auto-generated Javadoc
 /**

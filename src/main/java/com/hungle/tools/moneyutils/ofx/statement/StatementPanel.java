@@ -59,14 +59,14 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
-import com.hungle.tools.moneyutils.fi.AbstractFiDir;
-import com.hungle.tools.moneyutils.fi.DefaultFiDir;
+import com.hungle.msmoney.core.misc.CheckNullUtils;
+import com.hungle.msmoney.core.misc.Utils;
+import com.hungle.msmoney.statements.fi.AbstractFiDir;
+import com.hungle.msmoney.statements.fi.DefaultFiDir;
 import com.hungle.tools.moneyutils.fi.props.FIBean;
-import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
 import com.hungle.tools.moneyutils.gui.StripedTableRenderer;
 import com.hungle.tools.moneyutils.ofx.quotes.ImportUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.StreamConsumer;
-import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -763,7 +763,7 @@ public class StatementPanel extends JPanel {
             bean.setFi(fi);
         
             String name = fi.getName();
-            if (!PropertiesUtils.isNull(name)) {
+            if (!CheckNullUtils.isNull(name)) {
                 bean.setName(name);
             }
         }

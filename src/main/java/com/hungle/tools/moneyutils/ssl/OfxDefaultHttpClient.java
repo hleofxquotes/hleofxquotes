@@ -24,7 +24,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.OfxPostClientParams;
+import com.hungle.msmoney.statements.fi.OfxPostClientParams;
 
 // TODO: Auto-generated Javadoc
 /**

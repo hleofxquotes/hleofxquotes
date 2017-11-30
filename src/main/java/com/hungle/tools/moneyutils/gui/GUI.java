@@ -86,41 +86,42 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.bloomberg.BloombergQuoteSourcePanel;
-import com.hungle.tools.moneyutils.data.SymbolMapper;
-import com.hungle.tools.moneyutils.data.SymbolMapperEntry;
-import com.hungle.tools.moneyutils.fi.AbstractFiDir;
+import com.hungle.msmoney.core.data.SymbolMapper;
+import com.hungle.msmoney.core.data.SymbolMapperEntry;
+import com.hungle.msmoney.core.fx.FxTable;
+import com.hungle.msmoney.core.fx.FxTableUtils;
+import com.hungle.msmoney.core.fx.UpdateFx;
+import com.hungle.msmoney.core.jna.ImportDialogAutoClickService;
+import com.hungle.msmoney.core.misc.BuildNumber;
+import com.hungle.msmoney.core.misc.CheckNullUtils;
+import com.hungle.msmoney.core.misc.Utils;
+import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
+import com.hungle.msmoney.core.ofx.xmlbeans.OfxSaveParameter;
+import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.Price;
+import com.hungle.msmoney.core.stockprice.StockPrice;
+import com.hungle.msmoney.core.stockprice.StockPriceCsvUtils;
+import com.hungle.msmoney.qs.DefaultQuoteSource;
+import com.hungle.msmoney.qs.QuoteSource;
+import com.hungle.msmoney.qs.QuoteSourceListener;
+import com.hungle.msmoney.qs.bloomberg.BloombergQuoteSourcePanel;
+import com.hungle.msmoney.qs.ft.FtDotComQuoteSourcePanel;
+import com.hungle.msmoney.qs.ft.FtEquitiesSourcePanel;
+import com.hungle.msmoney.qs.ft.FtEtfsSourcePanel;
+import com.hungle.msmoney.qs.ft.FtFundsSourcePanel;
+import com.hungle.msmoney.qs.scholarshare.TIAACREFQuoteSourcePanel;
+import com.hungle.msmoney.qs.yahoo.YahooApiQuoteSourcePanel;
+import com.hungle.msmoney.qs.yahoo.YahooHistoricalSourcePanel;
+import com.hungle.msmoney.qs.yahoo.YahooQuoteSourcePanel;
+import com.hungle.msmoney.qs.yahoo.YahooQuotesGetter;
+import com.hungle.msmoney.qs.yahoo.YahooScreenScrapper2SourcePanel;
+import com.hungle.msmoney.statements.fi.AbstractFiDir;
 import com.hungle.tools.moneyutils.fi.props.FIBean;
-import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
-import com.hungle.tools.moneyutils.ft.FtDotComQuoteSourcePanel;
-import com.hungle.tools.moneyutils.ft.FtEquitiesSourcePanel;
-import com.hungle.tools.moneyutils.ft.FtEtfsSourcePanel;
-import com.hungle.tools.moneyutils.ft.FtFundsSourcePanel;
-import com.hungle.tools.moneyutils.fx.UpdateFx;
-import com.hungle.tools.moneyutils.jna.ImportDialogAutoClickService;
-import com.hungle.tools.moneyutils.misc.BuildNumber;
 import com.hungle.tools.moneyutils.ofx.quotes.CurrencyUtils;
-import com.hungle.tools.moneyutils.ofx.quotes.DefaultQuoteSource;
-import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
 import com.hungle.tools.moneyutils.ofx.quotes.ImportUtils;
-import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
 import com.hungle.tools.moneyutils.ofx.quotes.QifUtils;
-import com.hungle.tools.moneyutils.ofx.quotes.QuoteSource;
-import com.hungle.tools.moneyutils.ofx.quotes.QuoteSourceListener;
-import com.hungle.tools.moneyutils.ofx.quotes.Utils;
 import com.hungle.tools.moneyutils.ofx.statement.StatementPanel;
-import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
-import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
-import com.hungle.tools.moneyutils.scholarshare.TIAACREFQuoteSourcePanel;
-import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.hungle.tools.moneyutils.stockprice.Price;
-import com.hungle.tools.moneyutils.stockprice.StockPrice;
-import com.hungle.tools.moneyutils.stockprice.StockPriceCsvUtils;
-import com.hungle.tools.moneyutils.yahoo.YahooApiQuoteSourcePanel;
-import com.hungle.tools.moneyutils.yahoo.YahooHistoricalSourcePanel;
-import com.hungle.tools.moneyutils.yahoo.YahooQuoteSourcePanel;
-import com.hungle.tools.moneyutils.yahoo.YahooQuotesGetter;
-import com.hungle.tools.moneyutils.yahoo.YahooScreenScrapper2SourcePanel;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -253,7 +254,7 @@ public class GUI extends JFrame {
 
     /** The default currency. */
     private String defaultCurrency = PREFS.get(PREF_DEFAULT_CURRENCY,
-            com.hungle.tools.moneyutils.ofx.xmlbeans.CurrencyUtils.getDefaultCurrency());
+            com.hungle.msmoney.core.ofx.xmlbeans.CurrencyUtils.getDefaultCurrency());
 
     /** The randomize share count. */
     private Boolean randomizeShareCount = Boolean.valueOf(PREFS.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
@@ -1225,11 +1226,11 @@ public class GUI extends JFrame {
             }
 
             String accountId = props.getProperty("accountId");
-            if (!PropertiesUtils.isNull(accountId)) {
+            if (!CheckNullUtils.isNull(accountId)) {
                 selectNewAccountId(accountId);
             }
             String currency = props.getProperty("currency");
-            if (!PropertiesUtils.isNull(currency)) {
+            if (!CheckNullUtils.isNull(currency)) {
                 selectNewCurrency(currency);
             }
         }
@@ -1675,7 +1676,7 @@ public class GUI extends JFrame {
         String currency = defaultValue;
         for (SymbolMapperEntry entry : mapper.getEntries()) {
             quoteSourceSymbol = entry.getQuotesSourceSymbol();
-            if (PropertiesUtils.isNull(quoteSourceSymbol)) {
+            if (CheckNullUtils.isNull(quoteSourceSymbol)) {
                 continue;
             }
             if (LOGGER.isDebugEnabled()) {
@@ -1688,7 +1689,7 @@ public class GUI extends JFrame {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("getMapperCurrency: s=" + quoteSourceSymbol + ", currency=" + currency);
             }
-            if (!PropertiesUtils.isNull(currency)) {
+            if (!CheckNullUtils.isNull(currency)) {
                 return currency;
             }
         }
@@ -1713,14 +1714,14 @@ public class GUI extends JFrame {
                 price.setCurrency(defaultCurrency);
             }
             String currency = stockPrice.getCurrency();
-            if (PropertiesUtils.isNull(currency)) {
+            if (CheckNullUtils.isNull(currency)) {
                 String symbol = stockPrice.getStockSymbol();
                 String overridingCurrency = null;
                 overridingCurrency = getMapperCurrency(symbol, symbolMapper, overridingCurrency);
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.info("symbol: " + symbol + ", overridingCurrency=" + overridingCurrency);
                 }
-                if (!PropertiesUtils.isNull(overridingCurrency)) {
+                if (!CheckNullUtils.isNull(overridingCurrency)) {
                     stockPrice.setCurrency(overridingCurrency);
                     stockPrice.updateLastPriceCurrency();
                 }
@@ -2094,7 +2095,7 @@ public class GUI extends JFrame {
             reader = new BufferedReader(new FileReader(file));
             props.load(reader);
             String name = props.getProperty("name");
-            if (PropertiesUtils.isNull(name)) {
+            if (CheckNullUtils.isNull(name)) {
                 name = file.getName();
             }
             JMenuItem item = new JMenuItem(new ProfileSelectedAction(name, props));

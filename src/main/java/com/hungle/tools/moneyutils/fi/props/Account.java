@@ -8,6 +8,8 @@ import java.util.Properties;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.core.misc.CheckNullUtils;
+
 
 // TODO: Auto-generated Javadoc
 /**
@@ -95,7 +97,7 @@ public class Account {
     private static List<Account> parseAccounts(Properties props, BeanUtilsBean beanUtilsBean) {
         List<Account> accounts = new ArrayList<Account>();
         String property = props.getProperty("accounts");
-        if (!PropertiesUtils.isNull(property)) {
+        if (!CheckNullUtils.isNull(property)) {
             property = property.trim();
             try {
                 int count = Long.valueOf(property).intValue();
@@ -117,7 +119,7 @@ public class Account {
         String[] keys = { "bankId", "id", "type", };
         for (String key : keys) {
             property = props.getProperty("account" + "." + index + "." + key);
-            if (!PropertiesUtils.isNull(property)) {
+            if (!CheckNullUtils.isNull(property)) {
                 property = property.trim();
                 try {
                     beanUtilsBean.setProperty(account, key, property);

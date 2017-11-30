@@ -11,8 +11,9 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.hungle.tools.moneyutils.ofx.quotes.net.AbstractHttpQuoteGetter;
-import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.qs.net.AbstractHttpQuoteGetter;
+import com.hungle.msmoney.qs.yahoo.YahooQuotesGetter;
 
 
 // TODO: Auto-generated Javadoc

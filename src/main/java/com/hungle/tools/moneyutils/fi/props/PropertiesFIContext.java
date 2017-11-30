@@ -8,7 +8,7 @@ import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.AbstractFiContext;
+import com.hungle.msmoney.statements.fi.AbstractFiContext;
 
 // TODO: Auto-generated Javadoc
 /**

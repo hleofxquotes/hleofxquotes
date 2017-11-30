@@ -8,8 +8,8 @@ import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.hungle.tools.moneyutils.stockprice.Price;
+import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.Price;
 
 import ca.odell.glazedlists.EventList;
 

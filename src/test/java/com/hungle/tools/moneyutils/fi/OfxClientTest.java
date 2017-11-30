@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.hungle.msmoney.statements.fi.OfxClient;
+import com.hungle.msmoney.statements.fi.OfxPostClientParams;
 import com.hungle.tools.moneyutils.fi.props.HttpProperties;
 
 public class OfxClientTest {

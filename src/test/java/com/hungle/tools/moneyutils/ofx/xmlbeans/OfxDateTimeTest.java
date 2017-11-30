@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.hungle.msmoney.core.ofx.xmlbeans.OfxDateTime;
+
 public class OfxDateTimeTest {
     private static final Logger LOGGER = Logger.getLogger(OfxDateTimeTest.class);
 

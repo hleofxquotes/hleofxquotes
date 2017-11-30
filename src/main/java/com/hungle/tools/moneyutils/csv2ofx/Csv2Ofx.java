@@ -31,7 +31,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
 import com.csvreader.CsvReader;
-import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.msmoney.core.ofx.OfxUtils;
 
 // TODO: Auto-generated Javadoc
 /**

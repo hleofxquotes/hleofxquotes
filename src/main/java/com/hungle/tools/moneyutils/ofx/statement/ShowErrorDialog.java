@@ -24,7 +24,7 @@ import javax.swing.WindowConstants;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.AbstractFiDir;
+import com.hungle.msmoney.statements.fi.AbstractFiDir;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -9,9 +9,10 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
-import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.hungle.tools.moneyutils.stockprice.Price;
+import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.Price;
+import com.hungle.msmoney.qs.yahoo.YahooHistoricalSS2QuoteGetter;
 
 public class YahooHistoricalSS2QuoteGetterTest {
     private static final Logger LOGGER = Logger.getLogger(YahooHistoricalSS2QuoteGetterTest.class);

@@ -12,7 +12,7 @@ public class AccountInquiryCmd {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        com.hungle.tools.moneyutils.ofx.quotes.net.CheckOfxVersion.main(args);
+        com.hungle.msmoney.qs.net.CheckOfxVersion.main(args);
     }
 
 }

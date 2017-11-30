@@ -8,7 +8,7 @@ import java.security.cert.X509Certificate;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.ofx.quotes.Utils;
+import com.hungle.msmoney.core.misc.Utils;
 
 // TODO: Auto-generated Javadoc
 /**

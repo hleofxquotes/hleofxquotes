@@ -6,7 +6,7 @@ import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
 
-import com.hungle.tools.moneyutils.fi.AbstractFiContext;
+import com.hungle.msmoney.statements.fi.AbstractFiContext;
 
 
 // TODO: Auto-generated Javadoc

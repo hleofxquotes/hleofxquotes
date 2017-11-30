@@ -2,7 +2,7 @@ package app;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.data.SymbolMapper;
+import com.hungle.msmoney.core.data.SymbolMapper;
 
 // TODO: Auto-generated Javadoc
 /**

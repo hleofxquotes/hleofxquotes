@@ -3,7 +3,7 @@ package com.hungle.tools.moneyutils.csv2ofx;
 import java.io.IOException;
 
 import com.csvreader.CsvReader;
-import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 
 // TODO: Auto-generated Javadoc
 /**

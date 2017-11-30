@@ -5,8 +5,8 @@ import java.io.FileFilter;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.AbstractFiDir;
-import com.hungle.tools.moneyutils.fi.DefaultFiDir;
+import com.hungle.msmoney.statements.fi.AbstractFiDir;
+import com.hungle.msmoney.statements.fi.DefaultFiDir;
 
 // TODO: Auto-generated Javadoc
 /**

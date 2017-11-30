@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.hungle.msmoney.core.ofx.OfxUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class OfxUtilsTest.

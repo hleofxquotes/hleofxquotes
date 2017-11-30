@@ -2,8 +2,8 @@ package app;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.gui.FxTableUtils;
-import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
+import com.hungle.msmoney.core.fx.FxTable;
+import com.hungle.msmoney.core.fx.FxTableUtils;
 
 // TODO: Auto-generated Javadoc
 /**

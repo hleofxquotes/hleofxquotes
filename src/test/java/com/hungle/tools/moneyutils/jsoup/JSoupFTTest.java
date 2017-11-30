@@ -15,8 +15,8 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.hungle.tools.moneyutils.ft.FtPriceModel;
-import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
+import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.qs.ft.FtPriceModel;
 
 public class JSoupFTTest {
     private static final Logger LOGGER = Logger.getLogger(JSoupFTTest.class);

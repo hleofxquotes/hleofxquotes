@@ -7,8 +7,8 @@ import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.data.SymbolMapper;
-import com.hungle.tools.moneyutils.data.SymbolMapperEntry;
+import com.hungle.msmoney.core.data.SymbolMapper;
+import com.hungle.msmoney.core.data.SymbolMapperEntry;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;

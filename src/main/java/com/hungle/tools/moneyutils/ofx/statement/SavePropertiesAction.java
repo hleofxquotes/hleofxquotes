@@ -14,8 +14,8 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.AbstractFiDir;
-import com.hungle.tools.moneyutils.fi.DefaultFiDir;
+import com.hungle.msmoney.statements.fi.AbstractFiDir;
+import com.hungle.msmoney.statements.fi.DefaultFiDir;
 
 /**
  * The Class SavePropertiesAction.

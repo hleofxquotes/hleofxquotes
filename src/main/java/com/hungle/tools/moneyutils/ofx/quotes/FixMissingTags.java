@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.tools.moneyutils.fi.ResponseUtils;
+import com.hungle.msmoney.statements.fi.ResponseUtils;
 
 // TODO: Auto-generated Javadoc
 /**

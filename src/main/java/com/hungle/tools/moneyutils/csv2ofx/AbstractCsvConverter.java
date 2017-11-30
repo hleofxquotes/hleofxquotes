@@ -15,16 +15,16 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
-import com.hungle.tools.moneyutils.data.SymbolMapper;
-import com.hungle.tools.moneyutils.fi.props.PropertiesUtils;
-import com.hungle.tools.moneyutils.gui.FxTableUtils;
-import com.hungle.tools.moneyutils.ofx.quotes.FxTable;
-import com.hungle.tools.moneyutils.ofx.xmlbeans.CurrencyUtils;
-import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxPriceInfo;
-import com.hungle.tools.moneyutils.ofx.xmlbeans.OfxSaveParameter;
-import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.hungle.tools.moneyutils.stockprice.Price;
-import com.hungle.tools.moneyutils.stockprice.StockPrice;
+import com.hungle.msmoney.core.data.SymbolMapper;
+import com.hungle.msmoney.core.fx.FxTable;
+import com.hungle.msmoney.core.fx.FxTableUtils;
+import com.hungle.msmoney.core.misc.CheckNullUtils;
+import com.hungle.msmoney.core.ofx.xmlbeans.CurrencyUtils;
+import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
+import com.hungle.msmoney.core.ofx.xmlbeans.OfxSaveParameter;
+import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.Price;
+import com.hungle.msmoney.core.stockprice.StockPrice;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -156,7 +156,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
     
             setUnits(csvReader, stockPrice);
         } finally {
-            if (PropertiesUtils.isNull(stockPrice.getStockName())) {
+            if (CheckNullUtils.isNull(stockPrice.getStockName())) {
                 stockPrice.setStockName(stockPrice.getStockSymbol());
             }
             stockPrice.calculateSecType();
@@ -179,7 +179,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + stockName);
         }
-        if (PropertiesUtils.isNull(stockName)) {
+        if (CheckNullUtils.isNull(stockName)) {
             throw new IOException("SKIP: invalid name=" + stockName);
         }
         stockPrice.setStockName(stockName);
@@ -198,7 +198,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + stockSymbol);
         }
-        if (PropertiesUtils.isNull(stockSymbol)) {
+        if (CheckNullUtils.isNull(stockSymbol)) {
             throw new IOException("SKIP: invalid symbolExchange=" + stockSymbol + ", name=" + stockPrice.getStockName());
         }
         stockPrice.setStockSymbol(stockSymbol);
@@ -217,7 +217,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + lastPrice);
         }
-        if (PropertiesUtils.isNull(lastPrice)) {
+        if (CheckNullUtils.isNull(lastPrice)) {
             throw new IOException("SKIP: no price for " + stockPrice.getStockSymbol());
         }
         NumberFormat formatter = null;
@@ -252,7 +252,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + quoteDateAndTime);
         }
-        if (!PropertiesUtils.isNull(quoteDateAndTime)) {
+        if (!CheckNullUtils.isNull(quoteDateAndTime)) {
             try {
                 Date date = quoteDateAndTimeFormatter.parse(quoteDateAndTime);
 //                stockPrice.setLastTradeDate(lastTradeDateFormatter.format(date));
@@ -295,7 +295,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(columnName + ": " + quantity);
             }
-            if (!PropertiesUtils.isNull(quantity)) {
+            if (!CheckNullUtils.isNull(quantity)) {
                 Double units;
                 try {
                     units = Double.valueOf(quantity);

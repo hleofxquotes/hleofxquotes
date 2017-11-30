@@ -11,6 +11,8 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.hungle.msmoney.core.misc.CheckNullUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class PropertiesUtilsTest.
@@ -22,15 +24,15 @@ public class PropertiesUtilsTest {
      */
     @Test
     public void testIsNull() {
-        Assert.assertTrue(PropertiesUtils.isNull(null));
-        Assert.assertTrue(PropertiesUtils.isNull(""));
+        Assert.assertTrue(CheckNullUtils.isNull(null));
+        Assert.assertTrue(CheckNullUtils.isNull(""));
 
-        Assert.assertFalse(PropertiesUtils.isNull(" "));
-        Assert.assertFalse(PropertiesUtils.isNull("  "));
+        Assert.assertFalse(CheckNullUtils.isNull(" "));
+        Assert.assertFalse(CheckNullUtils.isNull("  "));
 
-        Assert.assertFalse(PropertiesUtils.isNull("x"));
-        Assert.assertFalse(PropertiesUtils.isNull(" x"));
-        Assert.assertFalse(PropertiesUtils.isNull(" x "));
+        Assert.assertFalse(CheckNullUtils.isNull("x"));
+        Assert.assertFalse(CheckNullUtils.isNull(" x"));
+        Assert.assertFalse(CheckNullUtils.isNull(" x "));
     }
 
     /**
@@ -68,7 +70,7 @@ public class PropertiesUtilsTest {
         keys.add(key);
 
         Properties props = new Properties();
-        if (PropertiesUtils.isNull(prefix)) {
+        if (CheckNullUtils.isNull(prefix)) {
             props.setProperty(key, versionValue);
         } else {
             props.setProperty(prefix + "." + key, versionValue);

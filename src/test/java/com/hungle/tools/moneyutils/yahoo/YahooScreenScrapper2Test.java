@@ -28,9 +28,11 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hungle.tools.moneyutils.ofx.quotes.OfxUtils;
-import com.hungle.tools.moneyutils.stockprice.AbstractStockPrice;
-import com.hungle.tools.moneyutils.stockprice.Price;
+import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.Price;
+import com.hungle.msmoney.qs.yahoo.YahooScreenScrapper2;
+import com.hungle.msmoney.qs.yahoo.YahooScreenScrapper2QuoteGetter;
 
 public class YahooScreenScrapper2Test {
     private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2Test.class);
