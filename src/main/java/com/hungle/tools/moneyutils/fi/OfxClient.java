@@ -105,8 +105,6 @@ public class OfxClient {
      */
     private CloseableHttpClient createHttpClient(OfxPostClientParams params) {
 
-
-
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         
         RequestConfig requestConfig = RequestConfig.custom()
