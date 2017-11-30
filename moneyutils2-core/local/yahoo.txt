@@ -1,0 +1,1 @@
+wget -O out.html 'https://finance.yahoo.com/quote/TSLA?p=TSLA'

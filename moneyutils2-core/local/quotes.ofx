@@ -1,0 +1,877 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?OFX OFXHEADER="200" VERSION="200" SECURITY="NONE" OLDFILEUID="NONE" NEWFILEUID="NONE"?>
+<OFX>
+  <!--Created by hleOfxQuotes on: Thu Nov 09 15:23:42 PST 2017-->
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <!--DTSERVER local time is 20171109152342-->
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+        <MESSAGE>Successful Sign On</MESSAGE>
+      </STATUS>
+      <DTSERVER>20171109232342</DTSERVER>
+      <LANGUAGE>ENG</LANGUAGE>
+    </SONRS>
+  </SIGNONMSGSRSV1>
+  <INVSTMTMSGSRSV1>
+    <INVSTMTTRNRS>
+      <TRNUID>53E117C6-77CF-4677-B7C4-D850D92E58D4</TRNUID>
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+      </STATUS>
+      <!--DTASOF local time is 20171109152342-->
+      <INVSTMTRS>
+        <DTASOF>20171109232342</DTASOF>
+        <CURDEF>USD</CURDEF>
+        <INVACCTFROM>
+          <BROKERID>hungle.com</BROKERID>
+          <ACCTID>0123456789</ACCTID>
+        </INVACCTFROM>
+        <INVPOSLIST>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: FCNTX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>FCNTX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>126.72</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: FSITX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>FSITX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>11.61</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: FSIVX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>FSIVX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>43.23</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: FSTVX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>FSTVX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>74.91</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: SRJIX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>SRJIX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>21.05</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VBMFX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VBMFX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>10.78</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VBTLX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VBTLX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>10.78</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VFSTX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VFSTX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>10.68</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VGTSX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VGTSX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>17.95</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VRIVX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VRIVX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>22.81</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VTHRX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VTHRX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>33.49</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VTIAX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VTIAX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>30.02</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VTSAX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VTSAX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>64.52</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VTSMX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VTSMX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>64.49</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VTTHX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VTTHX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>20.57</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VTTWX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VTTWX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>23.00</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VWELX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VWELX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>42.74</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VWIAX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VWIAX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>65.34</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSMF>
+            <INVPOS>
+              <!--Ticker from quote source is: VWINX-->
+              <!--DTPRICEASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+              <SECID>
+                <UNIQUEID>VWINX</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>26.97</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171109232342</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.00</CURRATE>
+                <CURSYM>USD</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+        </INVPOSLIST>
+      </INVSTMTRS>
+    </INVSTMTTRNRS>
+  </INVSTMTMSGSRSV1>
+  <SECLISTMSGSRSV1>
+    <SECLIST>
+      <MFINFO>
+        <!--Ticker from quote source is: FCNTX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>FCNTX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Fidelity Contra Fund</SECNAME>
+          <TICKER>FCNTX</TICKER>
+          <UNITPRICE>126.72</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: FSITX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>FSITX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Fidelity U.S. Bond Index Fund -</SECNAME>
+          <TICKER>FSITX</TICKER>
+          <UNITPRICE>11.61</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: FSIVX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>FSIVX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Fidelity International Index Fu</SECNAME>
+          <TICKER>FSIVX</TICKER>
+          <UNITPRICE>43.23</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: FSTVX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>FSTVX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Fidelity Total Market Index Fun</SECNAME>
+          <TICKER>FSTVX</TICKER>
+          <UNITPRICE>74.91</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: SRJIX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>SRJIX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>JPMorgan SmartRetirement 2035 F</SECNAME>
+          <TICKER>SRJIX</TICKER>
+          <UNITPRICE>21.05</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VBMFX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VBMFX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Bond Index Fund Total</SECNAME>
+          <TICKER>VBMFX</TICKER>
+          <UNITPRICE>10.78</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VBTLX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VBTLX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Total Bond Market Inde</SECNAME>
+          <TICKER>VBTLX</TICKER>
+          <UNITPRICE>10.78</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VFSTX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VFSTX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Short-Term Investment</SECNAME>
+          <TICKER>VFSTX</TICKER>
+          <UNITPRICE>10.68</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VGTSX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VGTSX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Total International St</SECNAME>
+          <TICKER>VGTSX</TICKER>
+          <UNITPRICE>17.95</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VRIVX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VRIVX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Institutional Target R</SECNAME>
+          <TICKER>VRIVX</TICKER>
+          <UNITPRICE>22.81</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VTHRX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VTHRX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Target Retirement 2030</SECNAME>
+          <TICKER>VTHRX</TICKER>
+          <UNITPRICE>33.49</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VTIAX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VTIAX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Total International St</SECNAME>
+          <TICKER>VTIAX</TICKER>
+          <UNITPRICE>30.02</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VTSAX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VTSAX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Total Stock Market Ind</SECNAME>
+          <TICKER>VTSAX</TICKER>
+          <UNITPRICE>64.52</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VTSMX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VTSMX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Index Trust Total Stoc</SECNAME>
+          <TICKER>VTSMX</TICKER>
+          <UNITPRICE>64.49</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VTTHX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VTTHX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Target Retirement 2035</SECNAME>
+          <TICKER>VTTHX</TICKER>
+          <UNITPRICE>20.57</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VTTWX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VTTWX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Institutional  Target</SECNAME>
+          <TICKER>VTTWX</TICKER>
+          <UNITPRICE>23.00</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VWELX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VWELX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Wellington Income Fund</SECNAME>
+          <TICKER>VWELX</TICKER>
+          <UNITPRICE>42.74</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VWIAX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VWIAX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Wellesley Income Fund</SECNAME>
+          <TICKER>VWIAX</TICKER>
+          <UNITPRICE>65.34</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <MFINFO>
+        <!--Ticker from quote source is: VWINX-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <!--DTASOF local time is Thu Nov 09 15:23:42 PST 2017-->
+          <SECID>
+            <UNIQUEID>VWINX</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Wellesley Income Fund</SECNAME>
+          <TICKER>VWINX</TICKER>
+          <UNITPRICE>26.97</UNITPRICE>
+          <DTASOF>20171109232342</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.00</CURRATE>
+            <CURSYM>USD</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+    </SECLIST>
+  </SECLISTMSGSRSV1>
+</OFX>

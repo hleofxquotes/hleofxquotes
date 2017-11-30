@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?OFX OFXHEADER="200" VERSION="200" SECURITY="NONE" OLDFILEUID="NONE" NEWFILEUID="NONE"?>
+<OFX>
+  <SIGNONMSGSRQV1>
+    <SONRQ>
+      <DTCLIENT>$utils.dtClient</DTCLIENT>
+      <USERID>$auth.id</USERID>
+      <USERPASS>$auth.password</USERPASS>
+      <LANGUAGE>$auth.language</LANGUAGE>
+      <FI>
+        <ORG>$fi.org</ORG>
+#if($fi.id)
+        <FID>$fi.id</FID>
+#end
+      </FI>
+      <APPID>$appId</APPID>
+      <APPVER>$appVer</APPVER>
+    </SONRQ>
+  </SIGNONMSGSRQV1>
+  <SIGNUPMSGSRQV1>
+    <ACCTINFOTRNRQ>
+      <TRNUID>$utils.trnUid</TRNUID>
+      <ACCTINFORQ>
+        <DTACCTUP>19700101000000</DTACCTUP>
+      </ACCTINFORQ>
+    </ACCTINFOTRNRQ>
+  </SIGNUPMSGSRQV1>
+</OFX>

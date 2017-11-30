@@ -1,0 +1,34 @@
+# how to map CSV columns to OFX values
+# OFX = CSV
+#column.TRNTYPE=Transaction Type
+column.DTPOSTED=Date
+#column.DTUSER=Date
+column.TRNAMT=Amount
+#column.FITID=FITID
+column.NAME=Description
+column.MEMO=Check Number
+
+# date format: see http://download.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
+#date.format=MM/dd/yyyy
+
+# FI info (financial institution). You can look it up from http://www.ofxhome.com/.
+# If not sure, just enter some "reasonable" values.
+# I think MsMoney uses this value to try to match to the right account.
+ORG=HAN
+FID=6805
+
+# Account info
+# Default currency
+CURDEF=USD
+BANKID=123456789
+ACCTID=987654321
+
+#CHECKING Checking
+#SAVINGS Savings
+#MONEYMRKT Money Market
+#CREDITLINE Line of credit
+ACCTTYPE=CHECKING
+
+
+
+        

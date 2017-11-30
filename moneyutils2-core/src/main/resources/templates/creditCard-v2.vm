@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?OFX OFXHEADER="200" VERSION="200" SECURITY="NONE" OLDFILEUID="NONE" NEWFILEUID="NONE"?>
+<OFX>
+  <SIGNONMSGSRQV1>
+    <SONRQ>
+      <DTCLIENT>$utils.dtClient</DTCLIENT>
+      <USERID>$auth.id</USERID>
+      <USERPASS>$auth.password</USERPASS>
+      <LANGUAGE>$auth.language</LANGUAGE>
+      <FI>
+        <ORG>$fi.org</ORG>
+        <FID>$fi.id</FID>
+      </FI>
+      <APPID>$appId</APPID>
+      <APPVER>$appVer</APPVER>
+    </SONRQ>
+  </SIGNONMSGSRQV1>
+  <CREDITCARDMSGSRQV1>
+ #foreach( $account in $accounts )
+    <CCSTMTTRNRQ>
+      <TRNUID>$utils.trnUid</TRNUID>
+      <CCSTMTRQ>
+        <CCACCTFROM>
+          <ACCTID>$account.id</ACCTID>
+        </CCACCTFROM>
+        <INCTRAN>
+          <DTSTART>$startDate</DTSTART>
+          <INCLUDE>Y</INCLUDE>
+        </INCTRAN>
+      </CCSTMTRQ>
+    </CCSTMTTRNRQ>
+#end
+  </CREDITCARDMSGSRQV1>
+</OFX>
