@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.core.stockprice.StockPrice;
 
-public class YahooHistoricalSS2QuoteGetter extends YahooScreenScrapper2QuoteGetter {
-    private static final Logger LOGGER = Logger.getLogger(YahooHistoricalSS2QuoteGetter.class);
+public class YahooSS2HistQuoteGetter extends YahooSS2QuoteGetter {
+    private static final Logger LOGGER = Logger.getLogger(YahooSS2HistQuoteGetter.class);
 
     @Override
     protected String getUrlString(String symbol) {

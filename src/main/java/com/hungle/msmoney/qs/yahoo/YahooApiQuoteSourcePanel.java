@@ -76,7 +76,7 @@ public class YahooApiQuoteSourcePanel extends YahooQuoteSourcePanel {
                 listener.setSubTaskSize(stockSymbols.size());
             }
             StopWatch stopWatch = new StopWatch();
-            AbstractScreenScrapSource scrapper = new YahooScreenScrapSource(stockSymbols);
+            AbstractScreenScrapSource scrapper = new YahooSSSource(stockSymbols);
             try {
                 if (listener != null) {
                     listener.started(stockSymbols);

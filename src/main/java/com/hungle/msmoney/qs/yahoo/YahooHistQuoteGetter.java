@@ -33,10 +33,10 @@ import com.hungle.msmoney.qs.net.HttpUtils;
 /**
  * The Class GetYahooHistoricalQuotes.
  */
-public class GetYahooHistoricalQuotes extends YahooQuotesGetter {
+public class YahooHistQuoteGetter extends YahooQuotesGetter {
     
     /** The Constant log. */
-    private static final Logger LOGGER = Logger.getLogger(GetYahooHistoricalQuotes.class);
+    private static final Logger LOGGER = Logger.getLogger(YahooHistQuoteGetter.class);
 
     /** The from date. */
     private Date fromDate = null;
@@ -67,7 +67,7 @@ public class GetYahooHistoricalQuotes extends YahooQuotesGetter {
      * @param limitToFriday the limit to friday
      * @param limitToEOM the limit to EOM
      */
-    public GetYahooHistoricalQuotes(Date fromDate, Date toDate, Boolean limitToFriday, Boolean limitToEOM) {
+    public YahooHistQuoteGetter(Date fromDate, Date toDate, Boolean limitToFriday, Boolean limitToEOM) {
         super();
         setFxFileName(null);
 
@@ -96,7 +96,7 @@ public class GetYahooHistoricalQuotes extends YahooQuotesGetter {
     /**
      * Instantiates a new gets the yahoo historical quotes.
      */
-    public GetYahooHistoricalQuotes() {
+    public YahooHistQuoteGetter() {
         this(null, null, false, false);
     }
 

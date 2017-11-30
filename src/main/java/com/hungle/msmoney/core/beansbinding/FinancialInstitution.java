@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 public class FinancialInstitution {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(FinancialInstitution.class);
+    private static final Logger LOGGER = Logger.getLogger(FinancialInstitution.class);
 
     /** The name. */
     private String name;
@@ -42,7 +42,7 @@ public class FinancialInstitution {
      */
     public void setName(String name) {
         this.name = name;
-        log.info("setName: name=" + name);
+        LOGGER.info("setName: name=" + name);
     }
 
     /**

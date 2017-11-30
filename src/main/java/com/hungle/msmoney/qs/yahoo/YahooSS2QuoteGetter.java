@@ -34,12 +34,12 @@ import com.hungle.msmoney.core.stockprice.StockPrice;
 import com.hungle.msmoney.qs.net.AbstractHttpQuoteGetter;
 import com.hungle.msmoney.qs.net.GetQuotesListener;
 
-public class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
-    private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2QuoteGetter.class);
+public class YahooSS2QuoteGetter extends AbstractHttpQuoteGetter {
+    private static final Logger LOGGER = Logger.getLogger(YahooSS2QuoteGetter.class);
 
     private ThreadLocal<String> stockSymbol = new ThreadLocal<String>();
 
-    public YahooScreenScrapper2QuoteGetter() {
+    public YahooSS2QuoteGetter() {
         super();
         setBucketSize(1);
     }
@@ -340,14 +340,14 @@ public class YahooScreenScrapper2QuoteGetter extends AbstractHttpQuoteGetter {
             if (listener != null) {
                 listener.setSubTaskSize(stockSymbols.size());
             }
-            YahooScreenScrapper2 scrapper = null;
+            YahooSS2 scrapper = null;
             StopWatch stopWatch = new StopWatch();
             try {
                 if (listener != null) {
                     listener.started(stockSymbols);
                 }
 
-                scrapper = new YahooScreenScrapper2();
+                scrapper = new YahooSS2();
                 for (String stockSymbol : stockSymbols) {
                     try {
                         AbstractStockPrice stockPrice = scrapper.getStockPrice(stockSymbol);

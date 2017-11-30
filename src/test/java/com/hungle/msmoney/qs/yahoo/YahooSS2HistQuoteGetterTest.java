@@ -13,14 +13,14 @@ import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
 
-public class YahooHistoricalSS2QuoteGetterTest {
-    private static final Logger LOGGER = Logger.getLogger(YahooHistoricalSS2QuoteGetterTest.class);
+public class YahooSS2HistQuoteGetterTest {
+    private static final Logger LOGGER = Logger.getLogger(YahooSS2HistQuoteGetterTest.class);
 
     @Test
     public void testParseHtmlContent() throws IOException {
         String symbol = "GB00B2PLJJ36.L";
         InputStream stream = OfxUtils.getResource(symbol + ".html", this).openStream();
-        YahooHistoricalSS2QuoteGetter getter = new YahooHistoricalSS2QuoteGetter();
+        YahooSS2HistQuoteGetter getter = new YahooSS2HistQuoteGetter();
         getter.setStockSymbol("GB00B2PLJJ36.L");
         List<AbstractStockPrice> stockPrices = getter.parseInputStream(stream);
 
@@ -41,9 +41,9 @@ public class YahooHistoricalSS2QuoteGetterTest {
     @Test
     public void testLiveUrl() throws IOException {
 
-        YahooHistoricalSS2QuoteGetter quoteGetter = null;
+        YahooSS2HistQuoteGetter quoteGetter = null;
         try {
-            quoteGetter = new YahooHistoricalSS2QuoteGetter();
+            quoteGetter = new YahooSS2HistQuoteGetter();
             String[] stocks = {
                     "GB00B2PLJJ36.L",
             };

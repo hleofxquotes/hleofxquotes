@@ -1,4 +1,4 @@
-package com.hungle.msmoney.core.jsoup;
+package com.hungle.msmoney.qs.ft;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,8 +18,8 @@ import org.junit.Test;
 import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.qs.ft.FtPriceModel;
 
-public class JSoupFTTest {
-    private static final Logger LOGGER = Logger.getLogger(JSoupFTTest.class);
+public class FtPriceModelTest {
+    private static final Logger LOGGER = Logger.getLogger(FtPriceModelTest.class);
 
     @Test
     public void testFundIE00BYY18M47() throws IOException {
@@ -147,65 +147,5 @@ public class JSoupFTTest {
             }
         }
 
-    }
-
-    @Test
-    public void testLiveEquities() throws IOException {
-        String[] equities = { "IBM:NYQ", "AAPL:NSQ", "RDSA:LSE", "NESN:VTX", "FP:PAR", };
-        for (String equity : equities) {
-            testLiveEquity(equity);
-        }
-    }
-
-    @Test
-    public void testLiveFunds() throws IOException {
-        String[] funds = { "IE00BD2M9K78:GBP", "GB00B0CNH270:GBX", "GB00BYYV0405:GBX" };
-        for (String fund : funds) {
-            testLiveFund(fund);
-        }
-    }
-
-    @Test
-    public void testLiveETF() throws IOException {
-        String[] etfs = { "VUKE:LSE:GBP", "FTAL:LSE:GBP" };
-        for (String etf : etfs) {
-            testLiveEtf(etf);
-        }
-    }
-
-    private void testLiveEquity(String equity) throws IOException {
-        // https://markets.ft.com/data/equities/tearsheet/summary?s=IBM:NYQ
-        URL url = FtPriceModel.getFtEquityURL(equity);
-        int timeoutMillis = 30 * 1000;
-        LOGGER.info("url=" + url);
-        Document doc = Jsoup.parse(url, timeoutMillis);
-        Assert.assertNotNull(doc);
-        FtPriceModel model = FtPriceModel.parseFtDoc(doc, equity);
-        Assert.assertNotNull(model);
-        LOGGER.info(model);
-    }
-
-    private void testLiveFund(String fund) throws IOException {
-        // https://markets.ft.com/data/funds/tearsheet/summary?s=IE00BD2M9K78:GBP
-        URL url = FtPriceModel.getFtFundURL(fund);
-        int timeoutMillis = 30 * 1000;
-        LOGGER.info("url=" + url);
-        Document doc = Jsoup.parse(url, timeoutMillis);
-        Assert.assertNotNull(doc);
-        FtPriceModel model = FtPriceModel.parseFtDoc(doc, fund);
-        Assert.assertNotNull(model);
-        LOGGER.info(model);
-    }
-
-    private void testLiveEtf(String etf) throws IOException {
-        // https://markets.ft.com/data/etfs/tearsheet/summary?s=VUKE:LSE:GBP
-        URL url = FtPriceModel.getFtEtfURL(etf);
-        int timeoutMillis = 30 * 1000;
-        LOGGER.info("url=" + url);
-        Document doc = Jsoup.parse(url, timeoutMillis);
-        Assert.assertNotNull(doc);
-        FtPriceModel model = FtPriceModel.parseFtDoc(doc, etf);
-        Assert.assertNotNull(model);
-        LOGGER.info(model);
     }
 }

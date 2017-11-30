@@ -27,10 +27,10 @@ import com.hungle.msmoney.qs.scholarshare.TIAACREFPriceInfo;
 /**
  * The Class YahooScreenScrapSource.
  */
-public class YahooScreenScrapSource extends AbstractScreenScrapSource<TIAACREFPriceInfo> {
+public class YahooSSSource extends AbstractScreenScrapSource<TIAACREFPriceInfo> {
 
     /** The Constant log. */
-    private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapSource.class);
+    private static final Logger LOGGER = Logger.getLogger(YahooSSSource.class);
 
     /** The Constant DEFAULT_QUOTE_SERVER. */
     private static final String DEFAULT_QUOTE_SERVER = "finance.yahoo.com";
@@ -49,7 +49,7 @@ public class YahooScreenScrapSource extends AbstractScreenScrapSource<TIAACREFPr
      *
      * @param stockSymbols the stock symbols
      */
-    public YahooScreenScrapSource(List<String> stockSymbols) {
+    public YahooSSSource(List<String> stockSymbols) {
         super(stockSymbols);
     }
 

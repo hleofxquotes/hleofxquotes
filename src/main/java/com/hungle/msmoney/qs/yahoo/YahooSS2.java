@@ -26,14 +26,14 @@ import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.core.stockprice.StockPrice;
 
-public class YahooScreenScrapper2 implements Closeable {
-    private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2.class);
+public class YahooSS2 implements Closeable {
+    private static final Logger LOGGER = Logger.getLogger(YahooSS2.class);
 
     private CloseableHttpClient client;
 
     private SimpleDateFormat priceInfoLastTradeDateFormatter = new SimpleDateFormat("MM/dd/yyyy");
 
-    public YahooScreenScrapper2() {
+    public YahooSS2() {
         this.client = HttpClientBuilder.create().build();
     }
 

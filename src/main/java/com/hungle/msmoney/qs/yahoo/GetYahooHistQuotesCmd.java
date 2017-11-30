@@ -18,10 +18,10 @@ import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 /**
  * The Class GetYahooHistoricalQuotesCmd.
  */
-public class GetYahooHistoricalQuotesCmd {
+public class GetYahooHistQuotesCmd {
     
     /** The Constant log. */
-    private static final Logger LOGGER = Logger.getLogger(GetYahooHistoricalQuotesCmd.class);
+    private static final Logger LOGGER = Logger.getLogger(GetYahooHistQuotesCmd.class);
 
     /**
      * The main method.
@@ -29,10 +29,10 @@ public class GetYahooHistoricalQuotesCmd {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        GetYahooHistoricalQuotes getQuotes = null;
+        YahooHistQuoteGetter getQuotes = null;
 
         try {
-            getQuotes = new GetYahooHistoricalQuotes();
+            getQuotes = new YahooHistQuoteGetter();
             List<String> stocks = new ArrayList<String>();
             stocks.add("MSFT");
             LOGGER.info("stocks=" + stocks);

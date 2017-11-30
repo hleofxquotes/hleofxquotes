@@ -30,12 +30,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
-import com.hungle.msmoney.core.stockprice.Price;
 
-public class YahooScreenScrapper2Test {
-    private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapper2Test.class);
+public class YahooSS2Test {
+    private static final Logger LOGGER = Logger.getLogger(YahooSS2Test.class);
 
-    public YahooScreenScrapper2Test() {
+    public YahooSS2Test() {
         // TODO Auto-generated constructor stub
     }
 
@@ -157,11 +156,11 @@ public class YahooScreenScrapper2Test {
     @Test
     @Ignore
     public void testYahooScreenScrapper2() throws IOException {
-        YahooScreenScrapper2 scrapper = null;
+        YahooSS2 scrapper = null;
 
         int errors = 0;
         try {
-            scrapper = new YahooScreenScrapper2();
+            scrapper = new YahooSS2();
 
             String[] stockSymbols1 = { "TSLA", "AAPL", "VWINX", "INVALID", };
             String[] stockSymbols2 = { "VWINX", };
@@ -193,26 +192,5 @@ public class YahooScreenScrapper2Test {
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         YahooScreenScrapper2Json json = mapper.readValue(jsonStream, YahooScreenScrapper2Json.class);
         Assert.assertNotNull(json);
-    }
-
-    @Test
-    public void testParseHtmlContent() throws IOException {
-        InputStream stream = OfxUtils.getResource("TSLA.html", this).openStream();
-        YahooScreenScrapper2QuoteGetter getter = new YahooScreenScrapper2QuoteGetter();
-        getter.setStockSymbol("TSLA");
-        List<AbstractStockPrice> stockPrices = getter.parseInputStream(stream);
-        
-        Assert.assertNotNull(stockPrices);
-        
-        Assert.assertEquals(1, stockPrices.size());
-        
-        AbstractStockPrice stockPrice = stockPrices.get(0);
-        Assert.assertNotNull(stockPrice);
-        
-        Price price = stockPrice.getLastPrice();
-        Assert.assertNotNull(price);
-        
-        Assert.assertEquals(297.5151, price.doubleValue(), 0.1);
-        
     }
 }

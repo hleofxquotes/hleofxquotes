@@ -12,10 +12,10 @@ import com.hungle.msmoney.qs.scholarshare.TIAACREFPriceInfo;
 /**
  * The Class YahooScreenScrapSourceCmd.
  */
-public class YahooScreenScrapSourceCmd {
+public class YahooSSSourceCmd {
 
     /** The Constant log. */
-    private static final Logger LOGGER = Logger.getLogger(YahooScreenScrapSourceCmd.class);
+    private static final Logger LOGGER = Logger.getLogger(YahooSSSourceCmd.class);
 
     /**
      * The main method.
@@ -27,7 +27,7 @@ public class YahooScreenScrapSourceCmd {
 //        String[] symbols = { "CSCO110128C00017000", "CSCO", "AAPL", "123", "A", "B", "C", "IBM" };
         // String[] symbols = { "CSCO110128C00017000" };
         String[] symbols = { "CSCO" };
-        AbstractScreenScrapSource<TIAACREFPriceInfo> screenScrapper = new YahooScreenScrapSource(Arrays.asList(symbols));
+        AbstractScreenScrapSource<TIAACREFPriceInfo> screenScrapper = new YahooSSSource(Arrays.asList(symbols));
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Getting price for symbols:");

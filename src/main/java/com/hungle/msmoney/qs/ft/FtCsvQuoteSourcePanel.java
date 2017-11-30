@@ -40,10 +40,10 @@ import com.hungle.msmoney.qs.QuoteSourceListener;
 /**
  * The Class FtDotComQuoteSourcePanel.
  */
-public class FtDotComQuoteSourcePanel extends JPanel {
+public class FtCsvQuoteSourcePanel extends JPanel {
     
     /** The Constant LOGGER. */
-    private static final Logger LOGGER = Logger.getLogger(FtDotComQuoteSourcePanel.class);
+    private static final Logger LOGGER = Logger.getLogger(FtCsvQuoteSourcePanel.class);
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -94,7 +94,7 @@ public class FtDotComQuoteSourcePanel extends JPanel {
          * Inits the file chooser.
          */
         private void initFileChooser() {
-            String dir = prefs.get(FtDotComQuoteSourcePanel.PREF_IMPORT_FT_COM_CSV_DIR, ".");
+            String dir = prefs.get(FtCsvQuoteSourcePanel.PREF_IMPORT_FT_COM_CSV_DIR, ".");
             LOGGER.info("> pre creating JFileChooser");
             this.fc = new JFileChooser(dir);
             LOGGER.info("> post creating JFileChooser");
@@ -125,14 +125,14 @@ public class FtDotComQuoteSourcePanel extends JPanel {
             if (fc == null) {
                 initFileChooser();
             }
-            if (fc.showOpenDialog(FtDotComQuoteSourcePanel.this) == JFileChooser.CANCEL_OPTION) {
+            if (fc.showOpenDialog(FtCsvQuoteSourcePanel.this) == JFileChooser.CANCEL_OPTION) {
                 return;
             }
 
             Exception exception = null;
             File fromFile = fc.getSelectedFile();
             String dir = fromFile.getAbsoluteFile().getParentFile().getAbsolutePath();
-            prefs.put(FtDotComQuoteSourcePanel.PREF_IMPORT_FT_COM_CSV_DIR, dir);
+            prefs.put(FtCsvQuoteSourcePanel.PREF_IMPORT_FT_COM_CSV_DIR, dir);
             StopWatch stopWatch = new StopWatch();
             AbstractCsvConverter ftCsv = new FtCsv();
             boolean useQuoteSourceShareCount = shareCountCheckBox.isSelected();
@@ -151,7 +151,7 @@ public class FtDotComQuoteSourcePanel extends JPanel {
             }
 
             if (exception != null) {
-                Runnable doRun = new ShowDialogTask(FtDotComQuoteSourcePanel.this, exception, JOptionPane.ERROR_MESSAGE);
+                Runnable doRun = new ShowDialogTask(FtCsvQuoteSourcePanel.this, exception, JOptionPane.ERROR_MESSAGE);
                 SwingUtilities.invokeLater(doRun);
             }
 
@@ -163,7 +163,7 @@ public class FtDotComQuoteSourcePanel extends JPanel {
      *
      * @param gui the gui
      */
-    public FtDotComQuoteSourcePanel(GUI gui) {
+    public FtCsvQuoteSourcePanel(GUI gui) {
         super();
         this.prefs = GUI.getPrefs();
         this.quoteSourceListener = gui.getQuoteSourceListener();

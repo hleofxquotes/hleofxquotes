@@ -18,13 +18,13 @@ import com.hungle.msmoney.qs.net.AbstractHttpQuoteGetter;
 /**
  * The Class YahooHistoricalSourcePanel.
  */
-public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
+public class YahooHistSourcePanel extends YahooQuoteSourcePanel {
     
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
     /** The Constant log. */
-    private static final Logger LOGGER = Logger.getLogger(YahooHistoricalSourcePanel.class);
+    private static final Logger LOGGER = Logger.getLogger(YahooHistSourcePanel.class);
 
     /** The Constant STOCK_SYMBOLS_PREF_KEY. */
     private static final String STOCK_SYMBOLS_PREF_KEY = "yahooHistoricalStockSymbols";
@@ -35,7 +35,7 @@ public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
      * @param gui the gui
      * @param stockSymbolsPrefKey the stock symbols pref key
      */
-    public YahooHistoricalSourcePanel(GUI gui, String stockSymbolsPrefKey) {
+    public YahooHistSourcePanel(GUI gui, String stockSymbolsPrefKey) {
         super(gui, stockSymbolsPrefKey);
         getQuoteSource().setHistoricalQuotes(true);
     }
@@ -45,7 +45,7 @@ public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
      *
      * @param gui the gui
      */
-    public YahooHistoricalSourcePanel(GUI gui) {
+    public YahooHistSourcePanel(GUI gui) {
         this(gui, STOCK_SYMBOLS_PREF_KEY);
     }
 
@@ -76,7 +76,7 @@ public class YahooHistoricalSourcePanel extends YahooQuoteSourcePanel {
         LOGGER.info("user selected, limitToFriday=" + dialog.getLimitToFriday());
         LOGGER.info("user selected, limitToEOM=" + dialog.getLimitToEOM());
         
-        AbstractHttpQuoteGetter quoteGetter = new GetYahooHistoricalQuotes(fromDate, toDate, dialog.getLimitToFriday(), dialog.getLimitToEOM());
+        AbstractHttpQuoteGetter quoteGetter = new YahooHistQuoteGetter(fromDate, toDate, dialog.getLimitToFriday(), dialog.getLimitToEOM());
         if (quoteServer != null) {
             quoteGetter.setHost(quoteServer);
         }

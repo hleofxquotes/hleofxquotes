@@ -109,16 +109,16 @@ import com.hungle.msmoney.qs.DefaultQuoteSource;
 import com.hungle.msmoney.qs.QuoteSource;
 import com.hungle.msmoney.qs.QuoteSourceListener;
 import com.hungle.msmoney.qs.bloomberg.BloombergQuoteSourcePanel;
-import com.hungle.msmoney.qs.ft.FtDotComQuoteSourcePanel;
+import com.hungle.msmoney.qs.ft.FtCsvQuoteSourcePanel;
 import com.hungle.msmoney.qs.ft.FtEquitiesSourcePanel;
 import com.hungle.msmoney.qs.ft.FtEtfsSourcePanel;
 import com.hungle.msmoney.qs.ft.FtFundsSourcePanel;
 import com.hungle.msmoney.qs.scholarshare.TIAACREFQuoteSourcePanel;
 import com.hungle.msmoney.qs.yahoo.YahooApiQuoteSourcePanel;
-import com.hungle.msmoney.qs.yahoo.YahooHistoricalSourcePanel;
+import com.hungle.msmoney.qs.yahoo.YahooHistSourcePanel;
 import com.hungle.msmoney.qs.yahoo.YahooQuoteSourcePanel;
 import com.hungle.msmoney.qs.yahoo.YahooQuotesGetter;
-import com.hungle.msmoney.qs.yahoo.YahooScreenScrapper2SourcePanel;
+import com.hungle.msmoney.qs.yahoo.YahooSS2SourcePanel;
 import com.hungle.msmoney.stmt.StatementPanel;
 import com.hungle.msmoney.stmt.fi.AbstractFiDir;
 import com.hungle.msmoney.stmt.fi.props.FIBean;
@@ -276,7 +276,7 @@ public class GUI extends JFrame {
     private YahooApiQuoteSourcePanel yahooApiQuoteSourcePanel;
 
     /** The ft dot com quote source panel. */
-    private FtDotComQuoteSourcePanel ftDotComQuoteSourcePanel;
+    private FtCsvQuoteSourcePanel ftDotComQuoteSourcePanel;
 
     /** The yahoo historical quote source view. */
     private YahooQuoteSourcePanel yahooHistoricalQuoteSourceView;
@@ -329,7 +329,7 @@ public class GUI extends JFrame {
     // TODO_FI
     private File fiDir = new File(System.getProperty("fi.dir", FIBean.getDefaultFiDir()));
 
-    private YahooScreenScrapper2SourcePanel yahooScreenScrapper2SourcePanel;
+    private YahooSS2SourcePanel yahooScreenScrapper2SourcePanel;
 
     private SymbolMapper symbolMapper = SymbolMapper.loadMapperFile();
 
@@ -2466,7 +2466,7 @@ public class GUI extends JFrame {
      * @return the component
      */
     private Component createFtDotComSourceView() {
-        final FtDotComQuoteSourcePanel view = new FtDotComQuoteSourcePanel(this);
+        final FtCsvQuoteSourcePanel view = new FtCsvQuoteSourcePanel(this);
         this.ftDotComQuoteSourcePanel = view;
         return view;
     }
@@ -2477,7 +2477,7 @@ public class GUI extends JFrame {
      * @return the component
      */
     private Component createYahooHistoricalSourceView() {
-        final YahooQuoteSourcePanel view = new YahooHistoricalSourcePanel(this);
+        final YahooQuoteSourcePanel view = new YahooHistSourcePanel(this);
         this.yahooHistoricalQuoteSourceView = view;
         return view;
     }
@@ -2494,7 +2494,7 @@ public class GUI extends JFrame {
     }
 
     private Component createYahooScreenScrapper2SourceView() {
-        final YahooScreenScrapper2SourcePanel view = new YahooScreenScrapper2SourcePanel(this);
+        final YahooSS2SourcePanel view = new YahooSS2SourcePanel(this);
         this.yahooScreenScrapper2SourcePanel = view;
         return view;
     }
