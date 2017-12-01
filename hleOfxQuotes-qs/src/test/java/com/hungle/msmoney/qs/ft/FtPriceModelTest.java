@@ -59,7 +59,8 @@ public class FtPriceModelTest {
 
     @Test
     public void testEquityIBM() throws IOException {
-        String symbol = "IBM:NYQ";
+        // String symbol = "IBM:NYQ";
+        String symbol = "IBM_NYQ";
         String testResource = symbol + ".html";
         FtPriceModel model = getModel(testResource, symbol);
         Assert.assertNotNull(model);
@@ -123,7 +124,9 @@ public class FtPriceModelTest {
         InputStream stream = null;
 
         try {
-            URL url = OfxUtils.getResource("IBM:NYQ.html", this);
+//            String symbol = "IBM:NYQ";
+            String symbol = "IBM_NYQ";
+            URL url = OfxUtils.getResource(symbol + ".html", this);
             Assert.assertNotNull(url);
             stream = url.openStream();
             Document doc = Jsoup.parse(stream, "UTF-8", "http://localhost");
