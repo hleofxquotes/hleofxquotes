@@ -8,39 +8,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.URI;
-import java.net.URL;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
@@ -67,7 +57,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.ProgressMonitor;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -75,30 +64,16 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableCellRenderer;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.data.SymbolMapper;
 import com.hungle.msmoney.core.data.SymbolMapperEntry;
 import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableUtils;
-import com.hungle.msmoney.core.fx.UpdateFx;
 import com.hungle.msmoney.core.gui.StripedTableRenderer;
 import com.hungle.msmoney.core.jna.ImportDialogAutoClickService;
 import com.hungle.msmoney.core.misc.BuildNumber;
 import com.hungle.msmoney.core.misc.CheckNullUtils;
-import com.hungle.msmoney.core.misc.Utils;
-import com.hungle.msmoney.core.ofx.CurrencyUtils;
-import com.hungle.msmoney.core.ofx.ImportUtils;
-import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.core.ofx.QifUtils;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxSaveParameter;
@@ -106,6 +81,7 @@ import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.core.stockprice.StockPrice;
 import com.hungle.msmoney.core.stockprice.StockPriceCsvUtils;
+import com.hungle.msmoney.gui.about.AboutAction;
 import com.hungle.msmoney.gui.qs.BloombergQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtCsvQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEquitiesSourcePanel;
@@ -121,7 +97,6 @@ import com.hungle.msmoney.qs.QuoteSource;
 import com.hungle.msmoney.qs.QuoteSourceListener;
 import com.hungle.msmoney.qs.yahoo.YahooQuotesGetter;
 import com.hungle.msmoney.stmt.StatementPanel;
-import com.hungle.msmoney.stmt.fi.AbstractFiDir;
 import com.hungle.msmoney.stmt.fi.props.FIBean;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -169,28 +144,28 @@ public class GUI extends JFrame {
 
     /** The Constant prefs. */
     // TODO: le.com.tools.moneyutils.ofx.quotes.GUI
-    private static final Preferences PREFS = Preferences.userNodeForPackage(PREFS_CLASS);
+    static final Preferences PREFS = Preferences.userNodeForPackage(PREFS_CLASS);
 
     /** The Constant PREF_DEFAULT_CURRENCY. */
     private static final String PREF_DEFAULT_CURRENCY = "defaultCurrency";
 
     /** The Constant PREF_LAST_KNOWN_IMPORT_STRING. */
-    private static final String PREF_LAST_KNOWN_IMPORT_STRING = "lastKnownImportString";
+    static final String PREF_LAST_KNOWN_IMPORT_STRING = "lastKnownImportString";
 
     /** The Constant PREF_RANDOMIZE_SHARE_COUNT. */
-    private static final String PREF_RANDOMIZE_SHARE_COUNT = "randomizeShareCount";
+    static final String PREF_RANDOMIZE_SHARE_COUNT = "randomizeShareCount";
 
     /** The Constant PREF_FORCE_GENERATING_INVTRANLIST. */
     private static final String PREF_FORCE_GENERATING_INVTRANLIST = "forceGeneratingINVTRANLIST";
 
     /** The Constant HOME_PAGE. */
-    protected static final String HOME_PAGE = "http://code.google.com/p/hle-ofx-quotes/";
+    public static final String HOME_PAGE = "http://code.google.com/p/hle-ofx-quotes/";
 
     /** The Constant PREF_DATE_OFFSET. */
     private static final String PREF_DATE_OFFSET = "dateOffset";
 
     /** The Constant PREF_SUSPICIOUS_PRICE. */
-    private static final String PREF_SUSPICIOUS_PRICE = "suspiciousPrice";
+    static final String PREF_SUSPICIOUS_PRICE = "suspiciousPrice";
 
     /** The Constant PREF_INCREMENTALLY_INCREASED_SHARE_COUNT. */
     private static final String PREF_INCREMENTALLY_INCREASED_SHARE_COUNT = "incrementallyIncreasedShareCount";
@@ -209,7 +184,7 @@ public class GUI extends JFrame {
     private static final String PREF_SELECTED_QUOTE_SOURCE = "selectedQuoteSource";
 
     /** The thread pool. */
-    private final ExecutorService threadPool = Executors.newCachedThreadPool();
+    final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     /** The output files. */
     private List<File> outputFiles;
@@ -242,10 +217,10 @@ public class GUI extends JFrame {
     private JButton importToMoneyButton;
 
     /** The last known import. */
-    private JLabel lastKnownImport;
+    JLabel lastKnownImport;
 
     /** The last known import string. */
-    private String lastKnownImportString;
+    String lastKnownImportString;
 
     /** The update exchange rate button. */
     private JButton updateExchangeRateButton;
@@ -258,7 +233,7 @@ public class GUI extends JFrame {
             com.hungle.msmoney.core.ofx.xmlbeans.CurrencyUtils.getDefaultCurrency());
 
     /** The randomize share count. */
-    private Boolean randomizeShareCount = Boolean.valueOf(PREFS.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
+    Boolean randomizeShareCount = Boolean.valueOf(PREFS.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
 
     /** The random. */
     private Random random = new Random();
@@ -292,7 +267,7 @@ public class GUI extends JFrame {
     private Integer dateOffset = Integer.valueOf(PREFS.get(PREF_DATE_OFFSET, "0"));
 
     /** The suspicious price. */
-    private Integer suspiciousPrice = Integer.valueOf(PREFS.get(PREF_SUSPICIOUS_PRICE, "10000"));
+    Integer suspiciousPrice = Integer.valueOf(PREFS.get(PREF_SUSPICIOUS_PRICE, "10000"));
 
     /** The account id. */
     private String accountId = PREFS.get(PREF_ACCOUNT_ID, OfxPriceInfo.DEFAULT_ACCOUNT_ID);
@@ -303,16 +278,16 @@ public class GUI extends JFrame {
     private JLabel accountIdLabel;
 
     /** The download view. */
-    private StatementPanel downloadView;
+    StatementPanel downloadView;
 
     /** The main tabbed. */
-    private JTabbedPane mainTabbed;
+    JTabbedPane mainTabbed;
 
     /** The selected quote source. */
     private int selectedQuoteSource;
 
     /** The import dialog auto click service. */
-    private ImportDialogAutoClickService importDialogAutoClickService;
+    ImportDialogAutoClickService importDialogAutoClickService;
 
     /** The price formatter. */
     private NumberFormat priceFormatter;
@@ -343,1064 +318,10 @@ public class GUI extends JFrame {
     private FtEtfsSourcePanel ftEtfsSourcePanel;
 
     /**
-     * The Class EditRandomizeShareCountAction.
-     */
-    private final class EditRandomizeShareCountAction extends AbstractAction {
-
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Instantiates a new edits the randomize share count action.
-         *
-         * @param name
-         *            the name
-         */
-        private EditRandomizeShareCountAction(String name) {
-            super(name);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
-         * ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String[] possibilities = { "true", "false" };
-            Icon icon = null;
-            String s = (String) JOptionPane.showInputDialog(GUI.this,
-                    "Current: " + randomizeShareCount + "\n" + "Choices:", "Set Randomize Share Count",
-                    JOptionPane.PLAIN_MESSAGE, icon, possibilities, null);
-
-            // If a string was returned, say so.
-            if ((s != null) && (s.length() > 0)) {
-                String value = s;
-                LOGGER.info("Selected new 'Randomize Share Count': " + value);
-                Boolean newValue = Boolean.valueOf(value);
-                if (newValue.compareTo(randomizeShareCount) != 0) {
-                    randomizeShareCount = newValue;
-                    PREFS.put(PREF_RANDOMIZE_SHARE_COUNT, randomizeShareCount.toString());
-                    // to clear the pricing table
-                    QuoteSource quoteSource = null;
-                    stockSymbolsStringReceived(quoteSource, null);
-                }
-            } else {
-            }
-        }
-    }
-
-    /**
-     * The Class EditWarnSuspiciousPriceAction.
-     */
-    private final class EditWarnSuspiciousPriceAction extends AbstractAction {
-
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Instantiates a new edits the warn suspicious price action.
-         *
-         * @param name
-         *            the name
-         */
-        private EditWarnSuspiciousPriceAction(String name) {
-            super(name);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
-         * ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            String[] possibilities = null;
-            Icon icon = null;
-            String s = (String) JOptionPane.showInputDialog(GUI.this,
-                    "To guard against bad price from quote source,\n"
-                            + "you can set a value above which will trigger a warning dialog.\n"
-                            + "To disable: set to -1.\n" + "\n" + "Current: " + suspiciousPrice + "\n" + "Price:",
-                    "Set a price", JOptionPane.PLAIN_MESSAGE, icon, possibilities, suspiciousPrice.toString());
-
-            // If a string was returned, say so.
-            if ((s != null) && (s.length() > 0)) {
-                String value = s;
-                LOGGER.info("Selected new 'Warn Suspicious Price': " + value);
-                try {
-                    Integer newValue = Integer.valueOf(value);
-                    if (newValue.compareTo(suspiciousPrice) != 0) {
-                        suspiciousPrice = newValue;
-                        PREFS.put(PREF_SUSPICIOUS_PRICE, suspiciousPrice.toString());
-                        // to clear the pricing table
-                        // stockSymbolsStringReceived(null);
-                    }
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(GUI.this, "Not a valid number - " + e.getMessage(), "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-            }
-        }
-    }
-
-    /**
-     * The Class EditOFXAccountIdAction.
-     */
-    private final class EditOFXAccountIdAction extends AbstractAction {
-
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Instantiates a new edits the OFX account id action.
-         *
-         * @param name
-         *            the name
-         */
-        private EditOFXAccountIdAction(String name) {
-            super(name);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
-         * ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            String[] possibilities = null;
-            Icon icon = null;
-            String s = (String) JOptionPane.showInputDialog(GUI.this,
-                    "Current: " + accountId + "\n" + "OFX Account Id:", "Set OFX Account Id", JOptionPane.PLAIN_MESSAGE,
-                    icon, possibilities, accountId);
-
-            // If a string was returned, say so.
-            if ((s != null) && (s.length() > 0)) {
-                String value = s;
-                selectNewAccountId(value);
-            } else {
-            }
-        }
-    }
-
-    /**
-     * The Class EditCurrencyAction.
-     */
-    private final class EditCurrencyAction extends AbstractAction {
-
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Instantiates a new edits the currency action.
-         *
-         * @param name
-         *            the name
-         */
-        private EditCurrencyAction(String name) {
-            super(name);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
-         * ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Set<String> keys = CurrencyUtils.CURRENCIES.keySet();
-            String[] possibilities = new String[keys.size()];
-            int i = 0;
-            for (String key : keys) {
-                possibilities[i++] = key;
-            }
-            Icon icon = null;
-            String s = (String) JOptionPane.showInputDialog(GUI.this,
-                    "Current: " + defaultCurrency + "\n" + "Available:", "Set Currency", JOptionPane.PLAIN_MESSAGE,
-                    icon, possibilities, null);
-
-            // If a string was returned, say so.
-            if ((s != null) && (s.length() > 0)) {
-                String value = CurrencyUtils.CURRENCIES.get(s);
-                selectNewCurrency(value);
-            } else {
-            }
-        }
-    }
-
-    /**
-     * The Class UpdateMnyExchangeRatesTask.
-     */
-    private final class UpdateMnyExchangeRatesTask extends AbstractAction {
-
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Instantiates a new update mny exchange rates task.
-         *
-         * @param name
-         *            the name
-         */
-        private UpdateMnyExchangeRatesTask(String name) {
-            super(name);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
-         * ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            // JOptionPane.showMessageDialog(GUI.this,
-            // "Not yet implemented.");
-            try {
-                UpdateFx.invoke();
-            } catch (Exception e) {
-                LOGGER.error(e);
-
-                StringBuilder message = new StringBuilder();
-                message.append(e.toString() + "\n");
-                // message.append("\n");
-                // message.append("Please create a directory 'plugins' and\n");
-                // message.append("add the sunriise*.jar file there.\n");
-                message.append("Do you want me to download the sunriise plugin jar file and try again?");
-
-                String title = "Error updating exchange rate";
-
-                int n = JOptionPane.showOptionDialog(GUI.this, message.toString(), title, JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE, null, null, null);
-                if (n == JOptionPane.YES_OPTION) {
-                    getJarFile(event);
-                }
-            }
-        }
-
-        /**
-         * Gets the jar file.
-         *
-         * @param event
-         *            the event
-         * @return the jar file
-         */
-        private void getJarFile(final ActionEvent event) {
-            final ProgressMonitor progressMonitor = new ProgressMonitor(GUI.this, "Downloading sunriise plugin ...", "",
-                    0, 100);
-            final String jarFileName = "sunriise-0.0.3-20111220.210334-1-jar-with-dependencies.jar";
-
-            Callable<String> task = new Callable<String>() {
-                @Override
-                public String call() throws Exception {
-                    String errorMessage = null;
-                    String uri = "http://sunriise.sourceforge.net/out/hleofxquotes/Build_20111220_64/" + jarFileName;
-                    File toJarFile = new File("plugins");
-                    if (!toJarFile.isDirectory()) {
-                        toJarFile.mkdirs();
-                    }
-                    toJarFile = new File(toJarFile, jarFileName);
-                    try {
-                        if (getJarFile(uri, toJarFile, progressMonitor)) {
-                            actionPerformed(event);
-                        } else {
-                            LOGGER.warn("User cancel downloading!");
-                            if (!toJarFile.delete()) {
-                                LOGGER.warn("Failed to delete file=" + toJarFile);
-                            } else {
-                                LOGGER.info("Deleted file=" + toJarFile);
-                            }
-                        }
-                    } catch (IOException e) {
-                        LOGGER.warn(e, e);
-                        errorMessage = e.toString();
-                    } finally {
-                        if (progressMonitor != null) {
-                            progressMonitor.close();
-                        }
-                        if (errorMessage != null) {
-                            errorMessage += "\nFailed to download jar file\n" + jarFileName;
-                            JOptionPane.showMessageDialog(GUI.this, errorMessage, "Error downloading " + jarFileName,
-                                    JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                    return errorMessage;
-                }
-            };
-
-            Future<String> future = threadPool.submit(task);
-        }
-
-        /**
-         * Gets the jar file.
-         *
-         * @param uri
-         *            the uri
-         * @param toJarFile
-         *            the to jar file
-         * @param progressMonitor
-         *            the progress monitor
-         * @return the jar file
-         * @throws IOException
-         *             Signals that an I/O exception has occurred.
-         */
-        private boolean getJarFile(String uri, File toJarFile, final ProgressMonitor progressMonitor)
-                throws IOException {
-            boolean canceled = false;
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpGet httpGet = new HttpGet(uri);
-            LOGGER.info("GET " + uri);
-            HttpResponse httpResponse = client.execute(httpGet);
-
-            Long contentLength = -1L;
-            Header header = httpResponse.getFirstHeader("Content-Length");
-            if (header != null) {
-                String value = header.getValue();
-                LOGGER.info(header.getName() + ": " + value);
-                if ((value != null) && (value.length() > 0)) {
-                    try {
-                        contentLength = Long.valueOf(value);
-                    } catch (NumberFormatException e) {
-                        LOGGER.warn(e);
-                    }
-                }
-            }
-            StatusLine statusLine = httpResponse.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-            LOGGER.info("  statusCode=" + statusCode);
-            if (statusCode == HttpStatus.SC_OK) {
-                HttpEntity entity = httpResponse.getEntity();
-                BufferedInputStream in = null;
-                BufferedOutputStream out = null;
-
-                try {
-                    out = new BufferedOutputStream(new FileOutputStream(toJarFile));
-                    LOGGER.info("  ... saving to " + toJarFile);
-                    in = new BufferedInputStream(entity.getContent());
-                    long total = 0L;
-                    long percentageDone = 0L;
-                    int n;
-                    byte[] buffer = new byte[2048];
-                    while ((n = in.read(buffer)) != -1) {
-                        if (progressMonitor.isCanceled()) {
-                            canceled = true;
-                            notifyCanceled(httpGet, entity, progressMonitor);
-                            break;
-                        }
-
-                        out.write(buffer, 0, n);
-
-                        if (progressMonitor.isCanceled()) {
-                            canceled = true;
-                            notifyCanceled(httpGet, entity, progressMonitor);
-                            break;
-                        }
-
-                        total += n;
-                        if (contentLength > 0L) {
-                            long done = (total * 100) / contentLength;
-                            if (done > percentageDone) {
-                                percentageDone = done;
-                                if (percentageDone >= 99) {
-                                    percentageDone = 99;
-                                }
-                                final String message = updateProgressMonitor(percentageDone, progressMonitor);
-
-                                if (LOGGER.isDebugEnabled()) {
-                                    LOGGER.debug(total + "/" + contentLength + ", " + message);
-                                }
-                            }
-                        }
-                        if (progressMonitor.isCanceled()) {
-                            canceled = true;
-                            notifyCanceled(httpGet, entity, progressMonitor);
-                            break;
-                        }
-                    }
-                    percentageDone = 100;
-                    updateProgressMonitor(percentageDone, progressMonitor);
-                } finally {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("  > DONE saving");
-                    }
-
-                    if (in != null) {
-                        try {
-                            if (LOGGER.isDebugEnabled()) {
-                                LOGGER.debug("  calling in.close()");
-                            }
-                            in.close();
-                        } finally {
-                            in = null;
-                        }
-                    }
-                    if (out != null) {
-                        try {
-                            if (LOGGER.isDebugEnabled()) {
-                                LOGGER.debug("  calling out.close()");
-                            }
-                            out.close();
-                        } finally {
-                            out = null;
-                        }
-                    }
-                    LOGGER.info("  > DONE saving (post-closing)");
-                }
-            } else {
-                throw new IOException(statusLine.toString());
-            }
-
-            LOGGER.info("canceled=" + canceled);
-
-            return !canceled;
-        }
-
-        /**
-         * Update progress monitor.
-         *
-         * @param percentageDone
-         *            the percentage done
-         * @param progressMonitor
-         *            the progress monitor
-         * @return the string
-         */
-        private String updateProgressMonitor(long percentageDone, final ProgressMonitor progressMonitor) {
-            final String message = String.format("Completed %d%%.\n", percentageDone);
-            final int progress = (int) percentageDone;
-            Runnable doRun = new Runnable() {
-                @Override
-                public void run() {
-                    progressMonitor.setNote(message);
-                    progressMonitor.setProgress(progress);
-                }
-            };
-            SwingUtilities.invokeLater(doRun);
-            return message;
-        }
-
-        /**
-         * Notify canceled.
-         *
-         * @param httpGet
-         *            the http get
-         * @param entity
-         *            the entity
-         * @param progressMonitor
-         *            the progress monitor
-         */
-        private void notifyCanceled(HttpGet httpGet, HttpEntity entity, final ProgressMonitor progressMonitor) {
-            LOGGER.warn("progressMonitor.isCanceled()=" + progressMonitor.isCanceled());
-            if (httpGet != null) {
-                httpGet.abort();
-            }
-            if (entity != null) {
-                LOGGER.info("  calling entity.consumeContent()");
-                try {
-                    entity.consumeContent();
-                } catch (IOException e) {
-                    LOGGER.warn("Failed to entity.consumeContent(), " + e);
-                }
-            }
-            Runnable doRun = new Runnable() {
-                @Override
-                public void run() {
-                    progressMonitor.setProgress(100);
-                    progressMonitor.close();
-                }
-            };
-            SwingUtilities.invokeLater(doRun);
-        }
-    }
-
-    /**
-     * The listener interface for receiving closingWindow events. The class that
-     * is interested in processing a closingWindow event implements this
-     * interface, and the object created with that class is registered with a
-     * component using the component's <code>addClosingWindowListener<code>
-     * method. When the closingWindow event occurs, that object's appropriate
-     * method is invoked.
-     *
-     * @see ClosingWindowEvent
-     */
-    private final class ClosingWindowListener implements WindowListener {
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.WindowListener#windowOpened(java.awt.event.
-         * WindowEvent)
-         */
-        @Override
-        public void windowOpened(WindowEvent e) {
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.WindowListener#windowIconified(java.awt.event.
-         * WindowEvent)
-         */
-        @Override
-        public void windowIconified(WindowEvent e) {
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.
-         * WindowEvent)
-         */
-        @Override
-        public void windowDeiconified(WindowEvent e) {
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.
-         * WindowEvent)
-         */
-        @Override
-        public void windowDeactivated(WindowEvent e) {
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.WindowListener#windowClosing(java.awt.event.
-         * WindowEvent)
-         */
-        @Override
-        public void windowClosing(WindowEvent event) {
-            LOGGER.info("> windowClosing");
-            try {
-                shutdown();
-            } finally {
-                // TODO: see if this will help with JNA crash on the way out
-                LOGGER.info("> Calling System.gc()");
-                System.gc();
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.WindowListener#windowClosed(java.awt.event.
-         * WindowEvent)
-         */
-        @Override
-        public void windowClosed(WindowEvent event) {
-            LOGGER.info("> windowClosed");
-            try {
-                shutdown();
-            } finally {
-                // TODO: see if this will help with JNA crash on the way out
-                LOGGER.info("> Calling System.gc()");
-                System.gc();
-            }
-        }
-
-        /**
-         * Shutdown.
-         */
-        private void shutdown() {
-            if (threadPool != null) {
-                List<Runnable> tasks = threadPool.shutdownNow();
-                LOGGER.info("Number of not-run tasks=" + ((tasks == null) ? 0 : tasks.size()));
-                long timeout = 1L;
-                TimeUnit unit = TimeUnit.MINUTES;
-                try {
-                    LOGGER.info("WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
-                    if (!threadPool.awaitTermination(timeout, unit)) {
-                        LOGGER.warn("Timed-out waiting for threadPool.awaitTermination");
-                    }
-                } catch (InterruptedException e) {
-                    LOGGER.error(e, e);
-                } finally {
-                    LOGGER.info("DONE WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
-                }
-            }
-            if (importDialogAutoClickService != null) {
-                importDialogAutoClickService.setEnable(false);
-                importDialogAutoClickService.shutdown();
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.WindowListener#windowActivated(java.awt.event.
-         * WindowEvent)
-         */
-        @Override
-        public void windowActivated(WindowEvent e) {
-        }
-    }
-
-    /**
-     * The Class StockPricesReceivedTask.
-     */
-    private final class StockPricesReceivedTask implements Runnable {
-
-        /** The beans. */
-        private final List<AbstractStockPrice> prices;
-
-        /** The bad price. */
-        private final Double badPrice;
-
-        /** The fx table. */
-        private final FxTable fxTable;
-
-        /** The has wrapped share count. */
-        private final boolean hasWrappedShareCount;
-
-        /** The symbol mapper. */
-        private final SymbolMapper symbolMapper;
-
-        /** The quote source. */
-        private final QuoteSource quoteSource;
-
-        /**
-         * Instantiates a new stock prices received task.
-         *
-         * @param prices
-         *            the beans
-         * @param badPrice
-         *            the bad price
-         * @param fxTable
-         *            the fx table
-         * @param hasWrappedShareCount
-         *            the has wrapped share count
-         * @param symbolMapper
-         *            the symbol mapper
-         * @param quoteSource
-         *            the quote source
-         */
-        private StockPricesReceivedTask(List<AbstractStockPrice> prices, Double badPrice, FxTable fxTable,
-                boolean hasWrappedShareCount, SymbolMapper symbolMapper, QuoteSource quoteSource) {
-            this.prices = prices;
-            this.badPrice = badPrice;
-            this.fxTable = fxTable;
-            this.hasWrappedShareCount = hasWrappedShareCount;
-            this.symbolMapper = symbolMapper;
-            this.quoteSource = quoteSource;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Runnable#run()
-         */
-        @Override
-        public void run() {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("> stockPricesReceived, size=" + prices.size());
-            }
-
-            priceList.getReadWriteLock().writeLock().lock();
-            try {
-                priceList.clear();
-                priceList.addAll(prices);
-            } finally {
-                priceList.getReadWriteLock().writeLock().unlock();
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("< stockPricesReceived");
-                }
-            }
-
-            List<AbstractStockPrice> newExchangeRates = null;
-            if (quoteSource != null) {
-                newExchangeRates = quoteSource.getExchangeRates();
-            }
-            FxTableUtils.updateFxTable(newExchangeRates, exchangeRates);
-
-            try {
-                boolean onePerFile = quoteSource.isHistoricalQuotes();
-                List<File> ofxFiles = saveToOFX(prices, symbolMapper, fxTable, onePerFile);
-                for (File ofxFile : ofxFiles) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("ofxFile=" + ofxFile);
-                    }
-                }
-
-                if (LOGGER.isDebugEnabled()) {
-                    File csvFile = saveToCsv(prices);
-                    LOGGER.debug("Saved csvFile=" + csvFile);
-                }
-
-                MapperTableUtils.updateMapperTable(symbolMapper, mapper);
-            } catch (IOException e) {
-                LOGGER.warn(e);
-            } finally {
-                Runnable doRun = null;
-
-                if (hasWrappedShareCount) {
-                    doRun = new Runnable() {
-                        @Override
-                        public void run() {
-                            JOptionPane.showMessageDialog(GUI.this,
-                                    "Incrementally increased share count has wrapped around.\n"
-                                            + "Next import will not update price(s).",
-                                    "Share count has wrapped around", JOptionPane.WARNING_MESSAGE, null);
-                        }
-                    };
-                    SwingUtilities.invokeLater(doRun);
-                }
-
-                if (badPrice != null) {
-                    doRun = new Runnable() {
-
-                        @Override
-                        public void run() {
-                            JOptionPane.showMessageDialog(GUI.this,
-                                    "Incoming price from quote source has\n" + "suspicious price: " + badPrice,
-                                    "Suspicious Price", JOptionPane.WARNING_MESSAGE, null);
-                        }
-                    };
-                    SwingUtilities.invokeLater(doRun);
-                }
-                if (resultView != null) {
-                    doRun = new UpdateResultViewTask();
-                    SwingUtilities.invokeLater(doRun);
-                }
-
-                if (bottomTabs != null) {
-                    doRun = new Runnable() {
-
-                        @Override
-                        public void run() {
-                            bottomTabs.setSelectedIndex(0);
-                        }
-                    };
-                    SwingUtilities.invokeLater(doRun);
-                }
-            }
-        }
-    }
-
-    /**
-     * The Class CreateNewFi.
-     */
-    private final class CreateNewFiAction extends AbstractAction {
-
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /** The parent component. */
-        private Component parentComponent = GUI.this;
-
-        /**
-         * Instantiates a new creates the new fi.
-         *
-         * @param name
-         *            the name
-         */
-        private CreateNewFiAction(String name) {
-            super(name);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
-         * ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            String fiName = JOptionPane.showInputDialog(parentComponent, "Enter a new 'Financial Institution' name");
-            if (fiName == null) {
-                // cancel
-                return;
-            }
-
-            fiName = fiName.trim();
-            if (fiName.length() <= 0) {
-                return;
-            }
-
-            File topDir = getTopDir();
-            if ((!topDir.exists()) && (!topDir.mkdirs())) {
-                JOptionPane.showMessageDialog(parentComponent, "Cannot create dir\ndir=" + topDir.getAbsolutePath(),
-                        "Error creating", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            File fiDir = new File(topDir, fiName);
-            if (fiDir.exists()) {
-                JOptionPane.showMessageDialog(parentComponent, "Directory exist\ndir=" + fiDir.getAbsolutePath(),
-                        "Error creating", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            if (!fiDir.mkdirs()) {
-                JOptionPane.showMessageDialog(parentComponent, "Cannot create dir\ndir=" + fiDir.getAbsolutePath(),
-                        "Error creating", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            LOGGER.info("Created new FI dir=" + fiDir.getAbsolutePath());
-
-            String fiPropertiesFileName = AbstractFiDir.DEFAULT_PROPERTIES_FILENAME;
-            String sampleFileName = "samples" + "/" + fiPropertiesFileName;
-            URL url = OfxUtils.getResource(sampleFileName);
-            if (url == null) {
-                JOptionPane.showMessageDialog(parentComponent, "Cannot find sample file\nfile=" + sampleFileName,
-                        "Error creating", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            File fiPropertiesFile = null;
-            try {
-                fiPropertiesFile = new File(fiDir, fiPropertiesFileName);
-                Utils.copyToFile(url, fiPropertiesFile);
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(parentComponent, "Error creating " + fiPropertiesFileName,
-                        "Error creating", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            JOptionPane
-                    .showMessageDialog(parentComponent,
-                            "Succesfully created dirctory for fi=" + fiName + "\n" + "Please edit file\n"
-                                    + fiPropertiesFile.getAbsolutePath(),
-                            "FI Created", JOptionPane.INFORMATION_MESSAGE);
-
-            postCreated();
-        }
-
-        /**
-         * Gets the top dir.
-         *
-         * @return the top dir
-         */
-        protected File getTopDir() {
-            return getFiDir();
-        }
-
-        /**
-         * Post created.
-         */
-        protected void postCreated() {
-            downloadView.refreshFiDir();
-
-            mainTabbed.setSelectedIndex(1);
-        }
-
-    }
-
-    /**
-     * The Class ProfileSelectedAction.
-     */
-    private final class ProfileSelectedAction extends AbstractAction {
-
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /** The props. */
-        private Properties props;
-
-        /**
-         * Instantiates a new profile selected action.
-         *
-         * @param name
-         *            the name
-         * @param props
-         *            the props
-         */
-        private ProfileSelectedAction(String name, Properties props) {
-            super(name);
-            this.props = props;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
-         * ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (props == null) {
-                return;
-            }
-
-            String accountId = props.getProperty("accountId");
-            if (!CheckNullUtils.isNull(accountId)) {
-                selectNewAccountId(accountId);
-            }
-            String currency = props.getProperty("currency");
-            if (!CheckNullUtils.isNull(currency)) {
-                selectNewCurrency(currency);
-            }
-        }
-    }
-
-    /**
-     * The Class ExitAction.
-     */
-    private final class ExitAction extends AbstractAction {
-
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Instantiates a new exit action.
-         *
-         * @param name
-         *            the name
-         */
-        private ExitAction(String name) {
-            super(name);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
-         * ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            LOGGER.info("> ExitAction.actionPerformed");
-
-            List<Runnable> tasks = threadPool.shutdownNow();
-            LOGGER.info("Number of not-run tasks=" + ((tasks == null) ? 0 : tasks.size()));
-            long timeout = 1L;
-            TimeUnit unit = TimeUnit.MINUTES;
-            try {
-                LOGGER.info("WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
-                if (!threadPool.awaitTermination(timeout, unit)) {
-                    LOGGER.warn("Timed-out waiting for threadPool.awaitTermination");
-                }
-            } catch (InterruptedException e) {
-                LOGGER.error(e, e);
-            } finally {
-                LOGGER.info("DONE WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
-            }
-
-            if (importDialogAutoClickService != null) {
-                importDialogAutoClickService.setEnable(false);
-                importDialogAutoClickService.shutdown();
-            }
-
-            LOGGER.info("> Calling System.gc()");
-            System.gc();
-            LOGGER.info("> Calling System.exit(0)");
-            System.exit(0);
-        }
-    }
-
-    /**
-     * The Class UpdateResultViewTask.
-     */
-    private final class UpdateResultViewTask implements Runnable {
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Runnable#run()
-         */
-        @Override
-        public void run() {
-            if (resultView == null) {
-                return;
-            }
-
-            List<File> files = getOutputFiles();
-            if (files == null) {
-                return;
-            }
-            if (files.size() <= 0) {
-                return;
-            }
-
-            File outputFile = files.get(0);
-            if (outputFile == null) {
-                return;
-            }
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new FileReader(outputFile));
-                resultView.read(reader, outputFile.getName());
-                resultView.setCaretPosition(0);
-            } catch (IOException e) {
-                LOGGER.warn(e);
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        LOGGER.warn(e);
-                    } finally {
-                        reader = null;
-                    }
-                }
-            }
-
-        }
-    }
-
-    /**
-     * The Class ImportAction.
-     */
-    private final class ImportAction extends AbstractAction {
-
-        /** The Constant serialVersionUID. */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Instantiates a new import action.
-         *
-         * @param name
-         *            the name
-         */
-        private ImportAction(String name) {
-            super(name);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
-         * ActionEvent)
-         */
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            LOGGER.info("> Import action");
-            Runnable command = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        ImportUtils.doImport(threadPool, getOutputFiles());
-                    } finally {
-                        Runnable doRun = new Runnable() {
-                            @Override
-                            public void run() {
-                                lastKnownImportString = (new Date()).toString();
-                                if (lastKnownImport != null) {
-                                    lastKnownImport.setText(lastKnownImportString);
-                                }
-                                PREFS.put(PREF_LAST_KNOWN_IMPORT_STRING, lastKnownImportString);
-                            }
-                        };
-                        SwingUtilities.invokeLater(doRun);
-                    }
-
-                }
-
-            };
-            threadPool.execute(command);
-        }
-
-    }
-
-    /**
      * Clear price table.
      */
     protected void clearPriceTable() {
-        priceList.clear();
+        getPriceList().clear();
         // exchangeRates.clear();
         if (priceFilterEdit != null) {
             priceFilterEdit.setText("");
@@ -1411,11 +332,11 @@ public class GUI extends JFrame {
      * Clear mapper table.
      */
     protected void clearMapperTable() {
-        MapperTableUtils.clearMapperTable(mapper);
+        MapperTableUtils.clearMapperTable(getMapper());
     }
 
     protected void clearFxTable() {
-        FxTableUtils.clearFxTable(exchangeRates);
+        FxTableUtils.clearFxTable(getExchangeRates());
     }
 
     /**
@@ -1432,7 +353,7 @@ public class GUI extends JFrame {
 
         final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices
                 : new ArrayList<AbstractStockPrice>();
-        updateLastPriceCurrency(prices, defaultCurrency, symbolMapper);
+        updateLastPriceCurrency(prices, getDefaultCurrency(), symbolMapper);
 
         if (randomizeShareCount) {
             int randomInt = random.nextInt(998);
@@ -1498,7 +419,7 @@ public class GUI extends JFrame {
             }
         }
 
-        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(prices, badPrice, fxTable, hasWrappedShareCount,
+        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, badPrice, fxTable, hasWrappedShareCount,
                 symbolMapper, quoteSource);
         // doRun.run();
         SwingUtilities.invokeLater(stockPricesReceivedTask);
@@ -1519,7 +440,7 @@ public class GUI extends JFrame {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    private List<File> saveToOFX(final List<AbstractStockPrice> stockPrices, SymbolMapper symbolMapper, FxTable fxTable,
+    List<File> saveToOFX(final List<AbstractStockPrice> stockPrices, SymbolMapper symbolMapper, FxTable fxTable,
             boolean onePerFile) throws IOException {
         // cleanup
         List<File> files = getOutputFiles();
@@ -1569,8 +490,8 @@ public class GUI extends JFrame {
 
         LOGGER.info("forceGeneratingINVTRANLIST=" + forceGeneratingINVTRANLIST);
         OfxSaveParameter params = new OfxSaveParameter();
-        params.setDefaultCurrency(defaultCurrency);
-        params.setAccountId(accountId);
+        params.setDefaultCurrency(getDefaultCurrency());
+        params.setAccountId(getAccountId());
         params.setForceGeneratingINVTRANLIST(forceGeneratingINVTRANLIST);
         params.setDateOffset(dateOffset);
         OfxPriceInfo.save(stockPrices, outputFile, params, symbolMapper, fxTable);
@@ -1586,7 +507,7 @@ public class GUI extends JFrame {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    private File saveToCsv(List<AbstractStockPrice> stockPrices) throws IOException {
+    File saveToCsv(List<AbstractStockPrice> stockPrices) throws IOException {
         SimpleDateFormat tradeDateFormatter = new SimpleDateFormat(AbstractStockPrice.DEFAULT_LAST_TRADE_DATE_PATTERN);
         SimpleDateFormat tradeTimeFormatter = new SimpleDateFormat(AbstractStockPrice.DEFAULT_LAST_TRADE_TIME_PATTERN);
 
@@ -1780,7 +701,7 @@ public class GUI extends JFrame {
             importDialogAutoClickService.schedule();
         }
 
-        WindowListener windowListener = new ClosingWindowListener();
+        WindowListener windowListener = new ClosingWindowListener(this);
         addWindowListener(windowListener);
     }
 
@@ -1980,49 +901,7 @@ public class GUI extends JFrame {
 
         menu.addSeparator();
 
-        menuItem = new JMenuItem(new AbstractAction("About") {
-            /**
-             * 
-             */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                // showMessageDialog();
-                StringBuilder sb = new StringBuilder();
-                sb.append("Version: " + GUI.VERSION + "\n");
-                sb.append("Home page: " + GUI.HOME_PAGE + "\n");
-                sb.append("Wiki (documentation): http://code.google.com/p/hle-ofx-quotes/wiki" + "\n");
-                sb.append("\n");
-                sb.append("Directory: " + GUI.getCurrentWorkingDirectory() + "\n");
-                sb.append("Currency: " + defaultCurrency + "\n");
-                sb.append("OFX Account Id: " + accountId + "\n");
-                sb.append("Yahoo server: " + getYahooQuoteServer() + "\n");
-                File file = new File("hleOfxQuotes-log.txt");
-                if (file.exists()) {
-                    sb.append("Log file: " + file.getAbsoluteFile().getAbsolutePath() + "\n");
-                } else {
-                    sb.append("Log file: " + "NOT_FOUND" + "\n");
-                }
-
-                sb.append("\n");
-                String[] keys = { "dateOffset", "randomizeShareCount", "forceGeneratingINVTRANLIST", "suspiciousPrice",
-                        "incrementallyIncreasedShareCount" };
-                Arrays.sort(keys);
-                for (String key : keys) {
-                    try {
-                        String value = BeanUtils.getProperty(GUI.this, key);
-                        sb.append(key + "=" + value + "\n");
-                    } catch (Exception e) {
-                        LOGGER.warn(e);
-                    }
-                }
-
-                Component source = (Component) event.getSource();
-                source = null;
-                AboutDialog.showDialog(GUI.this, source, "About", sb.toString());
-            }
-        });
+        menuItem = new JMenuItem(new AboutAction(this, "About"));
         menu.add(menuItem);
 
         menubar.add(menu);
@@ -2043,7 +922,7 @@ public class GUI extends JFrame {
         JMenu newMenu = new JMenu("New");
         menu.add(newMenu);
 
-        menuItem = new JMenuItem(new CreateNewFiAction("Financial Institution"));
+        menuItem = new JMenuItem(new CreateNewFiAction(this, "Financial Institution"));
         newMenu.add(menuItem);
 
         JMenu profilesMenu = new JMenu("Open Quotes Profiles");
@@ -2051,7 +930,7 @@ public class GUI extends JFrame {
         addProfilesToMenu(profilesMenu);
 
         menu.addSeparator();
-        menuItem = new JMenuItem(new ExitAction("Exit"));
+        menuItem = new JMenuItem(new ExitAction(this, "Exit"));
         menu.add(menuItem);
     }
 
@@ -2099,7 +978,7 @@ public class GUI extends JFrame {
             if (CheckNullUtils.isNull(name)) {
                 name = file.getName();
             }
-            JMenuItem item = new JMenuItem(new ProfileSelectedAction(name, props));
+            JMenuItem item = new JMenuItem(new ProfileSelectedAction(this, name, props));
             profilesMenu.add(item);
         } catch (IOException e) {
             LOGGER.warn(e);
@@ -2134,18 +1013,18 @@ public class GUI extends JFrame {
         editMenu.add(menu);
 
         // menu.addSeparator();
-        menuItem = new JMenuItem(new EditCurrencyAction("Currency"));
+        menuItem = new JMenuItem(new EditCurrencyAction(this, "Currency"));
         menu.add(menuItem);
 
-        menuItem = new JMenuItem(new EditOFXAccountIdAction("OFX Account Id"));
-        menu.add(menuItem);
-
-        menu.addSeparator();
-        menuItem = new JMenuItem(new EditWarnSuspiciousPriceAction("Warn Suspicious Price"));
+        menuItem = new JMenuItem(new EditOFXAccountIdAction(this, "OFX Account Id"));
         menu.add(menuItem);
 
         menu.addSeparator();
-        menuItem = new JMenuItem(new EditRandomizeShareCountAction("Randomize Share Count"));
+        menuItem = new JMenuItem(new EditWarnSuspiciousPriceAction(this, "Warn Suspicious Price"));
+        menu.add(menuItem);
+
+        menu.addSeparator();
+        menuItem = new JMenuItem(new EditRandomizeShareCountAction(this, "Randomize Share Count"));
         menu.add(menuItem);
 
         // incrementallyIncreasedShareCount
@@ -2552,7 +1431,7 @@ public class GUI extends JFrame {
         JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
         view.setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 3));
-        accountIdLabel = new JLabel("OFX Account Id: " + accountId);
+        accountIdLabel = new JLabel("OFX Account Id: " + getAccountId());
         view.add(accountIdLabel, BorderLayout.WEST);
         return view;
     }
@@ -2567,7 +1446,7 @@ public class GUI extends JFrame {
         view.setLayout(new BorderLayout());
         view.setBorder(BorderFactory.createEmptyBorder(3, 3, 0, 3));
 
-        defaulCurrencyLabel = new JLabel("Default currency: " + defaultCurrency);
+        defaulCurrencyLabel = new JLabel("Default currency: " + getDefaultCurrency());
         view.add(defaulCurrencyLabel, BorderLayout.WEST);
 
         TimeZone zone = null;
@@ -2632,15 +1511,15 @@ public class GUI extends JFrame {
 
         view.add(createResultTopView(), BorderLayout.NORTH);
 
-        bottomTabs = new JTabbedPane();
+        setBottomTabs(new JTabbedPane());
 
-        bottomTabs.add("Prices", createPricesView());
+        getBottomTabs().add("Prices", createPricesView());
 
-        bottomTabs.add("Exchange Rates", createExchangeRatesView());
+        getBottomTabs().add("Exchange Rates", createExchangeRatesView());
 
-        bottomTabs.add("Mapper", createMapperView());
+        getBottomTabs().add("Mapper", createMapperView());
 
-        view.add(bottomTabs, BorderLayout.CENTER);
+        view.add(getBottomTabs(), BorderLayout.CENTER);
 
         JPopupMenu popupMenu = new JPopupMenu();
         popupMenu.add(new JMenuItem(new AbstractAction("Import *.csv file") {
@@ -2711,16 +1590,16 @@ public class GUI extends JFrame {
 
             @Override
             protected void maybeShowPopup(MouseEvent e) {
-                if (bottomTabs.getSelectedIndex() != 0) {
+                if (getBottomTabs().getSelectedIndex() != 0) {
                     return;
                 }
                 super.maybeShowPopup(e);
             }
         };
-        bottomTabs.addMouseListener(listener);
+        getBottomTabs().addMouseListener(listener);
 
-        if ((symbolMapper != null) && (mapper != null)) {
-            MapperTableUtils.updateMapperTable(symbolMapper, mapper);
+        if ((symbolMapper != null) && (getMapper() != null)) {
+            MapperTableUtils.updateMapperTable(symbolMapper, getMapper());
         }
 
         return view;
@@ -2740,7 +1619,7 @@ public class GUI extends JFrame {
 
         priceFilterEdit = new JTextField(10);
         PriceTableView<AbstractStockPrice> priceScrollPane = new PriceTableView<AbstractStockPrice>(priceFilterEdit,
-                priceList, AbstractStockPrice.class);
+                getPriceList(), AbstractStockPrice.class);
         view.add(priceScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -2749,7 +1628,7 @@ public class GUI extends JFrame {
 
         AbstractAction action = null;
 
-        action = new ImportAction("Import to MSMoney");
+        action = new ImportAction(this, "Import to MSMoney");
         importToMoneyButton = new JButton(action);
         importToMoneyButton.setEnabled(false);
         commandView.add(importToMoneyButton);
@@ -2782,7 +1661,7 @@ public class GUI extends JFrame {
         menu = new JMenu("OFX");
         priceScrollPane.getPopupMenu().add(menu);
 
-        action = new ImportAction("Open as *.ofx");
+        action = new ImportAction(this, "Open as *.ofx");
         menu.add(action);
 
         action = new SaveOfxAction(this, "Save");
@@ -2833,7 +1712,7 @@ public class GUI extends JFrame {
                 File toFile = fc.getSelectedFile();
                 PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                 try {
-                    QifUtils.saveToQif(priceList, toFile);
+                    QifUtils.saveToQif(getPriceList(), toFile);
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -2869,14 +1748,14 @@ public class GUI extends JFrame {
 
         JTextField filterEdit = new JTextField(10);
         PriceTableView<AbstractStockPrice> fxScrollPane = new PriceTableView<AbstractStockPrice>(filterEdit,
-                exchangeRates, AbstractStockPrice.class);
+                getExchangeRates(), AbstractStockPrice.class);
         view.add(fxScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
         commandView.setLayout(new BoxLayout(commandView, BoxLayout.LINE_AXIS));
         commandView.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
-        AbstractAction action = new UpdateMnyExchangeRatesTask("Update MsMoney");
+        AbstractAction action = new UpdateMnyExchangeRatesTask(this, "Update MsMoney");
         updateExchangeRateButton = new JButton(action);
         updateExchangeRateButton.setEnabled(false);
         commandView.add(updateExchangeRateButton);
@@ -2957,7 +1836,7 @@ public class GUI extends JFrame {
             }
         };
         boolean addStripe = true;
-        JTable table = MapperTableUtils.createMapperTable(mapper, comparator, filterEdit, filter, addStripe);
+        JTable table = MapperTableUtils.createMapperTable(getMapper(), comparator, filterEdit, filter, addStripe);
         // table.setFillsViewportHeight(true);
         JScrollPane scrolledPane = new JScrollPane(table);
 
@@ -3202,7 +2081,7 @@ public class GUI extends JFrame {
      *
      * @return the yahoo quote server
      */
-    private String getYahooQuoteServer() {
+    public String getYahooQuoteServer() {
         String yahooQuoteServer = null;
         YahooQuoteSourcePanel quoteSourceView = getYahooQuoteSourceView();
         if (quoteSourceView != null) {
@@ -3301,13 +2180,13 @@ public class GUI extends JFrame {
      * @param value
      *            the value
      */
-    private void selectNewCurrency(String value) {
+    void selectNewCurrency(String value) {
         LOGGER.info("Selected new currency: " + value);
         String newValue = value;
-        if (newValue.compareTo(defaultCurrency) != 0) {
-            defaultCurrency = value;
-            PREFS.put(PREF_DEFAULT_CURRENCY, defaultCurrency);
-            defaulCurrencyLabel.setText("Default currency: " + defaultCurrency);
+        if (newValue.compareTo(getDefaultCurrency()) != 0) {
+            setDefaultCurrency(value);
+            PREFS.put(PREF_DEFAULT_CURRENCY, getDefaultCurrency());
+            defaulCurrencyLabel.setText("Default currency: " + getDefaultCurrency());
             // to clear the pricing table
             QuoteSource quoteSource = null;
             stockSymbolsStringReceived(quoteSource, null);
@@ -3320,13 +2199,13 @@ public class GUI extends JFrame {
      * @param value
      *            the value
      */
-    private void selectNewAccountId(String value) {
+    void selectNewAccountId(String value) {
         LOGGER.info("Selected new 'OFX Account Id': " + value);
         String newValue = value;
-        if (newValue.compareTo(accountId) != 0) {
-            accountId = newValue;
-            PREFS.put(PREF_ACCOUNT_ID, accountId);
-            accountIdLabel.setText("OFX Account Id: " + accountId);
+        if (newValue.compareTo(getAccountId()) != 0) {
+            setAccountId(newValue);
+            PREFS.put(PREF_ACCOUNT_ID, getAccountId());
+            accountIdLabel.setText("OFX Account Id: " + getAccountId());
             // to clear the pricing table
             QuoteSource quoteSource = null;
             stockSymbolsStringReceived(quoteSource, null);
@@ -3390,6 +2269,62 @@ public class GUI extends JFrame {
      */
     public void setFiDir(File fiDir) {
         this.fiDir = fiDir;
+    }
+
+    public EventList<AbstractStockPrice> getPriceList() {
+        return priceList;
+    }
+
+    public void setPriceList(EventList<AbstractStockPrice> priceList) {
+        this.priceList = priceList;
+    }
+
+    public EventList<AbstractStockPrice> getExchangeRates() {
+        return exchangeRates;
+    }
+
+    public void setExchangeRates(EventList<AbstractStockPrice> exchangeRates) {
+        this.exchangeRates = exchangeRates;
+    }
+
+    public EventList<SymbolMapperEntry> getMapper() {
+        return mapper;
+    }
+
+    public void setMapper(EventList<SymbolMapperEntry> mapper) {
+        this.mapper = mapper;
+    }
+
+    public JTabbedPane getBottomTabs() {
+        return bottomTabs;
+    }
+
+    public void setBottomTabs(JTabbedPane bottomTabs) {
+        this.bottomTabs = bottomTabs;
+    }
+
+    public JTextPane getResultView() {
+        return resultView;
+    }
+
+    public void setResultView(JTextPane resultView) {
+        this.resultView = resultView;
+    }
+
+    public String getDefaultCurrency() {
+        return defaultCurrency;
+    }
+
+    public void setDefaultCurrency(String defaultCurrency) {
+        this.defaultCurrency = defaultCurrency;
+    }
+
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
 }

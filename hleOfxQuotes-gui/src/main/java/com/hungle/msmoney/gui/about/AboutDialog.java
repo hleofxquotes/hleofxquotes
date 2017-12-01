@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.about;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
