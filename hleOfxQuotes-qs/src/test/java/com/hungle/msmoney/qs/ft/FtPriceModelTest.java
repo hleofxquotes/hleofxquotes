@@ -23,7 +23,8 @@ public class FtPriceModelTest {
     @Test
     public void testFundIE00BYY18M47() throws IOException {
         // IE00BYY18M47:GBP.html
-        String symbol = "IE00BYY18M47:GBP";
+//        String symbol = "IE00BYY18M47:GBP";
+        String symbol = "IE00BYY18M47_GBP";
         String testResource = symbol + ".html";
         FtPriceModel model = getModel(testResource, symbol);
         Assert.assertNotNull(model);
