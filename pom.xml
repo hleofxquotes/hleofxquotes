@@ -285,4 +285,11 @@
     </dependency>
   </dependencies>
 
+  <packaging>pom</packaging>
+  <modules>
+    <module>hleOfxQuotes-core</module>
+    <module>hleOfxQuotes-qs</module>
+    <module>hleOfxQuotes-stmt</module>
+    <module>hleOfxQuotes-gui</module>
+  </modules>
 </project>
