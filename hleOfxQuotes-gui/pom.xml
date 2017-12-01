@@ -17,9 +17,9 @@
           <mainClass>app.GUI</mainClass>
           <layout>ZIP</layout>
           <classifier>exec</classifier>
-          <finalName>${project.artifactId}-Build_${buildNumber}-app</finalName>
+          <finalName>${project.artifactId}-Build_${buildNumber}</finalName>
           <additionalProperties>
-            <number>${project.artifactId}-Build_${buildNumber}-app</number>
+            <number>${project.artifactId}-Build_${buildNumber}</number>
           </additionalProperties>
         </configuration>
         <executions>

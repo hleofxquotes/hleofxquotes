@@ -2404,10 +2404,10 @@ public class GUI extends JFrame {
         // LOGGER.debug("> creating createTIAACREFQuoteSourceView");
         // }
         // tabbedPane.addTab("Scholarshare", createTIAACREFQuoteSourceView());
-        
+
         tabbedPane.addTab("FT Equities", createFtEquitiesSourceView());
-        
-        //createFtFundsSourceView
+
+        // createFtFundsSourceView
         tabbedPane.addTab("FT Funds", createFtFundsSourceView());
 
         // createFtEtfsSourceView
@@ -2512,13 +2512,12 @@ public class GUI extends JFrame {
         return view;
     }
 
-
     private Component createFtEtfsSourceView() {
         final FtEtfsSourcePanel view = new FtEtfsSourcePanel(this);
         this.ftEtfsSourcePanel = view;
         return view;
     }
-    
+
     /**
      * Creates the TIAACREF quote source view.
      *
@@ -2834,6 +2833,51 @@ public class GUI extends JFrame {
                 PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                 try {
                     QifUtils.saveToQif(priceList, toFile);
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            private void initFileChooser() {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("> creating FileChooser");
+                }
+                String key = Action.ACCELERATOR_KEY;
+                fc = new JFileChooser(PREFS.get(key, "."));
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("< creating FileChooser");
+                }
+            }
+        };
+        menu.add(action);
+
+        // MD
+        menu = new JMenu("MD");
+        priceScrollPane.getPopupMenu().add(menu);
+        action = new AbstractAction("Save CSV") {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+            private JFileChooser fc = null;
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (fc == null) {
+                    initFileChooser();
+                }
+                Component parent = view;
+                if (this.fc.getSelectedFile() == null) {
+                    this.fc.setSelectedFile(new File("mdQuotes.csv"));
+                }
+
+                if (fc.showSaveDialog(parent) == JFileChooser.CANCEL_OPTION) {
+                    return;
+                }
+                File toFile = fc.getSelectedFile();
+                PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
+                try {
+                    MDUtils.saveToCsv(priceList, toFile);
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
