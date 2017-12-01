@@ -78,8 +78,8 @@ public class YahooHistSourcePanel extends YahooQuoteSourcePanel {
         LOGGER.info("user selected, limitToEOM=" + dialog.getLimitToEOM());
         
         AbstractHttpQuoteGetter quoteGetter = new YahooHistQuoteGetter(fromDate, toDate, dialog.getLimitToFriday(), dialog.getLimitToEOM());
-        if (quoteServer != null) {
-            quoteGetter.setHost(quoteServer);
+        if (getQuoteServer() != null) {
+            quoteGetter.setHost(getQuoteServer());
         }
         try {
             stockPrices = quoteGetter.getQuotes(stockSymbols, listener);

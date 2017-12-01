@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.action;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -24,6 +24,7 @@ import javax.swing.JFileChooser;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.ofx.ImportUtils;
+import com.hungle.msmoney.gui.GUI;
 
 // TODO: Auto-generated Javadoc
 /**

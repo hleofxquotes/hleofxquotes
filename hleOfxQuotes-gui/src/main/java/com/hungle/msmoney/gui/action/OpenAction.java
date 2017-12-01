@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui.qs;
+package com.hungle.msmoney.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -13,13 +13,14 @@ import javax.swing.JFileChooser;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.gui.qs.YahooQuoteSourcePanel;
 import com.hungle.msmoney.qs.AbstractLoadStockSymbolsTask;
 import com.hungle.msmoney.qs.QuoteSourceListener;
 
 /**
  * The Class OpenAction.
  */
-final class OpenAction extends AbstractLoadStockSymbolsTask {
+public final class OpenAction extends AbstractLoadStockSymbolsTask {
     private static final Logger LOGGER = Logger.getLogger(OpenAction.class);
 
     /**

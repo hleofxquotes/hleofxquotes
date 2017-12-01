@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.task;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,10 +8,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.gui.GUI;
+
 /**
  * The Class UpdateResultViewTask.
  */
-final class UpdateResultViewTask implements Runnable {
+public final class UpdateResultViewTask implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(UpdateResultViewTask.class);
 
     /**
@@ -22,7 +24,7 @@ final class UpdateResultViewTask implements Runnable {
     /**
      * @param gui
      */
-    UpdateResultViewTask(GUI gui) {
+    public UpdateResultViewTask(GUI gui) {
         this.gui = gui;
     }
 

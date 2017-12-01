@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.action;
 
 import java.awt.event.ActionEvent;
 
@@ -6,10 +6,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
+import com.hungle.msmoney.gui.GUI;
+
 /**
  * The Class EditOFXAccountIdAction.
  */
-final class EditOFXAccountIdAction extends AbstractAction {
+public final class EditOFXAccountIdAction extends AbstractAction {
 
     /**
      * 
@@ -25,7 +27,7 @@ final class EditOFXAccountIdAction extends AbstractAction {
      *            the name
      * @param gui TODO
      */
-    EditOFXAccountIdAction(GUI gui, String name) {
+    public EditOFXAccountIdAction(GUI gui, String name) {
         super(name);
         this.gui = gui;
     }

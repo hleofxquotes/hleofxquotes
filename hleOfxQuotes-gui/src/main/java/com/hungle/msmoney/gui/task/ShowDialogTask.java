@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.task;
 
 import java.awt.Component;
 

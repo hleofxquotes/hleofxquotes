@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui.qs;
+package com.hungle.msmoney.gui.menu;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -10,7 +10,10 @@ import javax.swing.JTextArea;
 
 import org.apache.log4j.Logger;
 
-final class EditCleanupAction extends AbstractAction {
+import com.hungle.msmoney.gui.qs.QuoteSourceUtils;
+import com.hungle.msmoney.gui.qs.YahooQuoteSourcePanel;
+
+public final class EditCleanupAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(EditCleanupAction.class);
 
     /**
@@ -19,7 +22,7 @@ final class EditCleanupAction extends AbstractAction {
     private final YahooQuoteSourcePanel yahooQuoteSourcePanel;
     private final JTextArea textArea;
 
-    EditCleanupAction(YahooQuoteSourcePanel yahooQuoteSourcePanel, String name, JTextArea textArea) {
+    public EditCleanupAction(YahooQuoteSourcePanel yahooQuoteSourcePanel, String name, JTextArea textArea) {
         super(name);
         this.yahooQuoteSourcePanel = yahooQuoteSourcePanel;
         this.textArea = textArea;

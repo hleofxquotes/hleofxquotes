@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.util.Date;
@@ -9,11 +9,12 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.ofx.ImportUtils;
+import com.hungle.msmoney.gui.GUI;
 
 /**
  * The Class ImportAction.
  */
-final class ImportAction extends AbstractAction {
+public final class ImportAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(ImportAction.class);
 
     /**
@@ -30,7 +31,7 @@ final class ImportAction extends AbstractAction {
      *            the name
      * @param gui TODO
      */
-    ImportAction(GUI gui, String name) {
+    public ImportAction(GUI gui, String name) {
         super(name);
         this.gui = gui;
     }
@@ -48,16 +49,16 @@ final class ImportAction extends AbstractAction {
             @Override
             public void run() {
                 try {
-                    ImportUtils.doImport(ImportAction.this.gui.threadPool, ImportAction.this.gui.getOutputFiles());
+                    ImportUtils.doImport(ImportAction.this.gui.getThreadPool(), ImportAction.this.gui.getOutputFiles());
                 } finally {
                     Runnable doRun = new Runnable() {
                         @Override
                         public void run() {
-                            ImportAction.this.gui.lastKnownImportString = (new Date()).toString();
-                            if (ImportAction.this.gui.lastKnownImport != null) {
-                                ImportAction.this.gui.lastKnownImport.setText(ImportAction.this.gui.lastKnownImportString);
+                            ImportAction.this.gui.setLastKnownImportString((new Date()).toString());
+                            if (ImportAction.this.gui.getLastKnownImport() != null) {
+                                ImportAction.this.gui.getLastKnownImport().setText(ImportAction.this.gui.getLastKnownImportString());
                             }
-                            GUI.PREFS.put(GUI.PREF_LAST_KNOWN_IMPORT_STRING, ImportAction.this.gui.lastKnownImportString);
+                            GUI.PREFS.put(GUI.PREF_LAST_KNOWN_IMPORT_STRING, ImportAction.this.gui.getLastKnownImportString());
                         }
                     };
                     SwingUtilities.invokeLater(doRun);
@@ -66,7 +67,7 @@ final class ImportAction extends AbstractAction {
             }
 
         };
-        this.gui.threadPool.execute(command);
+        this.gui.getThreadPool().execute(command);
     }
 
 }

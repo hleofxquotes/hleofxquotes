@@ -31,8 +31,16 @@ import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.gui.PopupListener;
-import com.hungle.msmoney.gui.ShowDialogTask;
-import com.hungle.msmoney.gui.qs.menu.MenuUtils;
+import com.hungle.msmoney.gui.action.GetQuotesAction;
+import com.hungle.msmoney.gui.action.OpenAction;
+import com.hungle.msmoney.gui.action.SaveAsAction;
+import com.hungle.msmoney.gui.menu.EditCleanupAction;
+import com.hungle.msmoney.gui.menu.EditCopyAction;
+import com.hungle.msmoney.gui.menu.EditCutAction;
+import com.hungle.msmoney.gui.menu.EditPasteAction;
+import com.hungle.msmoney.gui.menu.EditYahoServerAction;
+import com.hungle.msmoney.gui.menu.MenuUtils;
+import com.hungle.msmoney.gui.task.ShowDialogTask;
 import com.hungle.msmoney.qs.DefaultQuoteSource;
 import com.hungle.msmoney.qs.QuoteSource;
 import com.hungle.msmoney.qs.QuoteSourceListener;
@@ -52,13 +60,13 @@ public class YahooQuoteSourcePanel extends JPanel {
     public static final Logger LOGGER = Logger.getLogger(YahooQuoteSourcePanel.class);
 
     /** The Constant PREF_YAHOO_QUOTE_SERVER. */
-    static final String QUOTE_SERVER_PREFS_KEY = "yahooQuoteServer";
+    public static final String QUOTE_SERVER_PREFS_KEY = "yahooQuoteServer";
 
     /** The Constant STOCK_SYMBOLS_PREF_KEY. */
     private static final String STOCK_SYMBOLS_PREF_KEY = null;
 
     /** The prefs. */
-    final Preferences prefs;
+    private final Preferences prefs;
 
     /** The parent quote source listener. */
     private final QuoteSourceListener parentQuoteSourceListener;
@@ -70,7 +78,7 @@ public class YahooQuoteSourcePanel extends JPanel {
     private boolean setToolTipText = false;
 
     /** The stock symbols view. */
-    JTextArea stockSymbolsView;
+    private JTextArea stockSymbolsView;
 
     /** The listener. */
     protected GetQuotesProgressMonitor listener;
@@ -79,7 +87,7 @@ public class YahooQuoteSourcePanel extends JPanel {
     private JProgressBar progressBar;
 
     /** The quote server. */
-    protected String quoteServer;
+    private String quoteServer;
 
     /** The update button. */
     private JButton updateButton;
@@ -113,7 +121,7 @@ public class YahooQuoteSourcePanel extends JPanel {
         if (this.threadPool == null) {
             LOGGER.warn("YahooQuoteSourcePanel is constructed with this.threadPool=null");
         }
-        this.quoteServer = prefs.get(YahooQuoteSourcePanel.QUOTE_SERVER_PREFS_KEY, YahooQuotesGetter.DEFAULT_HOST);
+        this.setQuoteServer(getPrefs().get(YahooQuoteSourcePanel.QUOTE_SERVER_PREFS_KEY, YahooQuotesGetter.DEFAULT_HOST));
         this.quoteSourceListener = new QuoteSourceListener() {
 
             @Override
@@ -125,8 +133,8 @@ public class YahooQuoteSourcePanel extends JPanel {
 
             @Override
             public void stockSymbolsStringReceived(QuoteSource quoteSource, String lines) {
-                stockSymbolsView.setText(lines);
-                stockSymbolsView.setCaretPosition(0);
+                getStockSymbolsView().setText(lines);
+                getStockSymbolsView().setCaretPosition(0);
                 if (parentQuoteSourceListener != null) {
                     parentQuoteSourceListener.stockSymbolsStringReceived(quoteSource, lines);
                 }
@@ -168,7 +176,7 @@ public class YahooQuoteSourcePanel extends JPanel {
 
         JTextArea textArea = new JTextArea();
         textArea = new JTextArea();
-        String stockSymbols = OfxUtils.retrieveStockSymbols(prefs, stockSymbolsPrefKey);
+        String stockSymbols = OfxUtils.retrieveStockSymbols(getPrefs(), stockSymbolsPrefKey);
         if ((stockSymbols != null) && (stockSymbols.length() > 0)) {
             textArea.setText(stockSymbols);
             textArea.setCaretPosition(0);
@@ -181,7 +189,7 @@ public class YahooQuoteSourcePanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Symbols"));
-        this.stockSymbolsView = textArea;
+        this.setStockSymbolsView(textArea);
 
         view.add(scrollPane, BorderLayout.CENTER);
 
@@ -366,7 +374,7 @@ public class YahooQuoteSourcePanel extends JPanel {
         try {
             stockPrices = getStockQuotes(stockSymbols);
         } finally {
-            OfxUtils.storeStockSymbols(prefs, stockSymbolsPrefKey, stocksString);
+            OfxUtils.storeStockSymbols(getPrefs(), stockSymbolsPrefKey, stocksString);
             stockPricesReceived(stockPrices);
         }
     }
@@ -383,8 +391,8 @@ public class YahooQuoteSourcePanel extends JPanel {
     protected List<AbstractStockPrice> getStockQuotes(final List<String> stockSymbols) throws IOException {
         List<AbstractStockPrice> stockPrices;
         AbstractHttpQuoteGetter quoteGetter = getHttpQuoteGetter();
-        if (quoteServer != null) {
-            quoteGetter.setHost(quoteServer);
+        if (getQuoteServer() != null) {
+            quoteGetter.setHost(getQuoteServer());
         }
         try {
             stockPrices = quoteGetter.getQuotes(stockSymbols, listener);
@@ -422,14 +430,14 @@ public class YahooQuoteSourcePanel extends JPanel {
      *
      * @return the quotes
      */
-    protected void getQuotes() {
+    public void getQuotes() {
         LOGGER.info("> getQuotes");
 
         updateButton.setEnabled(false);
         progressBar.setValue(0);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-        String text = stockSymbolsView.getText();
+        String text = getStockSymbolsView().getText();
 
         if (text == null) {
             notifyNoStockRequest();
@@ -497,5 +505,21 @@ public class YahooQuoteSourcePanel extends JPanel {
             }
         };
         threadPool.execute(command);
+    }
+
+    public void setQuoteServer(String quoteServer) {
+        this.quoteServer = quoteServer;
+    }
+
+    public Preferences getPrefs() {
+        return prefs;
+    }
+
+    public JTextArea getStockSymbolsView() {
+        return stockSymbolsView;
+    }
+
+    public void setStockSymbolsView(JTextArea stockSymbolsView) {
+        this.stockSymbolsView = stockSymbolsView;
     }
 }

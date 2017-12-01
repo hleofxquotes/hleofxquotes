@@ -115,7 +115,7 @@ public class MapperTableUtils {
         mapper.clear();
     }
 
-    static final void updateMapperTable(SymbolMapper symbolMapper, EventList<SymbolMapperEntry> list) {
+    public static final void updateMapperTable(SymbolMapper symbolMapper, EventList<SymbolMapperEntry> list) {
         list.getReadWriteLock().writeLock().lock();
         try {
             list.clear();

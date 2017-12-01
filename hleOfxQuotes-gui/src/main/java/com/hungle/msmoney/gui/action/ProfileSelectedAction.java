@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.util.Properties;
@@ -6,11 +6,12 @@ import java.util.Properties;
 import javax.swing.AbstractAction;
 
 import com.hungle.msmoney.core.misc.CheckNullUtils;
+import com.hungle.msmoney.gui.GUI;
 
 /**
  * The Class ProfileSelectedAction.
  */
-final class ProfileSelectedAction extends AbstractAction {
+public final class ProfileSelectedAction extends AbstractAction {
 
     /**
      * 
@@ -32,7 +33,7 @@ final class ProfileSelectedAction extends AbstractAction {
      *            the props
      * @param gui TODO
      */
-    ProfileSelectedAction(GUI gui, String name, Properties props) {
+    public ProfileSelectedAction(GUI gui, String name, Properties props) {
         super(name);
         this.gui = gui;
         this.props = props;

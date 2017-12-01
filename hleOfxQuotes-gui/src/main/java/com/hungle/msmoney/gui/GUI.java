@@ -82,6 +82,15 @@ import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.core.stockprice.StockPrice;
 import com.hungle.msmoney.core.stockprice.StockPriceCsvUtils;
 import com.hungle.msmoney.gui.about.AboutAction;
+import com.hungle.msmoney.gui.action.CreateNewFiAction;
+import com.hungle.msmoney.gui.action.EditCurrencyAction;
+import com.hungle.msmoney.gui.action.EditOFXAccountIdAction;
+import com.hungle.msmoney.gui.action.EditRandomizeShareCountAction;
+import com.hungle.msmoney.gui.action.EditWarnSuspiciousPriceAction;
+import com.hungle.msmoney.gui.action.ExitAction;
+import com.hungle.msmoney.gui.action.ImportAction;
+import com.hungle.msmoney.gui.action.ProfileSelectedAction;
+import com.hungle.msmoney.gui.action.SaveOfxAction;
 import com.hungle.msmoney.gui.qs.BloombergQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtCsvQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEquitiesSourcePanel;
@@ -92,6 +101,8 @@ import com.hungle.msmoney.gui.qs.YahooApiQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.YahooHistSourcePanel;
 import com.hungle.msmoney.gui.qs.YahooQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.YahooSS2SourcePanel;
+import com.hungle.msmoney.gui.task.StockPricesReceivedTask;
+import com.hungle.msmoney.gui.task.UpdateMnyExchangeRatesTask;
 import com.hungle.msmoney.qs.DefaultQuoteSource;
 import com.hungle.msmoney.qs.QuoteSource;
 import com.hungle.msmoney.qs.QuoteSourceListener;
@@ -144,16 +155,16 @@ public class GUI extends JFrame {
 
     /** The Constant prefs. */
     // TODO: le.com.tools.moneyutils.ofx.quotes.GUI
-    static final Preferences PREFS = Preferences.userNodeForPackage(PREFS_CLASS);
+    public static final Preferences PREFS = Preferences.userNodeForPackage(PREFS_CLASS);
 
     /** The Constant PREF_DEFAULT_CURRENCY. */
     private static final String PREF_DEFAULT_CURRENCY = "defaultCurrency";
 
     /** The Constant PREF_LAST_KNOWN_IMPORT_STRING. */
-    static final String PREF_LAST_KNOWN_IMPORT_STRING = "lastKnownImportString";
+    public static final String PREF_LAST_KNOWN_IMPORT_STRING = "lastKnownImportString";
 
     /** The Constant PREF_RANDOMIZE_SHARE_COUNT. */
-    static final String PREF_RANDOMIZE_SHARE_COUNT = "randomizeShareCount";
+    public static final String PREF_RANDOMIZE_SHARE_COUNT = "randomizeShareCount";
 
     /** The Constant PREF_FORCE_GENERATING_INVTRANLIST. */
     private static final String PREF_FORCE_GENERATING_INVTRANLIST = "forceGeneratingINVTRANLIST";
@@ -165,7 +176,7 @@ public class GUI extends JFrame {
     private static final String PREF_DATE_OFFSET = "dateOffset";
 
     /** The Constant PREF_SUSPICIOUS_PRICE. */
-    static final String PREF_SUSPICIOUS_PRICE = "suspiciousPrice";
+    public static final String PREF_SUSPICIOUS_PRICE = "suspiciousPrice";
 
     /** The Constant PREF_INCREMENTALLY_INCREASED_SHARE_COUNT. */
     private static final String PREF_INCREMENTALLY_INCREASED_SHARE_COUNT = "incrementallyIncreasedShareCount";
@@ -217,10 +228,10 @@ public class GUI extends JFrame {
     private JButton importToMoneyButton;
 
     /** The last known import. */
-    JLabel lastKnownImport;
+    private JLabel lastKnownImport;
 
     /** The last known import string. */
-    String lastKnownImportString;
+    private String lastKnownImportString;
 
     /** The update exchange rate button. */
     private JButton updateExchangeRateButton;
@@ -233,7 +244,7 @@ public class GUI extends JFrame {
             com.hungle.msmoney.core.ofx.xmlbeans.CurrencyUtils.getDefaultCurrency());
 
     /** The randomize share count. */
-    Boolean randomizeShareCount = Boolean.valueOf(PREFS.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
+    private Boolean randomizeShareCount = Boolean.valueOf(PREFS.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
 
     /** The random. */
     private Random random = new Random();
@@ -267,7 +278,7 @@ public class GUI extends JFrame {
     private Integer dateOffset = Integer.valueOf(PREFS.get(PREF_DATE_OFFSET, "0"));
 
     /** The suspicious price. */
-    Integer suspiciousPrice = Integer.valueOf(PREFS.get(PREF_SUSPICIOUS_PRICE, "10000"));
+    private Integer suspiciousPrice = Integer.valueOf(PREFS.get(PREF_SUSPICIOUS_PRICE, "10000"));
 
     /** The account id. */
     private String accountId = PREFS.get(PREF_ACCOUNT_ID, OfxPriceInfo.DEFAULT_ACCOUNT_ID);
@@ -278,16 +289,16 @@ public class GUI extends JFrame {
     private JLabel accountIdLabel;
 
     /** The download view. */
-    StatementPanel downloadView;
+    private StatementPanel downloadView;
 
     /** The main tabbed. */
-    JTabbedPane mainTabbed;
+    private JTabbedPane mainTabbed;
 
     /** The selected quote source. */
     private int selectedQuoteSource;
 
     /** The import dialog auto click service. */
-    ImportDialogAutoClickService importDialogAutoClickService;
+    private ImportDialogAutoClickService importDialogAutoClickService;
 
     /** The price formatter. */
     private NumberFormat priceFormatter;
@@ -355,11 +366,11 @@ public class GUI extends JFrame {
                 : new ArrayList<AbstractStockPrice>();
         updateLastPriceCurrency(prices, getDefaultCurrency(), symbolMapper);
 
-        if (randomizeShareCount) {
+        if (getRandomizeShareCount()) {
             int randomInt = random.nextInt(998);
             randomInt = randomInt + 1;
             double value = randomInt / 1000.00;
-            LOGGER.info("randomizeShareCount=" + randomizeShareCount + ", value=" + value);
+            LOGGER.info("randomizeShareCount=" + getRandomizeShareCount() + ", value=" + value);
             for (AbstractStockPrice price : prices) {
                 price.setUnits(value);
             }
@@ -400,8 +411,8 @@ public class GUI extends JFrame {
         // }
 
         Double badPrice = null;
-        if (suspiciousPrice > -1L) {
-            Double d = new Double(suspiciousPrice);
+        if (getSuspiciousPrice() > -1L) {
+            Double d = new Double(getSuspiciousPrice());
             for (AbstractStockPrice bean : prices) {
                 String stockSymbol = bean.getStockSymbol();
                 if ((stockSymbol != null) && (stockSymbol.startsWith("^"))) {
@@ -440,7 +451,7 @@ public class GUI extends JFrame {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    List<File> saveToOFX(final List<AbstractStockPrice> stockPrices, SymbolMapper symbolMapper, FxTable fxTable,
+    public List<File> saveToOFX(final List<AbstractStockPrice> stockPrices, SymbolMapper symbolMapper, FxTable fxTable,
             boolean onePerFile) throws IOException {
         // cleanup
         List<File> files = getOutputFiles();
@@ -507,7 +518,7 @@ public class GUI extends JFrame {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    File saveToCsv(List<AbstractStockPrice> stockPrices) throws IOException {
+    public File saveToCsv(List<AbstractStockPrice> stockPrices) throws IOException {
         SimpleDateFormat tradeDateFormatter = new SimpleDateFormat(AbstractStockPrice.DEFAULT_LAST_TRADE_DATE_PATTERN);
         SimpleDateFormat tradeTimeFormatter = new SimpleDateFormat(AbstractStockPrice.DEFAULT_LAST_TRADE_TIME_PATTERN);
 
@@ -697,8 +708,8 @@ public class GUI extends JFrame {
 
         getContentPane().add(createMainView());
 
-        if (importDialogAutoClickService != null) {
-            importDialogAutoClickService.schedule();
+        if (getImportDialogAutoClickService() != null) {
+            getImportDialogAutoClickService().schedule();
         }
 
         WindowListener windowListener = new ClosingWindowListener(this);
@@ -772,22 +783,22 @@ public class GUI extends JFrame {
                     showStatementProgress = Boolean.FALSE;
                 }
                 PREFS.putBoolean(PREF_SHOW_STATEMENT_PROGRESS, showStatementProgress);
-                if (downloadView != null) {
-                    downloadView.setShowProgress(showStatementProgress);
+                if (getDownloadView() != null) {
+                    getDownloadView().setShowProgress(showStatementProgress);
                 }
             }
         };
         menuItem.addActionListener(listener);
 
-        if (downloadView != null) {
-            downloadView.setShowProgress(showStatementProgress);
+        if (getDownloadView() != null) {
+            getDownloadView().setShowProgress(showStatementProgress);
         }
         menuItem.setSelected(showStatementProgress);
         menu.add(menuItem);
     }
 
     private void addAutoClickToolMenuItem(JMenu menu) {
-        importDialogAutoClickService = new ImportDialogAutoClickService();
+        setImportDialogAutoClickService(new ImportDialogAutoClickService());
 
         JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem("Import dialog auto-click");
         ActionListener listener = new ActionListener() {
@@ -796,10 +807,10 @@ public class GUI extends JFrame {
                 AbstractButton aButton = (AbstractButton) event.getSource();
                 boolean selected = aButton.getModel().isSelected();
                 if (selected) {
-                    importDialogAutoClickService.setEnable(true);
+                    getImportDialogAutoClickService().setEnable(true);
                     PREFS.putBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.TRUE);
                 } else {
-                    importDialogAutoClickService.setEnable(false);
+                    getImportDialogAutoClickService().setEnable(false);
                     PREFS.putBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
                 }
             }
@@ -807,7 +818,7 @@ public class GUI extends JFrame {
         menuItem.addActionListener(listener);
         Boolean autoClick = PREFS.getBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
         menuItem.setSelected(autoClick);
-        importDialogAutoClickService.setEnable(autoClick);
+        getImportDialogAutoClickService().setEnable(autoClick);
         menu.add(menuItem);
     }
 
@@ -1143,9 +1154,9 @@ public class GUI extends JFrame {
         Dimension preferredSize = new Dimension(600, 600);
         view.setPreferredSize(preferredSize);
 
-        mainTabbed = new JTabbedPane(SwingConstants.BOTTOM);
+        setMainTabbed(new JTabbedPane(SwingConstants.BOTTOM));
 
-        mainTabbed.addChangeListener(new ChangeListener() {
+        getMainTabbed().addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent event) {
                 JTabbedPane p = (JTabbedPane) event.getSource();
@@ -1153,20 +1164,20 @@ public class GUI extends JFrame {
             }
         });
         // TAB: #1
-        mainTabbed.addTab("Quotes", createQuotesView());
+        getMainTabbed().addTab("Quotes", createQuotesView());
 
         // TAB: #2
-        downloadView = new StatementPanel();
-        downloadView.setShowProgress(showStatementProgress);
-        downloadView.setFiDir(getFiDir());
-        downloadView.refreshFiDir();
-        mainTabbed.addTab("Statements", downloadView);
+        setDownloadView(new StatementPanel());
+        getDownloadView().setShowProgress(showStatementProgress);
+        getDownloadView().setFiDir(getFiDir());
+        getDownloadView().refreshFiDir();
+        getMainTabbed().addTab("Statements", getDownloadView());
 
         // TAB: #3
         backupView = new BackupPanel();
-        mainTabbed.addTab("Backup", backupView);
+        getMainTabbed().addTab("Backup", backupView);
 
-        view.add(mainTabbed, BorderLayout.CENTER);
+        view.add(getMainTabbed(), BorderLayout.CENTER);
 
         return view;
     }
@@ -1635,9 +1646,9 @@ public class GUI extends JFrame {
 
         commandView.add(new JLabel("Last import on:"));
         commandView.add(Box.createHorizontalStrut(3));
-        lastKnownImportString = PREFS.get(PREF_LAST_KNOWN_IMPORT_STRING, null);
-        lastKnownImport = new JLabel(lastKnownImportString == null ? "Not known" : lastKnownImportString);
-        commandView.add(lastKnownImport);
+        setLastKnownImportString(PREFS.get(PREF_LAST_KNOWN_IMPORT_STRING, null));
+        setLastKnownImport(new JLabel(getLastKnownImportString() == null ? "Not known" : getLastKnownImportString()));
+        commandView.add(getLastKnownImport());
 
         // commandView.add(Box.createHorizontalStrut(5));
 
@@ -2224,7 +2235,7 @@ public class GUI extends JFrame {
      * @param value
      *            the value
      */
-    void selectNewCurrency(String value) {
+    public void selectNewCurrency(String value) {
         LOGGER.info("Selected new currency: " + value);
         String newValue = value;
         if (newValue.compareTo(getDefaultCurrency()) != 0) {
@@ -2243,7 +2254,7 @@ public class GUI extends JFrame {
      * @param value
      *            the value
      */
-    void selectNewAccountId(String value) {
+    public void selectNewAccountId(String value) {
         LOGGER.info("Selected new 'OFX Account Id': " + value);
         String newValue = value;
         if (newValue.compareTo(getAccountId()) != 0) {
@@ -2369,6 +2380,54 @@ public class GUI extends JFrame {
 
     public void setAccountId(String accountId) {
         this.accountId = accountId;
+    }
+
+    public StatementPanel getDownloadView() {
+        return downloadView;
+    }
+
+    public void setDownloadView(StatementPanel downloadView) {
+        this.downloadView = downloadView;
+    }
+
+    public JTabbedPane getMainTabbed() {
+        return mainTabbed;
+    }
+
+    public void setMainTabbed(JTabbedPane mainTabbed) {
+        this.mainTabbed = mainTabbed;
+    }
+
+    public ImportDialogAutoClickService getImportDialogAutoClickService() {
+        return importDialogAutoClickService;
+    }
+
+    public void setImportDialogAutoClickService(ImportDialogAutoClickService importDialogAutoClickService) {
+        this.importDialogAutoClickService = importDialogAutoClickService;
+    }
+
+    public void setRandomizeShareCount(Boolean randomizeShareCount) {
+        this.randomizeShareCount = randomizeShareCount;
+    }
+
+    public void setSuspiciousPrice(Integer suspiciousPrice) {
+        this.suspiciousPrice = suspiciousPrice;
+    }
+
+    public String getLastKnownImportString() {
+        return lastKnownImportString;
+    }
+
+    public void setLastKnownImportString(String lastKnownImportString) {
+        this.lastKnownImportString = lastKnownImportString;
+    }
+
+    public JLabel getLastKnownImport() {
+        return lastKnownImport;
+    }
+
+    public void setLastKnownImport(JLabel lastKnownImport) {
+        this.lastKnownImport = lastKnownImport;
     }
 
 }

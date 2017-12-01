@@ -22,7 +22,7 @@ public class QuoteSourceUtils {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    static List<String> toStockSymbols(String stocksString) throws IOException {
+    public static List<String> toStockSymbols(String stocksString) throws IOException {
         List<String> stocks = new ArrayList<String>();
         BufferedReader reader = null;
         try {

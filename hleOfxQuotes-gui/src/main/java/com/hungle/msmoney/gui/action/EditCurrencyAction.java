@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -8,11 +8,12 @@ import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
 import com.hungle.msmoney.core.ofx.CurrencyUtils;
+import com.hungle.msmoney.gui.GUI;
 
 /**
  * The Class EditCurrencyAction.
  */
-final class EditCurrencyAction extends AbstractAction {
+public final class EditCurrencyAction extends AbstractAction {
 
     /**
      * 
@@ -28,7 +29,7 @@ final class EditCurrencyAction extends AbstractAction {
      *            the name
      * @param gui TODO
      */
-    EditCurrencyAction(GUI gui, String name) {
+    public EditCurrencyAction(GUI gui, String name) {
         super(name);
         this.gui = gui;
     }

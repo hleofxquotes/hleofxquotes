@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.task;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +14,8 @@ import com.hungle.msmoney.core.data.SymbolMapper;
 import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.gui.GUI;
+import com.hungle.msmoney.gui.MapperTableUtils;
 import com.hungle.msmoney.qs.QuoteSource;
 
 import ca.odell.glazedlists.EventList;
@@ -21,7 +23,7 @@ import ca.odell.glazedlists.EventList;
 /**
  * The Class StockPricesReceivedTask.
  */
-final class StockPricesReceivedTask implements Runnable {
+public final class StockPricesReceivedTask implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(StockPricesReceivedTask.class);
 
     /**
@@ -65,7 +67,7 @@ final class StockPricesReceivedTask implements Runnable {
      * @param gui
      *            TODO
      */
-    StockPricesReceivedTask(GUI gui, List<AbstractStockPrice> prices, Double badPrice, FxTable fxTable,
+    public StockPricesReceivedTask(GUI gui, List<AbstractStockPrice> prices, Double badPrice, FxTable fxTable,
             boolean hasWrappedShareCount, SymbolMapper symbolMapper, QuoteSource quoteSource) {
         this.gui = gui;
         this.prices = prices;

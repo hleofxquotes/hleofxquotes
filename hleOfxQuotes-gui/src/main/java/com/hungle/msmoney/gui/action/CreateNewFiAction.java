@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.action;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -13,12 +13,13 @@ import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.misc.Utils;
 import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.stmt.fi.AbstractFiDir;
 
 /**
  * The Class CreateNewFi.
  */
-final class CreateNewFiAction extends AbstractAction {
+public final class CreateNewFiAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(CreateNewFiAction.class);
 
     /**
@@ -39,7 +40,7 @@ final class CreateNewFiAction extends AbstractAction {
      *            the name
      * @param gui TODO
      */
-    CreateNewFiAction(GUI gui, String name) {
+    public CreateNewFiAction(GUI gui, String name) {
         super(name);
         this.gui = gui;
         this.parentComponent = CreateNewFiAction.this.gui;
@@ -124,9 +125,9 @@ final class CreateNewFiAction extends AbstractAction {
      * Post created.
      */
     protected void postCreated() {
-        this.gui.downloadView.refreshFiDir();
+        this.gui.getDownloadView().refreshFiDir();
 
-        this.gui.mainTabbed.setSelectedIndex(1);
+        this.gui.getMainTabbed().setSelectedIndex(1);
     }
 
 }

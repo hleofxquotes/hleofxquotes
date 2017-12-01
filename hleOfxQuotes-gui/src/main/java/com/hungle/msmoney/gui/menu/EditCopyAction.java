@@ -1,15 +1,15 @@
-package com.hungle.msmoney.gui.qs;
+package com.hungle.msmoney.gui.menu;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JTextArea;
 
-final class EditCopyAction extends AbstractAction {
+public final class EditCopyAction extends AbstractAction {
     private final JTextArea textArea;
     private static final long serialVersionUID = 1L;
 
-    EditCopyAction(String name, JTextArea textArea) {
+    public EditCopyAction(String name, JTextArea textArea) {
         super(name);
         this.textArea = textArea;
     }

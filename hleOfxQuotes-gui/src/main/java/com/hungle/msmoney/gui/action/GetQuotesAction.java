@@ -1,13 +1,15 @@
-package com.hungle.msmoney.gui.qs;
+package com.hungle.msmoney.gui.action;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import com.hungle.msmoney.gui.qs.YahooQuoteSourcePanel;
+
 /**
  * The Class GetQuotesAction.
  */
-final class GetQuotesAction extends AbstractAction {
+public final class GetQuotesAction extends AbstractAction {
     
     /**
      * 
@@ -22,7 +24,7 @@ final class GetQuotesAction extends AbstractAction {
      * @param name the name
      * @param yahooQuoteSourcePanel TODO
      */
-    GetQuotesAction(YahooQuoteSourcePanel yahooQuoteSourcePanel, String name) {
+    public GetQuotesAction(YahooQuoteSourcePanel yahooQuoteSourcePanel, String name) {
         super(name);
         this.yahooQuoteSourcePanel = yahooQuoteSourcePanel;
     }

@@ -128,9 +128,9 @@ final class ClosingWindowListener implements WindowListener {
                 LOGGER.info("DONE WAITING - threadPool.awaitTermination: " + timeout + " " + unit.toString());
             }
         }
-        if (this.gui.importDialogAutoClickService != null) {
-            this.gui.importDialogAutoClickService.setEnable(false);
-            this.gui.importDialogAutoClickService.shutdown();
+        if (this.gui.getImportDialogAutoClickService() != null) {
+            this.gui.getImportDialogAutoClickService().setEnable(false);
+            this.gui.getImportDialogAutoClickService().shutdown();
         }
     }
 

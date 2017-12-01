@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui.qs;
+package com.hungle.msmoney.gui.menu;
 
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -9,12 +9,13 @@ import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.gui.qs.YahooQuoteSourcePanel;
 import com.hungle.msmoney.qs.yahoo.YahooQuotesGetter;
 
 /**
  * The Class EditYahoServerAction.
  */
-final class EditYahoServerAction extends AbstractAction {
+public final class EditYahoServerAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(EditYahoServerAction.class);
 
     /**
@@ -53,16 +54,16 @@ final class EditYahoServerAction extends AbstractAction {
         }
         Icon icon = null;
         String s = (String) JOptionPane.showInputDialog(this.yahooQuoteSourcePanel,
-                "Current: " + this.yahooQuoteSourcePanel.quoteServer + "\n" + "Available:", "Set Yahoo Quote Server",
+                "Current: " + this.yahooQuoteSourcePanel.getQuoteServer() + "\n" + "Available:", "Set Yahoo Quote Server",
                 JOptionPane.PLAIN_MESSAGE, icon, possibilities, null);
 
         // If a string was returned, say so.
         if ((s != null) && (s.length() > 0)) {
             String value = YahooQuotesGetter.QUOTE_HOSTS.get(s);
             LOGGER.info("Selected new Yahoo Quote Server: " + value);
-            this.yahooQuoteSourcePanel.quoteServer = value;
-            this.yahooQuoteSourcePanel.prefs.put(YahooQuoteSourcePanel.QUOTE_SERVER_PREFS_KEY,
-                    this.yahooQuoteSourcePanel.quoteServer);
+            this.yahooQuoteSourcePanel.setQuoteServer(value);
+            this.yahooQuoteSourcePanel.getPrefs().put(YahooQuoteSourcePanel.QUOTE_SERVER_PREFS_KEY,
+                    this.yahooQuoteSourcePanel.getQuoteServer());
         } else {
         }
 

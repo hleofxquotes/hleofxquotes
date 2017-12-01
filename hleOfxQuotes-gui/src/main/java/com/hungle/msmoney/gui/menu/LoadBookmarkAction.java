@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui.qs.menu;
+package com.hungle.msmoney.gui.menu;
 
 import java.io.File;
 import java.io.IOException;

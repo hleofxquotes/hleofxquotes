@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui.qs;
+package com.hungle.msmoney.gui.action;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -12,10 +12,12 @@ import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.gui.qs.YahooQuoteSourcePanel;
+
 /**
  * The Class SaveAsAction.
  */
-final class SaveAsAction extends AbstractAction {
+public final class SaveAsAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(OpenAction.class);
 
     /**
@@ -73,7 +75,7 @@ final class SaveAsAction extends AbstractAction {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new FileWriter(outFile));
-            writer.write(this.yahooQuoteSourcePanel.stockSymbolsView.getText());
+            writer.write(this.yahooQuoteSourcePanel.getStockSymbolsView().getText());
             LOGGER.info("Save stock symbols to file=" + outFile);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this.yahooQuoteSourcePanel, e.getMessage(), "Failed To Save To File",

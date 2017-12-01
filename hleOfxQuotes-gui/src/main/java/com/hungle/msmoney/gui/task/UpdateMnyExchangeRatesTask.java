@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.task;
 
 import java.awt.event.ActionEvent;
 import java.io.BufferedInputStream;
@@ -25,11 +25,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.fx.UpdateFx;
+import com.hungle.msmoney.gui.GUI;
 
 /**
  * The Class UpdateMnyExchangeRatesTask.
  */
-final class UpdateMnyExchangeRatesTask extends AbstractAction {
+public final class UpdateMnyExchangeRatesTask extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(UpdateMnyExchangeRatesTask.class);
 
     /**
@@ -46,7 +47,7 @@ final class UpdateMnyExchangeRatesTask extends AbstractAction {
      *            the name
      * @param gui TODO
      */
-    UpdateMnyExchangeRatesTask(GUI gui, String name) {
+    public UpdateMnyExchangeRatesTask(GUI gui, String name) {
         super(name);
         this.gui = gui;
     }
@@ -133,7 +134,7 @@ final class UpdateMnyExchangeRatesTask extends AbstractAction {
             }
         };
 
-        Future<String> future = this.gui.threadPool.submit(task);
+        Future<String> future = this.gui.getThreadPool().submit(task);
     }
 
     /**

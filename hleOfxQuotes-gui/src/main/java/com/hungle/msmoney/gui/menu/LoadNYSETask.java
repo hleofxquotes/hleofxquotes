@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui.qs.menu;
+package com.hungle.msmoney.gui.menu;
 
 import java.io.IOException;
 import java.util.List;
@@ -8,15 +8,18 @@ import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.qs.AbstractLoadStockSymbolsTask;
 import com.hungle.msmoney.qs.QuoteSourceListener;
 
-final class LoadDogTask extends AbstractLoadStockSymbolsTask {
+final class LoadNYSETask extends AbstractLoadStockSymbolsTask {
+    /**
+     * 
+     */
     private static final long serialVersionUID = 1L;
 
-    LoadDogTask(String name, QuoteSourceListener listener, ExecutorService threadPool) {
+    LoadNYSETask(String name, QuoteSourceListener listener, ExecutorService threadPool) {
         super(name, listener, threadPool);
     }
 
     @Override
     protected List<String> getStocks() throws IOException {
-        return OfxUtils.getList("dotd.txt");
+        return OfxUtils.getNYSEList();
     }
 }

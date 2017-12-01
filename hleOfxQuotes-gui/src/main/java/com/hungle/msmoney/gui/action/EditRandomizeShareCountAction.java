@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.action;
 
 import java.awt.event.ActionEvent;
 
@@ -8,12 +8,13 @@ import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.qs.QuoteSource;
 
 /**
  * The Class EditRandomizeShareCountAction.
  */
-final class EditRandomizeShareCountAction extends AbstractAction {
+public final class EditRandomizeShareCountAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(EditRandomizeShareCountAction.class);
 
     /**
@@ -30,7 +31,7 @@ final class EditRandomizeShareCountAction extends AbstractAction {
      *            the name
      * @param gui TODO
      */
-    EditRandomizeShareCountAction(GUI gui, String name) {
+    public EditRandomizeShareCountAction(GUI gui, String name) {
         super(name);
         this.gui = gui;
     }
@@ -46,7 +47,7 @@ final class EditRandomizeShareCountAction extends AbstractAction {
         String[] possibilities = { "true", "false" };
         Icon icon = null;
         String s = (String) JOptionPane.showInputDialog(this.gui,
-                "Current: " + this.gui.randomizeShareCount + "\n" + "Choices:", "Set Randomize Share Count",
+                "Current: " + this.gui.getRandomizeShareCount() + "\n" + "Choices:", "Set Randomize Share Count",
                 JOptionPane.PLAIN_MESSAGE, icon, possibilities, null);
 
         // If a string was returned, say so.
@@ -54,9 +55,9 @@ final class EditRandomizeShareCountAction extends AbstractAction {
             String value = s;
             LOGGER.info("Selected new 'Randomize Share Count': " + value);
             Boolean newValue = Boolean.valueOf(value);
-            if (newValue.compareTo(this.gui.randomizeShareCount) != 0) {
-                this.gui.randomizeShareCount = newValue;
-                GUI.PREFS.put(GUI.PREF_RANDOMIZE_SHARE_COUNT, this.gui.randomizeShareCount.toString());
+            if (newValue.compareTo(this.gui.getRandomizeShareCount()) != 0) {
+                this.gui.setRandomizeShareCount(newValue);
+                GUI.PREFS.put(GUI.PREF_RANDOMIZE_SHARE_COUNT, this.gui.getRandomizeShareCount().toString());
                 // to clear the pricing table
                 QuoteSource quoteSource = null;
                 this.gui.stockSymbolsStringReceived(quoteSource, null);

@@ -31,7 +31,7 @@ import com.hungle.msmoney.core.csv2ofx.AbstractCsvConverter;
 import com.hungle.msmoney.core.misc.StopWatch;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.gui.GUI;
-import com.hungle.msmoney.gui.ShowDialogTask;
+import com.hungle.msmoney.gui.task.ShowDialogTask;
 import com.hungle.msmoney.qs.DefaultQuoteSource;
 import com.hungle.msmoney.qs.QuoteSource;
 import com.hungle.msmoney.qs.QuoteSourceListener;
