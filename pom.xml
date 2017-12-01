@@ -25,6 +25,7 @@
     <module>hleOfxQuotes-qs</module>
     <module>hleOfxQuotes-stmt</module>
     <module>hleOfxQuotes-gui</module>
+    <module>hleOfxQuotes-misc</module>
   </modules>
 
   <properties>
