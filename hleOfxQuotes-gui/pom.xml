@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.hungle.tools.moneyutils</groupId>
@@ -6,11 +7,70 @@
     <version>0.0.4-SNAPSHOT</version>
   </parent>
   <artifactId>hleOfxQuotes-gui</artifactId>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <mainClass>app.GUI</mainClass>
+          <layout>ZIP</layout>
+          <classifier>exec</classifier>
+          <finalName>${project.artifactId}-Build_${buildNumber}-app</finalName>
+          <additionalProperties>
+            <number>${project.artifactId}-Build_${buildNumber}-app</number>
+          </additionalProperties>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+              <goal>build-info</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <configuration>
+          <format>{0,date,yyyyMMdd}_{1,number}</format>
+          <items>
+            <item>timestamp</item>
+            <item>buildNumber0</item>
+          </items>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+  </build>
   <dependencies>
     <dependency>
       <groupId>com.hungle.tools.moneyutils</groupId>
       <artifactId>hleOfxQuotes-stmt</artifactId>
       <version>0.0.4-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.jgoodies</groupId>
+      <artifactId>forms</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.swinglabs</groupId>
+      <artifactId>swingx</artifactId>
     </dependency>
   </dependencies>
 </project>

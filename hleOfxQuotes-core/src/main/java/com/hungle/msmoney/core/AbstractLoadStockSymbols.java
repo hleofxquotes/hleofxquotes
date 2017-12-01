@@ -20,7 +20,7 @@ import com.hungle.msmoney.core.ofx.OfxUtils;
 public abstract class AbstractLoadStockSymbols implements Runnable {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(AbstractLoadStockSymbols.class);
+    private static final Logger LOGGER = Logger.getLogger(AbstractLoadStockSymbols.class);
 
     /** The max symbols per line. */
     private int maxSymbolsPerLine;
@@ -58,7 +58,7 @@ public abstract class AbstractLoadStockSymbols implements Runnable {
                 SwingUtilities.invokeLater(doRun);
             }
         } catch (IOException e) {
-            log.warn(e);
+            LOGGER.warn(e);
         }
     }
 
@@ -77,8 +77,8 @@ public abstract class AbstractLoadStockSymbols implements Runnable {
             stockSymbolsString = OfxUtils.toSeparatedString(stocks);
         } finally {
             long delta = stopWatch.click();
-            if (log.isDebugEnabled()) {
-                log.debug("< getStockSymbolsString, delta=" + delta);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("< getStockSymbolsString, delta=" + delta);
             }
         }
         return stockSymbolsString;

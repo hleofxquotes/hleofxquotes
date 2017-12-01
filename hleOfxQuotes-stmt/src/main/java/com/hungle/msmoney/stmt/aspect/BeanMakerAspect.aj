@@ -1,4 +1,4 @@
-package com.hungle.msmoney.core.aspect;
+package com.hungle.msmoney.stmt.aspect;
 
 import java.beans.Introspector;
 import java.beans.PropertyChangeListener;
@@ -6,10 +6,12 @@ import java.beans.PropertyChangeSupport;
 
 import org.apache.commons.beanutils.BeanUtils;
 
+import com.hungle.msmoney.core.aspect.BeanSupport;
+
 public aspect BeanMakerAspect {
     // package com.hungle.tools.moneyutils.fi.model.bean;
 //    declare parents: com.hungle.msmoney.statements.fi.model.bean.* implements BeanSupport;
-    declare parents: com.hungle.msmoney.core.bean.* implements BeanSupport;
+    declare parents: com.hungle.msmoney.stmt.bean.* implements BeanSupport;
 
     // introduces a member propertyChangeSupport
     private PropertyChangeSupport BeanSupport.propertyChangeSupport;

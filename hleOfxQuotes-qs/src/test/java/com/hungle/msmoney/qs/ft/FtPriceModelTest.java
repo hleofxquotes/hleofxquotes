@@ -16,7 +16,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.hungle.msmoney.core.ofx.OfxUtils;
-import com.hungle.msmoney.qs.ft.FtPriceModel;
 
 public class FtPriceModelTest {
     private static final Logger LOGGER = Logger.getLogger(FtPriceModelTest.class);

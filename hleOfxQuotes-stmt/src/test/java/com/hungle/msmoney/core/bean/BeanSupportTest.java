@@ -1,12 +1,14 @@
-package com.hungle.msmoney.core.aspect;
+package com.hungle.msmoney.core.bean;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.hungle.msmoney.stmt.fi.model.bean.FiInfoBean;
+import com.hungle.msmoney.stmt.bean.FiInfoBean;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -25,14 +27,14 @@ public class BeanSupportTest {
 
         final AtomicInteger counter = new AtomicInteger();
 
-//        testCustomer.addPropertyChangeListener(new PropertyChangeListener() {
-//            public void propertyChange(PropertyChangeEvent evt) {
-//                Assert.assertEquals("name", evt.getPropertyName());
-//                Assert.assertEquals("oldName", evt.getOldValue());
-//                Assert.assertEquals("newName", evt.getNewValue());
-//                counter.incrementAndGet();
-//            }
-//        });
+        testCustomer.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                Assert.assertEquals("name", evt.getPropertyName());
+                Assert.assertEquals("oldName", evt.getOldValue());
+                Assert.assertEquals("newName", evt.getNewValue());
+                counter.incrementAndGet();
+            }
+        });
 
         testCustomer.setName("newName");
         Assert.assertEquals(1, counter.get());

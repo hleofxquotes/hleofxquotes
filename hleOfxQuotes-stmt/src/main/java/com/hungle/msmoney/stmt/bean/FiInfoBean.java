@@ -1,4 +1,4 @@
-package com.hungle.msmoney.stmt.fi.model.bean;
+package com.hungle.msmoney.stmt.bean;
 
 import org.apache.log4j.Logger;
 
