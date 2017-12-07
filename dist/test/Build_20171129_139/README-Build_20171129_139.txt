@@ -1,0 +1,14 @@
+Wed Nov 29 15:40:21 PST 2017
+
+  * Add support for ft.com. Three new tabs: equities, funds, and ETFs
+
+unzip hleOfxQuotes-Build_20171129_139.zip to get
+
+hleOfxQuotes-Build_20171129_139-app-exec.jar
+
+Need Java 1.8
+
+java -jar hleOfxQuotes-Build_20171129_139-app-exec.jar
+  Use symbols from ft.com
+  Choose appropriate tab: equities, funds, or ETFs
+
