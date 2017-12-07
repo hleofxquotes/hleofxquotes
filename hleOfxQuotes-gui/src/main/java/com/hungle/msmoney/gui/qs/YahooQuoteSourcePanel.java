@@ -125,9 +125,9 @@ public class YahooQuoteSourcePanel extends JPanel {
         this.quoteSourceListener = new QuoteSourceListener() {
 
             @Override
-            public void stockPricesLookupStarted(QuoteSource quoteSource) {
+            public void stockPricesLookupStarted(QuoteSource quoteSource, List<String> stockSymbols) {
                 if (parentQuoteSourceListener != null) {
-                    parentQuoteSourceListener.stockPricesLookupStarted(quoteSource);
+                    parentQuoteSourceListener.stockPricesLookupStarted(quoteSource, stockSymbols);
                 }
             }
 
@@ -328,10 +328,11 @@ public class YahooQuoteSourcePanel extends JPanel {
 
     /**
      * Stock prices lookup started.
+     * @param stockSymbols 
      */
-    private void stockPricesLookupStarted() {
+    private void stockPricesLookupStarted(List<String> stockSymbols) {
         if (quoteSourceListener != null) {
-            quoteSourceListener.stockPricesLookupStarted(quoteSource);
+            quoteSourceListener.stockPricesLookupStarted(quoteSource, stockSymbols);
         }
     }
 
@@ -369,7 +370,7 @@ public class YahooQuoteSourcePanel extends JPanel {
      *             Signals that an I/O exception has occurred.
      */
     private void getStockQuotesAndNotify(final List<String> stockSymbols, final String stocksString) throws IOException {
-        stockPricesLookupStarted();
+        stockPricesLookupStarted(stockSymbols);
         List<AbstractStockPrice> stockPrices = null;
         try {
             stockPrices = getStockQuotes(stockSymbols);

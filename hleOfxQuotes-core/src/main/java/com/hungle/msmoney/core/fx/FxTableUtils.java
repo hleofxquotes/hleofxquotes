@@ -58,16 +58,16 @@ public class FxTableUtils {
     public static FxTable loadFxFile(String fileName) {
         FxTable fxTable = new FxTable();
         File fxTableFile = new File(fileName);
-        FxTable.LOGGER.info("Looking for fxTable=" + fxTableFile.getAbsoluteFile().getAbsolutePath());
+        LOGGER.info("Looking for fxTable=" + fxTableFile.getAbsoluteFile().getAbsolutePath());
         if (fxTableFile.exists()) {
             try {
                 fxTable.load(fxTableFile);
-                FxTable.LOGGER.info("Loaded fxTableFile=" + fxTableFile);
+                LOGGER.info("Loaded fxTableFile=" + fxTableFile);
             } catch (IOException e) {
-                FxTable.LOGGER.warn("Cannot load fxTableFile=" + fxTableFile);
+                LOGGER.warn("Cannot load fxTableFile=" + fxTableFile);
             }
         } else {
-            FxTable.LOGGER.info("No " + fileName + " file.");
+            LOGGER.info("No " + fileName + " file.");
         }
         return fxTable;
     }
@@ -147,7 +147,7 @@ public class FxTableUtils {
      * @param now
      *            the now
      */
-    public static void writeFxCsvEntry(PrintWriter writer, FxSymbol fxSymbol, Date now) {
+    private static void writeFxCsvEntry(PrintWriter writer, FxSymbol fxSymbol, Date now) {
         writer.println(
                 fxSymbol.getFromCurrency() + ", " + fxSymbol.getToCurrency() + ", " + fxSymbol.getRate() + ", " + now);
     }

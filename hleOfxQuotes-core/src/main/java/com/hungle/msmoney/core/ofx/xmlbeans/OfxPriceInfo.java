@@ -14,10 +14,10 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 
-import com.hungle.msmoney.core.data.SymbolMapper;
-import com.hungle.msmoney.core.data.SymbolMapperEntry;
 import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableUtils;
+import com.hungle.msmoney.core.mapper.SymbolMapper;
+import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 import com.hungle.msmoney.core.misc.CheckNullUtils;
 import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;

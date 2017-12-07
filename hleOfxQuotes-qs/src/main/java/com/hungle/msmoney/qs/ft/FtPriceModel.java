@@ -75,23 +75,27 @@ public class FtPriceModel {
     }
 
     public static final FtPriceModel parseFtDoc(Document doc, String symbol) throws IOException {
-        FtPriceModel model = new FtPriceModel();
-        model.setSymbol(symbol);
+        try {
+            FtPriceModel model = new FtPriceModel();
+            model.setSymbol(symbol);
 
-        String cssQuery = null;
+            String cssQuery = null;
 
-        // <div class="mod-tearsheet-overview__quote">
-        cssQuery = "div.mod-tearsheet-overview__quote";
-        Element topDiv = doc.selectFirst(cssQuery);
-        if (topDiv == null) {
-            throw new IOException("Cannot find " + cssQuery);
+            // <div class="mod-tearsheet-overview__quote">
+            cssQuery = "div.mod-tearsheet-overview__quote";
+            Element topDiv = doc.selectFirst(cssQuery);
+            if (topDiv == null) {
+                throw new IOException("Cannot find " + cssQuery);
+            }
+
+            parsePrice(topDiv, model);
+
+            parseDate(topDiv, model);
+
+            return model;
+        } catch (IOException e) {
+            throw new IOException("Cannot parse response for symbol=" + symbol, e);
         }
-
-        parsePrice(topDiv, model);
-
-        parseDate(topDiv, model);
-
-        return model;
     }
 
     private static void parseDate(Element topDiv, FtPriceModel model) throws IOException {

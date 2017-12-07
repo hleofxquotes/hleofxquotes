@@ -26,9 +26,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.prefs.Preferences;
@@ -66,12 +68,12 @@ import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.msmoney.core.data.SymbolMapper;
-import com.hungle.msmoney.core.data.SymbolMapperEntry;
 import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableUtils;
 import com.hungle.msmoney.core.gui.StripedTableRenderer;
 import com.hungle.msmoney.core.jna.ImportDialogAutoClickService;
+import com.hungle.msmoney.core.mapper.SymbolMapper;
+import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 import com.hungle.msmoney.core.misc.BuildNumber;
 import com.hungle.msmoney.core.misc.CheckNullUtils;
 import com.hungle.msmoney.core.ofx.QifUtils;
@@ -207,10 +209,10 @@ public class GUI extends JFrame {
     private EventList<AbstractStockPrice> priceList = new BasicEventList<AbstractStockPrice>();
 
     /** The exchange rates. */
-    private EventList<AbstractStockPrice> exchangeRates = new BasicEventList<AbstractStockPrice>();
+//    private EventList<AbstractStockPrice> exchangeRates = new BasicEventList<AbstractStockPrice>();
 
     /** The mapper. */
-    private EventList<SymbolMapperEntry> mapper = new BasicEventList<SymbolMapperEntry>();
+//    private EventList<SymbolMapperEntry> mapper = new BasicEventList<SymbolMapperEntry>();
 
     /** The price filter edit. */
     private JTextField priceFilterEdit;
@@ -343,11 +345,11 @@ public class GUI extends JFrame {
      * Clear mapper table.
      */
     protected void clearMapperTable() {
-        MapperTableUtils.clearMapperTable(getMapper());
+//        MapperTableUtils.clearMapperTable(getMapper());
     }
 
     protected void clearFxTable() {
-        FxTableUtils.clearFxTable(getExchangeRates());
+//        FxTableUtils.clearFxTable(getExchangeRates());
     }
 
     /**
@@ -359,8 +361,8 @@ public class GUI extends JFrame {
      *            the stock prices
      */
     private void stockPricesReceived(final QuoteSource quoteSource, List<AbstractStockPrice> stockPrices) {
-        symbolMapper = SymbolMapper.loadMapperFile();
-        fxTable = FxTableUtils.loadFxFile();
+//        symbolMapper = SymbolMapper.loadMapperFile();
+//        fxTable = FxTableUtils.loadFxFile();
 
         final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices
                 : new ArrayList<AbstractStockPrice>();
@@ -687,8 +689,8 @@ public class GUI extends JFrame {
 
         quoteSourceListener = new QuoteSourceListener() {
             @Override
-            public void stockPricesLookupStarted(QuoteSource quoteSource) {
-                GUI.this.stockPricesLookupStarted(quoteSource);
+            public void stockPricesLookupStarted(QuoteSource quoteSource, List<String> stockSymbols) {
+                GUI.this.stockPricesLookupStarted(quoteSource, stockSymbols);
             }
 
             @Override
@@ -721,12 +723,28 @@ public class GUI extends JFrame {
      *
      * @param quoteSource
      *            the quote source
+     * @param stockSymbols 
      */
-    protected void stockPricesLookupStarted(QuoteSource quoteSource) {
+    protected void stockPricesLookupStarted(QuoteSource quoteSource, final List<String> stockSymbols) {
+        symbolMapper = SymbolMapper.loadMapperFile();
+        fxTable = FxTableUtils.loadFxFile();
+        
+        // these symbols could have mapper attributes
+        symbolMapper.addAttributes(stockSymbols);
+        List<String> currencySymbols = symbolMapper.getCurrencySymbols();
+        if ((currencySymbols != null)) {
+            stockSymbols.addAll(currencySymbols);
+        }
+        Set<String> unique = new TreeSet<String>();
+        unique.addAll(stockSymbols);
+        stockSymbols.clear();
+        stockSymbols.addAll(unique);
+        
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
                 clearPriceTable();
+                
                 clearFxTable();
 
                 clearMapperTable();
@@ -1259,10 +1277,10 @@ public class GUI extends JFrame {
         // });
         // tabbedPane.addMouseListener(new PopupListener(popup));
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("> creating createYahooSourceView");
-        }
-        tabbedPane.addTab("Yahoo", createYahooSourceView());
+//        if (LOGGER.isDebugEnabled()) {
+//            LOGGER.debug("> creating createYahooSourceView");
+//        }
+//        tabbedPane.addTab("Yahoo", createYahooSourceView());
 
         // if (LOGGER.isDebugEnabled()) {
         // LOGGER.debug("> creating createYahooApiSourceView");
@@ -1295,13 +1313,15 @@ public class GUI extends JFrame {
         // }
         // tabbedPane.addTab("Scholarshare", createTIAACREFQuoteSourceView());
 
-        tabbedPane.addTab("FT Equities", createFtEquitiesSourceView());
+        tabbedPane.addTab("FT", createFtEquitiesSourceView());
+
+//        tabbedPane.addTab("FT Equities", createFtEquitiesSourceView());
 
         // createFtFundsSourceView
-        tabbedPane.addTab("FT Funds", createFtFundsSourceView());
+//        tabbedPane.addTab("FT Funds", createFtFundsSourceView());
 
         // createFtEtfsSourceView
-        tabbedPane.addTab("FT ETFs", createFtEtfsSourceView());
+//        tabbedPane.addTab("FT ETFs", createFtEtfsSourceView());
 
         int initialIndex = PREFS.getInt(PREF_SELECTED_QUOTE_SOURCE, 0);
         LOGGER.info("RESTORE selectedQuoteSource, index=" + initialIndex);
@@ -1318,7 +1338,7 @@ public class GUI extends JFrame {
                 LOGGER.info("selectedQuoteSource=" + selectedQuoteSource);
                 saveSelectedQuoteSource(selectedQuoteSource);
                 QuoteSource quoteSource = null;
-                stockPricesLookupStarted(quoteSource);
+                stockPricesLookupStarted(quoteSource, new ArrayList<String>());
             }
         });
         return tabbedPane;
@@ -1525,9 +1545,9 @@ public class GUI extends JFrame {
 
         getBottomTabs().add("Prices", createPricesView());
 
-        getBottomTabs().add("Exchange Rates", createExchangeRatesView());
+//        getBottomTabs().add("Exchange Rates", createExchangeRatesView());
 
-        getBottomTabs().add("Mapper", createMapperView());
+//        getBottomTabs().add("Mapper", createMapperView());
 
         view.add(getBottomTabs(), BorderLayout.CENTER);
 
@@ -1608,9 +1628,9 @@ public class GUI extends JFrame {
         };
         getBottomTabs().addMouseListener(listener);
 
-        if ((symbolMapper != null) && (getMapper() != null)) {
-            MapperTableUtils.updateMapperTable(symbolMapper, getMapper());
-        }
+//        if ((symbolMapper != null) && (getMapper() != null)) {
+//            MapperTableUtils.updateMapperTable(symbolMapper, getMapper());
+//        }
 
         return view;
     }
@@ -1803,7 +1823,7 @@ public class GUI extends JFrame {
 
         JTextField filterEdit = new JTextField(10);
         PriceTableView<AbstractStockPrice> fxScrollPane = new PriceTableView<AbstractStockPrice>(filterEdit,
-                getExchangeRates(), AbstractStockPrice.class);
+                /* getExchangeRates() */ null, AbstractStockPrice.class);
         view.add(fxScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -1891,7 +1911,7 @@ public class GUI extends JFrame {
             }
         };
         boolean addStripe = true;
-        JTable table = MapperTableUtils.createMapperTable(getMapper(), comparator, filterEdit, filter, addStripe);
+        JTable table = MapperTableUtils.createMapperTable(/*getMapper()*/ null, comparator, filterEdit, filter, addStripe);
         // table.setFillsViewportHeight(true);
         JScrollPane scrolledPane = new JScrollPane(table);
 
@@ -2294,7 +2314,7 @@ public class GUI extends JFrame {
         LOGGER.info(cwd);
 
         final GUI mainFrame = new GUI(title);
-        LOGGER.info("Using quote server: " + mainFrame.getYahooQuoteServer());
+        LOGGER.info("Using Yahoo quote server: " + mainFrame.getYahooQuoteServer());
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
@@ -2334,21 +2354,21 @@ public class GUI extends JFrame {
         this.priceList = priceList;
     }
 
-    public EventList<AbstractStockPrice> getExchangeRates() {
-        return exchangeRates;
-    }
-
-    public void setExchangeRates(EventList<AbstractStockPrice> exchangeRates) {
-        this.exchangeRates = exchangeRates;
-    }
-
-    public EventList<SymbolMapperEntry> getMapper() {
-        return mapper;
-    }
-
-    public void setMapper(EventList<SymbolMapperEntry> mapper) {
-        this.mapper = mapper;
-    }
+//    public EventList<AbstractStockPrice> getExchangeRates() {
+//        return exchangeRates;
+//    }
+//
+//    public void setExchangeRates(EventList<AbstractStockPrice> exchangeRates) {
+//        this.exchangeRates = exchangeRates;
+//    }
+//
+//    public EventList<SymbolMapperEntry> getMapper() {
+//        return mapper;
+//    }
+//
+//    public void setMapper(EventList<SymbolMapperEntry> mapper) {
+//        this.mapper = mapper;
+//    }
 
     public JTabbedPane getBottomTabs() {
         return bottomTabs;

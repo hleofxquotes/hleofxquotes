@@ -15,9 +15,9 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
-import com.hungle.msmoney.core.data.SymbolMapper;
 import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableUtils;
+import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.misc.CheckNullUtils;
 import com.hungle.msmoney.core.ofx.xmlbeans.CurrencyUtils;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;

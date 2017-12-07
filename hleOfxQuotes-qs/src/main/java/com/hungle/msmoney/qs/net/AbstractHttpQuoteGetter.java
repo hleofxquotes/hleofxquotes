@@ -57,7 +57,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     private static final long DEFAULT_TIMEOUT = 120L;
 
     /** The Constant DEFAULT_FX_FILENAME. */
-    private static final String DEFAULT_FX_FILENAME = "fx.csv";
+//    private static final String DEFAULT_FX_FILENAME = "fx.csv";
 
     /** The Constant threadPool. */
     private static final ExecutorService threadPool = Executors.newFixedThreadPool(3);
@@ -297,14 +297,22 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
                     List<AbstractStockPrice> receivedFromQuoteSource = future.get();
                     addPrices(receivedFromQuoteSource, prices);
                 } catch (InterruptedException e) {
-                    LOGGER.warn(e);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.warn(e, e);
+                    } else {
+                        LOGGER.warn(e);
+                    }
                 } catch (ExecutionException e) {
-                    LOGGER.warn(e, e);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.warn(e, e);
+                    } else {
+                        LOGGER.warn(e);
+                    }
                 }
             }
 
             if (fxSymbols != null) {
-                FxTableUtils.writeFxFile(fxSymbols, fxFileName);
+//                FxTableUtils.writeFxFile(fxSymbols, fxFileName);
             }
         } finally {
             long delta = stopWatch.click();

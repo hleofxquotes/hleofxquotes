@@ -22,8 +22,9 @@ public interface QuoteSourceListener {
      * Stock prices lookup started.
      *
      * @param quoteSource the quote source
+     * @param stockSymbols 
      */
-    void stockPricesLookupStarted(QuoteSource quoteSource);
+    void stockPricesLookupStarted(QuoteSource quoteSource, List<String> stockSymbols);
 
     /**
      * Stock symbols string received.

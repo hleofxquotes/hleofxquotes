@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
@@ -139,7 +140,7 @@ public class FtCsvQuoteSourcePanel extends JPanel {
             boolean useQuoteSourceShareCount = shareCountCheckBox.isSelected();
             ftCsv.setUseQuoteSourceShareCount(useQuoteSourceShareCount);
             try {
-                stockPricesLookupStarted(quoteSource);
+                stockPricesLookupStarted(quoteSource, new ArrayList<String>());
                 stopWatch.click();
                 stockPrices = ftCsv.convert(fromFile);
             } catch (IOException e) {
@@ -239,9 +240,9 @@ public class FtCsvQuoteSourcePanel extends JPanel {
      *
      * @param quoteSource the quote source
      */
-    private void stockPricesLookupStarted(QuoteSource quoteSource) {
+    private void stockPricesLookupStarted(QuoteSource quoteSource, List<String> stockSymbols) {
         if (quoteSourceListener != null) {
-            quoteSourceListener.stockPricesLookupStarted(quoteSource);
+            quoteSourceListener.stockPricesLookupStarted(quoteSource, stockSymbols);
         }
     }
 

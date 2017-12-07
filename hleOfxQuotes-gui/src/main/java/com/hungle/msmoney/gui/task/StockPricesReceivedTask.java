@@ -10,9 +10,9 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.msmoney.core.data.SymbolMapper;
 import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableUtils;
+import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.gui.MapperTableUtils;
@@ -105,7 +105,7 @@ public final class StockPricesReceivedTask implements Runnable {
         if (quoteSource != null) {
             newExchangeRates = quoteSource.getExchangeRates();
         }
-        FxTableUtils.updateFxTable(newExchangeRates, this.gui.getExchangeRates());
+//        FxTableUtils.updateFxTable(newExchangeRates, this.gui.getExchangeRates());
 
         try {
             boolean onePerFile = quoteSource.isHistoricalQuotes();
@@ -121,7 +121,7 @@ public final class StockPricesReceivedTask implements Runnable {
                 LOGGER.debug("Saved csvFile=" + csvFile);
             }
 
-            MapperTableUtils.updateMapperTable(symbolMapper, this.gui.getMapper());
+//            MapperTableUtils.updateMapperTable(symbolMapper, this.gui.getMapper());
         } catch (IOException e) {
             LOGGER.warn(e);
         } finally {

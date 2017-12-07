@@ -136,6 +136,9 @@ public class StockPrice extends AbstractStockPrice {
         }
 
         fxSymbol = FxSymbol.parse(stockSymbol);
+        if (fxSymbol == null) {
+            // get from mapper in case the quote source has the currency format
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("fxSymbol=" + fxSymbol + ", stockSymbol=" + stockSymbol);
         }

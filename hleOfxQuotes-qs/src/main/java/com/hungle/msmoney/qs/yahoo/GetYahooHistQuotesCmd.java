@@ -7,9 +7,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.msmoney.core.data.SymbolMapper;
 import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableUtils;
+import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxSaveParameter;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;

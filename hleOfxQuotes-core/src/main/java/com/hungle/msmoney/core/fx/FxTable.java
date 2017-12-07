@@ -21,7 +21,7 @@ import com.hungle.msmoney.core.misc.CheckNullUtils;
 public class FxTable {
     
     /** The Constant log. */
-    public static final Logger LOGGER = Logger.getLogger(FxTable.class);
+    private static final Logger LOGGER = Logger.getLogger(FxTable.class);
 
     /** The entries. */
     private List<FxTableEntry> entries = new ArrayList<FxTableEntry>();

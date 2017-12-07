@@ -7,9 +7,9 @@ import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 
-import com.hungle.msmoney.core.data.SymbolMapper;
-import com.hungle.msmoney.core.data.SymbolMapperEntry;
 import com.hungle.msmoney.core.gui.StripedTableRenderer;
+import com.hungle.msmoney.core.mapper.SymbolMapper;
+import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;

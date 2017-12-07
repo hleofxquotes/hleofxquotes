@@ -1,4 +1,4 @@
-package com.hungle.msmoney.core.data;
+package com.hungle.msmoney.core.mapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.csvreader.CsvReader;
+import com.hungle.msmoney.core.mapper.SymbolMapper;
 
 // TODO: Auto-generated Javadoc
 /**

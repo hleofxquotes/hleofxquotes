@@ -1,4 +1,4 @@
-package com.hungle.msmoney.core.data;
+package com.hungle.msmoney.core.mapper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,8 +8,10 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
@@ -19,7 +21,7 @@ import com.csvreader.CsvReader;
  * The Class SymbolMapper.
  */
 public class SymbolMapper {
-    
+
     /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(SymbolMapper.class);
 
@@ -27,18 +29,20 @@ public class SymbolMapper {
 
     /** The map by ms money symbol. */
     private final Map<String, List<SymbolMapperEntry>> mapByMsMoneySymbol = new HashMap<String, List<SymbolMapperEntry>>();
-    
+
     /** The map by quotes source symbol. */
     private final Map<String, List<SymbolMapperEntry>> mapByQuotesSourceSymbol = new HashMap<String, List<SymbolMapperEntry>>();
-    
+
     /** The entries. */
     private final List<SymbolMapperEntry> entries = new ArrayList<SymbolMapperEntry>();
 
     /**
      * Load.
      *
-     * @param file the file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param file
+     *            the file
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void load(File file) throws IOException {
         CsvReader csvReader = null;
@@ -72,8 +76,10 @@ public class SymbolMapper {
     /**
      * Load.
      *
-     * @param csvReader the csv reader
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param csvReader
+     *            the csv reader
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void load(CsvReader csvReader) throws IOException {
         SymbolMapperEntry entry;
@@ -86,16 +92,21 @@ public class SymbolMapper {
 
             entry.load(csvReader);
 
-            updateMapBys(entry);
-
-            entries.add(entry);
+            addEntry(entry);
         }
+    }
+
+    private void addEntry(SymbolMapperEntry entry) {
+        updateMapBys(entry);
+
+        entries.add(entry);
     }
 
     /**
      * Update map bys.
      *
-     * @param entry the entry
+     * @param entry
+     *            the entry
      */
     private void updateMapBys(SymbolMapperEntry entry) {
         String msMoneySymbol = entry.getMsMoneySymbol();
@@ -120,7 +131,8 @@ public class SymbolMapper {
     /**
      * Entries by quote source.
      *
-     * @param quoteSourceSymbol the quote source symbol
+     * @param quoteSourceSymbol
+     *            the quote source symbol
      * @return the list
      */
     public List<SymbolMapperEntry> entriesByQuoteSource(String quoteSourceSymbol) {
@@ -134,7 +146,8 @@ public class SymbolMapper {
     /**
      * Checks for entry.
      *
-     * @param ticker the ticker
+     * @param ticker
+     *            the ticker
      * @return true, if successful
      */
     public boolean hasEntry(String ticker) {
@@ -151,7 +164,8 @@ public class SymbolMapper {
     /**
      * Gets the checks if is mutual fund.
      *
-     * @param ticker the ticker
+     * @param ticker
+     *            the ticker
      * @return the checks if is mutual fund
      */
     public boolean getIsMutualFund(String ticker) {
@@ -181,7 +195,8 @@ public class SymbolMapper {
     /**
      * Gets the checks if is options.
      *
-     * @param ticker the ticker
+     * @param ticker
+     *            the ticker
      * @return the checks if is options
      */
     public boolean getIsOptions(String ticker) {
@@ -212,7 +227,8 @@ public class SymbolMapper {
     /**
      * Gets the checks if is bond.
      *
-     * @param ticker the ticker
+     * @param ticker
+     *            the ticker
      * @return the checks if is bond
      */
     public boolean getIsBond(String ticker) {
@@ -276,4 +292,56 @@ public class SymbolMapper {
         return symbolMapper;
     }
 
+    public void addAttributes(List<String> stockSymbols) {
+        List<MetaStockSymbol> metaStockSymbols = MetaStockSymbol.parse(stockSymbols);
+        for (MetaStockSymbol metaStockSymbol : metaStockSymbols) {
+            SymbolMapperEntry symbolMapperEntry = new SymbolMapperEntry();
+            populateEntry(metaStockSymbol, symbolMapperEntry);
+            addEntry(symbolMapperEntry);
+
+            ListIterator<String> iter = stockSymbols.listIterator();
+            while (iter.hasNext()) {
+                String s = iter.next();
+                if (s.compareTo(metaStockSymbol.getOriginalSymbol()) == 0) {
+                    iter.remove();
+                }
+            }
+            stockSymbols.add(metaStockSymbol.getSymbol());
+        }
+    }
+
+    private void populateEntry(MetaStockSymbol metaStockSymbol, SymbolMapperEntry symbolMapperEntry) {
+        symbolMapperEntry.setMsMoneySymbol(metaStockSymbol.getSymbol());
+        symbolMapperEntry.setQuotesSourceSymbol(metaStockSymbol.getQsSymbol());
+        symbolMapperEntry.setQuotesSourceCurrency(metaStockSymbol.getQsCurrency());
+        symbolMapperEntry.setMsMoneyCurrency(metaStockSymbol.getCurrency());
+    }
+
+    public List<String> getCurrencySymbols() {
+        List<String> list = new ArrayList<String>();
+
+        for (SymbolMapperEntry entry : entries) {
+            String qsCurrency = entry.getQuotesSourceCurrency();
+            if (StringUtils.isBlank(qsCurrency)) {
+                continue;
+            }
+            if (qsCurrency.compareToIgnoreCase("GBX") == 0) {
+                continue;
+            }
+
+            String currency = entry.getMsMoneyCurrency();
+            if (StringUtils.isBlank(currency)) {
+                continue;
+            }
+            if (currency.compareToIgnoreCase("GBX") == 0) {
+                continue;
+            }
+
+            // ft.com
+//            list.add(qsCurrency + currency);
+            // yahoo.com
+            list.add(qsCurrency + currency + "=X");
+        }
+        return list;
+    }
 }
