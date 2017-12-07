@@ -34,6 +34,7 @@ public class FtEquitiesQuoteGetter extends AbstractHttpQuoteGetter {
     public FtEquitiesQuoteGetter() {
         super();
         setBucketSize(1);
+        setKeepFxSymbols(false);
     }
 
     @Override
@@ -98,21 +99,25 @@ public class FtEquitiesQuoteGetter extends AbstractHttpQuoteGetter {
 
         if (model != null) {
             StockPrice stockPrice = new StockPrice();
-            stockPrice.setStockSymbol(model.getSymbol());
-            Double modelPrice = model.getPrice();
-            Price lastPrice = null;
-            if (modelPrice != null) {
-                lastPrice = new Price(modelPrice);
-                lastPrice.setCurrency(model.getCurrency());
+            try {
+                stockPrice.setStockSymbol(model.getSymbol());
+                Double modelPrice = model.getPrice();
+                Price lastPrice = null;
+                if (modelPrice != null) {
+                    lastPrice = new Price(modelPrice);
+                    lastPrice.setCurrency(model.getCurrency());
+                }
+                stockPrice.setLastPrice(lastPrice);
+                stockPrice.setDayHigh(lastPrice);
+                stockPrice.setDayHigh(lastPrice);
+                stockPrice.setLastTrade(model.getDate());
+            } finally {
+                stockPrice.postSetProperties();
             }
-            stockPrice.setLastPrice(lastPrice);
-            stockPrice.setDayHigh(lastPrice);
-            stockPrice.setDayHigh(lastPrice);
-            stockPrice.setLastTrade(model.getDate());
-            stockPrice.postSetProperties();
 
             stockPrices.add(stockPrice);
         }
+        
         return stockPrices;
     }
 

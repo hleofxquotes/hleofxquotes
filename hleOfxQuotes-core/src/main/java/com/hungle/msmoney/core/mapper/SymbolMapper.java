@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
@@ -299,6 +298,7 @@ public class SymbolMapper {
             populateEntry(metaStockSymbol, symbolMapperEntry);
             addEntry(symbolMapperEntry);
 
+            // replace the current symbol with the quote source symbol
             ListIterator<String> iter = stockSymbols.listIterator();
             while (iter.hasNext()) {
                 String s = iter.next();
@@ -306,7 +306,8 @@ public class SymbolMapper {
                     iter.remove();
                 }
             }
-            stockSymbols.add(metaStockSymbol.getSymbol());
+            // lookup using Quote Source symbol
+            stockSymbols.add(metaStockSymbol.getQsSymbol());
         }
     }
 
@@ -317,31 +318,19 @@ public class SymbolMapper {
         symbolMapperEntry.setMsMoneyCurrency(metaStockSymbol.getCurrency());
     }
 
-    public List<String> getCurrencySymbols() {
-        List<String> list = new ArrayList<String>();
+    public Map<String, List<SymbolMapperEntry>> getMapByMsMoneySymbol() {
+        return mapByMsMoneySymbol;
+    }
 
+    public Map<String, List<SymbolMapperEntry>> getMapByQuotesSourceSymbol() {
+        return mapByQuotesSourceSymbol;
+    }
+
+    public void dump() {
+        LOGGER.debug("> BEGIN dump");
         for (SymbolMapperEntry entry : entries) {
-            String qsCurrency = entry.getQuotesSourceCurrency();
-            if (StringUtils.isBlank(qsCurrency)) {
-                continue;
-            }
-            if (qsCurrency.compareToIgnoreCase("GBX") == 0) {
-                continue;
-            }
-
-            String currency = entry.getMsMoneyCurrency();
-            if (StringUtils.isBlank(currency)) {
-                continue;
-            }
-            if (currency.compareToIgnoreCase("GBX") == 0) {
-                continue;
-            }
-
-            // ft.com
-//            list.add(qsCurrency + currency);
-            // yahoo.com
-            list.add(qsCurrency + currency + "=X");
+            LOGGER.debug(entry);
         }
-        return list;
+        LOGGER.debug("< END dump");
     }
 }

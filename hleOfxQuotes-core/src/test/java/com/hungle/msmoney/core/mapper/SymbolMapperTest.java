@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.csvreader.CsvReader;
-import com.hungle.msmoney.core.mapper.SymbolMapper;
 
 // TODO: Auto-generated Javadoc
 /**

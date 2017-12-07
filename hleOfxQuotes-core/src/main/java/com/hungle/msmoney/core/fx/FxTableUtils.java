@@ -28,7 +28,8 @@ public class FxTableUtils {
         list.clear();
     }
 
-    public static final void updateFxTable(List<AbstractStockPrice> newExchangeRates, EventList<AbstractStockPrice> list) {
+    public static final void updateFxTable(List<AbstractStockPrice> newExchangeRates,
+            EventList<AbstractStockPrice> list) {
         list.getReadWriteLock().writeLock().lock();
         try {
             list.clear();
@@ -150,6 +151,20 @@ public class FxTableUtils {
     private static void writeFxCsvEntry(PrintWriter writer, FxSymbol fxSymbol, Date now) {
         writer.println(
                 fxSymbol.getFromCurrency() + ", " + fxSymbol.getToCurrency() + ", " + fxSymbol.getRate() + ", " + now);
+    }
+
+    public static final void addExchangeRates(List<AbstractStockPrice> exchangeRates, FxTable fxTable) {
+        for (AbstractStockPrice exchangeRate : exchangeRates) {
+            FxSymbol fxSymbol = exchangeRate.getFxSymbol();
+            if (fxSymbol == null) {
+                continue;
+            }
+            FxTableEntry fxTableEntry = new FxTableEntry();
+            fxTableEntry.setFromCurrency(fxSymbol.getFromCurrency());
+            fxTableEntry.setToCurrency(fxSymbol.getToCurrency());
+            fxTableEntry.setRate(fxTable.getRateFormatter().format(fxSymbol.getRate()));
+            fxTable.add(fxTableEntry);
+        }
     }
 
 }

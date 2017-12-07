@@ -131,6 +131,7 @@ public class MetaStockSymbolTest {
                 "GB00B2PLJJ36/GBX/GBP",
                 "XMRC:LSE:GBX",
                 "XMRC:LSE:GBX/GBX/GBP",
+                "IBM/HAL"
         };
         List<String> stockSymbols = new ArrayList<String>();
         stockSymbols.addAll(Arrays.asList(list2));
@@ -165,6 +166,10 @@ public class MetaStockSymbolTest {
         //        "XMRC:LSE:GBX/GBX/GBP",
         Assert.assertFalse(stockSymbols.contains("XMRC:LSE:GBX/GBX/GBP"));
         Assert.assertTrue(stockSymbols.contains("XMRC:LSE:GBX"));
+
+        Assert.assertFalse(stockSymbols.contains("IBM/HAL"));
+        Assert.assertFalse(stockSymbols.contains("IBM"));
+        Assert.assertTrue(stockSymbols.contains("HAL"));
 
     }
 }

@@ -11,11 +11,9 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.fx.FxTable;
-import com.hungle.msmoney.core.fx.FxTableUtils;
 import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.gui.GUI;
-import com.hungle.msmoney.gui.MapperTableUtils;
 import com.hungle.msmoney.qs.QuoteSource;
 
 import ca.odell.glazedlists.EventList;

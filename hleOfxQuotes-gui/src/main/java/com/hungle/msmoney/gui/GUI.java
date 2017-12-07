@@ -80,6 +80,7 @@ import com.hungle.msmoney.core.ofx.QifUtils;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxSaveParameter;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.FxSymbol;
 import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.core.stockprice.StockPrice;
 import com.hungle.msmoney.core.stockprice.StockPriceCsvUtils;
@@ -209,10 +210,12 @@ public class GUI extends JFrame {
     private EventList<AbstractStockPrice> priceList = new BasicEventList<AbstractStockPrice>();
 
     /** The exchange rates. */
-//    private EventList<AbstractStockPrice> exchangeRates = new BasicEventList<AbstractStockPrice>();
+    // private EventList<AbstractStockPrice> exchangeRates = new
+    // BasicEventList<AbstractStockPrice>();
 
     /** The mapper. */
-//    private EventList<SymbolMapperEntry> mapper = new BasicEventList<SymbolMapperEntry>();
+    // private EventList<SymbolMapperEntry> mapper = new
+    // BasicEventList<SymbolMapperEntry>();
 
     /** The price filter edit. */
     private JTextField priceFilterEdit;
@@ -345,97 +348,11 @@ public class GUI extends JFrame {
      * Clear mapper table.
      */
     protected void clearMapperTable() {
-//        MapperTableUtils.clearMapperTable(getMapper());
+        // MapperTableUtils.clearMapperTable(getMapper());
     }
 
     protected void clearFxTable() {
-//        FxTableUtils.clearFxTable(getExchangeRates());
-    }
-
-    /**
-     * Stock prices received.
-     *
-     * @param quoteSource
-     *            the quote source
-     * @param stockPrices
-     *            the stock prices
-     */
-    private void stockPricesReceived(final QuoteSource quoteSource, List<AbstractStockPrice> stockPrices) {
-//        symbolMapper = SymbolMapper.loadMapperFile();
-//        fxTable = FxTableUtils.loadFxFile();
-
-        final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices
-                : new ArrayList<AbstractStockPrice>();
-        updateLastPriceCurrency(prices, getDefaultCurrency(), symbolMapper);
-
-        if (getRandomizeShareCount()) {
-            int randomInt = random.nextInt(998);
-            randomInt = randomInt + 1;
-            double value = randomInt / 1000.00;
-            LOGGER.info("randomizeShareCount=" + getRandomizeShareCount() + ", value=" + value);
-            for (AbstractStockPrice price : prices) {
-                price.setUnits(value);
-            }
-        }
-
-        boolean hasWrappedShareCount = false;
-        if (incrementallyIncreasedShareCount) {
-            String key = PREF_INCREMENTALLY_INCREASED_SHARE_COUNT_VALUE;
-            double value = PREFS.getDouble(key, 0.000);
-            if (value > 0.999) {
-                value = 0.000;
-                // TODO
-                LOGGER.warn("incrementallyIncreasedShareCount, is wrapping back to " + value);
-                hasWrappedShareCount = true;
-            }
-            value = value + 0.001;
-            for (AbstractStockPrice bean : prices) {
-                bean.setUnits(value);
-            }
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(
-                        "incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
-            }
-            PREFS.putDouble(key, value);
-        }
-
-        // for (StockPriceBean bean : beans) {
-        // String currency = bean.getCurrency();
-        // if (PropertiesUtils.isNull(currency)) {
-        // String symbol = bean.getStockSymbol();
-        // String overridingCurrency = getMapperCurrency(symbol, mapper);
-        // log.info("symbol: " + symbol + ", overridingCurrency=" +
-        // overridingCurrency);
-        // if (!PropertiesUtils.isNull(overridingCurrency)) {
-        // bean.setCurrency(overridingCurrency);
-        // }
-        // }
-        // }
-
-        Double badPrice = null;
-        if (getSuspiciousPrice() > -1L) {
-            Double d = new Double(getSuspiciousPrice());
-            for (AbstractStockPrice bean : prices) {
-                String stockSymbol = bean.getStockSymbol();
-                if ((stockSymbol != null) && (stockSymbol.startsWith("^"))) {
-                    // index
-                    continue;
-                }
-                Price price = bean.getLastPrice();
-                if (price == null) {
-                    continue;
-                }
-                if (price.getPrice().compareTo(d) > 0) {
-                    badPrice = price.getPrice();
-                    break;
-                }
-            }
-        }
-
-        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, badPrice, fxTable, hasWrappedShareCount,
-                symbolMapper, quoteSource);
-        // doRun.run();
-        SwingUtilities.invokeLater(stockPricesReceivedTask);
+        // FxTableUtils.clearFxTable(getExchangeRates());
     }
 
     /**
@@ -689,13 +606,13 @@ public class GUI extends JFrame {
 
         quoteSourceListener = new QuoteSourceListener() {
             @Override
-            public void stockPricesLookupStarted(QuoteSource quoteSource, List<String> stockSymbols) {
-                GUI.this.stockPricesLookupStarted(quoteSource, stockSymbols);
+            public void stockSymbolsStringReceived(QuoteSource quoteSource, String lines) {
+                GUI.this.stockSymbolsStringReceived(quoteSource, lines);
             }
 
             @Override
-            public void stockSymbolsStringReceived(QuoteSource quoteSource, String lines) {
-                GUI.this.stockSymbolsStringReceived(quoteSource, lines);
+            public void stockPricesLookupStarted(QuoteSource quoteSource, List<String> stockSymbols) {
+                GUI.this.stockPricesLookupStarted(quoteSource, stockSymbols);
             }
 
             @Override
@@ -719,38 +636,157 @@ public class GUI extends JFrame {
     }
 
     /**
+     * Stock symbols string received.
+     *
+     * @param quoteSource
+     *            the quote source
+     * @param stockSymbolsString
+     *            the stock symbols string
+     */
+    public void stockSymbolsStringReceived(QuoteSource quoteSource, String stockSymbolsString) {
+        clearPriceTable();
+
+        clearMapperTable();
+
+        this.saveOfxButton.setEnabled(false);
+
+        this.importToMoneyButton.setEnabled(false);
+
+        if (this.updateExchangeRateButton != null) {
+            this.updateExchangeRateButton.setEnabled(false);
+        }
+    }
+
+    /**
      * Stock prices lookup started.
      *
      * @param quoteSource
      *            the quote source
-     * @param stockSymbols 
+     * @param stockSymbols
      */
-    protected void stockPricesLookupStarted(QuoteSource quoteSource, final List<String> stockSymbols) {
+    private void stockPricesLookupStarted(QuoteSource quoteSource, final List<String> stockSymbols) {
         symbolMapper = SymbolMapper.loadMapperFile();
         fxTable = FxTableUtils.loadFxFile();
-        
+
         // these symbols could have mapper attributes
         symbolMapper.addAttributes(stockSymbols);
-        List<String> currencySymbols = symbolMapper.getCurrencySymbols();
-        if ((currencySymbols != null)) {
-            stockSymbols.addAll(currencySymbols);
-        }
-        Set<String> unique = new TreeSet<String>();
-        unique.addAll(stockSymbols);
-        stockSymbols.clear();
-        stockSymbols.addAll(unique);
-        
+        unique(stockSymbols);
+
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
                 clearPriceTable();
-                
+
                 clearFxTable();
 
                 clearMapperTable();
             }
         };
         SwingUtilities.invokeLater(doRun);
+    }
+
+    private void unique(final List<String> stockSymbols) {
+        Set<String> unique = new TreeSet<String>();
+        unique.addAll(stockSymbols);
+        stockSymbols.clear();
+        stockSymbols.addAll(unique);
+    }
+
+    /**
+     * Stock prices received.
+     *
+     * @param quoteSource
+     *            the quote source
+     * @param stockPrices
+     *            the stock prices
+     */
+    private void stockPricesReceived(final QuoteSource quoteSource, List<AbstractStockPrice> stockPrices) {
+        symbolMapper.dump();
+
+        List<AbstractStockPrice> exchangeRates = quoteSource.getExchangeRates();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> BEGIN exchangeRates");
+            for (AbstractStockPrice exchangeRate : exchangeRates) {
+                FxSymbol fxSymbol = exchangeRate.getFxSymbol();
+                LOGGER.debug(fxSymbol);
+            }
+            LOGGER.debug("< END exchangeRates");
+        }
+        FxTableUtils.addExchangeRates(exchangeRates, fxTable);
+        fxTable.dump();
+
+        final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices
+                : new ArrayList<AbstractStockPrice>();
+        updateLastPriceCurrency(prices, getDefaultCurrency(), symbolMapper);
+
+        if (getRandomizeShareCount()) {
+            int randomInt = random.nextInt(998);
+            randomInt = randomInt + 1;
+            double value = randomInt / 1000.00;
+            LOGGER.info("randomizeShareCount=" + getRandomizeShareCount() + ", value=" + value);
+            for (AbstractStockPrice price : prices) {
+                price.setUnits(value);
+            }
+        }
+
+        boolean hasWrappedShareCount = false;
+        if (incrementallyIncreasedShareCount) {
+            String key = PREF_INCREMENTALLY_INCREASED_SHARE_COUNT_VALUE;
+            double value = PREFS.getDouble(key, 0.000);
+            if (value > 0.999) {
+                value = 0.000;
+                // TODO
+                LOGGER.warn("incrementallyIncreasedShareCount, is wrapping back to " + value);
+                hasWrappedShareCount = true;
+            }
+            value = value + 0.001;
+            for (AbstractStockPrice bean : prices) {
+                bean.setUnits(value);
+            }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(
+                        "incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
+            }
+            PREFS.putDouble(key, value);
+        }
+
+        // for (StockPriceBean bean : beans) {
+        // String currency = bean.getCurrency();
+        // if (PropertiesUtils.isNull(currency)) {
+        // String symbol = bean.getStockSymbol();
+        // String overridingCurrency = getMapperCurrency(symbol, mapper);
+        // log.info("symbol: " + symbol + ", overridingCurrency=" +
+        // overridingCurrency);
+        // if (!PropertiesUtils.isNull(overridingCurrency)) {
+        // bean.setCurrency(overridingCurrency);
+        // }
+        // }
+        // }
+
+        Double badPrice = null;
+        if (getSuspiciousPrice() > -1L) {
+            Double d = new Double(getSuspiciousPrice());
+            for (AbstractStockPrice bean : prices) {
+                String stockSymbol = bean.getStockSymbol();
+                if ((stockSymbol != null) && (stockSymbol.startsWith("^"))) {
+                    // index
+                    continue;
+                }
+                Price price = bean.getLastPrice();
+                if (price == null) {
+                    continue;
+                }
+                if (price.getPrice().compareTo(d) > 0) {
+                    badPrice = price.getPrice();
+                    break;
+                }
+            }
+        }
+
+        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, badPrice, fxTable,
+                hasWrappedShareCount, symbolMapper, quoteSource);
+        // doRun.run();
+        SwingUtilities.invokeLater(stockPricesReceivedTask);
     }
 
     /**
@@ -1277,10 +1313,10 @@ public class GUI extends JFrame {
         // });
         // tabbedPane.addMouseListener(new PopupListener(popup));
 
-//        if (LOGGER.isDebugEnabled()) {
-//            LOGGER.debug("> creating createYahooSourceView");
-//        }
-//        tabbedPane.addTab("Yahoo", createYahooSourceView());
+        // if (LOGGER.isDebugEnabled()) {
+        // LOGGER.debug("> creating createYahooSourceView");
+        // }
+        // tabbedPane.addTab("Yahoo", createYahooSourceView());
 
         // if (LOGGER.isDebugEnabled()) {
         // LOGGER.debug("> creating createYahooApiSourceView");
@@ -1315,13 +1351,13 @@ public class GUI extends JFrame {
 
         tabbedPane.addTab("FT", createFtEquitiesSourceView());
 
-//        tabbedPane.addTab("FT Equities", createFtEquitiesSourceView());
+        // tabbedPane.addTab("FT Equities", createFtEquitiesSourceView());
 
         // createFtFundsSourceView
-//        tabbedPane.addTab("FT Funds", createFtFundsSourceView());
+        // tabbedPane.addTab("FT Funds", createFtFundsSourceView());
 
         // createFtEtfsSourceView
-//        tabbedPane.addTab("FT ETFs", createFtEtfsSourceView());
+        // tabbedPane.addTab("FT ETFs", createFtEtfsSourceView());
 
         int initialIndex = PREFS.getInt(PREF_SELECTED_QUOTE_SOURCE, 0);
         LOGGER.info("RESTORE selectedQuoteSource, index=" + initialIndex);
@@ -1545,9 +1581,9 @@ public class GUI extends JFrame {
 
         getBottomTabs().add("Prices", createPricesView());
 
-//        getBottomTabs().add("Exchange Rates", createExchangeRatesView());
+        // getBottomTabs().add("Exchange Rates", createExchangeRatesView());
 
-//        getBottomTabs().add("Mapper", createMapperView());
+        // getBottomTabs().add("Mapper", createMapperView());
 
         view.add(getBottomTabs(), BorderLayout.CENTER);
 
@@ -1628,9 +1664,9 @@ public class GUI extends JFrame {
         };
         getBottomTabs().addMouseListener(listener);
 
-//        if ((symbolMapper != null) && (getMapper() != null)) {
-//            MapperTableUtils.updateMapperTable(symbolMapper, getMapper());
-//        }
+        // if ((symbolMapper != null) && (getMapper() != null)) {
+        // MapperTableUtils.updateMapperTable(symbolMapper, getMapper());
+        // }
 
         return view;
     }
@@ -1787,7 +1823,7 @@ public class GUI extends JFrame {
                 File toFile = fc.getSelectedFile();
                 PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                 try {
-                    MDUtils.saveToCsv(priceList, toFile);
+                    MDUtils.saveToCsv(priceList, getDefaultCurrency(), symbolMapper, fxTable, toFile);
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1911,7 +1947,8 @@ public class GUI extends JFrame {
             }
         };
         boolean addStripe = true;
-        JTable table = MapperTableUtils.createMapperTable(/*getMapper()*/ null, comparator, filterEdit, filter, addStripe);
+        JTable table = MapperTableUtils.createMapperTable(/* getMapper() */ null, comparator, filterEdit, filter,
+                addStripe);
         // table.setFillsViewportHeight(true);
         JScrollPane scrolledPane = new JScrollPane(table);
 
@@ -2094,24 +2131,6 @@ public class GUI extends JFrame {
             if (!outputFile.delete()) {
                 LOGGER.warn("Failed to delete outputFile=" + outputFile);
             }
-        }
-    }
-
-    /**
-     * Stock symbols string received.
-     *
-     * @param quoteSource
-     *            the quote source
-     * @param stockSymbolsString
-     *            the stock symbols string
-     */
-    public void stockSymbolsStringReceived(QuoteSource quoteSource, String stockSymbolsString) {
-        clearPriceTable();
-        clearMapperTable();
-        this.saveOfxButton.setEnabled(false);
-        this.importToMoneyButton.setEnabled(false);
-        if (this.updateExchangeRateButton != null) {
-            this.updateExchangeRateButton.setEnabled(false);
         }
     }
 
@@ -2354,21 +2373,22 @@ public class GUI extends JFrame {
         this.priceList = priceList;
     }
 
-//    public EventList<AbstractStockPrice> getExchangeRates() {
-//        return exchangeRates;
-//    }
-//
-//    public void setExchangeRates(EventList<AbstractStockPrice> exchangeRates) {
-//        this.exchangeRates = exchangeRates;
-//    }
-//
-//    public EventList<SymbolMapperEntry> getMapper() {
-//        return mapper;
-//    }
-//
-//    public void setMapper(EventList<SymbolMapperEntry> mapper) {
-//        this.mapper = mapper;
-//    }
+    // public EventList<AbstractStockPrice> getExchangeRates() {
+    // return exchangeRates;
+    // }
+    //
+    // public void setExchangeRates(EventList<AbstractStockPrice> exchangeRates)
+    // {
+    // this.exchangeRates = exchangeRates;
+    // }
+    //
+    // public EventList<SymbolMapperEntry> getMapper() {
+    // return mapper;
+    // }
+    //
+    // public void setMapper(EventList<SymbolMapperEntry> mapper) {
+    // this.mapper = mapper;
+    // }
 
     public JTabbedPane getBottomTabs() {
         return bottomTabs;

@@ -7,13 +7,18 @@ package com.hungle.msmoney.core.fx;
 public class FxTableEntry {
     
     /** The from currency. */
-    String fromCurrency;
+    private String fromCurrency;
     
     /** The to currency. */
-    String toCurrency;
+    private String toCurrency;
     
     /** The rate. */
-    String rate;
+    private String rate;
+
+    @Override
+    public String toString() {
+        return "FxTableEntry [fromCurrency=" + fromCurrency + ", toCurrency=" + toCurrency + ", rate=" + rate + "]";
+    }
 
     /**
      * Gets the from currency.

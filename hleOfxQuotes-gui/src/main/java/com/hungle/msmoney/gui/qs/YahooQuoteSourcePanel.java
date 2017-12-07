@@ -57,7 +57,7 @@ public class YahooQuoteSourcePanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     /** The Constant log. */
-    public static final Logger LOGGER = Logger.getLogger(YahooQuoteSourcePanel.class);
+    private static final Logger LOGGER = Logger.getLogger(YahooQuoteSourcePanel.class);
 
     /** The Constant PREF_YAHOO_QUOTE_SERVER. */
     public static final String QUOTE_SERVER_PREFS_KEY = "yahooQuoteServer";

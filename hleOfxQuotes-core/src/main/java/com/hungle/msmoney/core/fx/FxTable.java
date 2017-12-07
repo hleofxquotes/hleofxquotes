@@ -19,7 +19,7 @@ import com.hungle.msmoney.core.misc.CheckNullUtils;
  * The Class FxTable.
  */
 public class FxTable {
-    
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(FxTable.class);
 
@@ -43,8 +43,10 @@ public class FxTable {
     /**
      * Gets the rate string.
      *
-     * @param fromCurrency the from currency
-     * @param toCurrency the to currency
+     * @param fromCurrency
+     *            the from currency
+     * @param toCurrency
+     *            the to currency
      * @return the rate string
      */
     public Double getCurrencyRate(String fromCurrency, String toCurrency) {
@@ -101,8 +103,10 @@ public class FxTable {
     /**
      * Load.
      *
-     * @param file the file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param file
+     *            the file
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void load(File file) throws IOException {
         Reader reader = null;
@@ -178,4 +182,25 @@ public class FxTable {
             }
         }
     }
+
+    public NumberFormat getRateFormatter() {
+        return rateFormatter;
+    }
+
+    public void setRateFormatter(NumberFormat rateFormatter) {
+        this.rateFormatter = rateFormatter;
+    }
+
+    public void add(FxTableEntry fxTableEntry) {
+        entries.add(fxTableEntry);
+    }
+
+    public void dump() {
+        LOGGER.debug("> BEGIN dump");
+        for (FxTableEntry entry : entries) {
+            LOGGER.debug(entry);
+        }
+        LOGGER.debug("< END dump");
+    }
+
 }

@@ -6,7 +6,6 @@ import java.io.StringReader;
 import org.junit.Test;
 
 import com.csvreader.CsvReader;
-import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -7,10 +7,12 @@ import java.util.concurrent.ExecutorService;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import com.hungle.msmoney.gui.qs.YahooQuoteSourcePanel;
+import org.apache.log4j.Logger;
+
 import com.hungle.msmoney.qs.QuoteSourceListener;
 
 public class MenuUtils {
+    private static final Logger LOGGER = Logger.getLogger(MenuUtils.class);
 
     /**
      * Creates the samples menu.
@@ -50,8 +52,8 @@ public class MenuUtils {
      * @return the j menu
      */
     public static final JMenu createBookmarksMenu(QuoteSourceListener quoteSourceListener, ExecutorService threadPool) {
-        if (YahooQuoteSourcePanel.LOGGER.isDebugEnabled()) {
-            YahooQuoteSourcePanel.LOGGER.debug("> createBookmarksMenu()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> createBookmarksMenu()");
         }
     
         File dir = new File("bookmarks");

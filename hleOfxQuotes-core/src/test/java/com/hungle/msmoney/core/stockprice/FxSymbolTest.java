@@ -31,7 +31,7 @@ public class FxSymbolTest {
 
         symbol = "EURUSD";
         fxSymbol = FxSymbol.parse(symbol);
-        Assert.assertNull(fxSymbol);
+        Assert.assertNotNull(fxSymbol);
 
         symbol = "EURUSD=";
         fxSymbol = FxSymbol.parse(symbol);
@@ -47,5 +47,13 @@ public class FxSymbolTest {
         Assert.assertEquals("EUR", fxSymbol.getFromCurrency());
         Assert.assertEquals("USD", fxSymbol.getToCurrency());
         Assert.assertEquals(new Double(0.0), new Double(fxSymbol.getRate()));
+
+        symbol = "USDGBP";
+        fxSymbol = FxSymbol.parse(symbol);
+        Assert.assertNotNull(fxSymbol);
+
+        symbol = "USDGBX";
+        fxSymbol = FxSymbol.parse(symbol);
+        Assert.assertNotNull(fxSymbol);
     }
 }

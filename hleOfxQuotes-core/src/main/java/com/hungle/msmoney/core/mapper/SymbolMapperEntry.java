@@ -51,6 +51,13 @@ public class SymbolMapperEntry {
             TYPE,
     };
 
+    @Override
+    public String toString() {
+        return "SymbolMapperEntry [msMoneySymbol=" + msMoneySymbol + ", quotesSourceSymbol=" + quotesSourceSymbol
+                + ", isMutualFund=" + isMutualFund + ", isOptions=" + isOptions + ", isBond=" + isBond
+                + ", msMoneyCurrency=" + msMoneyCurrency + ", quotesSourceCurrency=" + quotesSourceCurrency + "]";
+    }
+
     /** The ms money symbol. */
     private String msMoneySymbol;
     

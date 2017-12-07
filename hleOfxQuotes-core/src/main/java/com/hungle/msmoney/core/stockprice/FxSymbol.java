@@ -1,21 +1,35 @@
 package com.hungle.msmoney.core.stockprice;
 
+import java.util.Currency;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
 import com.hungle.msmoney.core.misc.CheckNullUtils;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class FxSymbol.
  */
 public class FxSymbol {
-    
+    private static final Logger LOGGER = Logger.getLogger(FxSymbol.class);
+
+    private static final String PENNY_STERLING = "GBX";
+
     /** The from currency. */
     private String fromCurrency;
-    
+
     /** The to currency. */
     private String toCurrency;
-    
+
     /** The rate. */
     private double rate;
+
+    private static final Set<Currency> availableCurrencies = Currency.getAvailableCurrencies();
+
+    @Override
+    public String toString() {
+        return "FxSymbol [fromCurrency=" + fromCurrency + ", toCurrency=" + toCurrency + ", rate=" + rate + "]";
+    }
 
     /**
      * Gets the from currency.
@@ -29,7 +43,8 @@ public class FxSymbol {
     /**
      * Sets the from currency.
      *
-     * @param fromCurrency the new from currency
+     * @param fromCurrency
+     *            the new from currency
      */
     public void setFromCurrency(String fromCurrency) {
         this.fromCurrency = fromCurrency;
@@ -47,7 +62,8 @@ public class FxSymbol {
     /**
      * Sets the to currency.
      *
-     * @param toCurrency the new to currency
+     * @param toCurrency
+     *            the new to currency
      */
     public void setToCurrency(String toCurrency) {
         this.toCurrency = toCurrency;
@@ -65,7 +81,8 @@ public class FxSymbol {
     /**
      * Sets the rate.
      *
-     * @param rate the new rate
+     * @param rate
+     *            the new rate
      */
     public void setRate(double rate) {
         this.rate = rate;
@@ -74,12 +91,11 @@ public class FxSymbol {
     /**
      * Parses the.
      *
-     * @param symbol the symbol
+     * @param symbol
+     *            the symbol
      * @return the fx symbol
      */
     public static FxSymbol parse(String symbol) {
-        FxSymbol fxSymbol = null;
-
         // ALLUSD=X
         // EURUSD=X
         if (symbol == null) {
@@ -90,18 +106,48 @@ public class FxSymbol {
             return null;
         }
 
-        if (symbol.length() != 8) {
+        if (symbol.length() == 8) {
+            if (!symbol.endsWith("=X")) {
+                return null;
+            }
+        } else if (symbol.length() == 6) {
+            // OK
+        } else {
             return null;
         }
 
-        if (!symbol.endsWith("=X")) {
+        String from = symbol.substring(0, 3);
+        if (!isValidCurrencyCode(from)) {
+            return null;
+        }
+        String to = symbol.substring(3, 6);
+        if (!isValidCurrencyCode(to)) {
             return null;
         }
 
-        fxSymbol = new FxSymbol();
-        fxSymbol.setFromCurrency(symbol.substring(0, 3));
-        fxSymbol.setToCurrency(symbol.substring(3, 6));
+        FxSymbol fxSymbol = new FxSymbol();
+        fxSymbol.setFromCurrency(from);
+        fxSymbol.setToCurrency(to);
 
         return fxSymbol;
+    }
+
+    private static boolean isValidCurrencyCode(String currencyCode) {
+        // handle special cases
+        if (currencyCode.compareToIgnoreCase(PENNY_STERLING) == 0) {
+            return true;
+        }
+
+        Currency currency = null;
+        try {
+            currency = Currency.getInstance(currencyCode);
+        } catch (Exception e) {
+            LOGGER.warn(e);
+        }
+
+        if (currency == null) {
+            return false;
+        }
+        return availableCurrencies.contains(currency);
     }
 }
