@@ -1,0 +1,46 @@
+Thu Dec  7 13:41:57 PST 2017
+
+  * Add support to add atributes to a symbol
+
+unzip hleOfxQuotes-gui-Build_20171207_165.zip
+  to get
+hleOfxQuotes-gui-Build_20171207_165-exec.jar
+
+Need Java 1.8
+
+java -jar hleOfxQuotes-gui-Build_20171207_165-exec.jar
+  Update prices
+  In price table: popup menu MD -> Save CSV
+
+Some sample symbols
+
+GB0033772517
+  As-is, no currency conversion
+
+ALO:PAR
+  As-is, no currency conversion
+
+GB00BTLX1Q39,USD,GBP
+  converts the returns price from USD to GBP
+  IMPORTANT: Make sure to include a meta-symbol USDGBP so that we will also lookup
+    the current rate.
+
+GB00BTLX1Q39,USD,GBX
+  NOT SUPPORTED YET. Currently for GBX, you can only convert between GBP and GBX
+
+AAPL
+  As-is, no currency conversion
+
+AAPL,USD,GBP
+  converts the returns price from USD to GBP
+  IMPORTANT: Make sure to include a meta-symbol USDGBP so that we will also lookup
+    the current rate.
+
+GB00B2PLJJ36,GBX,GBP
+  converts pence into pounds
+
+XMRC:LSE:GBX
+  As-is, no currency conversion
+
+XMRC:LSE:GBX,GBX,GBP
+  converts pence into pounds

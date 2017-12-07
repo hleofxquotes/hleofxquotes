@@ -1,0 +1,19 @@
+Fri Dec  1 10:15:56 PST 2017
+
+  * Add support to export prices via MD -> Save CSV
+
+Sample CSV
+Price,Ticker_ISIN
+58.7700,GB00B0CNH270:GBX
+112.5200,GB00BYYV0405:GBX
+1.0400,IE00BD2M9K78:GBP
+
+unzip hleOfxQuotes-gui-Build_20171201_160.zip
+  to get
+hleOfxQuotes-gui-Build_20171201_160-exec.jar
+
+Need Java 1.8
+
+java -jar hleOfxQuotes-gui-Build_20171201_160-exec.jar
+  Update prices
+  In price table: popup menu MD -> Save CSV
