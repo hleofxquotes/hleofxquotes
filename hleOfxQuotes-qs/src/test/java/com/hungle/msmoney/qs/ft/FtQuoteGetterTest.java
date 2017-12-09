@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.qs.net.AbstractHttpQuoteGetter;
 
 public class FtQuoteGetterTest {
     private static final Logger LOGGER = Logger.getLogger(FtQuoteGetterTest.class);
@@ -17,7 +18,7 @@ public class FtQuoteGetterTest {
     public void testLiveEquities() throws IOException {
         String[] equities = { "IBM:NYQ", "AAPL:NSQ", "RDSA:LSE", "NESN:VTX", "FP:PAR", };
         List<String> list = Arrays.asList(equities);
-        FtEquitiesQuoteGetter getter = new FtEquitiesQuoteGetter();
+        AbstractHttpQuoteGetter getter = new FtEquitiesQuoteGetter();
         List<AbstractStockPrice> stockPrices = getter.getQuotes(list);
         Assert.assertNotNull(stockPrices);
         Assert.assertTrue(stockPrices.size() == equities.length);

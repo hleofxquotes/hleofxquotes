@@ -399,7 +399,9 @@ public class YahooQuoteSourcePanel extends JPanel {
             stockPrices = quoteGetter.getQuotes(stockSymbols, listener);
             this.fxSymbols = quoteGetter.getFxSymbols();
         } finally {
-
+            if (quoteGetter != null) {
+                quoteGetter.close();
+            }
         }
         return stockPrices;
     }
@@ -432,7 +434,9 @@ public class YahooQuoteSourcePanel extends JPanel {
      * @return the quotes
      */
     public void getQuotes() {
-        LOGGER.info("> getQuotes");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> getQuotes");
+        }
 
         updateButton.setEnabled(false);
         progressBar.setValue(0);

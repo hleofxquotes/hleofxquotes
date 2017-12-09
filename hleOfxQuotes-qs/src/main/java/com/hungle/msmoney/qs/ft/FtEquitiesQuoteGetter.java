@@ -15,7 +15,6 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -35,6 +34,7 @@ public class FtEquitiesQuoteGetter extends AbstractHttpQuoteGetter {
         super();
         setBucketSize(1);
         setKeepFxSymbols(false);
+//        httpClient = createHttpClient();
     }
 
     @Override
@@ -60,7 +60,6 @@ public class FtEquitiesQuoteGetter extends AbstractHttpQuoteGetter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("uri=" + uri);
         }
-        HttpClient httpClient = createHttpClient();
         HttpResponse response = httpClient.execute(httpGet);
         return response;
     }
@@ -111,6 +110,8 @@ public class FtEquitiesQuoteGetter extends AbstractHttpQuoteGetter {
                 stockPrice.setDayHigh(lastPrice);
                 stockPrice.setDayHigh(lastPrice);
                 stockPrice.setLastTrade(model.getDate());
+                
+                stockPrice.setStockName(model.getName());
             } finally {
                 stockPrice.postSetProperties();
             }

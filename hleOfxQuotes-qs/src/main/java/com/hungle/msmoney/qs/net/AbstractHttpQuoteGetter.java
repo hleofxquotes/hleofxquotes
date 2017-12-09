@@ -1,5 +1,6 @@
 package com.hungle.msmoney.qs.net;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,6 +19,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
@@ -33,7 +35,9 @@ import com.hungle.msmoney.core.stockprice.FxSymbol;
 /**
  * The Class AbstractHttpQuoteGetter.
  */
-public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
+public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closeable {
+
+    private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36";
 
     /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(AbstractHttpQuoteGetter.class);
@@ -57,7 +61,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     private static final long DEFAULT_TIMEOUT = 120L;
 
     /** The Constant DEFAULT_FX_FILENAME. */
-//    private static final String DEFAULT_FX_FILENAME = "fx.csv";
+    // private static final String DEFAULT_FX_FILENAME = "fx.csv";
 
     /** The Constant threadPool. */
     private static final ExecutorService threadPool = Executors.newFixedThreadPool(3);
@@ -95,11 +99,14 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     /** The keep fx symbols. */
     private boolean keepFxSymbols = true;
 
+    protected CloseableHttpClient httpClient;
+
     /**
      * Instantiates a new abstract http quote getter.
      */
     public AbstractHttpQuoteGetter() {
         super();
+        httpClient = createHttpClient();
     }
 
     /*
@@ -120,11 +127,9 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
         return response;
     }
 
-    protected HttpClient createHttpClient() {
-        String userAgent = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36";
-        HttpClient httpClient = HttpClientBuilder.create()
-                .setUserAgent(userAgent)
-                .build();
+    private CloseableHttpClient createHttpClient() {
+        String userAgent = DEFAULT_USER_AGENT;
+        CloseableHttpClient httpClient = HttpClientBuilder.create().setUserAgent(userAgent).build();
         return httpClient;
     }
 
@@ -135,8 +140,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
      * httpEntityToStockPriceBean(org.apache.http.HttpEntity, boolean)
      */
     @Override
-    public List<AbstractStockPrice> httpEntityToStockPriceBean(HttpEntity entity, boolean skipIfNoPrice)
-            throws IOException {
+    public List<AbstractStockPrice> httpEntityToStockPriceBean(HttpEntity entity, boolean skipIfNoPrice) throws IOException {
         return HttpUtils.toStockPriceBean(entity, skipIfNoPrice);
     }
 
@@ -247,7 +251,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
      */
     protected List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener, boolean skipNoPrice)
             throws IOException {
-        LOGGER.info("> getQuotes");
+        LOGGER.info("> BEGIN getQuotes");
 
         fxSymbols = new ArrayList<AbstractStockPrice>();
 
@@ -258,8 +262,10 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
                 return prices;
             }
 
-            LOGGER.info("stocks.size=" + stocks.size());
-            LOGGER.info("bucketSize=" + bucketSize);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("> REQUEST prices for symbols=" + stocks.size());
+                LOGGER.debug("  bucketSize=" + bucketSize);
+            }
 
             if (stocks.size() <= 0) {
                 return prices;
@@ -295,6 +301,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
                 }
                 try {
                     List<AbstractStockPrice> receivedFromQuoteSource = future.get();
+
                     addPrices(receivedFromQuoteSource, prices);
                 } catch (InterruptedException e) {
                     if (LOGGER.isDebugEnabled()) {
@@ -308,18 +315,59 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
                     } else {
                         LOGGER.warn(e);
                     }
+                } finally {
                 }
             }
 
             if (fxSymbols != null) {
-//                FxTableUtils.writeFxFile(fxSymbols, fxFileName);
+                // FxTableUtils.writeFxFile(fxSymbols, fxFileName);
             }
         } finally {
+            logQuoteRequestSummary(stocks, prices);
+            
             long delta = stopWatch.click();
-            LOGGER.info("< getQuotes, delta=" + delta);
+            LOGGER.info("< END getQuotes, delta=" + delta + " ms");
         }
 
         return prices;
+    }
+
+    private void logQuoteRequestSummary(List<String> requests, List<AbstractStockPrice> responses) {
+        LOGGER.info("SUMMARY: requests=" + requests.size() + ", responses=" + responses.size());
+        if (requests.size() == responses.size()) {
+            // OK
+        } else if (requests.size() < responses.size()) {
+            LOGGER.warn("Gotten more responses than requests.");
+        } else {
+            String[] xxx = new String[responses.size()];
+            int i = 0;
+            for(AbstractStockPrice response: responses) {
+                xxx[i++] = response.getStockSymbol();
+            }
+            
+            List<String> notFound = new ArrayList<String>();
+            for(String request: requests) {
+                int index = findIndex(request, xxx);
+                if (index < 0) {
+                    notFound.add(request);
+                } else {
+                    xxx[index] = "";
+                }
+            }
+            
+            for(String item: notFound) {
+                LOGGER.warn("NOT_FOUND: " + item);
+            }
+        }
+    }
+
+    private int findIndex(String request, String[] xxx) {
+        for(int i = 0; i < xxx.length; i++) {
+            if (xxx[i].compareToIgnoreCase(request) == 0) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -332,6 +380,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     /**
      * Adds the prices we received to the all price list. Filter out fx as
      * needed.
+     * 
      * @param newPrices
      *            the received from quote source
      * @param prices
@@ -341,7 +390,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
         if (newPrices == null) {
             return;
         }
-        
+
         List<AbstractStockPrice> filtered = newPrices;
         if (filterFxQuotes) {
             filtered = new ArrayList<AbstractStockPrice>();
@@ -474,4 +523,11 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
     public void setBucketSize(int bucketSize) {
         this.bucketSize = bucketSize;
     }
+    
+    public void close() throws IOException {
+        if (httpClient != null) {
+            httpClient.close();
+        }
+    }
+
 }

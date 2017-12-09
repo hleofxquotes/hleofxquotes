@@ -26,20 +26,22 @@ public class FtPriceModel {
 
     public static final String FT_EQUITIES_BASE_URL = "https://markets.ft.com/data/equities/tearsheet/summary";
 
-    private String currency;
+    private String symbol;
 
     private Double price;
+
+    private String currency;
 
     private Date date;
 
     private String timeZone;
 
-    private String symbol;
-
+    private String name;
+    
     @Override
     public String toString() {
-        return "FTPriceModel [symbol=" + symbol + ", price=" + price + ", currency=" + currency + ", date=" + date
-                + ", timeZone=" + timeZone + "]";
+        return "FtPriceModel [symbol=" + symbol + ", price=" + price + ", currency=" + currency + ", date=" + date + ", timeZone="
+                + timeZone + ", name=" + name + "]";
     }
 
     public String getCurrency() {
@@ -80,10 +82,30 @@ public class FtPriceModel {
             model.setSymbol(symbol);
 
             String cssQuery = null;
-
+            Element topDiv = null;
+            
+            // name
+            // <h1 class="mod-tearsheet-overview__header__name mod-tearsheet-overview__header__name--large">
+            // <div class="mod-tearsheet-overview__header"
+            cssQuery = "div.mod-tearsheet-overview__header";
+            topDiv = doc.selectFirst(cssQuery);
+            if (topDiv == null) {
+                throw new IOException("Cannot find " + cssQuery);
+            }
+            cssQuery = "h1";
+            Elements items = topDiv.select(cssQuery);
+            if (items == null) {
+                throw new IOException("Cannot find " + cssQuery);
+            }
+            Element item = items.get(0);
+            if (item == null) {
+                throw new IOException("Cannot find first <li>");
+            }
+            model.setName(item.text());
+            
             // <div class="mod-tearsheet-overview__quote">
             cssQuery = "div.mod-tearsheet-overview__quote";
-            Element topDiv = doc.selectFirst(cssQuery);
+            topDiv = doc.selectFirst(cssQuery);
             if (topDiv == null) {
                 throw new IOException("Cannot find " + cssQuery);
             }
@@ -95,6 +117,45 @@ public class FtPriceModel {
             return model;
         } catch (IOException e) {
             throw new IOException("Cannot parse response for symbol=" + symbol, e);
+        }
+    }
+
+    private static void parsePrice(Element topDiv, FtPriceModel model) throws IOException {
+        String cssQuery;
+        cssQuery = "li";
+        Elements items = topDiv.select(cssQuery);
+        if (items == null) {
+            throw new IOException("Cannot find " + cssQuery);
+        }
+    
+        for (Element item : items) {
+            // <span class="mod-ui-data-list__label">Price (USD)</span>
+            String cssQueryLabel = "span.mod-ui-data-list__label";
+            Element label = item.selectFirst(cssQueryLabel);
+            if (label == null) {
+                throw new IOException("Cannot find " + cssQueryLabel);
+            }
+            String labelText = label.text();
+    
+            // <span class="mod-ui-data-list__value">152.47</span>
+            String cssQueryValue = "span.mod-ui-data-list__value";
+            Element value = item.selectFirst(cssQueryValue);
+            if (value == null) {
+                throw new IOException("Cannot find " + cssQueryValue);
+            }
+            String valueText = value.text();
+    
+            if (labelText != null) {
+                labelText = labelText.trim();
+                if (labelText.startsWith("Price")) {
+                    setPriceAndCurrency(labelText, valueText, model);
+                }
+            }
+    
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(labelText + "=" + valueText);
+            }
+    
         }
     }
 
@@ -137,45 +198,6 @@ public class FtPriceModel {
                     }
                 }
             }
-        }
-    }
-
-    private static void parsePrice(Element topDiv, FtPriceModel model) throws IOException {
-        String cssQuery;
-        cssQuery = "li";
-        Elements items = topDiv.select(cssQuery);
-        if (items == null) {
-            throw new IOException("Cannot find " + cssQuery);
-        }
-
-        for (Element item : items) {
-            // <span class="mod-ui-data-list__label">Price (USD)</span>
-            String cssQueryLabel = "span.mod-ui-data-list__label";
-            Element label = item.selectFirst(cssQueryLabel);
-            if (label == null) {
-                throw new IOException("Cannot find " + cssQueryLabel);
-            }
-            String labelText = label.text();
-
-            // <span class="mod-ui-data-list__value">152.47</span>
-            String cssQueryValue = "span.mod-ui-data-list__value";
-            Element value = item.selectFirst(cssQueryValue);
-            if (value == null) {
-                throw new IOException("Cannot find " + cssQueryValue);
-            }
-            String valueText = value.text();
-
-            if (labelText != null) {
-                labelText = labelText.trim();
-                if (labelText.startsWith("Price")) {
-                    setPriceAndCurrency(labelText, valueText, model);
-                }
-            }
-
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(labelText + "=" + valueText);
-            }
-
         }
     }
 
@@ -230,6 +252,14 @@ public class FtPriceModel {
 
     public static final URL getFtEquityURL(String equity) throws MalformedURLException, UnsupportedEncodingException {
         return new URL(FT_EQUITIES_BASE_URL + "?s=" + URLEncoder.encode(equity, "UTF-8"));
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     private static final Date toDate(String source) {

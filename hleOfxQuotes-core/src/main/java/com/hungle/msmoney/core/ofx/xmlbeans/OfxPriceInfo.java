@@ -276,8 +276,10 @@ public class OfxPriceInfo {
             }
         }
 
-        LOGGER.info("minLastTradeDate=" + minLastTradeDate);
-        LOGGER.info("maxLastTradeDate=" + maxLastTradeDate);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("minLastTradeDate=" + minLastTradeDate);
+            LOGGER.debug("maxLastTradeDate=" + maxLastTradeDate);
+        }
     }
 
     /**
@@ -408,8 +410,10 @@ public class OfxPriceInfo {
         String unitsStr = unitFormatter.format(units);
         Double unitPrice = getStockPrice(stockPrice);
         String currency = stockPrice.getCurrency();
-        LOGGER.info("quoteSourceSymbol=" + quoteSourceSymbol + ", msMoneySymbol=" + msMoneySymbol + ", unitPrice="
-                + unitPrice + ", currency=" + currency);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("quoteSourceSymbol=" + quoteSourceSymbol + ", msMoneySymbol=" + msMoneySymbol + ", unitPrice="
+                    + unitPrice + ", currency=" + currency);
+        }
 
         // currency conversion
         boolean convertedFromGBX = false;

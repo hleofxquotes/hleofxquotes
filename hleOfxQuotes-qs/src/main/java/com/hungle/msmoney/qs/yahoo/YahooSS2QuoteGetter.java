@@ -21,7 +21,6 @@ import java.util.TimeZone;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.log4j.Logger;
 
@@ -65,7 +64,7 @@ public class YahooSS2QuoteGetter extends AbstractHttpQuoteGetter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("uri=" + uri);
         }
-        HttpClient httpClient = createHttpClient();
+//        HttpClient httpClient = createHttpClient();
         HttpResponse response = httpClient.execute(httpGet);
         return response;
     }

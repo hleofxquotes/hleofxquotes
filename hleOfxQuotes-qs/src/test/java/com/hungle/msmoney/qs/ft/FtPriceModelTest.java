@@ -56,6 +56,12 @@ public class FtPriceModelTest {
         String currency = model.getCurrency();
         Assert.assertNotNull(currency);
         Assert.assertEquals("GBP", currency);
+        
+        // name: Nomura Cross Asset Momentum UCITS Fund S GBP
+        String name = model.getName();
+        Assert.assertNotNull(name);
+        Assert.assertEquals("Nomura Cross Asset Momentum UCITS Fund S GBP", name);
+        
     }
 
     @Test
@@ -93,6 +99,12 @@ public class FtPriceModelTest {
         String currency = model.getCurrency();
         Assert.assertNotNull(currency);
         Assert.assertEquals("USD", currency);
+        
+        // name: International Business Machines Corp
+        String name = model.getName();
+        Assert.assertNotNull(name);
+        Assert.assertEquals("International Business Machines Corp", name);
+
     }
 
     private FtPriceModel getModel(String testResource, String symbol) throws IOException {
