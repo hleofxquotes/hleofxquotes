@@ -125,6 +125,26 @@ public class StockPrice extends AbstractStockPrice {
         postSetProperties();
     }
 
+    public StockPrice(String symbol, Date date, double price) {
+        this(symbol, date, price, price, price);
+    }
+
+    public StockPrice(String symbol, Date date, double price, double daylow, double dayhigh) {
+        setStockSymbol(symbol);
+
+        setLastTrade(date);
+        
+        setLastPrice(new Price(price));
+        if (daylow >= 0) {
+            setDayLow(new Price(daylow));
+        }
+        if (dayhigh >= 0) {
+            setDayHigh(new Price(dayhigh));
+        }
+
+        postSetProperties();
+    }
+
     /**
      * Inits the.
      */
@@ -164,8 +184,8 @@ public class StockPrice extends AbstractStockPrice {
         Date date = getLastTrade();
         if (date == null) {
             try {
-                date = createLastTradeDate(lastTradeDate, lastTradeTime, lastTradeDateTimeFormatter, lastTradeDateFormatter,
-                        lastTradeTimeFormatter);
+                date = createLastTradeDate(lastTradeDate, lastTradeTime, lastTradeDateTimeFormatter,
+                        lastTradeDateFormatter, lastTradeTimeFormatter);
             } catch (ParseException e) {
                 LOGGER.warn("stockSymbol: " + stockSymbol + " - " + e);
             }
@@ -342,8 +362,8 @@ public class StockPrice extends AbstractStockPrice {
      */
     @Override
     public String getLastTradeDate() {
-         return lastTradeDateFormatter.format(getLastTrade());
-//        return lastTradeDate;
+        return lastTradeDateFormatter.format(getLastTrade());
+        // return lastTradeDate;
     }
 
     /**
@@ -352,20 +372,20 @@ public class StockPrice extends AbstractStockPrice {
      * @param lastTradeDate
      *            the new last trade date
      */
-     @Override
-     public void setLastTradeDate(String lastTradeDate) {
-     this.lastTradeDate = lastTradeDate;
-     }
+    @Override
+    public void setLastTradeDate(String lastTradeDate) {
+        this.lastTradeDate = lastTradeDate;
+    }
 
     /**
      * Gets the last trade time.
      *
      * @return the last trade time
      */
-     @Override
-     public String getLastTradeTime() {
-     return lastTradeTimeFormatter.format(getLastTrade());
-     }
+    @Override
+    public String getLastTradeTime() {
+        return lastTradeTimeFormatter.format(getLastTrade());
+    }
 
     /**
      * Sets the last trade time.
@@ -373,10 +393,10 @@ public class StockPrice extends AbstractStockPrice {
      * @param lastTradeTime
      *            the new last trade time
      */
-     @Override
-     public void setLastTradeTime(String lastTradeTime) {
-     this.lastTradeTime = lastTradeTime;
-     }
+    @Override
+    public void setLastTradeTime(String lastTradeTime) {
+        this.lastTradeTime = lastTradeTime;
+    }
 
     /*
      * (non-Javadoc)

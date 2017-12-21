@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?OFX OFXHEADER="200" VERSION="200" SECURITY="NONE" OLDFILEUID="NONE" NEWFILEUID="NONE"?>
+<OFX>
+  <!--Created by hleOfxQuotes on: Thu Dec 21 15:07:54 PST 2017-->
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <!--DTSERVER local time is Thu Dec 21 15:07:54 PST 2017-->
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+        <MESSAGE>Successful Sign On</MESSAGE>
+      </STATUS>
+      <DTSERVER>20171221150754.314[-8:PST]</DTSERVER>
+      <LANGUAGE>ENG</LANGUAGE>
+    </SONRS>
+  </SIGNONMSGSRSV1>
+  <INVSTMTMSGSRSV1>
+    <INVSTMTTRNRS>
+      <TRNUID>900E7E3C-B0E4-4738-8BC7-A587C45E0190</TRNUID>
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+      </STATUS>
+      <!--DTASOF local time is Thu Dec 21 15:07:54 PST 2017-->
+      <INVSTMTRS>
+        <DTASOF>20171221150754.199[-8:PST]</DTASOF>
+        <CURDEF>USD</CURDEF>
+        <INVACCTFROM>
+          <BROKERID>hungle.com</BROKERID>
+          <ACCTID>0123456789</ACCTID>
+        </INVACCTFROM>
+        <INVPOSLIST>
+          <POSMF>
+            <!--DTPRICEASOF local time is Thu Dec 21 15:07:54 PST 2017-->
+            <INVPOS>
+              <!--Ticker from quote source is: MFUND001-->
+              <SECID>
+                <UNIQUEID>MFUND001</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>1.00</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171221150754.188[-8:PST]</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>1.22</CURRATE>
+                <CURSYM>EUR</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+          <POSSTOCK>
+            <!--DTPRICEASOF local time is Thu Dec 21 15:07:54 PST 2017-->
+            <INVPOS>
+              <!--Ticker from quote source is: STOCK001-->
+              <SECID>
+                <UNIQUEID>STOCK001</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>2.00</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171221150754.199[-8:PST]</DTPRICEASOF>
+              <CURRENCY>
+                <CURRATE>0.9</CURRATE>
+                <CURSYM>GBP</CURSYM>
+              </CURRENCY>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+          </POSSTOCK>
+        </INVPOSLIST>
+      </INVSTMTRS>
+    </INVSTMTTRNRS>
+  </INVSTMTMSGSRSV1>
+  <SECLISTMSGSRSV1>
+    <SECLIST>
+      <MFINFO>
+        <!--Ticker from quote source is: MFUND001-->
+        <!--DTASOF local time is Thu Dec 21 15:07:54 PST 2017-->
+        <!--Security is treated as Mutual Fund-->
+        <SECINFO>
+          <SECID>
+            <UNIQUEID>MFUND001</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>MFUND001</SECNAME>
+          <TICKER>MFUND001</TICKER>
+          <UNITPRICE>1.00</UNITPRICE>
+          <DTASOF>20171221150754.188[-8:PST]</DTASOF>
+          <CURRENCY>
+            <CURRATE>1.22</CURRATE>
+            <CURSYM>EUR</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+        <MFTYPE>OPENEND</MFTYPE>
+      </MFINFO>
+      <STOCKINFO>
+        <!--Ticker from quote source is: STOCK001-->
+        <!--DTASOF local time is Thu Dec 21 15:07:54 PST 2017-->
+        <!--Security is treated as Stock-->
+        <SECINFO>
+          <SECID>
+            <UNIQUEID>STOCK001</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>STOCK001</SECNAME>
+          <TICKER>STOCK001</TICKER>
+          <UNITPRICE>2.00</UNITPRICE>
+          <DTASOF>20171221150754.199[-8:PST]</DTASOF>
+          <CURRENCY>
+            <CURRATE>0.9</CURRATE>
+            <CURSYM>GBP</CURSYM>
+          </CURRENCY>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+      </STOCKINFO>
+    </SECLIST>
+  </SECLISTMSGSRSV1>
+</OFX>

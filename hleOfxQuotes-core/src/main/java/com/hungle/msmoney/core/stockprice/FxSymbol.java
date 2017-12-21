@@ -3,6 +3,7 @@ package com.hungle.msmoney.core.stockprice;
 import java.util.Currency;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.misc.CheckNullUtils;
@@ -133,6 +134,10 @@ public class FxSymbol {
     }
 
     private static boolean isValidCurrencyCode(String currencyCode) {
+        if (StringUtils.isEmpty(currencyCode)) {
+            return false;
+        }
+        
         // handle special cases
         if (currencyCode.compareToIgnoreCase(PENNY_STERLING) == 0) {
             return true;
@@ -142,7 +147,7 @@ public class FxSymbol {
         try {
             currency = Currency.getInstance(currencyCode);
         } catch (Exception e) {
-            LOGGER.warn(e);
+            LOGGER.warn("currencyCode=" + currencyCode + ", e=" + e.getClass().getName() + " " + e.getMessage());
         }
 
         if (currency == null) {

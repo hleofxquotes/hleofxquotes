@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?OFX OFXHEADER="200" VERSION="200" SECURITY="NONE" OLDFILEUID="NONE" NEWFILEUID="NONE"?>
+<OFX>
+  <!--Created by hleOfxQuotes on: Thu Dec 21 14:04:33 PST 2017-->
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <!--DTSERVER local time is Thu Dec 21 14:04:33 PST 2017-->
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+        <MESSAGE>Successful Sign On</MESSAGE>
+      </STATUS>
+      <DTSERVER>20171221140433.509[-8:PST]</DTSERVER>
+      <LANGUAGE>ENG</LANGUAGE>
+    </SONRS>
+  </SIGNONMSGSRSV1>
+  <INVSTMTMSGSRSV1>
+    <INVSTMTTRNRS>
+      <TRNUID>D5650A4D-A3F6-43CC-AFF9-9F73540F66DD</TRNUID>
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+      </STATUS>
+      <!--DTASOF local time is Thu Dec 21 14:04:33 PST 2017-->
+      <INVSTMTRS>
+        <DTASOF>20171221140433.509[-8:PST]</DTASOF>
+        <CURDEF>USD</CURDEF>
+        <INVACCTFROM>
+          <BROKERID>hungle.com</BROKERID>
+          <ACCTID>0123456789</ACCTID>
+        </INVACCTFROM>
+        <INVPOSLIST>
+          <POSSTOCK>
+            <!--DTPRICEASOF local time is Thu Dec 21 14:04:33 PST 2017-->
+            <INVPOS>
+              <!--Ticker from quote source is: HLE001-->
+              <SECID>
+                <UNIQUEID>HLE001</UNIQUEID>
+                <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>0.000</UNITS>
+              <UNITPRICE>1.00</UNITPRICE>
+              <MKTVAL>0.00</MKTVAL>
+              <DTPRICEASOF>20171221140433.509[-8:PST]</DTPRICEASOF>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+          </POSSTOCK>
+        </INVPOSLIST>
+      </INVSTMTRS>
+    </INVSTMTTRNRS>
+  </INVSTMTMSGSRSV1>
+  <SECLISTMSGSRSV1>
+    <SECLIST>
+      <STOCKINFO>
+        <!--Ticker from quote source is: HLE001-->
+        <!--DTASOF local time is Thu Dec 21 14:04:33 PST 2017-->
+        <!--Security is treated as Stock-->
+        <SECINFO>
+          <SECID>
+            <UNIQUEID>HLE001</UNIQUEID>
+            <UNIQUEIDTYPE>TICKER</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>HLE001</SECNAME>
+          <TICKER>HLE001</TICKER>
+          <UNITPRICE>1.00</UNITPRICE>
+          <DTASOF>20171221140433.509[-8:PST]</DTASOF>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+      </STOCKINFO>
+    </SECLIST>
+  </SECLISTMSGSRSV1>
+</OFX>
