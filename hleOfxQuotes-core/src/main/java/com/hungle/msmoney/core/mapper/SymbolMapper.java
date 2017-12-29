@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
@@ -332,5 +333,23 @@ public class SymbolMapper {
             LOGGER.debug(entry);
         }
         LOGGER.debug("< END dump");
+    }
+
+    public static String getStockSymbol(String qsSymbol, SymbolMapper symbolMapper) {
+        String symbol = qsSymbol;
+        List<SymbolMapperEntry> entries = symbolMapper.getMapByQuotesSourceSymbol().get(qsSymbol);
+        if (entries == null) {
+            return symbol;
+        }
+    
+        for (SymbolMapperEntry entry : entries) {
+            String s = entry.getMsMoneySymbol();
+            if (!StringUtils.isBlank(s)) {
+                symbol = s;
+                break;
+            }
+        }
+    
+        return symbol;
     }
 }

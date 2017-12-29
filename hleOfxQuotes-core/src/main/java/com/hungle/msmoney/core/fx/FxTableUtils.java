@@ -8,10 +8,14 @@ import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.core.mapper.SymbolMapper;
+import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.FxSymbol;
+import com.hungle.msmoney.core.stockprice.Price;
 
 import ca.odell.glazedlists.EventList;
 
@@ -165,6 +169,85 @@ public class FxTableUtils {
             fxTableEntry.setRate(fxTable.getRateFormatter().format(fxSymbol.getRate()));
             fxTable.add(fxTableEntry);
         }
+    }
+
+    public static Price getPrice(String qsSymbol, Price qsPrice, String defaultCurrency, SymbolMapper symbolMapper,
+            FxTable fxTable) {
+        Price price = qsPrice;
+
+        String fromCurrency = null;
+        String toCurrency = null;
+
+        List<SymbolMapperEntry> entries = symbolMapper.getMapByQuotesSourceSymbol().get(qsSymbol);
+        if (entries != null) {
+            for (SymbolMapperEntry entry : entries) {
+                String from = entry.getQuotesSourceCurrency();
+                String to = entry.getMsMoneyCurrency();
+                if (!StringUtils.isBlank(from)) {
+                    fromCurrency = from;
+                }
+                if (!StringUtils.isBlank(to)) {
+                    toCurrency = to;
+                }
+                if ((!StringUtils.isBlank(fromCurrency)) && (!StringUtils.isBlank(toCurrency))) {
+                    break;
+                }
+            }
+        }
+
+        if (StringUtils.isBlank(fromCurrency)) {
+            fromCurrency = qsPrice.getCurrency();
+        }
+        if (StringUtils.isBlank(toCurrency)) {
+            toCurrency = defaultCurrency;
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("fromCurrency=" + fromCurrency + ", toCurrency=" + toCurrency);
+        }
+
+        Double rate = null;
+        if ((!StringUtils.isBlank(fromCurrency)) && (!StringUtils.isBlank(toCurrency))) {
+            if (fromCurrency.compareToIgnoreCase(toCurrency) != 0) {
+                if (FxTableUtils.isGBP(fromCurrency) && FxTableUtils.isGBX(toCurrency)) {
+                    rate = new Double(100.00);
+                } else if (FxTableUtils.isGBX(fromCurrency) && FxTableUtils.isGBP(toCurrency)) {
+                    rate = new Double(0.01);
+                } else {
+                    if (FxTableUtils.isGBX(fromCurrency)) {
+                        // need to convert to GBP first
+                        rate = new Double(0.01);
+                        LOGGER.info("FX - symbol=" + qsSymbol + ", fromCurrency=" + fromCurrency + ", toCurrency="
+                                + "GBP, rate=" + rate);
+                        fromCurrency = "GBP";
+                    } else {
+                        rate = 1.00;
+                    }
+                    Double rate2 = fxTable.getCurrencyRate(fromCurrency, toCurrency);
+                    LOGGER.info("FX - symbol=" + qsSymbol + ", fromCurrency=" + fromCurrency + ", toCurrency="
+                            + toCurrency + ", rate=" + rate2);
+                    if (rate2 != null) {
+                        rate = rate * rate2;
+                    }
+                }
+            }
+        }
+        if (rate != null) {
+            double oldPrice = qsPrice.getPrice();
+            price.setPrice(qsPrice.getPrice() * rate);
+            double newPrice = price.getPrice();
+            LOGGER.info(
+                    "FX - Converting price for symbol=" + qsSymbol + ", qsPrice=" + oldPrice + ", price=" + newPrice);
+        }
+
+        return price;
+    }
+
+    public static boolean isGBX(String currency) {
+        return currency.compareToIgnoreCase("GBX") == 0;
+    }
+
+    public static boolean isGBP(String currency) {
+        return currency.compareToIgnoreCase("GBP") == 0;
     }
 
 }

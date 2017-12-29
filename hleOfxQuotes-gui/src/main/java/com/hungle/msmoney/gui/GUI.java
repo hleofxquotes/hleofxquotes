@@ -665,11 +665,11 @@ public class GUI extends JFrame {
      * @param stockSymbols
      */
     private void stockPricesLookupStarted(QuoteSource quoteSource, final List<String> stockSymbols) {
-        symbolMapper = SymbolMapper.loadMapperFile();
-        fxTable = FxTableUtils.loadFxFile();
+        setSymbolMapper(SymbolMapper.loadMapperFile());
+        setFxTable(FxTableUtils.loadFxFile());
 
         // these symbols could have mapper attributes
-        symbolMapper.addAttributes(stockSymbols);
+        getSymbolMapper().addAttributes(stockSymbols);
         unique(stockSymbols);
 
         Runnable doRun = new Runnable() {
@@ -701,7 +701,7 @@ public class GUI extends JFrame {
      *            the stock prices
      */
     private void stockPricesReceived(final QuoteSource quoteSource, List<AbstractStockPrice> stockPrices) {
-        symbolMapper.dump();
+        getSymbolMapper().dump();
 
         List<AbstractStockPrice> exchangeRates = quoteSource.getExchangeRates();
         if (LOGGER.isDebugEnabled()) {
@@ -712,12 +712,12 @@ public class GUI extends JFrame {
             }
             LOGGER.debug("< END exchangeRates");
         }
-        FxTableUtils.addExchangeRates(exchangeRates, fxTable);
-        fxTable.dump();
+        FxTableUtils.addExchangeRates(exchangeRates, getFxTable());
+        getFxTable().dump();
 
         final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices
                 : new ArrayList<AbstractStockPrice>();
-        updateLastPriceCurrency(prices, getDefaultCurrency(), symbolMapper);
+        updateLastPriceCurrency(prices, getDefaultCurrency(), getSymbolMapper());
 
         if (getRandomizeShareCount()) {
             int randomInt = random.nextInt(998);
@@ -783,8 +783,8 @@ public class GUI extends JFrame {
             }
         }
 
-        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, badPrice, fxTable,
-                hasWrappedShareCount, symbolMapper, quoteSource);
+        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, badPrice, getFxTable(),
+                hasWrappedShareCount, getSymbolMapper(), quoteSource);
         // doRun.run();
         SwingUtilities.invokeLater(stockPricesReceivedTask);
     }
@@ -1579,7 +1579,7 @@ public class GUI extends JFrame {
 
         setBottomTabs(new JTabbedPane());
 
-        getBottomTabs().add("Prices", createPricesView());
+        getBottomTabs().add("Quote Source Prices", createPricesView());
 
         // getBottomTabs().add("Exchange Rates", createExchangeRatesView());
 
@@ -1778,7 +1778,7 @@ public class GUI extends JFrame {
                 File toFile = fc.getSelectedFile();
                 PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                 try {
-                    QifUtils.saveToQif(getPriceList(), toFile);
+                    QifUtils.saveToQif(getPriceList(), getDefaultCurrency(), getSymbolMapper(), getFxTable(), toFile);
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1823,7 +1823,7 @@ public class GUI extends JFrame {
                 File toFile = fc.getSelectedFile();
                 PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                 try {
-                    MDUtils.saveToCsv(priceList, getDefaultCurrency(), symbolMapper, fxTable, toFile);
+                    MDUtils.saveToCsv(priceList, getDefaultCurrency(), getSymbolMapper(), getFxTable(), toFile);
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -2468,6 +2468,22 @@ public class GUI extends JFrame {
 
     public void setLastKnownImport(JLabel lastKnownImport) {
         this.lastKnownImport = lastKnownImport;
+    }
+
+    private SymbolMapper getSymbolMapper() {
+        return symbolMapper;
+    }
+
+    private void setSymbolMapper(SymbolMapper symbolMapper) {
+        this.symbolMapper = symbolMapper;
+    }
+
+    private FxTable getFxTable() {
+        return fxTable;
+    }
+
+    private void setFxTable(FxTable fxTable) {
+        this.fxTable = fxTable;
     }
 
 }

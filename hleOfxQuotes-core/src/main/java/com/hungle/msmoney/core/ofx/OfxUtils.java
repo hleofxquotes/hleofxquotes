@@ -23,7 +23,7 @@ import org.apache.xmlbeans.XmlObject;
 public class OfxUtils {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(OfxUtils.class);
+    private static final Logger LOGGER = Logger.getLogger(OfxUtils.class);
 
     /**
      * From separated string.
@@ -126,15 +126,15 @@ public class OfxUtils {
         try {
             reader = new BufferedReader(new InputStreamReader(in));
             addToList(reader, stocks);
-            if (log.isDebugEnabled()) {
-                log.debug("stocks.size=" + stocks.size());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("stocks.size=" + stocks.size());
             }
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
@@ -196,7 +196,7 @@ public class OfxUtils {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     in = null;
                 }
@@ -216,7 +216,7 @@ public class OfxUtils {
         if (url != null) {
             addToList(url, stocks);
         } else {
-            log.warn("Cannot find url for resourceName=" + resourceName);
+            LOGGER.warn("Cannot find url for resourceName=" + resourceName);
         }
     }
 
@@ -288,7 +288,7 @@ public class OfxUtils {
         try {
             clearNode(prefs, nodeName);
         } catch (BackingStoreException e) {
-            log.error(e);
+            LOGGER.error(e);
         }
 
         Preferences node = prefs.node(nodeName);
@@ -312,9 +312,11 @@ public class OfxUtils {
             node.putInt("count", count);
             node.sync();
         } catch (BackingStoreException e) {
-            log.warn(e);
+            LOGGER.warn(e);
         }
 
+        LOGGER.info("SAVED symbols ...");
+        
         return count;
     }
 
