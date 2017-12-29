@@ -33,6 +33,7 @@ import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.gui.PopupListener;
 import com.hungle.msmoney.gui.action.GetQuotesAction;
 import com.hungle.msmoney.gui.action.OpenAction;
+import com.hungle.msmoney.gui.action.SaveAction;
 import com.hungle.msmoney.gui.action.SaveAsAction;
 import com.hungle.msmoney.gui.menu.EditCleanupAction;
 import com.hungle.msmoney.gui.menu.EditCopyAction;
@@ -121,7 +122,8 @@ public class YahooQuoteSourcePanel extends JPanel {
         if (this.threadPool == null) {
             LOGGER.warn("YahooQuoteSourcePanel is constructed with this.threadPool=null");
         }
-        this.setQuoteServer(getPrefs().get(YahooQuoteSourcePanel.QUOTE_SERVER_PREFS_KEY, YahooQuotesGetter.DEFAULT_HOST));
+        this.setQuoteServer(
+                getPrefs().get(YahooQuoteSourcePanel.QUOTE_SERVER_PREFS_KEY, YahooQuotesGetter.DEFAULT_HOST));
         this.quoteSourceListener = new QuoteSourceListener() {
 
             @Override
@@ -148,7 +150,7 @@ public class YahooQuoteSourcePanel extends JPanel {
             }
         };
         this.stockSymbolsPrefKey = stockSymbolsPrefKey;
-        
+
         createView();
     }
 
@@ -214,6 +216,10 @@ public class YahooQuoteSourcePanel extends JPanel {
 
         menu = new JMenu("File");
         menuItem = new JMenuItem(new OpenAction(this, "Open", quoteSourceListener, threadPool));
+        menu.add(menuItem);
+        popup.add(menu);
+
+        menuItem = new JMenuItem(new SaveAction(this, "Save"));
         menu.add(menuItem);
         popup.add(menu);
 
@@ -328,7 +334,8 @@ public class YahooQuoteSourcePanel extends JPanel {
 
     /**
      * Stock prices lookup started.
-     * @param stockSymbols 
+     * 
+     * @param stockSymbols
      */
     private void stockPricesLookupStarted(List<String> stockSymbols) {
         if (quoteSourceListener != null) {
@@ -369,7 +376,8 @@ public class YahooQuoteSourcePanel extends JPanel {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    private void getStockQuotesAndNotify(final List<String> stockSymbols, final String stocksString) throws IOException {
+    private void getStockQuotesAndNotify(final List<String> stockSymbols, final String stocksString)
+            throws IOException {
         stockPricesLookupStarted(stockSymbols);
         List<AbstractStockPrice> stockPrices = null;
         try {
@@ -492,7 +500,8 @@ public class YahooQuoteSourcePanel extends JPanel {
                     }
 
                     if (exception != null) {
-                        Runnable doRun = new ShowDialogTask(YahooQuoteSourcePanel.this, exception, JOptionPane.ERROR_MESSAGE);
+                        Runnable doRun = new ShowDialogTask(YahooQuoteSourcePanel.this, exception,
+                                JOptionPane.ERROR_MESSAGE);
                         SwingUtilities.invokeLater(doRun);
                     }
                 } finally {
@@ -526,5 +535,10 @@ public class YahooQuoteSourcePanel extends JPanel {
 
     public void setStockSymbolsView(JTextArea stockSymbolsView) {
         this.stockSymbolsView = stockSymbolsView;
+    }
+
+    public void storeStockSymbols() {
+        String symbolsString = getStockSymbolsView().getText();
+        OfxUtils.storeStockSymbols(getPrefs(), stockSymbolsPrefKey, symbolsString);
     }
 }
