@@ -21,7 +21,7 @@ import com.hungle.msmoney.core.misc.CheckNullUtils;
 /**
  * The Class AbstractStockPrice.
  */
-public abstract class AbstractStockPrice {
+public abstract class AbstractStockPrice implements Cloneable {
 
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(AbstractStockPrice.class);
@@ -387,4 +387,13 @@ public abstract class AbstractStockPrice {
      * @return true, if is bond
      */
     public abstract boolean isBond();
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+    
+    public AbstractStockPrice clonePrice() throws CloneNotSupportedException {
+        return (AbstractStockPrice) this.clone();
+    }
 }

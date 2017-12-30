@@ -2,6 +2,7 @@ package com.hungle.msmoney.gui.task;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -11,8 +12,10 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.fx.FxTable;
+import com.hungle.msmoney.core.fx.FxTableUtils;
 import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.qs.QuoteSource;
 
@@ -87,23 +90,15 @@ public final class StockPricesReceivedTask implements Runnable {
             LOGGER.debug("> stockPricesReceived, size=" + prices.size());
         }
 
-        EventList<AbstractStockPrice> priceList = this.gui.getPriceList();
-        priceList.getReadWriteLock().writeLock().lock();
-        try {
-            priceList.clear();
-            priceList.addAll(prices);
-        } finally {
-            priceList.getReadWriteLock().writeLock().unlock();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("< stockPricesReceived");
-            }
-        }
+        updatePriceList(prices, this.gui.getPriceList());
+        updateConvertedPriceList(prices, this.gui.getConvertedPriceList());
 
         List<AbstractStockPrice> newExchangeRates = null;
         if (quoteSource != null) {
             newExchangeRates = quoteSource.getExchangeRates();
         }
-//        FxTableUtils.updateFxTable(newExchangeRates, this.gui.getExchangeRates());
+        // FxTableUtils.updateFxTable(newExchangeRates,
+        // this.gui.getExchangeRates());
 
         try {
             boolean onePerFile = quoteSource.isHistoricalQuotes();
@@ -119,7 +114,8 @@ public final class StockPricesReceivedTask implements Runnable {
                 LOGGER.debug("Saved csvFile=" + csvFile);
             }
 
-//            MapperTableUtils.updateMapperTable(symbolMapper, this.gui.getMapper());
+            // MapperTableUtils.updateMapperTable(symbolMapper,
+            // this.gui.getMapper());
         } catch (IOException e) {
             LOGGER.warn(e);
         } finally {
@@ -150,7 +146,7 @@ public final class StockPricesReceivedTask implements Runnable {
                 };
                 SwingUtilities.invokeLater(doRun);
             }
-            
+
             if (this.gui.getResultView() != null) {
                 doRun = new UpdateResultViewTask(this.gui);
                 SwingUtilities.invokeLater(doRun);
@@ -168,5 +164,57 @@ public final class StockPricesReceivedTask implements Runnable {
                 SwingUtilities.invokeLater(doRun);
             }
         }
+    }
+
+    private void updatePriceList(List<AbstractStockPrice> prices, EventList<AbstractStockPrice> priceList) {
+        priceList.getReadWriteLock().writeLock().lock();
+        try {
+            priceList.clear();
+            priceList.addAll(prices);
+        } finally {
+            priceList.getReadWriteLock().writeLock().unlock();
+        }
+    }
+
+    private void updateConvertedPriceList(List<AbstractStockPrice> prices, EventList<AbstractStockPrice> priceList) {
+        try {
+            List<AbstractStockPrice> convertedPrices = toConvertedPrices(prices);
+            updatePriceList(convertedPrices, priceList);
+        } catch (CloneNotSupportedException e) {
+            LOGGER.error(e, e);
+        }
+    }
+
+    private List<AbstractStockPrice> toConvertedPrices(List<AbstractStockPrice> prices)
+            throws CloneNotSupportedException {
+        List<AbstractStockPrice> convertedPrices = new ArrayList<AbstractStockPrice>();
+        for (AbstractStockPrice price : prices) {
+            AbstractStockPrice convertedPrice = toConvertedPrice(price);
+            LOGGER.info("convertedPrice=" + convertedPrice);
+
+            convertedPrices.add(convertedPrice);
+        }
+        return convertedPrices;
+    }
+
+    private AbstractStockPrice toConvertedPrice(AbstractStockPrice price) throws CloneNotSupportedException {
+        AbstractStockPrice convertedPrice = price.clonePrice();
+
+        String symbol = SymbolMapper.getStockSymbol(price.getStockSymbol(), symbolMapper);
+        if (symbol == null) {
+            symbol = price.getStockName();
+        }
+        if (symbol == null) {
+            symbol = "";
+        }
+        convertedPrice.setStockSymbol(symbol);
+
+        Price lastPrice = price.getLastPrice();
+        if (price.getFxSymbol() == null) {
+            lastPrice = FxTableUtils.getPrice(price.getStockSymbol(), price.getLastPrice(), this.gui.getDefaultCurrency(),
+                    symbolMapper, fxTable);
+        }
+        convertedPrice.setLastPrice(lastPrice);
+        return convertedPrice;
     }
 }

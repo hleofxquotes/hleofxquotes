@@ -209,6 +209,8 @@ public class GUI extends JFrame {
     /** The price list. */
     private EventList<AbstractStockPrice> priceList = new BasicEventList<AbstractStockPrice>();
 
+    private EventList<AbstractStockPrice> convertedPriceList = new BasicEventList<AbstractStockPrice>();
+
     /** The exchange rates. */
     // private EventList<AbstractStockPrice> exchangeRates = new
     // BasicEventList<AbstractStockPrice>();
@@ -338,6 +340,7 @@ public class GUI extends JFrame {
      */
     protected void clearPriceTable() {
         getPriceList().clear();
+        getConvertedPriceList().clear();
         // exchangeRates.clear();
         if (priceFilterEdit != null) {
             priceFilterEdit.setText("");
@@ -1579,9 +1582,9 @@ public class GUI extends JFrame {
 
         setBottomTabs(new JTabbedPane());
 
-        getBottomTabs().add("Quote Source Prices", createPricesView());
+        getBottomTabs().add("Quote Source Prices", createPricesView(getPriceList(), true));
 
-        // getBottomTabs().add("Exchange Rates", createExchangeRatesView());
+        getBottomTabs().add("Converted Prices", createPricesView(getConvertedPriceList(), false));
 
         // getBottomTabs().add("Mapper", createMapperView());
 
@@ -1676,7 +1679,7 @@ public class GUI extends JFrame {
      *
      * @return the component
      */
-    private Component createPricesView() {
+    private Component createPricesView(EventList<AbstractStockPrice> priceList, boolean convertWhenExport) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("> createPricesView");
         }
@@ -1684,8 +1687,9 @@ public class GUI extends JFrame {
         view.setLayout(new BorderLayout());
 
         priceFilterEdit = new JTextField(10);
+//        EventList<AbstractStockPrice> localPriceList = getPriceList();
         PriceTableView<AbstractStockPrice> priceScrollPane = new PriceTableView<AbstractStockPrice>(priceFilterEdit,
-                getPriceList(), AbstractStockPrice.class);
+                priceList, AbstractStockPrice.class);
         view.add(priceScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -1694,33 +1698,35 @@ public class GUI extends JFrame {
 
         AbstractAction action = null;
 
-        action = new ImportAction(this, "Import to MSMoney");
-        importToMoneyButton = new JButton(action);
-        importToMoneyButton.setEnabled(false);
-        commandView.add(importToMoneyButton);
-        commandView.add(Box.createHorizontalStrut(5));
+        if (convertWhenExport) {
+            action = new ImportAction(this, "Import to MSMoney");
+            importToMoneyButton = new JButton(action);
+            importToMoneyButton.setEnabled(false);
+            commandView.add(importToMoneyButton);
+            commandView.add(Box.createHorizontalStrut(5));
 
-        commandView.add(new JLabel("Last import on:"));
-        commandView.add(Box.createHorizontalStrut(3));
-        setLastKnownImportString(PREFS.get(PREF_LAST_KNOWN_IMPORT_STRING, null));
-        setLastKnownImport(new JLabel(getLastKnownImportString() == null ? "Not known" : getLastKnownImportString()));
-        commandView.add(getLastKnownImport());
+            commandView.add(new JLabel("Last import on:"));
+            commandView.add(Box.createHorizontalStrut(3));
+            setLastKnownImportString(PREFS.get(PREF_LAST_KNOWN_IMPORT_STRING, null));
+            setLastKnownImport(new JLabel(getLastKnownImportString() == null ? "Not known" : getLastKnownImportString()));
+            commandView.add(getLastKnownImport());
 
-        // commandView.add(Box.createHorizontalStrut(5));
+            // commandView.add(Box.createHorizontalStrut(5));
 
-        /*
-         * 
-         * // view2.add(new JLabel("Filter:")); //
-         * view2.add(Box.createHorizontalStrut(3)); //
-         * view2.add(priceFilterEdit);
-         */
-        commandView.add(Box.createHorizontalGlue());
-        action = new SaveOfxAction(this, "Save OFX");
-        saveOfxButton = new JButton(action);
-        saveOfxButton.setEnabled(false);
-        commandView.add(saveOfxButton);
-        view.add(commandView, BorderLayout.SOUTH);
-
+            /*
+             * 
+             * // view2.add(new JLabel("Filter:")); //
+             * view2.add(Box.createHorizontalStrut(3)); //
+             * view2.add(priceFilterEdit);
+             */
+            commandView.add(Box.createHorizontalGlue());
+            action = new SaveOfxAction(this, "Save OFX");
+            saveOfxButton = new JButton(action);
+            saveOfxButton.setEnabled(false);
+            commandView.add(saveOfxButton);
+            view.add(commandView, BorderLayout.SOUTH);
+        }
+        
         JMenu menu = null;
 
         // OFX
@@ -1778,7 +1784,7 @@ public class GUI extends JFrame {
                 File toFile = fc.getSelectedFile();
                 PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                 try {
-                    QifUtils.saveToQif(getPriceList(), getDefaultCurrency(), getSymbolMapper(), getFxTable(), toFile);
+                    QifUtils.saveToQif(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(), getFxTable(), toFile);
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1823,7 +1829,7 @@ public class GUI extends JFrame {
                 File toFile = fc.getSelectedFile();
                 PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                 try {
-                    MDUtils.saveToCsv(priceList, getDefaultCurrency(), getSymbolMapper(), getFxTable(), toFile);
+                    MDUtils.saveToCsv(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(), getFxTable(), toFile);
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -2484,6 +2490,14 @@ public class GUI extends JFrame {
 
     private void setFxTable(FxTable fxTable) {
         this.fxTable = fxTable;
+    }
+
+    public EventList<AbstractStockPrice> getConvertedPriceList() {
+        return convertedPriceList;
+    }
+
+    public void setConvertedPriceList(EventList<AbstractStockPrice> convertedPriceList) {
+        this.convertedPriceList = convertedPriceList;
     }
 
 }

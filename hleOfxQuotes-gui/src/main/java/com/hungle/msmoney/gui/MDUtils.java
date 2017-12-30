@@ -22,12 +22,12 @@ public class MDUtils {
 
     private static final String DEFAULT_SEPARATOR = ",";
 
-    public static void saveToCsv(EventList<AbstractStockPrice> priceList, String defaultCurrency,
+    public static void saveToCsv(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
             SymbolMapper symbolMapper, FxTable fxTable, File file) throws IOException {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            MDUtils.saveToCsv(priceList, defaultCurrency, symbolMapper, fxTable, writer);
+            MDUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, writer);
         } finally {
             if (writer != null) {
                 writer.close();
@@ -36,36 +36,48 @@ public class MDUtils {
         }
     }
 
-    static void saveToCsv(EventList<AbstractStockPrice> priceList, String defaultCurrency, SymbolMapper symbolMapper,
-            FxTable fxTable, PrintWriter writer) {
-        
+    static void saveToCsv(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
+            SymbolMapper symbolMapper, FxTable fxTable, PrintWriter writer) {
+
         // HEADER
         // Price,Ticker ISIN
         writer.println("Price,Ticker_ISIN");
-        
+
         // ROWS
         for (AbstractStockPrice price : priceList) {
             // ROW
-            StringBuilder sb = toCsvRow(symbolMapper, price, fxTable, defaultCurrency);
+            StringBuilder sb = toCsvRow(convert, symbolMapper, price, fxTable, defaultCurrency);
 
             writer.println(sb.toString());
         }
     }
 
-    private static StringBuilder toCsvRow(SymbolMapper symbolMapper, AbstractStockPrice price, FxTable fxTable,
+    private static StringBuilder toCsvRow(boolean convert, SymbolMapper symbolMapper, AbstractStockPrice price, FxTable fxTable,
             String defaultCurrency) {
         // symbol
         String separator = DEFAULT_SEPARATOR;
-        
+
         StringBuilder sb = new StringBuilder();
 
         // Closing price
-        Price lastPrice = FxTableUtils.getPrice(price.getStockSymbol(), price.getLastPrice(), defaultCurrency, symbolMapper,
-                fxTable);
+        Price lastPrice = price.getLastPrice();
+        if (convert) {
+            if (price.getFxSymbol() == null) {
+                lastPrice = FxTableUtils.getPrice(price.getStockSymbol(), price.getLastPrice(), defaultCurrency, symbolMapper,
+                        fxTable);
+            }
+        }
         sb.append(lastPrice.getPriceFormatter().format(lastPrice));
 
         sb.append(separator);
-        String symbol = SymbolMapper.getStockSymbol(price.getStockSymbol(), symbolMapper);
+        String symbol = price.getStockSymbol();
+        if (price.getFxSymbol() != null) {
+            // MD specific
+            symbol = symbol + "=X";
+        }
+        if (convert) {
+            symbol = SymbolMapper.getStockSymbol(price.getStockSymbol(), symbolMapper);
+        }
         if (symbol == null) {
             symbol = price.getStockName();
         }
