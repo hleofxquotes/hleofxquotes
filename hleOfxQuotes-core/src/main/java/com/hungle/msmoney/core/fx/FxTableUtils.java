@@ -236,6 +236,7 @@ public class FxTableUtils {
         if (rate != null) {
             double oldPrice = qsPrice.getPrice();
             price.setPrice(qsPrice.getPrice() * rate);
+            price.setCurrency(toCurrency);
             double newPrice = price.getPrice();
             LOGGER.info(
                     "FX - Converting price for symbol=" + qsSymbol + ", qsPrice=" + oldPrice + ", price=" + newPrice);

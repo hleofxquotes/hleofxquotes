@@ -21,23 +21,26 @@ import ca.odell.glazedlists.EventList;
  * The Class QifUtils.
  */
 public class QifUtils {
-    
+
     /** The calendar. */
     private static Calendar calendar = Calendar.getInstance();
 
     /**
      * Save to qif.
      *
-     * @param priceList the price list
-     * @param file the file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param priceList
+     *            the price list
+     * @param file
+     *            the file
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    public static void saveToQif(EventList<AbstractStockPrice> priceList, String defaultCurrency, SymbolMapper symbolMapper,
-            FxTable fxTable, File file) throws IOException {
+    public static void saveToQif(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
+            SymbolMapper symbolMapper, FxTable fxTable, File file) throws IOException {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            QifUtils.saveToQif(priceList, defaultCurrency, symbolMapper, fxTable, writer);
+            QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, writer);
         } finally {
             if (writer != null) {
                 writer.close();
@@ -49,25 +52,27 @@ public class QifUtils {
     /**
      * Save to qif.
      *
-     * @param priceList the price list
-     * @param writer the writer
+     * @param priceList
+     *            the price list
+     * @param writer
+     *            the writer
      */
-    static void saveToQif(EventList<AbstractStockPrice> priceList, String defaultCurrency, SymbolMapper symbolMapper,
-            FxTable fxTable, PrintWriter writer) {
+    static void saveToQif(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
+            SymbolMapper symbolMapper, FxTable fxTable, PrintWriter writer) {
         // HEADER
         // !Type:Prices
         writer.println("!Type:Prices");
-        
+
         // ROWS
         for (AbstractStockPrice price : priceList) {
-            StringBuilder sb = toQifRow(price, defaultCurrency, symbolMapper, fxTable);
-            
+            StringBuilder sb = toQifRow(price, convert, defaultCurrency, symbolMapper, fxTable);
+
             writer.println(sb.toString());
         }
     }
 
-    private static StringBuilder toQifRow(AbstractStockPrice price, String defaultCurrency, SymbolMapper symbolMapper,
-            FxTable fxTable) {
+    private static StringBuilder toQifRow(AbstractStockPrice price, boolean convert, String defaultCurrency,
+            SymbolMapper symbolMapper, FxTable fxTable) {
         // "010869AQ",105.730,"6/6/03",,,0
         // the QIF Type:Prices fields are:
         // Stock Exchange code for stock (above is the ASX
@@ -83,7 +88,10 @@ public class QifUtils {
         StringBuilder sb = new StringBuilder();
 
         // symbol
-        String symbol = SymbolMapper.getStockSymbol(price.getStockSymbol(), symbolMapper);
+        String symbol = price.getStockSymbol();
+        if (convert) {
+            symbol = SymbolMapper.getStockSymbol(price.getStockSymbol(), symbolMapper);
+        }
         if (symbol == null) {
             symbol = price.getStockName();
         }
@@ -94,7 +102,15 @@ public class QifUtils {
 
         // Closing price
         sb.append(separator);
-        Price lastPrice = FxTableUtils.getPrice(price.getStockSymbol(), price.getLastPrice(), defaultCurrency, symbolMapper, fxTable);
+        Price lastPrice = price.getLastPrice();
+        if (convert) {
+            if (price.getFxSymbol() == null) {
+                if (price.getFxSymbol() == null) {
+                    lastPrice = FxTableUtils.getPrice(price.getStockSymbol(), price.getLastPrice(), defaultCurrency, symbolMapper,
+                            fxTable);
+                }
+            }
+        }
         sb.append(lastPrice.getPriceFormatter().format(lastPrice));
 
         // Date
@@ -116,7 +132,8 @@ public class QifUtils {
     /**
      * To qif date string.
      *
-     * @param date the date
+     * @param date
+     *            the date
      * @return the string
      */
     private static String toQifDateString(Date date) {
