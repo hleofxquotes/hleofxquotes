@@ -33,7 +33,7 @@ public class FtEquitiesQuoteGetter extends AbstractHttpQuoteGetter {
     public FtEquitiesQuoteGetter() {
         super();
         setBucketSize(1);
-        setKeepFxSymbols(false);
+//        setKeepFxSymbols(DEFAULT_KEEP_FX_SYMBOLS);
 //        httpClient = createHttpClient();
     }
 

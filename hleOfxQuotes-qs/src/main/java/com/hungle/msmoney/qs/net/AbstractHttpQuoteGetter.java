@@ -37,10 +37,10 @@ import com.hungle.msmoney.core.stockprice.FxSymbol;
  */
 public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closeable {
 
-    private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36";
-
     /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(AbstractHttpQuoteGetter.class);
+
+    private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36";
 
     /** The Constant DEFAULT_SCHEME. */
     private static final String DEFAULT_SCHEME = "http";
@@ -97,7 +97,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closea
     private String fxFileName = FxTableUtils.DEFAULT_FX_FILENAME;
 
     /** The keep fx symbols. */
-    private boolean keepFxSymbols = true;
+    private boolean keepFxSymbols = FxTableUtils.DEFAULT_KEEP_FX_SYMBOLS;
 
     protected CloseableHttpClient httpClient;
 
@@ -252,6 +252,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closea
     protected List<AbstractStockPrice> getQuotes(List<String> stocks, GetQuotesListener listener, boolean skipNoPrice)
             throws IOException {
         LOGGER.info("> BEGIN getQuotes");
+        LOGGER.info("  keepFxSymbols=" + isKeepFxSymbols());
 
         fxSymbols = new ArrayList<AbstractStockPrice>();
 
