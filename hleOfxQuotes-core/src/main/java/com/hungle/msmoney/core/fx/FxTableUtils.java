@@ -24,6 +24,8 @@ public class FxTableUtils {
 
     public static final String DEFAULT_FX_FILENAME = "fx.csv";
 
+    public static final boolean DEFAULT_KEEP_FX_SYMBOLS = Boolean.valueOf(System.getProperty("hleOfxQuotes.keepFxSymbols", "false"));
+
     private FxTableUtils() {
         // TODO Auto-generated constructor stub
     }
@@ -173,7 +175,7 @@ public class FxTableUtils {
 
     public static Price getPrice(String qsSymbol, Price qsPrice, String defaultCurrency, SymbolMapper symbolMapper,
             FxTable fxTable) {
-        Price price = qsPrice;
+        Price price = qsPrice.clonePrice();
 
         String fromCurrency = null;
         String toCurrency = null;

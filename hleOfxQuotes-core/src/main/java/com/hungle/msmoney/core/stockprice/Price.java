@@ -2,11 +2,14 @@ package com.hungle.msmoney.core.stockprice;
 
 import java.text.NumberFormat;
 
+import org.apache.log4j.Logger;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class Price.
  */
-public class Price extends Number implements Comparable<Price> {
+public class Price extends Number implements Comparable<Price>, Cloneable {
+    private static final Logger LOGGER = Logger.getLogger(Price.class);
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -34,6 +37,21 @@ public class Price extends Number implements Comparable<Price> {
         this.priceFormatter.setGroupingUsed(false);
         this.priceFormatter.setMinimumFractionDigits(4);
         this.priceFormatter.setMaximumFractionDigits(4);
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    public Price clonePrice() {
+        Price price = null;
+        try {
+            price = (Price) this.clone();
+        } catch (CloneNotSupportedException e) {
+            LOGGER.warn(e);
+        }
+        return price;
     }
 
     /**
