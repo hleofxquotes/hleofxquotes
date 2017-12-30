@@ -22,9 +22,9 @@ USDGBP
 
 The quote source prices are
 
-AMZN:NSQ	Amazon.com Inc	865.1739 USD	12/29/2017	01:00PM
-BARC:LSE	Barclays PLC	2.7453 GBX	12/29/2017	04:35AM
-FTSE:FSI	FTSE 100 Index	10391.6869 GBP	12/29/2017	04:35AM
+AMZN:NSQ	Amazon.com Inc	1169.4700 USD	12/29/2017	01:00PM
+BARC:LSE	Barclays PLC	203.1000 GBX	12/29/2017	04:35AM
+FTSE:FSI	FTSE 100 Index	7687.7700 GBP	12/29/2017	04:35AM
 
 When saving to QIF, the converted prices will be
 
@@ -33,13 +33,13 @@ When saving to QIF, the converted prices will be
 "BARC:LSE",2.7453,"12/29'2017",,,
 "FTSE:FSI",10391.6869,"12/29'2017",,,
 
+
 In log file 'hleOfxQuotes-log.txt', you should see the folowing log entries
 
-2017-12-29 16:39:24,620 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=AMZN:NSQ, fromCurrency=USD, toCurrency=GBP, rate=0.7398
-2017-12-29 16:39:24,620 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - Converting price for symbol=AMZN:NSQ, qsPrice=1169.47, price=865.173906
-2017-12-29 16:39:24,620 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=BARC:LSE, fromCurrency=GBX, toCurrency=GBP, rate=0.01
-2017-12-29 16:39:24,620 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=BARC:LSE, fromCurrency=GBP, toCurrency=USD, rate=1.3517166801838334
-2017-12-29 16:39:24,620 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - Converting price for symbol=BARC:LSE, qsPrice=203.1, price=2.7453365774533656
-2017-12-29 16:39:24,620 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=FTSE:FSI, fromCurrency=GBP, toCurrency=USD, rate=1.3517166801838334
-2017-12-29 16:39:24,620 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - Converting price for symbol=FTSE:FSI, qsPrice=7687.77, price=10391.686942416869
-
+2017-12-29 16:51:57,061 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=AMZN:NSQ, fromCurrency=USD, toCurrency=GBP, rate=0.7398
+2017-12-29 16:51:57,062 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - Converting price for symbol=AMZN:NSQ, qsPrice=1169.47, price=865.173906
+2017-12-29 16:51:57,062 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=BARC:LSE, fromCurrency=GBX, toCurrency=GBP, rate=0.01
+2017-12-29 16:51:57,062 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=BARC:LSE, fromCurrency=GBP, toCurrency=USD, rate=1.3517166801838334
+2017-12-29 16:51:57,062 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - Converting price for symbol=BARC:LSE, qsPrice=203.1, price=2.7453365774533656
+2017-12-29 16:51:57,063 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=FTSE:FSI, fromCurrency=GBP, toCurrency=USD, rate=1.3517166801838334
+2017-12-29 16:51:57,063 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - Converting price for symbol=FTSE:FSI, qsPrice=7687.77, price=10391.686942416869
