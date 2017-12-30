@@ -1,3 +1,8 @@
+Sat Dec 30 09:22:29 PST 2017
+
+  * Update; This build has BUG. Please DO NOTuse.
+  * The rest of the notes is valid.
+
 Fri Dec 29 15:40:45 PST 2017
 
 Happy Holidays!

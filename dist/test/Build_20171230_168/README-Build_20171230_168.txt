@@ -1,0 +1,14 @@
+Sat Dec 30 09:17:13 PST 2017
+
+Changes
+  * Fix bug: where quote price is changed after QIF file generation
+  * Default to keep fxsymbols. To disable, specify system property hleOfxQuotes.keepFxSymbols=false. For example
+java -DhleOfxQuotes.keepFxSymbols=false -jar hleOfxQuotes-gui-Build_20171230_168-exec.jar
+
+unzip hleOfxQuotes-gui-Build_20171230_168.zip
+  to get
+hleOfxQuotes-gui-Build_20171230_168-exec.jar
+
+Need Java 1.8
+
+java -jar hleOfxQuotes-gui-Build_20171230_168-exec.jar
