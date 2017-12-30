@@ -1,0 +1,14 @@
+Fri Dec 29 15:40:45 PST 2017
+
+Happy Holidays!
+
+  * QIF; make sure to include FX conversion when generating QIF output
+  * Add Menu item "Save" to allow user to save current list of symbols.
+
+unzip hleOfxQuotes-gui-Build_20171229_167.zip
+  to get
+hleOfxQuotes-gui-Build_20171229_167-exec.jar
+
+Need Java 1.8
+
+java -jar hleOfxQuotes-gui-Build_20171229_167-exec.jar
