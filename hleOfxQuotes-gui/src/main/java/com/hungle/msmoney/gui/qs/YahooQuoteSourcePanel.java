@@ -105,6 +105,8 @@ public class YahooQuoteSourcePanel extends JPanel {
     /** The quote source. */
     private final DefaultQuoteSource quoteSource = new DefaultYahooQuoteSource();
 
+    private List<String> notFoundSymbols;
+
     /**
      * Instantiates a new yahoo quote source panel.
      *
@@ -146,6 +148,13 @@ public class YahooQuoteSourcePanel extends JPanel {
             public void stockPricesReceived(QuoteSource quoteSource, List<AbstractStockPrice> stockPrices) {
                 if (parentQuoteSourceListener != null) {
                     parentQuoteSourceListener.stockPricesReceived(quoteSource, stockPrices);
+                }
+            }
+
+            @Override
+            public void notFoundSymbolsReceived(List<String> symbols) {
+                if (parentQuoteSourceListener != null) {
+                    parentQuoteSourceListener.notFoundSymbolsReceived(symbols);
                 }
             }
         };
@@ -318,6 +327,11 @@ public class YahooQuoteSourcePanel extends JPanel {
         public List<AbstractStockPrice> getExchangeRates() {
             return fxSymbols;
         }
+
+        @Override
+        public List<String> getNotFoundSymbols() {
+            return notFoundSymbols;
+        }
     }
 
     /**
@@ -406,6 +420,7 @@ public class YahooQuoteSourcePanel extends JPanel {
         try {
             stockPrices = quoteGetter.getQuotes(stockSymbols, listener);
             this.fxSymbols = quoteGetter.getFxSymbols();
+            this.notFoundSymbols = quoteGetter.getNotFoundSymbols();
         } finally {
             if (quoteGetter != null) {
                 quoteGetter.close();
@@ -535,6 +550,14 @@ public class YahooQuoteSourcePanel extends JPanel {
 
     public void setStockSymbolsView(JTextArea stockSymbolsView) {
         this.stockSymbolsView = stockSymbolsView;
+    }
+
+    public List<String> getNotFoundSymbols() {
+        return notFoundSymbols;
+    }
+
+    public void setNotFoundSymbols(List<String> notFoundSymbols) {
+        this.notFoundSymbols = notFoundSymbols;
     }
 
     public void storeStockSymbols() {

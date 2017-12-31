@@ -100,6 +100,8 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closea
     private boolean keepFxSymbols = FxTableUtils.DEFAULT_KEEP_FX_SYMBOLS;
 
     protected CloseableHttpClient httpClient;
+    
+    private List<String> notFoundSymbols;
 
     /**
      * Instantiates a new abstract http quote getter.
@@ -324,7 +326,7 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closea
                 // FxTableUtils.writeFxFile(fxSymbols, fxFileName);
             }
         } finally {
-            logQuoteRequestSummary(stocks, prices);
+            notFoundSymbols = logQuoteRequestSummary(stocks, prices);
             
             long delta = stopWatch.click();
             LOGGER.info("< END getQuotes, delta=" + delta + " ms");
@@ -333,7 +335,9 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closea
         return prices;
     }
 
-    private void logQuoteRequestSummary(List<String> requests, List<AbstractStockPrice> responses) {
+    private static final List<String> logQuoteRequestSummary(List<String> requests, List<AbstractStockPrice> responses) {
+        List<String> notFound = new ArrayList<String>();
+
         LOGGER.info("SUMMARY: requests=" + requests.size() + ", responses=" + responses.size());
         if (requests.size() == responses.size()) {
             // OK
@@ -346,7 +350,6 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closea
                 xxx[i++] = response.getStockSymbol();
             }
             
-            List<String> notFound = new ArrayList<String>();
             for(String request: requests) {
                 int index = findIndex(request, xxx);
                 if (index < 0) {
@@ -360,9 +363,11 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closea
                 LOGGER.warn("NOT_FOUND: " + item);
             }
         }
+        
+        return notFound;
     }
 
-    private int findIndex(String request, String[] xxx) {
+    private static final int findIndex(String request, String[] xxx) {
         for(int i = 0; i < xxx.length; i++) {
             if (xxx[i].compareToIgnoreCase(request) == 0) {
                 return i;
@@ -525,6 +530,14 @@ public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closea
         this.bucketSize = bucketSize;
     }
     
+    public List<String> getNotFoundSymbols() {
+        return notFoundSymbols;
+    }
+
+    public void setNotFoundSymbols(List<String> notFoundSymbols) {
+        this.notFoundSymbols = notFoundSymbols;
+    }
+
     public void close() throws IOException {
         if (httpClient != null) {
             httpClient.close();

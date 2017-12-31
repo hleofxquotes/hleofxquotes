@@ -12,6 +12,7 @@ import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableUtils;
 import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.FxSymbol;
 import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.qs.ft.FtEquitiesQuoteGetter;
 
@@ -47,9 +48,37 @@ public class MDUtils {
         for (AbstractStockPrice price : priceList) {
             // ROW
             StringBuilder sb = toCsvRow(convert, symbolMapper, price, fxTable, defaultCurrency);
-
             writer.println(sb.toString());
         }
+        
+        // Now write the derived FX symbols
+        for (AbstractStockPrice price : priceList) {
+            FxSymbol fxSymbol = price.getFxSymbol();
+            if (fxSymbol == null) {
+                continue;
+            }
+            
+            
+            // ROW
+            StringBuilder sb = toCsvRowAsDerivedValue(fxSymbol, price);
+            writer.println(sb.toString());
+        }        
+    }
+
+    private static StringBuilder toCsvRowAsDerivedValue(FxSymbol fxSymbol, AbstractStockPrice price) {
+        String separator = DEFAULT_SEPARATOR;
+
+        StringBuilder sb = new StringBuilder();
+        
+        Price lastPrice = price.getLastPrice().clonePrice();
+        lastPrice.setPrice(new Double(1.00) / lastPrice.getPrice());
+        sb.append(lastPrice.getPriceFormatter().format(lastPrice));
+
+        sb.append(separator);
+        String symbol = fxSymbol.getToCurrency() + fxSymbol.getFromCurrency() + "=X";
+        sb.append(symbol);
+        
+        return sb;
     }
 
     private static StringBuilder toCsvRow(boolean convert, SymbolMapper symbolMapper, AbstractStockPrice price, FxTable fxTable,
@@ -74,9 +103,10 @@ public class MDUtils {
         if (price.getFxSymbol() != null) {
             // MD specific
             symbol = symbol + "=X";
-        }
-        if (convert) {
-            symbol = SymbolMapper.getStockSymbol(price.getStockSymbol(), symbolMapper);
+        } else {
+            if (convert) {
+                symbol = SymbolMapper.getStockSymbol(price.getStockSymbol(), symbolMapper);
+            }
         }
         if (symbol == null) {
             symbol = price.getStockName();

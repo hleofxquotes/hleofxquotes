@@ -41,5 +41,7 @@ public interface QuoteSourceListener {
      * @param stockPrices the stock prices
      */
     void stockPricesReceived(QuoteSource quoteSource, List<AbstractStockPrice> stockPrices);
+    
+    void notFoundSymbolsReceived(List<String> symbols);
 
 }

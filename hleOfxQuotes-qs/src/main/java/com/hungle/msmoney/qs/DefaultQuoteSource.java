@@ -17,6 +17,8 @@ public class DefaultQuoteSource implements QuoteSource {
     /** The historical quotes. */
     private boolean historicalQuotes = false;
     
+    private List<String> notFoundSymbols = new ArrayList<String>();
+    
     /* (non-Javadoc)
      * @see com.hungle.tools.moneyutils.ofx.quotes.QuoteSource#getExchangeRates()
      */
@@ -40,6 +42,14 @@ public class DefaultQuoteSource implements QuoteSource {
      */
     public void setHistoricalQuotes(boolean historicalQuotes) {
         this.historicalQuotes = historicalQuotes;
+    }
+
+    public List<String> getNotFoundSymbols() {
+        return notFoundSymbols;
+    }
+
+    public void setNotFoundSymbols(List<String> notFoundSymbols) {
+        this.notFoundSymbols = notFoundSymbols;
     }
 
 }

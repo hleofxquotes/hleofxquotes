@@ -23,5 +23,6 @@ public interface QuoteSource {
      * @return true, if is historical quotes
      */
     boolean isHistoricalQuotes();
-
+    
+    List<String> getNotFoundSymbols();
 }

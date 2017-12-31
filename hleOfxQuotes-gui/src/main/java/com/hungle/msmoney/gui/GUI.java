@@ -208,8 +208,8 @@ public class GUI extends JFrame {
 
     /** The price list. */
     private EventList<AbstractStockPrice> priceList = new BasicEventList<AbstractStockPrice>();
-
     private EventList<AbstractStockPrice> convertedPriceList = new BasicEventList<AbstractStockPrice>();
+    private EventList<AbstractStockPrice> notFoundPriceList = new BasicEventList<AbstractStockPrice>();
 
     /** The exchange rates. */
     // private EventList<AbstractStockPrice> exchangeRates = new
@@ -341,6 +341,8 @@ public class GUI extends JFrame {
     protected void clearPriceTable() {
         getPriceList().clear();
         getConvertedPriceList().clear();
+        getNotFoundPriceList().clear();
+
         // exchangeRates.clear();
         if (priceFilterEdit != null) {
             priceFilterEdit.setText("");
@@ -622,6 +624,11 @@ public class GUI extends JFrame {
             public void stockPricesReceived(QuoteSource quoteSource, List<AbstractStockPrice> stockPrices) {
                 GUI.this.stockPricesReceived(quoteSource, stockPrices);
             }
+
+            @Override
+            public void notFoundSymbolsReceived(List<String> symbols) {
+                LOGGER.info("TODO");
+            }
         };
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -718,6 +725,8 @@ public class GUI extends JFrame {
         FxTableUtils.addExchangeRates(exchangeRates, getFxTable());
         getFxTable().dump();
 
+        updateNotFoundPriceList(quoteSource);
+
         final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices
                 : new ArrayList<AbstractStockPrice>();
         updateLastPriceCurrency(prices, getDefaultCurrency(), getSymbolMapper());
@@ -790,6 +799,24 @@ public class GUI extends JFrame {
                 hasWrappedShareCount, getSymbolMapper(), quoteSource);
         // doRun.run();
         SwingUtilities.invokeLater(stockPricesReceivedTask);
+    }
+
+    private void updateNotFoundPriceList(final QuoteSource quoteSource) {
+        // TODO: cleanup
+        List<String> symbols = quoteSource.getNotFoundSymbols();
+        if ((symbols != null) && (symbols.size() > 0)) {
+            ArrayList<AbstractStockPrice> stockPrices = new ArrayList<AbstractStockPrice>();
+            for (String symbol : symbols) {
+                AbstractStockPrice stockPrice = new StockPrice(symbol, new Date(), 0.00);
+                stockPrices.add(stockPrice);
+            }
+            getNotFoundPriceList().getReadWriteLock().writeLock().lock();
+            try {
+                getNotFoundPriceList().addAll(stockPrices);
+            } finally {
+                getNotFoundPriceList().getReadWriteLock().writeLock().unlock();
+            }
+        }
     }
 
     /**
@@ -1582,9 +1609,23 @@ public class GUI extends JFrame {
 
         setBottomTabs(new JTabbedPane());
 
-        getBottomTabs().add("Quote Source Prices", createPricesView(getPriceList(), true));
+        boolean convertWhenExport = true;
+        boolean createImportComponents = true;
+        boolean createMenu = true;
+        getBottomTabs().add("Quote Source Prices",
+                createPricesView(getPriceList(), convertWhenExport, createImportComponents, createMenu));
 
-        getBottomTabs().add("Converted Prices", createPricesView(getConvertedPriceList(), false));
+        convertWhenExport = false;
+        createImportComponents = false;
+        createMenu = true;
+        getBottomTabs().add("Converted Prices",
+                createPricesView(getConvertedPriceList(), convertWhenExport, createImportComponents, createMenu));
+
+        convertWhenExport = false;
+        createImportComponents = false;
+        createMenu = false;
+        getBottomTabs().add("Not Found Prices",
+                createPricesView(getNotFoundPriceList(), convertWhenExport, createImportComponents, createMenu));
 
         // getBottomTabs().add("Mapper", createMapperView());
 
@@ -1679,7 +1720,8 @@ public class GUI extends JFrame {
      *
      * @return the component
      */
-    private Component createPricesView(EventList<AbstractStockPrice> priceList, boolean convertWhenExport) {
+    private Component createPricesView(EventList<AbstractStockPrice> priceList, boolean convertWhenExport,
+            boolean createImportComponents, boolean createMenu) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("> createPricesView");
         }
@@ -1687,7 +1729,7 @@ public class GUI extends JFrame {
         view.setLayout(new BorderLayout());
 
         priceFilterEdit = new JTextField(10);
-//        EventList<AbstractStockPrice> localPriceList = getPriceList();
+        // EventList<AbstractStockPrice> localPriceList = getPriceList();
         PriceTableView<AbstractStockPrice> priceScrollPane = new PriceTableView<AbstractStockPrice>(priceFilterEdit,
                 priceList, AbstractStockPrice.class);
         view.add(priceScrollPane, BorderLayout.CENTER);
@@ -1698,7 +1740,7 @@ public class GUI extends JFrame {
 
         AbstractAction action = null;
 
-        if (convertWhenExport) {
+        if (createImportComponents) {
             action = new ImportAction(this, "Import to MSMoney");
             importToMoneyButton = new JButton(action);
             importToMoneyButton.setEnabled(false);
@@ -1708,7 +1750,8 @@ public class GUI extends JFrame {
             commandView.add(new JLabel("Last import on:"));
             commandView.add(Box.createHorizontalStrut(3));
             setLastKnownImportString(PREFS.get(PREF_LAST_KNOWN_IMPORT_STRING, null));
-            setLastKnownImport(new JLabel(getLastKnownImportString() == null ? "Not known" : getLastKnownImportString()));
+            setLastKnownImport(
+                    new JLabel(getLastKnownImportString() == null ? "Not known" : getLastKnownImportString()));
             commandView.add(getLastKnownImport());
 
             // commandView.add(Box.createHorizontalStrut(5));
@@ -1726,127 +1769,131 @@ public class GUI extends JFrame {
             commandView.add(saveOfxButton);
             view.add(commandView, BorderLayout.SOUTH);
         }
-        
-        JMenu menu = null;
 
-        // OFX
-        menu = new JMenu("OFX");
-        priceScrollPane.getPopupMenu().add(menu);
+        if (createMenu) {
+            JMenu menu = null;
 
-        action = new ImportAction(this, "Open as *.ofx");
-        menu.add(action);
+            // OFX
+            menu = new JMenu("OFX");
+            priceScrollPane.getPopupMenu().add(menu);
 
-        action = new SaveOfxAction(this, "Save");
-        menu.add(action);
+            action = new ImportAction(this, "Open as *.ofx");
+            menu.add(action);
 
-        // QIF
-        menu = new JMenu("QIF");
-        priceScrollPane.getPopupMenu().add(menu);
+            action = new SaveOfxAction(this, "Save");
+            menu.add(action);
 
-        // action = new AbstractAction("Open as *.qif") {
-        // public void actionPerformed(ActionEvent event) {
-        // try {
-        // File file = null;
-        //
-        // file = File.createTempFile("hleofxquotes", ".qif");
-        // file.deleteOnExit();
-        // QifUtils.saveToQif(priceList, file);
-        // log.info("file=" + file);
-        //
-        // } catch (IOException e) {
-        // JOptionPane.showMessageDialog(view, e.getMessage(), "Error",
-        // JOptionPane.ERROR_MESSAGE);
-        // }
-        // }
-        //
-        // };
-        // menu.add(action);
-        action = new AbstractAction("Save") {
-            /**
-             * 
-             */
-            private static final long serialVersionUID = 1L;
-            private JFileChooser fc = null;
+            // QIF
+            menu = new JMenu("QIF");
+            priceScrollPane.getPopupMenu().add(menu);
 
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if (fc == null) {
-                    initFileChooser();
-                }
-                Component parent = view;
-                if (this.fc.getSelectedFile() == null) {
-                    this.fc.setSelectedFile(new File("quotes.qif"));
-                }
+            // action = new AbstractAction("Open as *.qif") {
+            // public void actionPerformed(ActionEvent event) {
+            // try {
+            // File file = null;
+            //
+            // file = File.createTempFile("hleofxquotes", ".qif");
+            // file.deleteOnExit();
+            // QifUtils.saveToQif(priceList, file);
+            // log.info("file=" + file);
+            //
+            // } catch (IOException e) {
+            // JOptionPane.showMessageDialog(view, e.getMessage(), "Error",
+            // JOptionPane.ERROR_MESSAGE);
+            // }
+            // }
+            //
+            // };
+            // menu.add(action);
+            action = new AbstractAction("Save") {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+                private JFileChooser fc = null;
 
-                if (fc.showSaveDialog(parent) == JFileChooser.CANCEL_OPTION) {
-                    return;
-                }
-                File toFile = fc.getSelectedFile();
-                PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
-                try {
-                    QifUtils.saveToQif(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(), getFxTable(), toFile);
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    if (fc == null) {
+                        initFileChooser();
+                    }
+                    Component parent = view;
+                    if (this.fc.getSelectedFile() == null) {
+                        this.fc.setSelectedFile(new File("quotes.qif"));
+                    }
 
-            private void initFileChooser() {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("> creating FileChooser");
-                }
-                String key = Action.ACCELERATOR_KEY;
-                fc = new JFileChooser(PREFS.get(key, "."));
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("< creating FileChooser");
-                }
-            }
-        };
-        menu.add(action);
-
-        // MD
-        menu = new JMenu("MD");
-        priceScrollPane.getPopupMenu().add(menu);
-        action = new AbstractAction("Save CSV") {
-            /**
-             * 
-             */
-            private static final long serialVersionUID = 1L;
-            private JFileChooser fc = null;
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if (fc == null) {
-                    initFileChooser();
-                }
-                Component parent = view;
-                if (this.fc.getSelectedFile() == null) {
-                    this.fc.setSelectedFile(new File("mdQuotes.csv"));
+                    if (fc.showSaveDialog(parent) == JFileChooser.CANCEL_OPTION) {
+                        return;
+                    }
+                    File toFile = fc.getSelectedFile();
+                    PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
+                    try {
+                        QifUtils.saveToQif(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(),
+                                getFxTable(), toFile);
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
 
-                if (fc.showSaveDialog(parent) == JFileChooser.CANCEL_OPTION) {
-                    return;
+                private void initFileChooser() {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("> creating FileChooser");
+                    }
+                    String key = Action.ACCELERATOR_KEY;
+                    fc = new JFileChooser(PREFS.get(key, "."));
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("< creating FileChooser");
+                    }
                 }
-                File toFile = fc.getSelectedFile();
-                PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
-                try {
-                    MDUtils.saveToCsv(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(), getFxTable(), toFile);
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
+            };
+            menu.add(action);
 
-            private void initFileChooser() {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("> creating FileChooser");
+            // MD
+            menu = new JMenu("MD");
+            priceScrollPane.getPopupMenu().add(menu);
+            action = new AbstractAction("Save CSV") {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+                private JFileChooser fc = null;
+
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    if (fc == null) {
+                        initFileChooser();
+                    }
+                    Component parent = view;
+                    if (this.fc.getSelectedFile() == null) {
+                        this.fc.setSelectedFile(new File("mdQuotes.csv"));
+                    }
+
+                    if (fc.showSaveDialog(parent) == JFileChooser.CANCEL_OPTION) {
+                        return;
+                    }
+                    File toFile = fc.getSelectedFile();
+                    PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
+                    try {
+                        MDUtils.saveToCsv(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(),
+                                getFxTable(), toFile);
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
-                String key = Action.ACCELERATOR_KEY;
-                fc = new JFileChooser(PREFS.get(key, "."));
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("< creating FileChooser");
+
+                private void initFileChooser() {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("> creating FileChooser");
+                    }
+                    String key = Action.ACCELERATOR_KEY;
+                    fc = new JFileChooser(PREFS.get(key, "."));
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("< creating FileChooser");
+                    }
                 }
-            }
-        };
-        menu.add(action);
+            };
+            menu.add(action);
+        }
 
         return view;
     }
@@ -2498,6 +2545,14 @@ public class GUI extends JFrame {
 
     public void setConvertedPriceList(EventList<AbstractStockPrice> convertedPriceList) {
         this.convertedPriceList = convertedPriceList;
+    }
+
+    public EventList<AbstractStockPrice> getNotFoundPriceList() {
+        return notFoundPriceList;
+    }
+
+    public void setNotFoundPriceList(EventList<AbstractStockPrice> notFoundPriceList) {
+        this.notFoundPriceList = notFoundPriceList;
     }
 
 }
