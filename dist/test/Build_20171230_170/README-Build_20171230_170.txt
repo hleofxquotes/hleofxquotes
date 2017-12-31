@@ -1,8 +1,3 @@
-Changes
-  * Add tab "Not Found Prices" - list quotes with no price.
-  * When generating CSV for Moneydance, for currency exchange symbols, output both AAABBB=X and BBBAAA=X. 
-    Mike B "Security Price Loader" wants the base exchange to be the first currency and we don't the base
-    currency when outputing. So doing both will cover all cases.
 
 ###
 Sun Dec 31 09:13:13 PST 2017
@@ -40,11 +35,13 @@ Exception in thread "main" java.lang.UnsupportedClassVersionError: app/GUI : Uns
 
 Tips:
 
-  * Be cautious. Have a plan to get back to a known state. You might want to try this version on a COPY 
-    of your *.mny file first. 
+  * Be cautious. Have a plan to get back to a known state. You might want to try this version on a COPY (for msmoney)
+    of your *.mny file first. Similar advise for Moneydance.
 
-  * If you see something not working, post a message on
+  * If you see something not working, For msmoney, post a message on
 https://social.microsoft.com/Forums/mvpforum/en-US/home?forum=money
+
+  * For Moneydance issue, post a message on http://help.infinitekind.com/discussions/investments. 'derekkent23' (http://help.infinitekind.com/users/3480808) also is a good resource. 
 
 Fixes:
 
