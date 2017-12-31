@@ -1,0 +1,145 @@
+Changes
+  * Add tab "Not Found Prices" - list quotes with no price.
+  * When generating CSV for Moneydance, for currency exchange symbols, output both AAABBB=X and BBBAAA=X. 
+    Mike B "Security Price Loader" wants the base exchange to be the first currency and we don't the base
+    currency when outputing. So doing both will cover all cases.
+
+###
+Sun Dec 31 09:13:13 PST 2017
+
+  File: hleOfxQuotes-Build_20171230_170.zip
+  https://github.com/hleofxquotes/hleofxquotes/blob/master/dist/hleOfxQuotes-Build_20171230_170.zip
+  Click on 'View Raw' to download
+
+  Once downloaded,
+    * Unzip hleOfxQuotes-Build_20171230_170.zip to get file hleOfxQuotes-Build_20171230_170-exec.jar 
+    * You can double-click hleOfxQuotes-Build_20171230_170-exec.jar to start
+    * OR open command-line and run
+      java -jar hleOfxQuotes-Build_20171230_170-exec.jar
+    You can rename hleOfxQuotes-Build_20171230_170-exec.jar to a shorter name if you like.
+    See a note on Java 8 below.
+
+Java 1.8
+
+  You will need Java 1.8 or later. Otherwise, you will get error looking something like this
+
+Exception in thread "main" java.lang.UnsupportedClassVersionError: app/GUI : Unsupported major.minor version 52.0
+	at java.lang.ClassLoader.defineClass1(Native Method)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:803)
+	at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:142)
+	at java.net.URLClassLoader.defineClass(URLClassLoader.java:442)
+	at java.net.URLClassLoader.access$100(URLClassLoader.java:64)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:354)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:348)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:347)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:425)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:312)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:358)
+	at sun.launcher.LauncherHelper.checkAndLoadMain(LauncherHelper.java:482)
+
+Tips:
+
+  * Be cautious. Have a plan to get back to a known state. You might want to try this version on a COPY 
+    of your *.mny file first. 
+
+  * If you see something not working, post a message on
+https://social.microsoft.com/Forums/mvpforum/en-US/home?forum=money
+
+Fixes:
+
+  * Add support for ft.com
+
+  * Add support to export prices via MD -> Save CSV
+
+Sample CSV
+Price,Ticker_ISIN
+58.7700,GB00B0CNH270:GBX
+112.5200,GB00BYYV0405:GBX
+1.0400,IE00BD2M9K78:GBP
+
+
+  * Add support to add atributes to a symbol
+Some sample symbols
+
+GB0033772517
+  As-is, no currency conversion
+
+ALO:PAR
+  As-is, no currency conversion
+
+GB00BTLX1Q39/USD/GBP
+  converts the returns price from USD to GBP
+  IMPORTANT: Make sure to include a meta-symbol USDGBP so that we will also lookup
+    the current rate.
+
+GB00BTLX1Q39/USD/GBX
+  NOT SUPPORTED YET. Currently for GBX, you can only convert between GBP and GBX
+
+AAPL
+  As-is, no currency conversion
+
+AAPL/USD/GBP
+  converts the returns price from USD to GBP
+  IMPORTANT: Make sure to include a meta-symbol USDGBP so that we will also lookup
+    the current rate.
+
+GB00B2PLJJ36/GBX/GBP
+  converts pence into pounds
+
+XMRC:LSE:GBX
+  As-is, no currency conversion
+
+XMRC:LSE:GBX,GBX/GBP
+  converts pence into pounds
+
+  * QIF: make sure to include FX conversion when generating QIF output
+
+I did a simple test using the following symbols for ft.com
+
+FTSE:FSI
+BARC:LSE
+AMZN:NSQ/USD/GBP
+USDGBP
+
+The quote source prices are
+
+AMZN:NSQ	Amazon.com Inc	1169.4700 USD	12/29/2017	01:00PM
+BARC:LSE	Barclays PLC	203.1000 GBX	12/29/2017	04:35AM
+FTSE:FSI	FTSE 100 Index	7687.7700 GBP	12/29/2017	04:35AM
+
+When saving to QIF, the converted prices will be
+
+!Type:Prices
+"AMZN:NSQ",865.1739,"12/29'2017",,,
+"BARC:LSE",2.7453,"12/29'2017",,,
+"FTSE:FSI",10391.6869,"12/29'2017",,,
+
+
+In log file 'hleOfxQuotes-log.txt', you should see the folowing log entries
+
+2017-12-29 16:51:57,061 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=AMZN:NSQ, fromCurrency=USD, toCurrency=GBP, rate=0.7398
+2017-12-29 16:51:57,062 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - Converting price for symbol=AMZN:NSQ, qsPrice=1169.47, price=865.173906
+2017-12-29 16:51:57,062 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=BARC:LSE, fromCurrency=GBX, toCurrency=GBP, rate=0.01
+2017-12-29 16:51:57,062 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=BARC:LSE, fromCurrency=GBP, toCurrency=USD, rate=1.3517166801838334
+2017-12-29 16:51:57,062 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - Converting price for symbol=BARC:LSE, qsPrice=203.1, price=2.7453365774533656
+2017-12-29 16:51:57,063 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - symbol=FTSE:FSI, fromCurrency=GBP, toCurrency=USD, rate=1.3517166801838334
+2017-12-29 16:51:57,063 [AWT-EventQueue-0] INFO  com.hungle.msmoney.core.fx.FxTableUtils - FX - Converting price for symbol=FTSE:FSI, qsPrice=7687.77, price=10391.686942416869
+
+
+  * Add Menu item "Save" to allow user to save current list of symbols.
+
+  * Fix bug: where quote price is changed after QIF file generation
+
+  * Default to keep fxsymbols. To disable, specify system property hleOfxQuotes.keepFxSymbols=false. For example
+java -DhleOfxQuotes.keepFxSymbols=false -jar hleOfxQuotes-gui-Build_20171230_168-exec.jar
+
+  * Add tab "Not Found Prices" - list quotes with no price.
+
+  * When generating CSV for Moneydance, for currency exchange symbols, output both AAABBB=X and BBBAAA=X. 
+    Mike B "Security Price Loader" wants the base exchange to be the first currency and we don't the base
+    currency when outputing. So doing both will cover all cases.
+
+Kudos:
+  To 'derekkent23' (http://help.infinitekind.com/users/3480808) who has been instrumental in 
+  testing/feedback/suggestion on Moneydance issue/features.
