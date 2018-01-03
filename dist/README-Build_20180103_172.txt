@@ -1,16 +1,16 @@
 ###
-Wed Jan  3 10:26:10 PST 2018
+Wed Jan  3 11:15:01 PST 2018
 
-  File: hleOfxQuotes-gui-Build_20180103_171.zip
-  https://github.com/hleofxquotes/hleofxquotes/blob/master/dist/hleOfxQuotes-gui-Build_20180103_171.zip
+  File: hleOfxQuotes-gui-Build_20180103_172.zip
+  https://github.com/hleofxquotes/hleofxquotes/blob/master/dist/hleOfxQuotes-gui-Build_20180103_172.zip
   Click on 'View Raw' to download
 
   Once downloaded,
-    * Unzip hleOfxQuotes-gui-Build_20180103_171.zip to get file hleOfxQuotes-gui-Build_20180103_171-exec.jar 
-    * You can double-click hleOfxQuotes-gui-Build_20180103_171-exec.jar to start
+    * Unzip hleOfxQuotes-gui-Build_20180103_172.zip to get file hleOfxQuotes-gui-Build_20180103_172-exec.jar 
+    * You can double-click hleOfxQuotes-gui-Build_20180103_172-exec.jar to start
     * OR open command-line and run
-      java -jar hleOfxQuotes-gui-Build_20180103_171-exec.jar
-    You can rename hleOfxQuotes-gui-Build_20180103_171-exec.jar to a shorter name if you like.
+      java -jar hleOfxQuotes-gui-Build_20180103_172-exec.jar
+    You can rename hleOfxQuotes-gui-Build_20180103_172-exec.jar to a shorter name if you like.
     See a note on Java 8 below.
 
 Java 1.8
@@ -43,6 +43,8 @@ https://social.microsoft.com/Forums/mvpforum/en-US/home?forum=money
   * For Moneydance issue, post a message on http://help.infinitekind.com/discussions/investments. 'derekkent23' (http://help.infinitekind.com/users/3480808) also is a good resource. 
 
 Fixes:
+
+  * (Build_20180103_172) - fix error when price is not available from quote source. Test case: ft.com HANEUR:STO.
 
   * (Build_20180103_171) - fix error when trade date not available from quote source. Will default to today. Test case: ft.com HANA:LSE.
 
