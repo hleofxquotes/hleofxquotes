@@ -505,6 +505,10 @@ public class StockPrice extends AbstractStockPrice {
      */
     @Override
     public void setLastTrade(Date lastTrade) {
+        if (lastTrade == null) {
+            LOGGER.warn("lastTrade is null.");
+            lastTrade = new Date();
+        }
         this.lastTrade = lastTrade;
     }
 
