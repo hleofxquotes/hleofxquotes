@@ -76,9 +76,9 @@ import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 import com.hungle.msmoney.core.misc.BuildNumber;
 import com.hungle.msmoney.core.misc.CheckNullUtils;
-import com.hungle.msmoney.core.ofx.QifUtils;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxSaveParameter;
+import com.hungle.msmoney.core.qif.QifUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.FxSymbol;
 import com.hungle.msmoney.core.stockprice.Price;
@@ -94,6 +94,7 @@ import com.hungle.msmoney.gui.action.ExitAction;
 import com.hungle.msmoney.gui.action.ImportAction;
 import com.hungle.msmoney.gui.action.ProfileSelectedAction;
 import com.hungle.msmoney.gui.action.SaveOfxAction;
+import com.hungle.msmoney.gui.md.MdUtils;
 import com.hungle.msmoney.gui.qs.BloombergQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtCsvQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEquitiesSourcePanel;
@@ -1874,7 +1875,7 @@ public class GUI extends JFrame {
                     File toFile = fc.getSelectedFile();
                     PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                     try {
-                        MDUtils.saveToCsv(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(),
+                        MdUtils.saveToCsv(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(),
                                 getFxTable(), toFile);
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -2553,6 +2554,14 @@ public class GUI extends JFrame {
 
     public void setNotFoundPriceList(EventList<AbstractStockPrice> notFoundPriceList) {
         this.notFoundPriceList = notFoundPriceList;
+    }
+
+    public static String getHomeDirectory() {
+        String homeDirectory = null;
+        
+        homeDirectory = System.getProperty("user.home", ".");
+        
+        return homeDirectory;
     }
 
 }

@@ -9,8 +9,10 @@ import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
 
 import com.hungle.msmoney.core.misc.CheckNullUtils;
+import com.hungle.msmoney.core.qif.VelocityUtils;
 import com.hungle.msmoney.stmt.fi.props.FIBean;
 import com.hungle.msmoney.stmt.fi.props.HttpProperties;
+import com.hungle.msmoney.stmt.fi.props.OFX;
 import com.hungle.msmoney.stmt.fi.props.PropertiesUtils;
 import com.hungle.msmoney.stmt.scrubber.ResponseFilter;
 
@@ -61,10 +63,6 @@ public abstract class AbstractFiDir {
 
     /** The Constant RESP_FILE_OFX. */
     public static final String RESP_FILE_OFX = "resp.ofx";
-    
-    static {
-        VelocityUtils.initVelocity();
-    }
 
     /**
      * Instantiates a new update fi dir.
@@ -180,7 +178,7 @@ public abstract class AbstractFiDir {
         if (!CheckNullUtils.isNull(this.template)) {
             workingTemplate = this.template;
         } else {
-            workingTemplate = VelocityUtils.getTemplateNameFromContext(velocityContext);
+            workingTemplate = AbstractFiDir.getTemplateNameFromContext(velocityContext);
         }
         if (CheckNullUtils.isNull(workingTemplate)) {
             throw new IOException("template is null");
@@ -317,6 +315,30 @@ public abstract class AbstractFiDir {
      */
     public FIBean getFiBean() {
         return PropertiesUtils.getFiBean(velocityContext);
+    }
+
+    /**
+     * Gets the template from context.
+     *
+     * @param context the context
+     * @return the template from context
+     */
+    static String getTemplateNameFromContext(VelocityContext context) {
+        String requestType = PropertiesUtils.getRequestType(context);
+        if (CheckNullUtils.isNull(requestType)) {
+            LOGGER.error("Cannot create template, requestType is null");
+            return null;
+        }
+        com.hungle.msmoney.stmt.fi.props.OFX ofx = PropertiesUtils.getOfx(context);
+        if (ofx == null) {
+            LOGGER.error("Cannot create template, OFX object is null");
+            return null;
+        }
+        String version = ofx.getVersion();
+        if (CheckNullUtils.isNull(version)) {
+            LOGGER.error("Cannot create template, OFX version is null");
+        }
+        return requestType + "-v" + version + ".vm";
     }
 
     /**

@@ -92,11 +92,11 @@ public class SymbolMapper {
 
             entry.load(csvReader);
 
-            addEntry(entry);
+            add(entry);
         }
     }
 
-    private void addEntry(SymbolMapperEntry entry) {
+    public void add(SymbolMapperEntry entry) {
         updateMapBys(entry);
 
         entries.add(entry);
@@ -297,7 +297,7 @@ public class SymbolMapper {
         for (MetaStockSymbol metaStockSymbol : metaStockSymbols) {
             SymbolMapperEntry symbolMapperEntry = new SymbolMapperEntry();
             populateEntry(metaStockSymbol, symbolMapperEntry);
-            addEntry(symbolMapperEntry);
+            add(symbolMapperEntry);
 
             // replace the current symbol with the quote source symbol
             ListIterator<String> iter = stockSymbols.listIterator();
