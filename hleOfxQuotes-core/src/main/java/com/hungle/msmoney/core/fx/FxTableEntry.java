@@ -15,6 +15,17 @@ public class FxTableEntry {
     /** The rate. */
     private String rate;
 
+    public FxTableEntry(String fromCurrency, String toCurrency, String rate) {
+        super();
+        this.fromCurrency = fromCurrency;
+        this.toCurrency = toCurrency;
+        this.rate = rate;
+    }
+
+    public FxTableEntry() {
+        super();
+    }
+
     @Override
     public String toString() {
         return "FxTableEntry [fromCurrency=" + fromCurrency + ", toCurrency=" + toCurrency + ", rate=" + rate + "]";
