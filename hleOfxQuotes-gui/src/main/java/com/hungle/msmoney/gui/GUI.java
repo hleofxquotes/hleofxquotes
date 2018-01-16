@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.URI;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -76,6 +79,7 @@ import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 import com.hungle.msmoney.core.misc.BuildNumber;
 import com.hungle.msmoney.core.misc.CheckNullUtils;
+import com.hungle.msmoney.core.ofx.ImportUtils;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxSaveParameter;
 import com.hungle.msmoney.core.qif.QifUtils;
@@ -848,11 +852,82 @@ public class GUI extends JFrame {
 
         menu = new JMenu("Tools");
 
+        addImportQFXFile(menu);
+
         addAutoClickToolMenuItem(menu);
 
-        addShowStatementProgressMenuItem(menu);
-
         menubar.add(menu);
+    }
+
+    private void addImportQFXFile(JMenu menu) {
+        AbstractAction action = new AbstractAction("Import QFX to MSMoney") {
+            
+            private static final long serialVersionUID = 1L;
+
+            private final String prefKey = "importQFXDir";
+            private JFileChooser fc = null;
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (fc == null) {
+                    initFileChooser();
+                }
+                if (fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+                    return;
+                }
+                File file = fc.getSelectedFile();
+                PREFS.put(prefKey, file.getAbsoluteFile().getParentFile().getAbsolutePath());
+                try {
+                    File ofxFile = renameToOfxFile(file);
+                    LOGGER.info("Importing file=" + file + " as ofxFile=" + ofxFile);
+                    
+                    Runnable command = new Runnable() {
+                        @Override
+                        public void run() {
+                            ImportUtils.doImport(getThreadPool(), ofxFile);
+                        }
+                    };
+                    getThreadPool().execute(command);
+                    
+                } catch (IOException e) {
+                    LOGGER.error(e, e);
+                }
+            }
+
+            private File renameToOfxFile(File source) throws IOException {
+                File dest = File.createTempFile("import", ".ofx");
+                
+                CopyOption options = StandardCopyOption.REPLACE_EXISTING;
+                Files.copy(source.toPath(), dest.toPath(), options);
+                dest.deleteOnExit();
+                
+                return dest;
+            }
+
+            private void initFileChooser() {
+                fc = new JFileChooser(PREFS.get(prefKey, "."));
+                FileFilter filter = new FileFilter() {
+
+                    @Override
+                    public String getDescription() {
+                        return "QFX";
+                    }
+
+                    @Override
+                    public boolean accept(File file) {
+                        if (file.isDirectory()) {
+                            return true;
+                        }
+                        String name = file.getName();
+                        return name.endsWith(".qfx");
+                    }
+                };
+                this.fc.setFileFilter(filter);
+            }
+        };
+        
+        JMenuItem menuItem = new JMenuItem(action);
+        menu.add(menuItem);
     }
 
     private void addShowStatementProgressMenuItem(JMenu menu) {
@@ -1104,9 +1179,26 @@ public class GUI extends JFrame {
         JMenu editMenu = new JMenu("Edit");
         menubar.add(editMenu);
 
+        addQuotesMenu(editMenu);
+        addStatementMenu(editMenu);
+    }
+
+    private void addStatementMenu(JMenu parentMenu) {
+        JMenu menu;
+        
+        menu = new JMenu("Statement");
+        // menubar.add(menu);
+        parentMenu.add(menu);   
+        
+        addShowStatementProgressMenuItem(menu);
+    }
+
+    private void addQuotesMenu(JMenu parentMenu) {
+        JMenu menu;
+        JMenuItem menuItem;
         menu = new JMenu("Quotes");
         // menubar.add(menu);
-        editMenu.add(menu);
+        parentMenu.add(menu);
 
         // menu.addSeparator();
         menuItem = new JMenuItem(new EditCurrencyAction(this, "Currency"));
@@ -1119,7 +1211,7 @@ public class GUI extends JFrame {
         menuItem = new JMenuItem(new EditWarnSuspiciousPriceAction(this, "Warn Suspicious Price"));
         menu.add(menuItem);
 
-        menu.addSeparator();
+//        menu.addSeparator();
         menuItem = new JMenuItem(new EditRandomizeShareCountAction(this, "Randomize Share Count"));
         menu.add(menuItem);
 
@@ -1226,6 +1318,7 @@ public class GUI extends JFrame {
             }
         });
         menu.add(menuItem);
+        
     }
 
     /**

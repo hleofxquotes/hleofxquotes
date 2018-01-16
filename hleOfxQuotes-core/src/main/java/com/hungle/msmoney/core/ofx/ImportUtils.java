@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 public class ImportUtils {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(ImportUtils.class);
+    private static final Logger LOGGER = Logger.getLogger(ImportUtils.class);
 
     /**
      * Do import.
@@ -44,13 +44,13 @@ public class ImportUtils {
      * @param ofxFile the ofx file
      * @return true, if successful
      */
-    private static boolean doImport(Executor threadPool, File ofxFile) {
+    public static boolean doImport(Executor threadPool, File ofxFile) {
         if (ofxFile == null) {
-            log.warn("No OFX output file");
+            LOGGER.warn("No OFX output file");
             return false;
         }
         if (!ofxFile.exists()) {
-            log.warn("File ofxFile=" + ofxFile + " does not exist.");
+            LOGGER.warn("File ofxFile=" + ofxFile + " does not exist.");
             return false;
         }
 
@@ -58,8 +58,8 @@ public class ImportUtils {
         Runtime rt = Runtime.getRuntime();
         try {
             String command = "rundll32 SHELL32.DLL,ShellExec_RunDLL " + ofxFile.getAbsolutePath();
-            if (log.isDebugEnabled()) {
-                log.info("Import command=" + command);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.info("Import command=" + command);
             }
             Process proc = rt.exec(command);
             final InputStream stdout = proc.getInputStream();
@@ -67,21 +67,21 @@ public class ImportUtils {
             final InputStream stderr = proc.getErrorStream();
             threadPool.execute(new StreamConsumer(stderr, "stderr"));
 
-            if (log.isDebugEnabled()) {
-                log.debug("pre proc.waitFor()");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("pre proc.waitFor()");
             }
             int status = proc.waitFor();
             if (status != 0) {
-                log.warn("Import command failed with exit status=" + status);
-                log.warn("  command=" + command);
+                LOGGER.warn("Import command failed with exit status=" + status);
+                LOGGER.warn("  command=" + command);
                 returnCode = false;
             } else {
                 returnCode = true;
             }
         } catch (IOException e) {
-            log.error(e);
+            LOGGER.error(e);
         } catch (InterruptedException e) {
-            log.error(e);
+            LOGGER.error(e);
         }
 
         return returnCode;

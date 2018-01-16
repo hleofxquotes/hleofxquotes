@@ -14,8 +14,6 @@ import org.apache.velocity.VelocityContext;
 import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableUtils;
 import com.hungle.msmoney.core.mapper.SymbolMapper;
-import com.hungle.msmoney.core.qif.QifBean;
-import com.hungle.msmoney.core.qif.QifUtils;
 import com.hungle.msmoney.core.qif.VelocityUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.FxSymbol;
