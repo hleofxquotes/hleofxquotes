@@ -118,7 +118,9 @@ class ImportDialogAutoClickTask implements Runnable {
             return;
         }
         int childWindowsCount = getChildWindowsCount(user32, hWnd);
-        LOGGER.info("Dialog children window count=" + childWindowsCount);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Dialog children window count=" + childWindowsCount);
+        }
         if (childWindowsCount > 6) {
             return;
         }

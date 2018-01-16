@@ -1353,6 +1353,7 @@ public class GUI extends JFrame {
 
         // TAB: #3
         backupView = new BackupPanel();
+        backupView.setThreadPool(getThreadPool());
         getMainTabbed().addTab("Backup", backupView);
 
         view.add(getMainTabbed(), BorderLayout.CENTER);

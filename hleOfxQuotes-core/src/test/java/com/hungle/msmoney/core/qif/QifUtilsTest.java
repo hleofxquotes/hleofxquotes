@@ -14,7 +14,6 @@ import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableEntry;
 import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
-import com.hungle.msmoney.core.qif.QifUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.core.stockprice.StockPrice;

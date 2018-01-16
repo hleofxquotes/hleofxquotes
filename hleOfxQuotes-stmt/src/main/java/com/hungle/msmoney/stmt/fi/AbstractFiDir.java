@@ -12,7 +12,6 @@ import com.hungle.msmoney.core.misc.CheckNullUtils;
 import com.hungle.msmoney.core.qif.VelocityUtils;
 import com.hungle.msmoney.stmt.fi.props.FIBean;
 import com.hungle.msmoney.stmt.fi.props.HttpProperties;
-import com.hungle.msmoney.stmt.fi.props.OFX;
 import com.hungle.msmoney.stmt.fi.props.PropertiesUtils;
 import com.hungle.msmoney.stmt.scrubber.ResponseFilter;
 
