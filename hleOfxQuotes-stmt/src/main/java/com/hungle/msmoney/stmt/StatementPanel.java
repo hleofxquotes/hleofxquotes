@@ -965,11 +965,15 @@ public class StatementPanel extends JPanel {
                                 if ((respFile != null) && (respFile.exists())) {
                                     List<File> files = new ArrayList<File>();
                                     files.add(respFile);
-                                    int count = ImportUtils.doImport(threadPool, files);
-                                    if (count != files.size()) {
-                                        LOGGER.warn("Last import failed");
-                                    } else {
-                                        fiBean.setLastImported(new Date());
+                                    try {
+                                        int count = ImportUtils.doImport(threadPool, files);
+                                        if (count != files.size()) {
+                                            LOGGER.warn("Last import failed");
+                                        } else {
+                                            fiBean.setLastImported(new Date());
+                                        }
+                                    } catch (IOException e) {
+                                        LOGGER.error(e, e);
                                     }
                                 }
                             }

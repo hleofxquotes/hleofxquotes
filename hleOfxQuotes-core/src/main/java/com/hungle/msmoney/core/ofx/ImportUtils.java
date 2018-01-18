@@ -26,8 +26,9 @@ public class ImportUtils {
      * @param threadPool the thread pool
      * @param ofxFiles the ofx files
      * @return the int
+     * @throws IOException 
      */
-    public static int doImport(Executor threadPool, List<File> ofxFiles) {
+    public static int doImport(Executor threadPool, List<File> ofxFiles) throws IOException {
         if (ofxFiles == null) {
             return 0;
         }
@@ -46,8 +47,9 @@ public class ImportUtils {
      * @param threadPool the thread pool
      * @param ofxFile the ofx file
      * @return true, if successful
+     * @throws IOException 
      */
-    public static boolean doImport(Executor threadPool, File ofxFile) {
+    public static boolean doImport(Executor threadPool, File ofxFile) throws IOException {
         if (ofxFile == null) {
             LOGGER.warn("No OFX output file");
             return false;
@@ -81,10 +83,8 @@ public class ImportUtils {
             } else {
                 returnCode = true;
             }
-        } catch (IOException e) {
-            LOGGER.error(e);
         } catch (InterruptedException e) {
-            LOGGER.error(e);
+            throw new IOException(e);
         }
 
         return returnCode;

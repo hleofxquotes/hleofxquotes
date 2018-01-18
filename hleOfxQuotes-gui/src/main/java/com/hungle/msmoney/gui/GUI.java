@@ -2633,10 +2633,13 @@ public class GUI extends JFrame {
     }
 
     private void importQFXFile(File file) {
+        final String errorTitle = "Cannot import";
         String fileName = file.getName();
         int index = fileName.lastIndexOf(".");
         if (index < 0) {
             LOGGER.warn("Cannot find suffix for fileName=" + fileName);
+            String message = "Don't know how to import file=" + file;
+            JOptionPane.showConfirmDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
             return;
         }
         
@@ -2645,6 +2648,8 @@ public class GUI extends JFrame {
         
         if (suffix == null) {
             LOGGER.warn("Cannot find suffix for fileName=" + fileName);
+            String message = "Don't know how to import\r\nfile=" + file;
+            JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
             return;
         }
         
@@ -2657,7 +2662,8 @@ public class GUI extends JFrame {
                 ofxFile = ImportUtils.renameToOfxFile(file);
                 LOGGER.info("Importing file=" + file + " as ofxFile=" + ofxFile);
             } else {
-                LOGGER.warn("Don't know how to import file=" + file);
+                String message = "Don't know how to import\r\nfile=" + file;
+                JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
                 return;
             }
             String prefKey = GUI.importQFXDirPrefKey;
@@ -2667,12 +2673,25 @@ public class GUI extends JFrame {
             Runnable command = new Runnable() {
                 @Override
                 public void run() {
-                    ImportUtils.doImport(getThreadPool(), finalOfxFile);
+                    try {
+                        ImportUtils.doImport(getThreadPool(), finalOfxFile);
+                    } catch (IOException e) {
+                        Runnable doRun = new Runnable() {
+                            @Override
+                            public void run() {
+                                String message = e.getMessage();
+                                JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
+                            }
+                        };
+                        SwingUtilities.invokeLater(doRun);
+                    }
                 }
             };
             getThreadPool().execute(command);
         } catch (IOException e) {
             LOGGER.error(e, e);
+            String message = e.getMessage();
+            JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
         }
     }
 
