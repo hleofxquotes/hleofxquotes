@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.URI;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -201,6 +198,8 @@ public class GUI extends JFrame {
     private static final String PREF_SHOW_STATEMENT_PROGRESS = "showStatementProgress";
 
     private static final String PREF_SELECTED_QUOTE_SOURCE = "selectedQuoteSource";
+    
+    private static final String importQFXDirPrefKey = "importQFXDir";
 
     /** The thread pool. */
     final ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -861,10 +860,8 @@ public class GUI extends JFrame {
 
     private void addImportQFXFile(JMenu menu) {
         AbstractAction action = new AbstractAction("Import QFX to MSMoney") {
-            
             private static final long serialVersionUID = 1L;
 
-            private final String prefKey = "importQFXDir";
             private JFileChooser fc = null;
 
             @Override
@@ -876,36 +873,11 @@ public class GUI extends JFrame {
                     return;
                 }
                 File file = fc.getSelectedFile();
-                PREFS.put(prefKey, file.getAbsoluteFile().getParentFile().getAbsolutePath());
-                try {
-                    File ofxFile = renameToOfxFile(file);
-                    LOGGER.info("Importing file=" + file + " as ofxFile=" + ofxFile);
-                    
-                    Runnable command = new Runnable() {
-                        @Override
-                        public void run() {
-                            ImportUtils.doImport(getThreadPool(), ofxFile);
-                        }
-                    };
-                    getThreadPool().execute(command);
-                    
-                } catch (IOException e) {
-                    LOGGER.error(e, e);
-                }
-            }
-
-            private File renameToOfxFile(File source) throws IOException {
-                File dest = File.createTempFile("import", ".ofx");
-                
-                CopyOption options = StandardCopyOption.REPLACE_EXISTING;
-                Files.copy(source.toPath(), dest.toPath(), options);
-                dest.deleteOnExit();
-                
-                return dest;
+                importQFXFile(file);
             }
 
             private void initFileChooser() {
-                fc = new JFileChooser(PREFS.get(prefKey, "."));
+                fc = new JFileChooser(PREFS.get(importQFXDirPrefKey, "."));
                 FileFilter filter = new FileFilter() {
 
                     @Override
@@ -1640,19 +1612,22 @@ public class GUI extends JFrame {
         defaulCurrencyLabel = new JLabel("Default currency: " + getDefaultCurrency());
         view.add(defaulCurrencyLabel, BorderLayout.WEST);
 
-        TimeZone zone = null;
-        String[] timeZoneIds = { "America/New_York",
+        String[] timeZoneIds = { 
+                /* "America/New_York", */
                 /* "Europe/London", */
         };
-        clockFormatters = new SimpleDateFormat[timeZoneIds.length];
-        for (int i = 0; i < timeZoneIds.length; i++) {
-            clockFormatters[i] = new SimpleDateFormat("EEEEEEEEE, dd-MMM-yy HH:mm:ss z");
-            zone = TimeZone.getTimeZone(timeZoneIds[i]);
-            clockFormatters[i].setTimeZone(zone);
+        if ((timeZoneIds != null) && (timeZoneIds.length > 0)) {
+            TimeZone zone = null;
+            clockFormatters = new SimpleDateFormat[timeZoneIds.length];
+            for (int i = 0; i < timeZoneIds.length; i++) {
+                clockFormatters[i] = new SimpleDateFormat("EEEEEEEEE, dd-MMM-yy HH:mm:ss z");
+                zone = TimeZone.getTimeZone(timeZoneIds[i]);
+                clockFormatters[i].setTimeZone(zone);
+            }
+            clockLabel = new JLabel(getClockDisplayString());
+            scheduleClockUpdate();
+            view.add(clockLabel, BorderLayout.EAST);
         }
-        clockLabel = new JLabel(getClockDisplayString());
-        scheduleClockUpdate();
-        view.add(clockLabel, BorderLayout.EAST);
 
         return view;
     }
@@ -1830,6 +1805,13 @@ public class GUI extends JFrame {
         view.add(priceScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
+        commandView.setTransferHandler(new FileDropHandler() {
+            @Override
+            public void handleFile(File file) {
+                importQFXFile(file);
+            }
+        });
+
         commandView.setLayout(new BoxLayout(commandView, BoxLayout.LINE_AXIS));
         commandView.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
@@ -2648,6 +2630,50 @@ public class GUI extends JFrame {
 
     public void setNotFoundPriceList(EventList<AbstractStockPrice> notFoundPriceList) {
         this.notFoundPriceList = notFoundPriceList;
+    }
+
+    private void importQFXFile(File file) {
+        String fileName = file.getName();
+        int index = fileName.lastIndexOf(".");
+        if (index < 0) {
+            LOGGER.warn("Cannot find suffix for fileName=" + fileName);
+            return;
+        }
+        
+        String suffix = fileName.substring(index);
+        LOGGER.info("suffix=" + suffix);
+        
+        if (suffix == null) {
+            LOGGER.warn("Cannot find suffix for fileName=" + fileName);
+            return;
+        }
+        
+        try {
+            File ofxFile = null;
+            if (suffix.compareToIgnoreCase(".ofx") == 0) {
+                // OK
+                ofxFile = file;
+            } else if (suffix.compareToIgnoreCase(".qfx") == 0) {
+                ofxFile = ImportUtils.renameToOfxFile(file);
+                LOGGER.info("Importing file=" + file + " as ofxFile=" + ofxFile);
+            } else {
+                LOGGER.warn("Don't know how to import file=" + file);
+                return;
+            }
+            String prefKey = GUI.importQFXDirPrefKey;
+            PREFS.put(prefKey, file.getAbsoluteFile().getParentFile().getAbsolutePath());
+            
+            final File finalOfxFile = ofxFile;
+            Runnable command = new Runnable() {
+                @Override
+                public void run() {
+                    ImportUtils.doImport(getThreadPool(), finalOfxFile);
+                }
+            };
+            getThreadPool().execute(command);
+        } catch (IOException e) {
+            LOGGER.error(e, e);
+        }
     }
 
     public static String getHomeDirectory() {

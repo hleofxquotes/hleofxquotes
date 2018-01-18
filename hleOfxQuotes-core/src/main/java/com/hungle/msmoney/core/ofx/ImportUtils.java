@@ -3,6 +3,9 @@ package com.hungle.msmoney.core.ofx;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -85,6 +88,16 @@ public class ImportUtils {
         }
 
         return returnCode;
+    }
+
+    public static final File renameToOfxFile(File source) throws IOException {
+        File dest = File.createTempFile("import", ".ofx");
+        
+        CopyOption options = StandardCopyOption.REPLACE_EXISTING;
+        Files.copy(source.toPath(), dest.toPath(), options);
+        dest.deleteOnExit();
+        
+        return dest;
     }
 
 }
