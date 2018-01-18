@@ -37,6 +37,26 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /** The text field. */
+    private JTextField fromDirTextField;
+    private File fromDir;
+    private String fromDirPrefKey = "backup.fromDir";
+
+    /** The text field 1. */
+    private JTextField toDirTextField;
+    private File toDir;
+    private String toDirPrefKey = "backup.toDir";
+
+    private JFileChooser fc;
+
+    private ExecutorService threadPool;
+
+    private JButton backupButton;
+
+    private JProgressBar progressBar;
+
+    private int fileCount;
+
     private final class SaveBackupsAction implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
             if (fromDir == null) {
@@ -51,9 +71,8 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
             if (!toDir.isDirectory()) {
                 return;
             }
-
+    
             Runnable command = new Runnable() {
-
                 @Override
                 public void run() {
                     LOGGER.info("BACKUP - fromDir=" + fromDir);
@@ -75,26 +94,6 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         }
     }
 
-    /** The text field. */
-    private JTextField fromDirTextField;
-    private File fromDir;
-    private String fromDirPrefKey = "backup.fromDir";
-
-    /** The text field 1. */
-    private JTextField toDirTextField;
-    private File toDir;
-    private String toDirPrefKey = "backup.toDir";
-
-    private JFileChooser fc;
-
-    private ExecutorService threadPool;
-
-    private JButton backupButton;
-
-    private JProgressBar progressBar;
-
-    private int fileCount;
-
     /**
      * Instantiates a new backup panel.
      */
@@ -110,7 +109,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
                 new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
                         FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
                         FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
+                        FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.MIN_ROWSPEC,
                         FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
                         RowSpec.decode("default:grow"), }));
 
@@ -186,15 +185,14 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         backupButton.setEnabled(true);
 
         backupButton.addActionListener(new SaveBackupsAction());
-        add(backupButton, "10, 10");
-
-        JPanel panel = new JPanel();
-        add(panel, "6, 16, fill, fill");
 
         progressBar = new JProgressBar();
-        panel.add(progressBar);
+        add(progressBar, "6, 10, 5, 1");
+        progressBar.setMinimum(0);
+        progressBar.setMaximum(100);
         progressBar.setValue(0);
         progressBar.setString("");
+        add(backupButton, "12, 10");
     }
 
     public void setThreadPool(ExecutorService threadPool) {
@@ -206,7 +204,6 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         fileCount = 0;
 
         Runnable doRun = new Runnable() {
-
             @Override
             public void run() {
                 LOGGER.info("> notifyStartBackup");
@@ -227,16 +224,15 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
     @Override
     public void notifyStartCopyFile(File file, int size) {
         Runnable doRun = new Runnable() {
-
             @Override
             public void run() {
-                LOGGER.info("> notifyStartCopyFile");
-
                 int progress = fileCount / size;
-                progressBar.setValue(progress);
-                progressBar.setString(file.getName());
+                LOGGER.info("> notifyStartCopyFile, progress=" + progress);
 
-                backupButton.setEnabled(true);
+                progressBar.setValue(progress);
+//                progressBar.setString(file.getName());
+
+//                backupButton.setEnabled(true);
             }
         };
         try {
@@ -251,7 +247,6 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
     @Override
     public void notifyCopyFile(File fromFile, File toFile, String password) {
         Runnable doRun = new Runnable() {
-
             @Override
             public void run() {
                 LOGGER.info("> notifyCopyFile");
@@ -264,17 +259,14 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         } catch (InterruptedException e) {
             LOGGER.warn(e);
         }
-
     }
 
     @Override
     public void notifyDoneCopyFile(File file, int size) {
-
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
                 LOGGER.info("> notifyDoneCopyFile");
-
                 fileCount++;
             }
         };
@@ -285,19 +277,17 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         } catch (InterruptedException e) {
             LOGGER.warn(e);
         }
-
     }
 
     @Override
     public void notifyDoneBackup() {
         Runnable doRun = new Runnable() {
-
             @Override
             public void run() {
                 LOGGER.info("> notifyDoneBackup");
 
                 progressBar.setValue(100);
-                progressBar.setString("DONE");
+//                progressBar.setString("DONE");
 
                 backupButton.setEnabled(true);
             }
