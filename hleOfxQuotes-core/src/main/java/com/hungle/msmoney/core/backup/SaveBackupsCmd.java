@@ -20,32 +20,32 @@ public class SaveBackupsCmd {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        File inDir = null;
-        File outDir = null;
+        File fromDir = null;
+        File toDir = null;
         String password = null;
 
         if (args.length == 2) {
-            inDir = new File(args[0]);
-            outDir = new File(args[1]);
+            fromDir = new File(args[0]);
+            toDir = new File(args[1]);
             password = null;
         } else if (args.length == 3) {
-            inDir = new File(args[0]);
-            outDir = new File(args[1]);
+            fromDir = new File(args[0]);
+            toDir = new File(args[1]);
             password = args[2];
         } else {
             Class<SaveBackupsCmd> clz = SaveBackupsCmd.class;
-            System.out.println("Usage: java " + clz.getName() + " inDir outDir [password]");
+            System.out.println("Usage: java " + clz.getName() + " fromDir toDir [password]");
             System.exit(1);
         }
 
-        LOGGER.info("inDir=" + inDir);
-        LOGGER.info("outDir=" + outDir);
+        LOGGER.info("fromDir=" + fromDir);
+        LOGGER.info("toDir=" + toDir);
         LOGGER.info("password=" + (password != null));
 
         try {
             SaveBackups cmd = new SaveBackups();
             LOGGER.info("> START");
-            cmd.saveBackups(inDir, outDir, password);
+            cmd.saveBackups(fromDir, toDir, password);
         } catch (IOException e) {
             LOGGER.error(e, e);
         } finally {
