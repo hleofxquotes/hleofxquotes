@@ -763,7 +763,7 @@ public class StatementPanel extends JPanel {
             bean.setFi(fi);
         
             String name = fi.getName();
-            if (!CheckNullUtils.isNull(name)) {
+            if (!CheckNullUtils.isEmpty(name)) {
                 bean.setName(name);
             }
         }

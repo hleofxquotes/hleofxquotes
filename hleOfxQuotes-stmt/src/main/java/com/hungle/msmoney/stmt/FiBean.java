@@ -231,11 +231,11 @@ public class FiBean {
             props.load(reader);
             String value = null;
             value = props.getProperty("download.status");
-            if (!CheckNullUtils.isNull(value)) {
+            if (!CheckNullUtils.isEmpty(value)) {
                 setStatus(value);
             }
             value = props.getProperty("download.lastImported");
-            if (!CheckNullUtils.isNull(value)) {
+            if (!CheckNullUtils.isEmpty(value)) {
                 try {
                     setLastImported(dateFormatter.parse(value));
                 } catch (ParseException e) {
@@ -243,7 +243,7 @@ public class FiBean {
                 }
             }
             value = props.getProperty("download.lastDownloaded");
-            if (!CheckNullUtils.isNull(value)) {
+            if (!CheckNullUtils.isEmpty(value)) {
                 try {
                     setLastDownloaded(dateFormatter.parse(value));
                 } catch (ParseException e) {

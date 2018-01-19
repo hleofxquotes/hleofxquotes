@@ -214,7 +214,7 @@ public class SymbolMapperEntry {
     public void load(CsvReader csvReader) throws IOException {
         // MSMoneySymbol
         String msMoneySymbol = csvReader.get(MS_MONEY_SYMBOL);
-        if (CheckNullUtils.isNull(msMoneySymbol)) {
+        if (CheckNullUtils.isEmpty(msMoneySymbol)) {
             LOGGER.warn("MSMoneySymbol column is blank");
             return;
         } else {
@@ -223,7 +223,7 @@ public class SymbolMapperEntry {
 
         // QuotesSourceSymbol
         String quotesSourceSymbol = csvReader.get(QUOTES_SOURCE_SYMBOL);
-        if (CheckNullUtils.isNull(quotesSourceSymbol)) {
+        if (CheckNullUtils.isEmpty(quotesSourceSymbol)) {
             LOGGER.warn("QuotesSourceSymbol column is blank");
             return;
         } else {
@@ -232,7 +232,7 @@ public class SymbolMapperEntry {
 
         // IsMutualFund
         String isMutualFund = csvReader.get(IS_MUTUAL_FUND);
-        if (CheckNullUtils.isNull(quotesSourceSymbol)) {
+        if (CheckNullUtils.isEmpty(quotesSourceSymbol)) {
             setMutualFund(false);
         } else {
             setMutualFund(Boolean.valueOf(isMutualFund));
@@ -240,7 +240,7 @@ public class SymbolMapperEntry {
 
         // IsOptions
         String isOptions = csvReader.get(IS_OPTIONS);
-        if (CheckNullUtils.isNull(quotesSourceSymbol)) {
+        if (CheckNullUtils.isEmpty(quotesSourceSymbol)) {
             setOptions(false);
         } else {
             setOptions(Boolean.valueOf(isOptions));
@@ -248,7 +248,7 @@ public class SymbolMapperEntry {
 
         // Type
         String type = csvReader.get(TYPE);
-        if (CheckNullUtils.isNull(type)) {
+        if (CheckNullUtils.isEmpty(type)) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.warn("Type column is blank");
             }
@@ -272,7 +272,7 @@ public class SymbolMapperEntry {
 
         // MSMoneyCurrency
         String mSMoneyCurrency = csvReader.get(MS_MONEY_CURRENCY);
-        if (CheckNullUtils.isNull(mSMoneyCurrency)) {
+        if (CheckNullUtils.isEmpty(mSMoneyCurrency)) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.warn("MSMoneyCurrency column is blank");
             }
@@ -282,7 +282,7 @@ public class SymbolMapperEntry {
 
         // QuotesSourceCurrency
         String quotesSourceCurrency = csvReader.get(QUOTES_SOURCE_CURRENCY);
-        if (CheckNullUtils.isNull(quotesSourceCurrency)) {
+        if (CheckNullUtils.isEmpty(quotesSourceCurrency)) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.warn("QuotesSourceCurrency column is blank");
             }

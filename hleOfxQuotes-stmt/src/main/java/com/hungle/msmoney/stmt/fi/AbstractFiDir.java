@@ -97,7 +97,7 @@ public abstract class AbstractFiDir {
         LOGGER.info("FI.name=" + fi.getName());
         
         String url = fi.getUrl();
-        if (CheckNullUtils.isNull(url)) {
+        if (CheckNullUtils.isEmpty(url)) {
             LOGGER.warn("SKIP sending request, fi.url is null");
             return false;
         }
@@ -174,12 +174,12 @@ public abstract class AbstractFiDir {
      */
     private String getWorkingTemplate() throws IOException {
         String workingTemplate = null;
-        if (!CheckNullUtils.isNull(this.template)) {
+        if (!CheckNullUtils.isEmpty(this.template)) {
             workingTemplate = this.template;
         } else {
             workingTemplate = AbstractFiDir.getTemplateNameFromContext(velocityContext);
         }
-        if (CheckNullUtils.isNull(workingTemplate)) {
+        if (CheckNullUtils.isEmpty(workingTemplate)) {
             throw new IOException("template is null");
         }
 
@@ -324,7 +324,7 @@ public abstract class AbstractFiDir {
      */
     static String getTemplateNameFromContext(VelocityContext context) {
         String requestType = PropertiesUtils.getRequestType(context);
-        if (CheckNullUtils.isNull(requestType)) {
+        if (CheckNullUtils.isEmpty(requestType)) {
             LOGGER.error("Cannot create template, requestType is null");
             return null;
         }
@@ -334,7 +334,7 @@ public abstract class AbstractFiDir {
             return null;
         }
         String version = ofx.getVersion();
-        if (CheckNullUtils.isNull(version)) {
+        if (CheckNullUtils.isEmpty(version)) {
             LOGGER.error("Cannot create template, OFX version is null");
         }
         return requestType + "-v" + version + ".vm";

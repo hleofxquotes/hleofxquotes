@@ -123,7 +123,7 @@ public class FxTable {
 
                 columnName = "FromCurrency";
                 String fromCurrency = csvReader.get(columnName);
-                if (CheckNullUtils.isNull(fromCurrency)) {
+                if (CheckNullUtils.isEmpty(fromCurrency)) {
                     LOGGER.warn("Value for column=" + columnName + " is null.");
                     continue;
                 }
@@ -137,7 +137,7 @@ public class FxTable {
 
                 columnName = "ToCurrency";
                 String toCurrency = csvReader.get(columnName);
-                if (CheckNullUtils.isNull(toCurrency)) {
+                if (CheckNullUtils.isEmpty(toCurrency)) {
                     LOGGER.warn("Value for column=" + columnName + " is null.");
                     continue;
                 }
@@ -151,7 +151,7 @@ public class FxTable {
 
                 columnName = "Rate";
                 String rate = csvReader.get(columnName);
-                if (CheckNullUtils.isNull(rate)) {
+                if (CheckNullUtils.isEmpty(rate)) {
                     LOGGER.warn("Value for column=" + columnName + " is null.");
                     continue;
                 }

@@ -30,9 +30,23 @@ public class VelocityUtils {
      */
     private static void initVelocity() {
         Properties props = new Properties();
-        props.setProperty("resource.loader", "class");
+        props.setProperty("resource.loader", "file, class");
+        
         props.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
         props.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        
+        props.setProperty("file.resource.loader.description", "Velocity File Resource Loader");
+        props.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
+//        props.setProperty("file.resource.loader.class", HleOfxQuotesFileResourceLoader.class.getName());
+        String homeDir = System.getProperty("user.home",".");
+        File topDir = new File(homeDir, ".hleofxquotes");
+//        File templatesDir = new File(topDir, "templates");
+        if (! topDir.exists()) {
+            topDir.mkdirs();
+        }
+        props.setProperty("file.resource.loader.path", ".," + topDir.getAbsoluteFile().getAbsolutePath());
+        // <name>.resource.loader.path = .
+        
         Velocity.init(props);
     }
 

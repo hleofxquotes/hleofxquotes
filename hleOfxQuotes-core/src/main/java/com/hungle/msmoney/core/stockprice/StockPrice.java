@@ -160,7 +160,7 @@ public class StockPrice extends AbstractStockPrice {
     public void postSetProperties() {
         String stockSymbol = getStockSymbol();
 
-        if (CheckNullUtils.isNull(getStockName())) {
+        if (CheckNullUtils.isEmpty(getStockName())) {
             setStockName(stockSymbol);
         }
 

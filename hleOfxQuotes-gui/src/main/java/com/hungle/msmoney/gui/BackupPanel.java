@@ -147,7 +147,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         add(fromDirTextField, "6, 4, 5, 1, fill, default");
         fromDirTextField.setColumns(10);
         String pathName = GUI.PREFS.get(fromDirPrefKey, null);
-        if (!CheckNullUtils.isNull(pathName)) {
+        if (!CheckNullUtils.isEmpty(pathName)) {
             fromDirTextField.setText(pathName);
             fromDir = new File(pathName);
         }
@@ -179,7 +179,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         add(toDirTextField, "6, 6, 5, 1, fill, default");
         toDirTextField.setColumns(10);
         pathName = GUI.PREFS.get(toDirPrefKey, null);
-        if (!CheckNullUtils.isNull(pathName)) {
+        if (!CheckNullUtils.isEmpty(pathName)) {
             toDirTextField.setText(pathName);
             toDir = new File(pathName);
         }

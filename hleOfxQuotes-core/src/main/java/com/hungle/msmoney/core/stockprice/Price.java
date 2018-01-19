@@ -209,7 +209,7 @@ public class Price extends Number implements Comparable<Price>, Cloneable {
 
     public static String toPriceString(Price lastPrice, String language, String country) {
         NumberFormat priceFormatter = null;
-        if (CheckNullUtils.isNull(language) || CheckNullUtils.isNull(country)) {
+        if (CheckNullUtils.isEmpty(language) || CheckNullUtils.isEmpty(country)) {
             priceFormatter = lastPrice.getPriceFormatter();
         } else {
             Locale locale = new Locale(language, country);

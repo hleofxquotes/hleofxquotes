@@ -156,7 +156,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
     
             setUnits(csvReader, stockPrice);
         } finally {
-            if (CheckNullUtils.isNull(stockPrice.getStockName())) {
+            if (CheckNullUtils.isEmpty(stockPrice.getStockName())) {
                 stockPrice.setStockName(stockPrice.getStockSymbol());
             }
             stockPrice.calculateSecType();
@@ -179,7 +179,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + stockName);
         }
-        if (CheckNullUtils.isNull(stockName)) {
+        if (CheckNullUtils.isEmpty(stockName)) {
             throw new IOException("SKIP: invalid name=" + stockName);
         }
         stockPrice.setStockName(stockName);
@@ -198,7 +198,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + stockSymbol);
         }
-        if (CheckNullUtils.isNull(stockSymbol)) {
+        if (CheckNullUtils.isEmpty(stockSymbol)) {
             throw new IOException("SKIP: invalid symbolExchange=" + stockSymbol + ", name=" + stockPrice.getStockName());
         }
         stockPrice.setStockSymbol(stockSymbol);
@@ -217,7 +217,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + lastPrice);
         }
-        if (CheckNullUtils.isNull(lastPrice)) {
+        if (CheckNullUtils.isEmpty(lastPrice)) {
             throw new IOException("SKIP: no price for " + stockPrice.getStockSymbol());
         }
         NumberFormat formatter = null;
@@ -252,7 +252,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(columnName + ": " + quoteDateAndTime);
         }
-        if (!CheckNullUtils.isNull(quoteDateAndTime)) {
+        if (!CheckNullUtils.isEmpty(quoteDateAndTime)) {
             try {
                 Date date = quoteDateAndTimeFormatter.parse(quoteDateAndTime);
 //                stockPrice.setLastTradeDate(lastTradeDateFormatter.format(date));
@@ -295,7 +295,7 @@ public abstract class AbstractCsvConverter implements CsvConverter {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(columnName + ": " + quantity);
             }
-            if (!CheckNullUtils.isNull(quantity)) {
+            if (!CheckNullUtils.isEmpty(quantity)) {
                 Double units;
                 try {
                     units = Double.valueOf(quantity);

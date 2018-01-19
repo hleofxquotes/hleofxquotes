@@ -537,7 +537,7 @@ public class GUI extends JFrame {
         String currency = defaultValue;
         for (SymbolMapperEntry entry : mapper.getEntries()) {
             quoteSourceSymbol = entry.getQuotesSourceSymbol();
-            if (CheckNullUtils.isNull(quoteSourceSymbol)) {
+            if (CheckNullUtils.isEmpty(quoteSourceSymbol)) {
                 continue;
             }
             if (LOGGER.isDebugEnabled()) {
@@ -550,7 +550,7 @@ public class GUI extends JFrame {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("getMapperCurrency: s=" + quoteSourceSymbol + ", currency=" + currency);
             }
-            if (!CheckNullUtils.isNull(currency)) {
+            if (!CheckNullUtils.isEmpty(currency)) {
                 return currency;
             }
         }
@@ -575,14 +575,14 @@ public class GUI extends JFrame {
                 price.setCurrency(defaultCurrency);
             }
             String currency = stockPrice.getCurrency();
-            if (CheckNullUtils.isNull(currency)) {
+            if (CheckNullUtils.isEmpty(currency)) {
                 String symbol = stockPrice.getStockSymbol();
                 String overridingCurrency = null;
                 overridingCurrency = getMapperCurrency(symbol, symbolMapper, overridingCurrency);
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.info("symbol: " + symbol + ", overridingCurrency=" + overridingCurrency);
                 }
-                if (!CheckNullUtils.isNull(overridingCurrency)) {
+                if (!CheckNullUtils.isEmpty(overridingCurrency)) {
                     stockPrice.setCurrency(overridingCurrency);
                     stockPrice.updateLastPriceCurrency();
                 }
@@ -1118,7 +1118,7 @@ public class GUI extends JFrame {
             reader = new BufferedReader(new FileReader(file));
             props.load(reader);
             String name = props.getProperty("name");
-            if (CheckNullUtils.isNull(name)) {
+            if (CheckNullUtils.isEmpty(name)) {
                 name = file.getName();
             }
             JMenuItem item = new JMenuItem(new ProfileSelectedAction(this, name, props));
@@ -2701,6 +2701,15 @@ public class GUI extends JFrame {
         homeDirectory = System.getProperty("user.home", ".");
         
         return homeDirectory;
+    }
+    
+    public static String getTopDirectory() {
+        String homeDir = getHomeDirectory();
+        File topDir = new File(homeDir, ".hleofxquotes");
+        if (! topDir.exists()) {
+            topDir.mkdirs();
+        }
+        return topDir.getAbsoluteFile().getAbsolutePath();
     }
 
 }
