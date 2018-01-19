@@ -26,6 +26,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
 import javax.swing.JProgressBar;
+import javax.swing.JTextPane;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -101,19 +102,40 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         this.fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-        setLayout(new FormLayout(new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC,
-                FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC, FormSpecs.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("default:grow"), FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
-                FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC, FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC, },
-                new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.MIN_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
-                        RowSpec.decode("default:grow"), }));
+        setLayout(new FormLayout(new ColumnSpec[] {
+                FormSpecs.RELATED_GAP_COLSPEC,
+                FormSpecs.DEFAULT_COLSPEC,
+                FormSpecs.RELATED_GAP_COLSPEC,
+                ColumnSpec.decode("default:grow"),
+                FormSpecs.RELATED_GAP_COLSPEC,
+                ColumnSpec.decode("default:grow"),
+                FormSpecs.RELATED_GAP_COLSPEC,
+                ColumnSpec.decode("default:grow"),
+                FormSpecs.RELATED_GAP_COLSPEC,
+                ColumnSpec.decode("default:grow"),
+                FormSpecs.RELATED_GAP_COLSPEC,
+                FormSpecs.DEFAULT_COLSPEC,
+                FormSpecs.RELATED_GAP_COLSPEC,
+                FormSpecs.DEFAULT_COLSPEC,},
+            new RowSpec[] {
+                FormSpecs.RELATED_GAP_ROWSPEC,
+                FormSpecs.DEFAULT_ROWSPEC,
+                FormSpecs.RELATED_GAP_ROWSPEC,
+                FormSpecs.DEFAULT_ROWSPEC,
+                FormSpecs.RELATED_GAP_ROWSPEC,
+                FormSpecs.DEFAULT_ROWSPEC,
+                FormSpecs.RELATED_GAP_ROWSPEC,
+                FormSpecs.DEFAULT_ROWSPEC,
+                FormSpecs.RELATED_GAP_ROWSPEC,
+                FormSpecs.DEFAULT_ROWSPEC,
+                FormSpecs.RELATED_GAP_ROWSPEC,
+                FormSpecs.MIN_ROWSPEC,
+                FormSpecs.RELATED_GAP_ROWSPEC,
+                RowSpec.decode("default:grow"),
+                FormSpecs.RELATED_GAP_ROWSPEC,
+                RowSpec.decode("default:grow"),}));
 
-        JLabel lblNewJgoodiesTitle = DefaultComponentFactory.getInstance().createTitle("Backup Manager");
+        JLabel lblNewJgoodiesTitle = DefaultComponentFactory.getInstance().createTitle("Backup Organizer");
         lblNewJgoodiesTitle.setHorizontalAlignment(SwingConstants.TRAILING);
         add(lblNewJgoodiesTitle, "4, 2");
 
@@ -181,7 +203,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         });
         add(toDirButton, "12, 6");
 
-        backupButton = new JButton("Backup");
+        backupButton = new JButton("Organize");
         backupButton.setEnabled(true);
 
         backupButton.addActionListener(new SaveBackupsAction());
@@ -193,6 +215,11 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         progressBar.setValue(0);
         progressBar.setString(null);
         add(backupButton, "12, 10");
+        
+        JTextPane txtpnThisToolWill = new JTextPane();
+        txtpnThisToolWill.setEditable(false);
+        txtpnThisToolWill.setText("This tool will copy backup files from ‘From dir’ to ‘To dir’ and put them into\nan hierarchical directory structure\nYYYY/MM/DD");
+        add(txtpnThisToolWill, "4, 14, 9, 1, fill, fill");
     }
 
     public void setThreadPool(ExecutorService threadPool) {
