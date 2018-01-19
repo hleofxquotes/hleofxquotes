@@ -1,9 +1,12 @@
 package com.hungle.msmoney.gui.action;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
@@ -45,11 +48,23 @@ public final class ImportAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent event) {
         LOGGER.info("> Import action");
+        final Component component = (Component) event.getSource();
+        final String errorTitle = "Cannot import";
+        
         Runnable command = new Runnable() {
             @Override
             public void run() {
                 try {
                     ImportUtils.doImport(ImportAction.this.gui.getThreadPool(), ImportAction.this.gui.getOutputFiles());
+                } catch (IOException e) {
+                    Runnable doRun = new Runnable() {
+                        @Override
+                        public void run() {
+                            String message = e.getMessage();
+                            JOptionPane.showMessageDialog(component, message, errorTitle, JOptionPane.ERROR_MESSAGE);
+                        }
+                    };
+                    SwingUtilities.invokeLater(doRun);
                 } finally {
                     Runnable doRun = new Runnable() {
                         @Override

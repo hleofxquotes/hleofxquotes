@@ -1,20 +1,26 @@
 package com.hungle.msmoney.core.misc;
 
+import org.apache.commons.lang.StringUtils;
+
 public class CheckNullUtils {
 
     /**
      * Checks if is null.
      *
-     * @param property
+     * @param value
      *            the property
      * @return true, if is null
      */
-    public static boolean isNull(String property) {
-        if (property == null) {
+    public static boolean isEmpty(String str) {
+        return StringUtils.isEmpty(str);
+    }
+    
+    private static boolean isNull(String value) {
+        if (value == null) {
             return true;
         }
     
-        if (property.length() <= 0) {
+        if (value.length() <= 0) {
             return true;
         }
     

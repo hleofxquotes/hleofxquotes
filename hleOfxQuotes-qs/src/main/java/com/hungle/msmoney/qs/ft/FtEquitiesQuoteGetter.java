@@ -116,7 +116,9 @@ public class FtEquitiesQuoteGetter extends AbstractHttpQuoteGetter {
                 stockPrice.postSetProperties();
             }
 
-            stockPrices.add(stockPrice);
+            if (stockPrice.getLastPrice() != null) {
+                stockPrices.add(stockPrice);
+            }
         }
         
         return stockPrices;

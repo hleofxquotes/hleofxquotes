@@ -103,7 +103,7 @@ public class FxSymbol {
             return null;
         }
 
-        if (CheckNullUtils.isNull(symbol)) {
+        if (CheckNullUtils.isEmpty(symbol)) {
             return null;
         }
 

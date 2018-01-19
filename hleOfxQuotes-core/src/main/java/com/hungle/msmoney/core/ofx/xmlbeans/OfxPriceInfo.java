@@ -403,7 +403,7 @@ public class OfxPriceInfo {
         // stockSourceTicker = quoteSourceSymbol;
         // quoteSourceSymbol = msMoneySymbol;
         // }
-        if (CheckNullUtils.isNull(msMoneySymbol)) {
+        if (CheckNullUtils.isEmpty(msMoneySymbol)) {
             msMoneySymbol = quoteSourceSymbol;
         }
         double units = stockPrice.getUnits();
@@ -816,7 +816,7 @@ public class OfxPriceInfo {
      */
     private void addGeneralSecurityInfo(SecurityList securityList, AbstractStockPrice stockPrice,
             String quoteSourceSymbol, String msMoneySymbol) {
-        if (CheckNullUtils.isNull(msMoneySymbol)) {
+        if (CheckNullUtils.isEmpty(msMoneySymbol)) {
             msMoneySymbol = quoteSourceSymbol;
         }
 
@@ -1164,7 +1164,7 @@ public class OfxPriceInfo {
             String comment = "Ticker from quote source is: " + quoteSourceTicker;
             insertComment(secInfo, comment);
         }
-        if (CheckNullUtils.isNull(secName)) {
+        if (CheckNullUtils.isEmpty(secName)) {
             secName = ticker;
         }
         secInfo.setSECNAME(secName);
@@ -1314,7 +1314,7 @@ public class OfxPriceInfo {
                 ofxPriceInfo.setCurDef(curDef);
             }
         }
-        if (!CheckNullUtils.isNull(params.getAccountId())) {
+        if (!CheckNullUtils.isEmpty(params.getAccountId())) {
             ofxPriceInfo.setAccountId(params.getAccountId());
         }
 

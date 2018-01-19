@@ -24,15 +24,15 @@ public class PropertiesUtilsTest {
      */
     @Test
     public void testIsNull() {
-        Assert.assertTrue(CheckNullUtils.isNull(null));
-        Assert.assertTrue(CheckNullUtils.isNull(""));
+        Assert.assertTrue(CheckNullUtils.isEmpty(null));
+        Assert.assertTrue(CheckNullUtils.isEmpty(""));
 
-        Assert.assertFalse(CheckNullUtils.isNull(" "));
-        Assert.assertFalse(CheckNullUtils.isNull("  "));
+        Assert.assertFalse(CheckNullUtils.isEmpty(" "));
+        Assert.assertFalse(CheckNullUtils.isEmpty("  "));
 
-        Assert.assertFalse(CheckNullUtils.isNull("x"));
-        Assert.assertFalse(CheckNullUtils.isNull(" x"));
-        Assert.assertFalse(CheckNullUtils.isNull(" x "));
+        Assert.assertFalse(CheckNullUtils.isEmpty("x"));
+        Assert.assertFalse(CheckNullUtils.isEmpty(" x"));
+        Assert.assertFalse(CheckNullUtils.isEmpty(" x "));
     }
 
     /**
@@ -70,7 +70,7 @@ public class PropertiesUtilsTest {
         keys.add(key);
 
         Properties props = new Properties();
-        if (CheckNullUtils.isNull(prefix)) {
+        if (CheckNullUtils.isEmpty(prefix)) {
             props.setProperty(key, versionValue);
         } else {
             props.setProperty(prefix + "." + key, versionValue);

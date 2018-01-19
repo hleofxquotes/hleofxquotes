@@ -105,7 +105,7 @@ public class PropertiesUtils {
         // requestType
         String requestType = null;
         String property = props.getProperty(KEY_REQUEST_TYPE);
-        if (!CheckNullUtils.isNull(property)) {
+        if (!CheckNullUtils.isEmpty(property)) {
             requestType = property;
         }
         if (LOGGER.isDebugEnabled()) {
@@ -124,13 +124,13 @@ public class PropertiesUtils {
         // DefaultAppID = 'QWIN'
         // DefaultAppVer = '1900'
         String appID = props.getProperty(KEY_APP_ID);
-        if (CheckNullUtils.isNull(appID)) {
+        if (CheckNullUtils.isEmpty(appID)) {
             appID = DEFAULT_APP_ID;
         }
         context.put(KEY_APP_ID, appID);
 
         String appVer = props.getProperty(KEY_APP_VER);
-        if (CheckNullUtils.isNull(appVer)) {
+        if (CheckNullUtils.isEmpty(appVer)) {
             appVer = DEFAULT_APP_VER;
         }
         context.put(KEY_APP_VER, appVer);
@@ -187,7 +187,7 @@ public class PropertiesUtils {
     private static String parseStartDate(Properties props) {
         String startDate = null;
         String property = props.getProperty(KEY_START_DATE);
-        if (!CheckNullUtils.isNull(property)) {
+        if (!CheckNullUtils.isEmpty(property)) {
             property = property.trim();
             if (property.charAt(0) == '-') {
                 try {
@@ -231,7 +231,7 @@ public class PropertiesUtils {
                     return;
                 }
                 String url = fi.getUrl();
-                if (CheckNullUtils.isNull(url)) {
+                if (CheckNullUtils.isEmpty(url)) {
                     return;
                 }
                 if (!url.contains("ofx.ingdirect.com")) {
@@ -243,7 +243,7 @@ public class PropertiesUtils {
                     return;
                 }
                 String version = ofx.getVersion();
-                if (CheckNullUtils.isNull(version)) {
+                if (CheckNullUtils.isEmpty(version)) {
                     return;
                 }
                 int v = 0;
@@ -321,12 +321,12 @@ public class PropertiesUtils {
             BeanUtilsBean beanUtilsBean) {
         for (String key : keys) {
             String property = null;
-            if (CheckNullUtils.isNull(prefix)) {
+            if (CheckNullUtils.isEmpty(prefix)) {
                 property = props.getProperty(key);
             } else {
                 property = props.getProperty(prefix + "." + key);
             }
-            if (!CheckNullUtils.isNull(property)) {
+            if (!CheckNullUtils.isEmpty(property)) {
                 try {
                     property = property.trim();
                     beanUtilsBean.setProperty(bean, key, property);

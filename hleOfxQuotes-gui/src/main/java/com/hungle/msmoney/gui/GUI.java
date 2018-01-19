@@ -76,9 +76,10 @@ import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 import com.hungle.msmoney.core.misc.BuildNumber;
 import com.hungle.msmoney.core.misc.CheckNullUtils;
-import com.hungle.msmoney.core.ofx.QifUtils;
+import com.hungle.msmoney.core.ofx.ImportUtils;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxSaveParameter;
+import com.hungle.msmoney.core.qif.QifUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.FxSymbol;
 import com.hungle.msmoney.core.stockprice.Price;
@@ -94,6 +95,7 @@ import com.hungle.msmoney.gui.action.ExitAction;
 import com.hungle.msmoney.gui.action.ImportAction;
 import com.hungle.msmoney.gui.action.ProfileSelectedAction;
 import com.hungle.msmoney.gui.action.SaveOfxAction;
+import com.hungle.msmoney.gui.md.MdUtils;
 import com.hungle.msmoney.gui.qs.BloombergQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtCsvQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEquitiesSourcePanel;
@@ -196,6 +198,8 @@ public class GUI extends JFrame {
     private static final String PREF_SHOW_STATEMENT_PROGRESS = "showStatementProgress";
 
     private static final String PREF_SELECTED_QUOTE_SOURCE = "selectedQuoteSource";
+    
+    private static final String importQFXDirPrefKey = "importQFXDir";
 
     /** The thread pool. */
     final ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -533,7 +537,7 @@ public class GUI extends JFrame {
         String currency = defaultValue;
         for (SymbolMapperEntry entry : mapper.getEntries()) {
             quoteSourceSymbol = entry.getQuotesSourceSymbol();
-            if (CheckNullUtils.isNull(quoteSourceSymbol)) {
+            if (CheckNullUtils.isEmpty(quoteSourceSymbol)) {
                 continue;
             }
             if (LOGGER.isDebugEnabled()) {
@@ -546,7 +550,7 @@ public class GUI extends JFrame {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("getMapperCurrency: s=" + quoteSourceSymbol + ", currency=" + currency);
             }
-            if (!CheckNullUtils.isNull(currency)) {
+            if (!CheckNullUtils.isEmpty(currency)) {
                 return currency;
             }
         }
@@ -571,14 +575,14 @@ public class GUI extends JFrame {
                 price.setCurrency(defaultCurrency);
             }
             String currency = stockPrice.getCurrency();
-            if (CheckNullUtils.isNull(currency)) {
+            if (CheckNullUtils.isEmpty(currency)) {
                 String symbol = stockPrice.getStockSymbol();
                 String overridingCurrency = null;
                 overridingCurrency = getMapperCurrency(symbol, symbolMapper, overridingCurrency);
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.info("symbol: " + symbol + ", overridingCurrency=" + overridingCurrency);
                 }
-                if (!CheckNullUtils.isNull(overridingCurrency)) {
+                if (!CheckNullUtils.isEmpty(overridingCurrency)) {
                     stockPrice.setCurrency(overridingCurrency);
                     stockPrice.updateLastPriceCurrency();
                 }
@@ -847,11 +851,55 @@ public class GUI extends JFrame {
 
         menu = new JMenu("Tools");
 
+        addImportQFXFile(menu);
+
         addAutoClickToolMenuItem(menu);
 
-        addShowStatementProgressMenuItem(menu);
-
         menubar.add(menu);
+    }
+
+    private void addImportQFXFile(JMenu menu) {
+        AbstractAction action = new AbstractAction("Import QFX to MSMoney") {
+            private static final long serialVersionUID = 1L;
+
+            private JFileChooser fc = null;
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (fc == null) {
+                    initFileChooser();
+                }
+                if (fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+                    return;
+                }
+                File file = fc.getSelectedFile();
+                importQFXFile(file);
+            }
+
+            private void initFileChooser() {
+                fc = new JFileChooser(PREFS.get(importQFXDirPrefKey, "."));
+                FileFilter filter = new FileFilter() {
+
+                    @Override
+                    public String getDescription() {
+                        return "QFX";
+                    }
+
+                    @Override
+                    public boolean accept(File file) {
+                        if (file.isDirectory()) {
+                            return true;
+                        }
+                        String name = file.getName();
+                        return name.endsWith(".qfx");
+                    }
+                };
+                this.fc.setFileFilter(filter);
+            }
+        };
+        
+        JMenuItem menuItem = new JMenuItem(action);
+        menu.add(menuItem);
     }
 
     private void addShowStatementProgressMenuItem(JMenu menu) {
@@ -1070,7 +1118,7 @@ public class GUI extends JFrame {
             reader = new BufferedReader(new FileReader(file));
             props.load(reader);
             String name = props.getProperty("name");
-            if (CheckNullUtils.isNull(name)) {
+            if (CheckNullUtils.isEmpty(name)) {
                 name = file.getName();
             }
             JMenuItem item = new JMenuItem(new ProfileSelectedAction(this, name, props));
@@ -1103,9 +1151,26 @@ public class GUI extends JFrame {
         JMenu editMenu = new JMenu("Edit");
         menubar.add(editMenu);
 
+        addQuotesMenu(editMenu);
+        addStatementMenu(editMenu);
+    }
+
+    private void addStatementMenu(JMenu parentMenu) {
+        JMenu menu;
+        
+        menu = new JMenu("Statement");
+        // menubar.add(menu);
+        parentMenu.add(menu);   
+        
+        addShowStatementProgressMenuItem(menu);
+    }
+
+    private void addQuotesMenu(JMenu parentMenu) {
+        JMenu menu;
+        JMenuItem menuItem;
         menu = new JMenu("Quotes");
         // menubar.add(menu);
-        editMenu.add(menu);
+        parentMenu.add(menu);
 
         // menu.addSeparator();
         menuItem = new JMenuItem(new EditCurrencyAction(this, "Currency"));
@@ -1118,7 +1183,7 @@ public class GUI extends JFrame {
         menuItem = new JMenuItem(new EditWarnSuspiciousPriceAction(this, "Warn Suspicious Price"));
         menu.add(menuItem);
 
-        menu.addSeparator();
+//        menu.addSeparator();
         menuItem = new JMenuItem(new EditRandomizeShareCountAction(this, "Randomize Share Count"));
         menu.add(menuItem);
 
@@ -1225,6 +1290,7 @@ public class GUI extends JFrame {
             }
         });
         menu.add(menuItem);
+        
     }
 
     /**
@@ -1259,6 +1325,7 @@ public class GUI extends JFrame {
 
         // TAB: #3
         backupView = new BackupPanel();
+        backupView.setThreadPool(getThreadPool());
         getMainTabbed().addTab("Backup", backupView);
 
         view.add(getMainTabbed(), BorderLayout.CENTER);
@@ -1545,19 +1612,22 @@ public class GUI extends JFrame {
         defaulCurrencyLabel = new JLabel("Default currency: " + getDefaultCurrency());
         view.add(defaulCurrencyLabel, BorderLayout.WEST);
 
-        TimeZone zone = null;
-        String[] timeZoneIds = { "America/New_York",
+        String[] timeZoneIds = { 
+                /* "America/New_York", */
                 /* "Europe/London", */
         };
-        clockFormatters = new SimpleDateFormat[timeZoneIds.length];
-        for (int i = 0; i < timeZoneIds.length; i++) {
-            clockFormatters[i] = new SimpleDateFormat("EEEEEEEEE, dd-MMM-yy HH:mm:ss z");
-            zone = TimeZone.getTimeZone(timeZoneIds[i]);
-            clockFormatters[i].setTimeZone(zone);
+        if ((timeZoneIds != null) && (timeZoneIds.length > 0)) {
+            TimeZone zone = null;
+            clockFormatters = new SimpleDateFormat[timeZoneIds.length];
+            for (int i = 0; i < timeZoneIds.length; i++) {
+                clockFormatters[i] = new SimpleDateFormat("EEEEEEEEE, dd-MMM-yy HH:mm:ss z");
+                zone = TimeZone.getTimeZone(timeZoneIds[i]);
+                clockFormatters[i].setTimeZone(zone);
+            }
+            clockLabel = new JLabel(getClockDisplayString());
+            scheduleClockUpdate();
+            view.add(clockLabel, BorderLayout.EAST);
         }
-        clockLabel = new JLabel(getClockDisplayString());
-        scheduleClockUpdate();
-        view.add(clockLabel, BorderLayout.EAST);
 
         return view;
     }
@@ -1735,6 +1805,13 @@ public class GUI extends JFrame {
         view.add(priceScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
+        commandView.setTransferHandler(new FileDropHandler() {
+            @Override
+            public void handleFile(File file) {
+                importQFXFile(file);
+            }
+        });
+
         commandView.setLayout(new BoxLayout(commandView, BoxLayout.LINE_AXIS));
         commandView.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
@@ -1874,7 +1951,7 @@ public class GUI extends JFrame {
                     File toFile = fc.getSelectedFile();
                     PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                     try {
-                        MDUtils.saveToCsv(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(),
+                        MdUtils.saveToCsv(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(),
                                 getFxTable(), toFile);
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -2553,6 +2630,86 @@ public class GUI extends JFrame {
 
     public void setNotFoundPriceList(EventList<AbstractStockPrice> notFoundPriceList) {
         this.notFoundPriceList = notFoundPriceList;
+    }
+
+    private void importQFXFile(File file) {
+        final String errorTitle = "Cannot import";
+        String fileName = file.getName();
+        int index = fileName.lastIndexOf(".");
+        if (index < 0) {
+            LOGGER.warn("Cannot find suffix for fileName=" + fileName);
+            String message = "Don't know how to import file=" + file;
+            JOptionPane.showConfirmDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        String suffix = fileName.substring(index);
+        LOGGER.info("suffix=" + suffix);
+        
+        if (suffix == null) {
+            LOGGER.warn("Cannot find suffix for fileName=" + fileName);
+            String message = "Don't know how to import\r\nfile=" + file;
+            JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        try {
+            File ofxFile = null;
+            if (suffix.compareToIgnoreCase(".ofx") == 0) {
+                // OK
+                ofxFile = file;
+            } else if (suffix.compareToIgnoreCase(".qfx") == 0) {
+                ofxFile = ImportUtils.renameToOfxFile(file);
+                LOGGER.info("Importing file=" + file + " as ofxFile=" + ofxFile);
+            } else {
+                String message = "Don't know how to import\r\nfile=" + file;
+                JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            String prefKey = GUI.importQFXDirPrefKey;
+            PREFS.put(prefKey, file.getAbsoluteFile().getParentFile().getAbsolutePath());
+            
+            final File finalOfxFile = ofxFile;
+            Runnable command = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ImportUtils.doImport(getThreadPool(), finalOfxFile);
+                    } catch (IOException e) {
+                        Runnable doRun = new Runnable() {
+                            @Override
+                            public void run() {
+                                String message = e.getMessage();
+                                JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
+                            }
+                        };
+                        SwingUtilities.invokeLater(doRun);
+                    }
+                }
+            };
+            getThreadPool().execute(command);
+        } catch (IOException e) {
+            LOGGER.error(e, e);
+            String message = e.getMessage();
+            JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public static String getHomeDirectory() {
+        String homeDirectory = null;
+        
+        homeDirectory = System.getProperty("user.home", ".");
+        
+        return homeDirectory;
+    }
+    
+    public static String getTopDirectory() {
+        String homeDir = getHomeDirectory();
+        File topDir = new File(homeDir, ".hleofxquotes");
+        if (! topDir.exists()) {
+            topDir.mkdirs();
+        }
+        return topDir.getAbsoluteFile().getAbsolutePath();
     }
 
 }

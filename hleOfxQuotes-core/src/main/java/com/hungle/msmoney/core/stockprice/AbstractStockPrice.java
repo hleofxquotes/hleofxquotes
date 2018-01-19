@@ -69,13 +69,13 @@ public abstract class AbstractStockPrice implements Cloneable {
             SimpleDateFormat lastTradeTimeFormatter) throws ParseException {
         Date date = null;
         String dateString = lastTradeDate + " " + lastTradeTime;
-        if ((!CheckNullUtils.isNull(lastTradeDate)) && (!CheckNullUtils.isNull(lastTradeTime))) {
+        if ((!CheckNullUtils.isEmpty(lastTradeDate)) && (!CheckNullUtils.isEmpty(lastTradeTime))) {
             dateString = lastTradeDate + " " + lastTradeTime;
             date = lastTradeDateTimeFormatter.parse(dateString);
-        } else if (!CheckNullUtils.isNull(lastTradeDate)) {
+        } else if (!CheckNullUtils.isEmpty(lastTradeDate)) {
             dateString = lastTradeDate;
             date = lastTradeDateFormatter.parse(dateString);
-        } else if (!CheckNullUtils.isNull(lastTradeTime)) {
+        } else if (!CheckNullUtils.isEmpty(lastTradeTime)) {
             dateString = lastTradeTime;
             date = lastTradeTimeFormatter.parse(lastTradeTime);
         } else {

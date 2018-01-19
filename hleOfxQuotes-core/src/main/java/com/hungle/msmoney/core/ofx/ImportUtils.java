@@ -3,6 +3,9 @@ package com.hungle.msmoney.core.ofx;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -15,7 +18,7 @@ import org.apache.log4j.Logger;
 public class ImportUtils {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(ImportUtils.class);
+    private static final Logger LOGGER = Logger.getLogger(ImportUtils.class);
 
     /**
      * Do import.
@@ -23,8 +26,9 @@ public class ImportUtils {
      * @param threadPool the thread pool
      * @param ofxFiles the ofx files
      * @return the int
+     * @throws IOException 
      */
-    public static int doImport(Executor threadPool, List<File> ofxFiles) {
+    public static int doImport(Executor threadPool, List<File> ofxFiles) throws IOException {
         if (ofxFiles == null) {
             return 0;
         }
@@ -43,14 +47,15 @@ public class ImportUtils {
      * @param threadPool the thread pool
      * @param ofxFile the ofx file
      * @return true, if successful
+     * @throws IOException 
      */
-    private static boolean doImport(Executor threadPool, File ofxFile) {
+    public static boolean doImport(Executor threadPool, File ofxFile) throws IOException {
         if (ofxFile == null) {
-            log.warn("No OFX output file");
+            LOGGER.warn("No OFX output file");
             return false;
         }
         if (!ofxFile.exists()) {
-            log.warn("File ofxFile=" + ofxFile + " does not exist.");
+            LOGGER.warn("File ofxFile=" + ofxFile + " does not exist.");
             return false;
         }
 
@@ -58,8 +63,8 @@ public class ImportUtils {
         Runtime rt = Runtime.getRuntime();
         try {
             String command = "rundll32 SHELL32.DLL,ShellExec_RunDLL " + ofxFile.getAbsolutePath();
-            if (log.isDebugEnabled()) {
-                log.info("Import command=" + command);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.info("Import command=" + command);
             }
             Process proc = rt.exec(command);
             final InputStream stdout = proc.getInputStream();
@@ -67,24 +72,32 @@ public class ImportUtils {
             final InputStream stderr = proc.getErrorStream();
             threadPool.execute(new StreamConsumer(stderr, "stderr"));
 
-            if (log.isDebugEnabled()) {
-                log.debug("pre proc.waitFor()");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("pre proc.waitFor()");
             }
             int status = proc.waitFor();
             if (status != 0) {
-                log.warn("Import command failed with exit status=" + status);
-                log.warn("  command=" + command);
+                LOGGER.warn("Import command failed with exit status=" + status);
+                LOGGER.warn("  command=" + command);
                 returnCode = false;
             } else {
                 returnCode = true;
             }
-        } catch (IOException e) {
-            log.error(e);
         } catch (InterruptedException e) {
-            log.error(e);
+            throw new IOException(e);
         }
 
         return returnCode;
+    }
+
+    public static final File renameToOfxFile(File source) throws IOException {
+        File dest = File.createTempFile("import", ".ofx");
+        
+        CopyOption options = StandardCopyOption.REPLACE_EXISTING;
+        Files.copy(source.toPath(), dest.toPath(), options);
+        dest.deleteOnExit();
+        
+        return dest;
     }
 
 }

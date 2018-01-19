@@ -129,18 +129,27 @@ public class StockPrice extends AbstractStockPrice {
         this(symbol, date, price, price, price);
     }
 
+    public StockPrice(String symbol, Date date, Price price) {
+        this(symbol, date, price, price, price);
+    }
+
     public StockPrice(String symbol, Date date, double price, double daylow, double dayhigh) {
+        this(symbol, date, 
+                (price < 0? null: new Price(price)),
+                (daylow < 0? null: new Price(daylow)),
+                (dayhigh < 0? null: new Price(dayhigh)));
+    }
+
+    public StockPrice(String symbol, Date date, Price price, Price daylow, Price dayhigh) {
         setStockSymbol(symbol);
 
         setLastTrade(date);
+
+        setLastPrice(price);
         
-        setLastPrice(new Price(price));
-        if (daylow >= 0) {
-            setDayLow(new Price(daylow));
-        }
-        if (dayhigh >= 0) {
-            setDayHigh(new Price(dayhigh));
-        }
+        setDayLow(daylow);
+        
+        setDayHigh(dayhigh);
 
         postSetProperties();
     }
@@ -151,7 +160,7 @@ public class StockPrice extends AbstractStockPrice {
     public void postSetProperties() {
         String stockSymbol = getStockSymbol();
 
-        if (CheckNullUtils.isNull(getStockName())) {
+        if (CheckNullUtils.isEmpty(getStockName())) {
             setStockName(stockSymbol);
         }
 
@@ -184,8 +193,8 @@ public class StockPrice extends AbstractStockPrice {
         Date date = getLastTrade();
         if (date == null) {
             try {
-                date = createLastTradeDate(lastTradeDate, lastTradeTime, lastTradeDateTimeFormatter,
-                        lastTradeDateFormatter, lastTradeTimeFormatter);
+                date = createLastTradeDate(lastTradeDate, lastTradeTime, lastTradeDateTimeFormatter, lastTradeDateFormatter,
+                        lastTradeTimeFormatter);
             } catch (ParseException e) {
                 LOGGER.warn("stockSymbol: " + stockSymbol + " - " + e);
             }
@@ -505,6 +514,10 @@ public class StockPrice extends AbstractStockPrice {
      */
     @Override
     public void setLastTrade(Date lastTrade) {
+        if (lastTrade == null) {
+            LOGGER.warn("lastTrade is null.");
+            lastTrade = new Date();
+        }
         this.lastTrade = lastTrade;
     }
 

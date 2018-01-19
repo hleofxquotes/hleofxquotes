@@ -52,11 +52,11 @@ public final class ProfileSelectedAction extends AbstractAction {
         }
 
         String accountId = props.getProperty("accountId");
-        if (!CheckNullUtils.isNull(accountId)) {
+        if (!CheckNullUtils.isEmpty(accountId)) {
             this.gui.selectNewAccountId(accountId);
         }
         String currency = props.getProperty("currency");
-        if (!CheckNullUtils.isNull(currency)) {
+        if (!CheckNullUtils.isEmpty(currency)) {
             this.gui.selectNewCurrency(currency);
         }
     }

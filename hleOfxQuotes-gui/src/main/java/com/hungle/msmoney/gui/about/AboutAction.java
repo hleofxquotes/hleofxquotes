@@ -37,7 +37,9 @@ public final class AboutAction extends AbstractAction {
         sb.append("Home page: " + GUI.HOME_PAGE + "\n");
         sb.append("Wiki (documentation): http://code.google.com/p/hle-ofx-quotes/wiki" + "\n");
         sb.append("\n");
-        sb.append("Directory: " + GUI.getCurrentWorkingDirectory() + "\n");
+        sb.append("Home Directory: " + GUI.getHomeDirectory() + "\n");
+        sb.append("Top Directory: " + GUI.getTopDirectory() + "\n");
+        sb.append("Current Directory: " + GUI.getCurrentWorkingDirectory() + "\n");
         sb.append("Currency: " + this.gui.getDefaultCurrency() + "\n");
         sb.append("OFX Account Id: " + this.gui.getAccountId() + "\n");
         sb.append("Yahoo server: " + this.gui.getYahooQuoteServer() + "\n");

@@ -97,7 +97,7 @@ public class Account {
     private static List<Account> parseAccounts(Properties props, BeanUtilsBean beanUtilsBean) {
         List<Account> accounts = new ArrayList<Account>();
         String property = props.getProperty("accounts");
-        if (!CheckNullUtils.isNull(property)) {
+        if (!CheckNullUtils.isEmpty(property)) {
             property = property.trim();
             try {
                 int count = Long.valueOf(property).intValue();
@@ -119,7 +119,7 @@ public class Account {
         String[] keys = { "bankId", "id", "type", };
         for (String key : keys) {
             property = props.getProperty("account" + "." + index + "." + key);
-            if (!CheckNullUtils.isNull(property)) {
+            if (!CheckNullUtils.isEmpty(property)) {
                 property = property.trim();
                 try {
                     beanUtilsBean.setProperty(account, key, property);

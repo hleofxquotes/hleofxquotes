@@ -1,8 +1,11 @@
 package com.hungle.msmoney.core.stockprice;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
+
+import com.hungle.msmoney.core.misc.CheckNullUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -33,10 +36,24 @@ public class Price extends Number implements Comparable<Price>, Cloneable {
      */
     public Price(double price) {
         this.price = price;
-        this.priceFormatter = NumberFormat.getNumberInstance();
-        this.priceFormatter.setGroupingUsed(false);
-        this.priceFormatter.setMinimumFractionDigits(4);
-        this.priceFormatter.setMaximumFractionDigits(4);
+        this.priceFormatter = createPriceFormatter();
+    }
+
+    private NumberFormat createPriceFormatter() {
+        return createPriceFormatter(null);
+    }
+
+    public static final NumberFormat createPriceFormatter(Locale locale) {
+        NumberFormat priceFormatter = null;
+        if (locale == null) {
+            priceFormatter = NumberFormat.getNumberInstance();
+        } else {
+            priceFormatter = NumberFormat.getNumberInstance(locale);
+        }
+        priceFormatter.setGroupingUsed(false);
+        priceFormatter.setMinimumFractionDigits(4);
+        priceFormatter.setMaximumFractionDigits(4);
+        return priceFormatter;
     }
 
     @Override
@@ -188,5 +205,16 @@ public class Price extends Number implements Comparable<Price>, Cloneable {
 
     public void setMarketState(String marketState) {
         this.marketState = marketState;
+    }
+
+    public static String toPriceString(Price lastPrice, String language, String country) {
+        NumberFormat priceFormatter = null;
+        if (CheckNullUtils.isEmpty(language) || CheckNullUtils.isEmpty(country)) {
+            priceFormatter = lastPrice.getPriceFormatter();
+        } else {
+            Locale locale = new Locale(language, country);
+            priceFormatter = createPriceFormatter(locale);
+        }
+        return priceFormatter.format(lastPrice);
     }
 }
