@@ -191,7 +191,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         progressBar.setMinimum(0);
         progressBar.setMaximum(100);
         progressBar.setValue(0);
-        progressBar.setString("");
+        progressBar.setString(null);
         add(backupButton, "12, 10");
     }
 
@@ -209,7 +209,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
                 LOGGER.info("> notifyStartBackup");
                 backupButton.setEnabled(false);
                 progressBar.setValue(0);
-                progressBar.setString("START");
+                progressBar.setString(null);
             }
         };
         try {
@@ -226,13 +226,11 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
-                int progress = fileCount / size;
-                LOGGER.info("> notifyStartCopyFile, progress=" + progress);
+                int progress = (fileCount * 100) / size;
+                LOGGER.info("> notifyStartCopyFile, progress=" + progress + ", fileCount=" + fileCount + ", size=" + size);
 
                 progressBar.setValue(progress);
-//                progressBar.setString(file.getName());
-
-//                backupButton.setEnabled(true);
+                progressBar.setString(fileCount + "/" + size);
             }
         };
         try {
@@ -249,7 +247,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
-                LOGGER.info("> notifyCopyFile");
+                LOGGER.info("> notifyCopyFile, " + fromFile + " -> " + toFile);
             }
         };
         try {
@@ -266,8 +264,8 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
-                LOGGER.info("> notifyDoneCopyFile");
                 fileCount++;
+                LOGGER.info("> notifyDoneCopyFile, fileCount= + fileCount");
             }
         };
         try {
@@ -287,7 +285,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
                 LOGGER.info("> notifyDoneBackup");
 
                 progressBar.setValue(100);
-//                progressBar.setString("DONE");
+                progressBar.setString(null);
 
                 backupButton.setEnabled(true);
             }
