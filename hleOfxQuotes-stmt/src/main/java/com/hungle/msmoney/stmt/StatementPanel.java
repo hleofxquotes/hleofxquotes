@@ -1099,7 +1099,7 @@ public class StatementPanel extends JPanel {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                protected void setCellHorizontalAlignment(int column) {
+                public void setCellHorizontalAlignment(int column) {
                     super.setCellHorizontalAlignment(column);
                     if ((column == 0) || (column == 1) || (column == 2)) {
                         setHorizontalAlignment(SwingConstants.RIGHT);

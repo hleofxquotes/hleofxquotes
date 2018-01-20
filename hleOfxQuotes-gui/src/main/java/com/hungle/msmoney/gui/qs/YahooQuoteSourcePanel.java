@@ -27,10 +27,10 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.core.gui.PopupListener;
 import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.gui.GUI;
-import com.hungle.msmoney.gui.PopupListener;
 import com.hungle.msmoney.gui.action.GetQuotesAction;
 import com.hungle.msmoney.gui.action.OpenAction;
 import com.hungle.msmoney.gui.action.SaveAction;

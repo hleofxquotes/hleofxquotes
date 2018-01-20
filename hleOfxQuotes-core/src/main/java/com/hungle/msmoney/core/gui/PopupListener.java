@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.core.gui;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
