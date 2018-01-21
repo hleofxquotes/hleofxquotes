@@ -186,11 +186,11 @@
         <artifactId>ofx</artifactId>
         <version>${ofx.version}</version>
       </dependency>
-      <dependency>
-        <groupId>net.java.dev.glazedlists</groupId>
-        <artifactId>glazedlists_java15</artifactId>
-        <version>${glazedlists_java15.version}</version>
-      </dependency>
+<!--       <dependency> -->
+<!--         <groupId>net.java.dev.glazedlists</groupId> -->
+<!--         <artifactId>glazedlists_java15</artifactId> -->
+<!--         <version>${glazedlists_java15.version}</version> -->
+<!--       </dependency> -->
       <dependency>
         <groupId>net.sourceforge.javacsv</groupId>
         <artifactId>javacsv</artifactId>

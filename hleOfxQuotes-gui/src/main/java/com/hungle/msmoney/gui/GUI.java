@@ -64,13 +64,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.fx.FxTableUtils;
-import com.hungle.msmoney.core.gui.StripedTableRenderer;
+import com.hungle.msmoney.core.gui.PopupListener;
 import com.hungle.msmoney.core.jna.ImportDialogAutoClickService;
 import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
@@ -117,19 +116,7 @@ import com.hungle.msmoney.stmt.fi.props.FIBean;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.FilterList;
-import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TextFilterator;
-import ca.odell.glazedlists.TransformedList;
-import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
-import ca.odell.glazedlists.gui.AdvancedTableFormat;
-import ca.odell.glazedlists.impl.beans.BeanTableFormat;
-import ca.odell.glazedlists.matchers.MatcherEditor;
-import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
-import ca.odell.glazedlists.swing.DefaultEventTableModel;
-import ca.odell.glazedlists.swing.GlazedListsSwing;
-import ca.odell.glazedlists.swing.TableComparatorChooser;
-import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -1145,9 +1132,6 @@ public class GUI extends JFrame {
      *            the menubar
      */
     private void addEditMenu(JMenuBar menubar) {
-        JMenu menu;
-        JMenuItem menuItem;
-
         JMenu editMenu = new JMenu("Edit");
         menubar.add(editMenu);
 
@@ -1800,8 +1784,8 @@ public class GUI extends JFrame {
 
         priceFilterEdit = new JTextField(10);
         // EventList<AbstractStockPrice> localPriceList = getPriceList();
-        PriceTableView<AbstractStockPrice> priceScrollPane = new PriceTableView<AbstractStockPrice>(priceFilterEdit,
-                priceList, AbstractStockPrice.class);
+        PriceTableView<AbstractStockPrice> priceScrollPane = new PriceTableView<AbstractStockPrice>(priceList,
+                priceFilterEdit, AbstractStockPrice.class);
         view.add(priceScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -1988,8 +1972,8 @@ public class GUI extends JFrame {
         view.setLayout(new BorderLayout());
 
         JTextField filterEdit = new JTextField(10);
-        PriceTableView<AbstractStockPrice> fxScrollPane = new PriceTableView<AbstractStockPrice>(filterEdit,
-                /* getExchangeRates() */ null, AbstractStockPrice.class);
+        PriceTableView<AbstractStockPrice> fxScrollPane = new PriceTableView<AbstractStockPrice>(/* getExchangeRates() */ null,
+                filterEdit, AbstractStockPrice.class);
         view.add(fxScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -2083,126 +2067,6 @@ public class GUI extends JFrame {
         JScrollPane scrolledPane = new JScrollPane(table);
 
         return scrolledPane;
-    }
-
-    /**
-     * Creates the price table.
-     *
-     * @param priceList
-     *            the price list
-     * @param comparator
-     *            the comparator
-     * @param filterEdit
-     *            the filter edit
-     * @param filter
-     *            the filter
-     * @param addStripe
-     *            the add stripe
-     * @return the j table
-     */
-    private static JTable createPriceTable(EventList<AbstractStockPrice> priceList,
-            Comparator<? super AbstractStockPrice> comparator, JTextField filterEdit,
-            TextFilterator<AbstractStockPrice> filter, boolean addStripe) {
-        EventList<AbstractStockPrice> source = priceList;
-
-        SortedList<AbstractStockPrice> sortedList = null;
-
-        if (comparator != null) {
-            sortedList = new SortedList<AbstractStockPrice>(source, comparator);
-            source = sortedList;
-        }
-
-        if ((filterEdit != null) && (filter != null)) {
-            FilterList<AbstractStockPrice> filterList = null;
-            MatcherEditor<AbstractStockPrice> textMatcherEditor = new TextComponentMatcherEditor<AbstractStockPrice>(
-                    filterEdit, filter);
-            filterList = new FilterList<AbstractStockPrice>(source, textMatcherEditor);
-            source = filterList;
-        }
-
-        Class<StockPrice> beanClass = StockPrice.class;
-        String propertyNames[] = { "stockSymbol", "stockName", "lastPrice", "lastTradeDate", "lastTradeTime" };
-        String columnLabels[] = { "Symbol", "Name", "Price", "Last Trade Date", "Last Trade Time" };
-        AdvancedTableFormat tableFormat = new BeanTableFormat(beanClass, propertyNames, columnLabels);
-        TransformedList<AbstractStockPrice, AbstractStockPrice> sourceProxyList = GlazedListsSwing
-                .swingThreadProxyList(source);
-        DefaultEventTableModel<AbstractStockPrice> tableModel = new DefaultEventTableModel<AbstractStockPrice>(
-                sourceProxyList, tableFormat);
-
-        JTable table = new JTable(tableModel);
-
-        if (sortedList != null) {
-            TableComparatorChooser tableSorter = TableComparatorChooser.install(table, sortedList,
-                    AbstractTableComparatorChooser.SINGLE_COLUMN);
-        }
-
-        DefaultEventSelectionModel myDefaultEventSelectionModel = new DefaultEventSelectionModel(source);
-        table.setSelectionModel(myDefaultEventSelectionModel);
-
-        if (addStripe) {
-            // final Color oddRowsColor = new Color(204, 255, 204);
-            // final Color evenRowsColor = Color.WHITE;
-            TableCellRenderer renderer = null;
-            // renderer = new StripedTableCellRenderer(oddRowsColor,
-            // evenRowsColor) {
-            //
-            // public Component getTableCellRendererComponent(JTable table,
-            // Object value, boolean isSelected, boolean hasFocus, int row, int
-            // column) {
-            // Component rendererComponent = null;
-            // rendererComponent = super.getTableCellRendererComponent(table,
-            // value, isSelected, hasFocus, row, column);
-            // if (column == 3) {
-            // // ((JLabel)
-            // rendererComponent).setHorizontalAlignment(JLabel.RIGHT);
-            // // (javax.swing.JLabel)
-            // rendererComponent).setHorizontalAlignment(JLabel.RIGHT);
-            // rendererComponent.setEnabled(false);
-            // }
-            // return rendererComponent;
-            // }
-            //
-            // };
-            int cols = table.getColumnModel().getColumnCount();
-            for (int i = 0; i < cols; i++) {
-                renderer = new StripedTableRenderer() {
-
-                    /**
-                     * 
-                     */
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    protected void setCellHorizontalAlignment(int column) {
-                        super.setCellHorizontalAlignment(column);
-                        if ((column == 0) || (column == 2) || (column == 3)) {
-                            setHorizontalAlignment(SwingConstants.RIGHT);
-                        }
-                    }
-                };
-                table.getColumnModel().getColumn(i).setCellRenderer(renderer);
-            }
-        }
-        // String dateFormat = "yyyyMMddHHMMSS";
-        // DateTableCellRenderer renderer = new
-        // DateTableCellRenderer(dateFormat);
-        // table.getColumnModel().getColumn(2).setCellRenderer(renderer);
-        //
-
-        // int columnCount = table.getColumnModel().getColumnCount();
-        // int[] colWidths = new int[columnCount];
-        // for (int i = 0; i < colWidths.length; i++) {
-        // colWidths[i] = -1;
-        // }
-        // // colWidths = null;
-        // if (colWidths != null) {
-        // LOGGER.info("colWidths=" + colWidths);
-        // Object[] maxWidthValues =
-        // TableUtils.calculateMaxWidthValues(colWidths);
-        // TableUtils.adjustColumnSizes(table, maxWidthValues);
-        // }
-
-        return table;
     }
 
     /**

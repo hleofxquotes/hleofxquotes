@@ -66,6 +66,6 @@ public class StripedTableRenderer extends DefaultTableCellRenderer {
      *
      * @param column the new cell horizontal alignment
      */
-    protected void setCellHorizontalAlignment(int column) {
+    public void setCellHorizontalAlignment(int column) {
     }
 }
