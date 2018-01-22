@@ -17,6 +17,7 @@ import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.core.stockprice.StockPrice;
+import com.hungle.msmoney.core.template.TemplateUtils;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -34,7 +35,7 @@ public class QifUtilsTest {
         File expectedFile = File.createTempFile("testQif", ".qif");
         LOGGER.info("expectedFile=" + expectedFile);
         expectedFile.deleteOnExit();
-        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(QifUtils.QIF_HEADERS);
     }
 
@@ -50,7 +51,7 @@ public class QifUtilsTest {
         expectedFile.deleteOnExit();
 
         priceList.add(new StockPrice("IBM", new Date(0L), 1.00));
-        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(
                 QifUtils.QIF_HEADERS, 
                 "\"IBM\",\"1.0000\",\"12/31/1969\",,,");
@@ -69,7 +70,7 @@ public class QifUtilsTest {
 
         priceList.add(new StockPrice("IBM", new Date(0L), 1.00));
         priceList.add(new StockPrice("AAPL", new Date(7 * 24 * 60 * 60 * 1000L), 2.00));
-        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(
                 QifUtils.QIF_HEADERS, 
                 "\"IBM\",\"1.0000\",\"12/31/1969\",,,",
@@ -106,7 +107,7 @@ public class QifUtilsTest {
         fxTableEntry = new FxTableEntry("EUR", "USD", "3.33");
         fxTable.add(fxTableEntry);
 
-        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(
                 QifUtils.QIF_HEADERS, 
                 "\"IBM\",\"1.0000\",\"12/31/1969\",,,",
@@ -114,7 +115,7 @@ public class QifUtilsTest {
                 );
         
         convert = true;
-        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(
                 QifUtils.QIF_HEADERS, 
                 "\"IBM\",\"2.2200\",\"12/31/1969\",,,",
@@ -134,7 +135,7 @@ public class QifUtilsTest {
         symbolMapper.add(symbolMapperEntry);
         
         convert = true;
-        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(
                 QifUtils.QIF_HEADERS, 
                 "\"IBM.X\",\"2.2200\",\"12/31/1969\",,,",

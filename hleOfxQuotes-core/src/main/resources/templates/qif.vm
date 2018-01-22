@@ -1,8 +1,4 @@
 ## https://velocity.apache.org/engine/1.7/user-guide.html
-## Set language and country if you need to override.
-## Leave them blank if you just want to user the default.
-#set( $language = '' )
-#set( $country = '' )
 ## HEADER
 $header
 ## ROWS

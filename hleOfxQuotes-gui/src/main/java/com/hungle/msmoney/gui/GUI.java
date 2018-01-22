@@ -91,6 +91,7 @@ import com.hungle.msmoney.core.stockprice.FxSymbol;
 import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.core.stockprice.StockPrice;
 import com.hungle.msmoney.core.stockprice.StockPriceCsvUtils;
+import com.hungle.msmoney.core.template.TemplateUtils;
 import com.hungle.msmoney.gui.about.AboutAction;
 import com.hungle.msmoney.gui.action.CreateNewFiAction;
 import com.hungle.msmoney.gui.action.EditCurrencyAction;
@@ -169,6 +170,8 @@ public class GUI extends JFrame {
     /** The Constant PREF_FORCE_GENERATING_INVTRANLIST. */
     private static final String PREF_FORCE_GENERATING_INVTRANLIST = "forceGeneratingINVTRANLIST";
 
+    private static final String PREF_TEMPLATE_DECIMAL_SEPARATOR = "template.decimalSeparator";
+
     /** The Constant HOME_PAGE. */
     public static final String HOME_PAGE = "http://code.google.com/p/hle-ofx-quotes/";
 
@@ -194,7 +197,7 @@ public class GUI extends JFrame {
 
     private static final String PREF_SELECTED_QUOTE_SOURCE = "selectedQuoteSource";
 
-    private static final String importQFXDirPrefKey = "importQFXDir";
+    private static final String PRE_IMPORT_QFX_DIR = "importQFXDir";
 
     /** The thread pool. */
     final ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -1006,7 +1009,7 @@ public class GUI extends JFrame {
             }
 
             private void initFileChooser() {
-                fc = new JFileChooser(PREFS.get(importQFXDirPrefKey, "."));
+                fc = new JFileChooser(PREFS.get(PRE_IMPORT_QFX_DIR, "."));
                 FileFilter filter = new FileFilter() {
 
                     @Override
@@ -1278,7 +1281,64 @@ public class GUI extends JFrame {
         menubar.add(editMenu);
 
         addQuotesMenu(editMenu);
+        
         addStatementMenu(editMenu);
+        
+        addEditTemplateMenu(editMenu);
+    }
+
+    private void addEditTemplateMenu(JMenu parentMenu) {
+        JMenu menu;
+
+        menu = new JMenu("Template");
+        // menubar.add(menu);
+        parentMenu.add(menu);
+
+        addDecimalSeparatorMenuItem(menu);        
+    }
+
+    private void addDecimalSeparatorMenuItem(JMenu menu) {
+        AbstractAction action = new AbstractAction("Set Decimal Separator") {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Set<String> keys = new TreeSet<String>();
+                keys.add(TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
+                keys.add(TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_COMMA);
+                keys.add(TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_PERIOD);
+                String[] possibilities = new String[keys.size()];
+                int i = 0;
+                for (String key : keys) {
+                    possibilities[i++] = key;
+                }
+                // get curent value
+                String currentValue = getTemplateDecimalSeparator();
+                Icon icon = null;
+                String s = (String) JOptionPane.showInputDialog(GUI.this,
+                        "Current: " + currentValue + "\n" + "Choices:", 
+                        "Set Template Decimal Separator", 
+                        JOptionPane.PLAIN_MESSAGE,
+                        icon, possibilities, currentValue);
+
+                // If a string was returned, say so.
+                if ((s != null) && (s.length() > 0)) {
+                    String value = s;
+                    setTemplateDecimalSeparator(value);
+                } else {
+                }
+            }
+        };
+        JMenuItem menuItem = new JMenuItem(action);
+        menu.add(menuItem);        
+    }
+
+    protected void setTemplateDecimalSeparator(String value) {
+        LOGGER.info("Setting Template Decimal Separator to " + value);
+        PREFS.put(PREF_TEMPLATE_DECIMAL_SEPARATOR, value);
+    }
+
+    protected String getTemplateDecimalSeparator() {
+        String str = PREFS.get(PREF_TEMPLATE_DECIMAL_SEPARATOR, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
+        return str;
     }
 
     private void addStatementMenu(JMenu parentMenu) {
@@ -2028,7 +2088,7 @@ public class GUI extends JFrame {
                     PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                     try {
                         QifUtils.saveToQif(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(), getFxTable(),
-                                toFile);
+                                toFile, getTemplateDecimalSeparator());
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -2074,7 +2134,7 @@ public class GUI extends JFrame {
                     PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                     try {
                         MdUtils.saveToCsv(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(), getFxTable(),
-                                toFile);
+                                toFile, getTemplateDecimalSeparator());
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -2667,7 +2727,7 @@ public class GUI extends JFrame {
                 JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            String prefKey = GUI.importQFXDirPrefKey;
+            String prefKey = GUI.PRE_IMPORT_QFX_DIR;
             PREFS.put(prefKey, file.getAbsoluteFile().getParentFile().getAbsolutePath());
 
             final File finalOfxFile = ofxFile;
