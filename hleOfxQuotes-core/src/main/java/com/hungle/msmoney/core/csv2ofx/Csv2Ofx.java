@@ -31,7 +31,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
 import com.csvreader.CsvReader;
-import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.core.misc.ResourceUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -237,7 +237,7 @@ public class Csv2Ofx {
         try {
             if (mapFile == null) {
                 String resourceName = DEFAULT_MAP_FILE;
-                URL url = OfxUtils.getResource(resourceName);
+                URL url = ResourceUtils.getResource(resourceName);
                 LOGGER.info("url=" + url);
                 if (url == null) {
                     throw new IOException("Cannot find resource=" + resourceName);

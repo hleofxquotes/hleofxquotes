@@ -9,15 +9,21 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.URI;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,6 +81,7 @@ import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 import com.hungle.msmoney.core.misc.BuildNumber;
 import com.hungle.msmoney.core.misc.CheckNullUtils;
+import com.hungle.msmoney.core.misc.ResourceUtils;
 import com.hungle.msmoney.core.ofx.ImportUtils;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxSaveParameter;
@@ -94,6 +101,7 @@ import com.hungle.msmoney.gui.action.ExitAction;
 import com.hungle.msmoney.gui.action.ImportAction;
 import com.hungle.msmoney.gui.action.ProfileSelectedAction;
 import com.hungle.msmoney.gui.action.SaveOfxAction;
+import com.hungle.msmoney.gui.dnd.FileDropHandler;
 import com.hungle.msmoney.gui.md.MdUtils;
 import com.hungle.msmoney.gui.qs.BloombergQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtCsvQuoteSourcePanel;
@@ -185,7 +193,7 @@ public class GUI extends JFrame {
     private static final String PREF_SHOW_STATEMENT_PROGRESS = "showStatementProgress";
 
     private static final String PREF_SELECTED_QUOTE_SOURCE = "selectedQuoteSource";
-    
+
     private static final String importQFXDirPrefKey = "importQFXDir";
 
     /** The thread pool. */
@@ -325,6 +333,22 @@ public class GUI extends JFrame {
     private FtFundsSourcePanel ftFundsSourcePanel;
 
     private FtEtfsSourcePanel ftEtfsSourcePanel;
+
+    public static final class TemplateEntry {
+
+        private String src;
+        private String dest;
+
+        public TemplateEntry(String src) {
+            this(src, src);
+        }
+
+        public TemplateEntry(String src, String dest) {
+            this.src = src;
+            this.dest = dest;
+        }
+
+    }
 
     /**
      * Clear price table.
@@ -554,8 +578,7 @@ public class GUI extends JFrame {
      * @param symbolMapper
      *            the symbol mapper
      */
-    private void updateLastPriceCurrency(List<AbstractStockPrice> stockPrices, String defaultCurrency,
-            SymbolMapper symbolMapper) {
+    private void updateLastPriceCurrency(List<AbstractStockPrice> stockPrices, String defaultCurrency, SymbolMapper symbolMapper) {
         for (AbstractStockPrice stockPrice : stockPrices) {
             Price price = stockPrice.getLastPrice();
             if ((defaultCurrency != null) && (price.getCurrency() == null)) {
@@ -718,8 +741,7 @@ public class GUI extends JFrame {
 
         updateNotFoundPriceList(quoteSource);
 
-        final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices
-                : new ArrayList<AbstractStockPrice>();
+        final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices : new ArrayList<AbstractStockPrice>();
         updateLastPriceCurrency(prices, getDefaultCurrency(), getSymbolMapper());
 
         if (getRandomizeShareCount()) {
@@ -747,8 +769,7 @@ public class GUI extends JFrame {
                 bean.setUnits(value);
             }
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(
-                        "incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
+                LOGGER.debug("incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
             }
             PREFS.putDouble(key, value);
         }
@@ -786,8 +807,8 @@ public class GUI extends JFrame {
             }
         }
 
-        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, badPrice, getFxTable(),
-                hasWrappedShareCount, getSymbolMapper(), quoteSource);
+        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, badPrice, getFxTable(), hasWrappedShareCount,
+                getSymbolMapper(), quoteSource);
         // doRun.run();
         SwingUtilities.invokeLater(stockPricesReceivedTask);
     }
@@ -838,11 +859,132 @@ public class GUI extends JFrame {
 
         menu = new JMenu("Tools");
 
+        addCopyTemplates(menu);
+
+        menu.addSeparator();
+
         addImportQFXFile(menu);
 
         addAutoClickToolMenuItem(menu);
 
         menubar.add(menu);
+    }
+
+    private void addCopyTemplates(final JMenu menu) {
+        File topDir = new File(GUI.getTopDirectory());
+        final File templateDir = new File(topDir, "templates");
+        AbstractAction action = new AbstractAction("Copy Templates") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Runnable command = new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            copyTemplates(templateDir);
+                        } finally {
+                            Runnable doRun = new Runnable() {
+                                
+                                @Override
+                                public void run() {
+                                    JOptionPane.showMessageDialog(menu, 
+                                            "Done copying templates to\n" + templateDir.getAbsolutePath(), 
+                                            "Copying templates ...", 
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                }
+                            };
+                            SwingUtilities.invokeLater(doRun);
+                        }
+                    }
+
+                };
+                GUI.this.getThreadPool().execute(command);
+            }
+        };
+
+        JMenuItem menuItem = new JMenuItem(action);
+        menu.add(menuItem);
+    }
+
+    protected void copyTemplates(File templateDir) {
+        TemplateEntry[] entries = { new TemplateEntry("qif.vm"), new TemplateEntry("mdcsv.vm"), };
+
+//        File topDir = new File(GUI.getTopDirectory());
+//        File templateDir = new File(topDir, "templates");
+        if (!templateDir.exists()) {
+            templateDir.mkdirs();
+        }
+        for (TemplateEntry entry : entries) {
+            try {
+                copyTemplate(entry, templateDir);
+            } catch (IOException e) {
+                LOGGER.error(e);
+            }
+        }
+
+    }
+
+    private void copyTemplate(TemplateEntry entry, File templateDir) throws IOException {
+        final String resourceName = "/templates/" + entry.src;
+        URL url = ResourceUtils.getResource(resourceName);
+        if (url == null) {
+            LOGGER.warn("Cannot find resource=" + resourceName);
+            return;
+        }
+        InputStream stream = null;
+        try {
+            stream = url.openStream();
+            stream = new BufferedInputStream(stream);
+            LOGGER.info("> Coping from resourceName=" + resourceName);
+            File outFile = copyTemplate(stream, templateDir, entry.dest);
+            LOGGER.info("<   to file=" + outFile.getAbsolutePath());
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    LOGGER.warn(e);
+                } finally {
+                    stream = null;
+                }
+            }
+        }
+    }
+
+    private File copyTemplate(InputStream stream, File templateDir, String dest) throws IOException {
+        File outFile = new File(templateDir, dest);
+
+        if (outFile.exists()) {
+            outFile = new File(templateDir, "Sample-" + dest);
+        }
+
+        copyTemplate(stream, outFile);
+
+        return outFile;
+    }
+
+    private void copyTemplate(InputStream in, File outFile) throws IOException {
+        BufferedOutputStream out = null;
+        try {
+            out = new BufferedOutputStream(new FileOutputStream(outFile));
+            copyStream(in, out);
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    LOGGER.warn(e);
+                } finally {
+                    out = null;
+                }
+            }
+        }
+
+    }
+
+    private void copyStream(InputStream in, OutputStream out) throws IOException {
+        ResourceUtils.copyStream(in, out);
     }
 
     private void addImportQFXFile(JMenu menu) {
@@ -884,7 +1026,7 @@ public class GUI extends JFrame {
                 this.fc.setFileFilter(filter);
             }
         };
-        
+
         JMenuItem menuItem = new JMenuItem(action);
         menu.add(menuItem);
     }
@@ -1141,11 +1283,11 @@ public class GUI extends JFrame {
 
     private void addStatementMenu(JMenu parentMenu) {
         JMenu menu;
-        
+
         menu = new JMenu("Statement");
         // menubar.add(menu);
-        parentMenu.add(menu);   
-        
+        parentMenu.add(menu);
+
         addShowStatementProgressMenuItem(menu);
     }
 
@@ -1167,7 +1309,7 @@ public class GUI extends JFrame {
         menuItem = new JMenuItem(new EditWarnSuspiciousPriceAction(this, "Warn Suspicious Price"));
         menu.add(menuItem);
 
-//        menu.addSeparator();
+        // menu.addSeparator();
         menuItem = new JMenuItem(new EditRandomizeShareCountAction(this, "Randomize Share Count"));
         menu.add(menuItem);
 
@@ -1184,8 +1326,7 @@ public class GUI extends JFrame {
                 Icon icon = null;
                 String s = (String) JOptionPane.showInputDialog(GUI.this,
                         "Current: " + incrementallyIncreasedShareCount + "\n" + "Choices:",
-                        "Set Incrementally Increased Share Count", JOptionPane.PLAIN_MESSAGE, icon, possibilities,
-                        null);
+                        "Set Incrementally Increased Share Count", JOptionPane.PLAIN_MESSAGE, icon, possibilities, null);
 
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
@@ -1194,8 +1335,7 @@ public class GUI extends JFrame {
                     Boolean newValue = Boolean.valueOf(value);
                     if (newValue.compareTo(incrementallyIncreasedShareCount) != 0) {
                         incrementallyIncreasedShareCount = newValue;
-                        PREFS.put(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT,
-                                incrementallyIncreasedShareCount.toString());
+                        PREFS.put(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT, incrementallyIncreasedShareCount.toString());
                         // to clear the pricing table
                         QuoteSource quoteSource = null;
                         stockSymbolsStringReceived(quoteSource, null);
@@ -1248,9 +1388,8 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent event) {
                 String[] possibilities = null;
                 Icon icon = null;
-                String s = (String) JOptionPane.showInputDialog(GUI.this,
-                        "Current: " + dateOffset + "\n" + "Number of days:", "Set number of date to offset",
-                        JOptionPane.PLAIN_MESSAGE, icon, possibilities, dateOffset.toString());
+                String s = (String) JOptionPane.showInputDialog(GUI.this, "Current: " + dateOffset + "\n" + "Number of days:",
+                        "Set number of date to offset", JOptionPane.PLAIN_MESSAGE, icon, possibilities, dateOffset.toString());
 
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
@@ -1274,7 +1413,7 @@ public class GUI extends JFrame {
             }
         });
         menu.add(menuItem);
-        
+
     }
 
     /**
@@ -1596,7 +1735,7 @@ public class GUI extends JFrame {
         defaulCurrencyLabel = new JLabel("Default currency: " + getDefaultCurrency());
         view.add(defaulCurrencyLabel, BorderLayout.WEST);
 
-        String[] timeZoneIds = { 
+        String[] timeZoneIds = {
                 /* "America/New_York", */
                 /* "Europe/London", */
         };
@@ -1784,8 +1923,8 @@ public class GUI extends JFrame {
 
         priceFilterEdit = new JTextField(10);
         // EventList<AbstractStockPrice> localPriceList = getPriceList();
-        PriceTableView<AbstractStockPrice> priceScrollPane = new PriceTableView<AbstractStockPrice>(priceList,
-                priceFilterEdit, AbstractStockPrice.class);
+        PriceTableView<AbstractStockPrice> priceScrollPane = new PriceTableView<AbstractStockPrice>(priceList, priceFilterEdit,
+                AbstractStockPrice.class);
         view.add(priceScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -1811,8 +1950,7 @@ public class GUI extends JFrame {
             commandView.add(new JLabel("Last import on:"));
             commandView.add(Box.createHorizontalStrut(3));
             setLastKnownImportString(PREFS.get(PREF_LAST_KNOWN_IMPORT_STRING, null));
-            setLastKnownImport(
-                    new JLabel(getLastKnownImportString() == null ? "Not known" : getLastKnownImportString()));
+            setLastKnownImport(new JLabel(getLastKnownImportString() == null ? "Not known" : getLastKnownImportString()));
             commandView.add(getLastKnownImport());
 
             // commandView.add(Box.createHorizontalStrut(5));
@@ -1889,8 +2027,8 @@ public class GUI extends JFrame {
                     File toFile = fc.getSelectedFile();
                     PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                     try {
-                        QifUtils.saveToQif(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(),
-                                getFxTable(), toFile);
+                        QifUtils.saveToQif(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(), getFxTable(),
+                                toFile);
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -1935,8 +2073,8 @@ public class GUI extends JFrame {
                     File toFile = fc.getSelectedFile();
                     PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
                     try {
-                        MdUtils.saveToCsv(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(),
-                                getFxTable(), toFile);
+                        MdUtils.saveToCsv(priceList, convertWhenExport, getDefaultCurrency(), getSymbolMapper(), getFxTable(),
+                                toFile);
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(view, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -1972,8 +2110,8 @@ public class GUI extends JFrame {
         view.setLayout(new BorderLayout());
 
         JTextField filterEdit = new JTextField(10);
-        PriceTableView<AbstractStockPrice> fxScrollPane = new PriceTableView<AbstractStockPrice>(/* getExchangeRates() */ null,
-                filterEdit, AbstractStockPrice.class);
+        PriceTableView<AbstractStockPrice> fxScrollPane = new PriceTableView<AbstractStockPrice>(
+                /* getExchangeRates() */ null, filterEdit, AbstractStockPrice.class);
         view.add(fxScrollPane, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -2061,8 +2199,7 @@ public class GUI extends JFrame {
             }
         };
         boolean addStripe = true;
-        JTable table = MapperTableUtils.createMapperTable(/* getMapper() */ null, comparator, filterEdit, filter,
-                addStripe);
+        JTable table = MapperTableUtils.createMapperTable(/* getMapper() */ null, comparator, filterEdit, filter, addStripe);
         // table.setFillsViewportHeight(true);
         JScrollPane scrolledPane = new JScrollPane(table);
 
@@ -2506,17 +2643,17 @@ public class GUI extends JFrame {
             JOptionPane.showConfirmDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         String suffix = fileName.substring(index);
         LOGGER.info("suffix=" + suffix);
-        
+
         if (suffix == null) {
             LOGGER.warn("Cannot find suffix for fileName=" + fileName);
             String message = "Don't know how to import\r\nfile=" + file;
             JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         try {
             File ofxFile = null;
             if (suffix.compareToIgnoreCase(".ofx") == 0) {
@@ -2532,7 +2669,7 @@ public class GUI extends JFrame {
             }
             String prefKey = GUI.importQFXDirPrefKey;
             PREFS.put(prefKey, file.getAbsoluteFile().getParentFile().getAbsolutePath());
-            
+
             final File finalOfxFile = ofxFile;
             Runnable command = new Runnable() {
                 @Override
@@ -2561,16 +2698,16 @@ public class GUI extends JFrame {
 
     public static String getHomeDirectory() {
         String homeDirectory = null;
-        
+
         homeDirectory = System.getProperty("user.home", ".");
-        
+
         return homeDirectory;
     }
-    
+
     public static String getTopDirectory() {
         String homeDir = getHomeDirectory();
         File topDir = new File(homeDir, ".hleofxquotes");
-        if (! topDir.exists()) {
+        if (!topDir.exists()) {
             topDir.mkdirs();
         }
         return topDir.getAbsoluteFile().getAbsolutePath();

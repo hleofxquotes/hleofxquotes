@@ -1,4 +1,4 @@
-package com.hungle.msmoney.gui;
+package com.hungle.msmoney.gui.dnd;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;

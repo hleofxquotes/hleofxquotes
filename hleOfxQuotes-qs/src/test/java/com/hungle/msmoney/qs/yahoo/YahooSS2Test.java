@@ -28,7 +28,7 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.core.misc.ResourceUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 
 public class YahooSS2Test {
@@ -42,7 +42,7 @@ public class YahooSS2Test {
     @Ignore
     public void testParseLocalFile() throws IOException {
         String name = "TSLA.html";
-        URL url = OfxUtils.getResource(name, this);
+        URL url = ResourceUtils.getResource(name, this);
         Assert.assertNotNull(url);
 
         String fileName = url.getFile();
@@ -188,7 +188,7 @@ public class YahooSS2Test {
 
     @Test
     public void testParseJson() throws IOException {
-        InputStream jsonStream = OfxUtils.getResource("TSLA.json", this).openStream();
+        InputStream jsonStream = ResourceUtils.getResource("TSLA.json", this).openStream();
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         YahooScreenScrapper2Json json = mapper.readValue(jsonStream, YahooScreenScrapper2Json.class);
         Assert.assertNotNull(json);

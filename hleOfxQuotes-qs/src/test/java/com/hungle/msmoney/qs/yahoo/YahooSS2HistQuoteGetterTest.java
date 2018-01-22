@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.core.misc.ResourceUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
 
@@ -19,7 +19,7 @@ public class YahooSS2HistQuoteGetterTest {
     @Test
     public void testParseHtmlContent() throws IOException {
         String symbol = "GB00B2PLJJ36.L";
-        InputStream stream = OfxUtils.getResource(symbol + ".html", this).openStream();
+        InputStream stream = ResourceUtils.getResource(symbol + ".html", this).openStream();
         YahooSS2HistQuoteGetter getter = new YahooSS2HistQuoteGetter();
         getter.setStockSymbol("GB00B2PLJJ36.L");
         List<AbstractStockPrice> stockPrices = getter.parseInputStream(stream);

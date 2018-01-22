@@ -16,6 +16,8 @@ import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 
+import com.hungle.msmoney.core.misc.ResourceUtils;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class OfxUtils.
@@ -143,43 +145,6 @@ public class OfxUtils {
     }
 
     /**
-     * Gets the resource.
-     *
-     * @param name the name
-     * @return the resource
-     */
-    public static URL getResource(String name) {
-        return OfxUtils.getResource(name, name);
-    }
-
-    /**
-     * Gets the resource.
-     *
-     * @param name the name
-     * @param obj the obj
-     * @return the resource
-     */
-    public static URL getResource(String name, Object obj) {
-        if (obj == null) {
-            obj = name;
-        }
-
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        URL url = cl.getResource(name);
-        if (url == null) {
-            cl = obj.getClass().getClassLoader();
-            if (cl != null) {
-                url = cl.getResource(name);
-            }
-        }
-
-        if (url == null) {
-            url = obj.getClass().getResource(name);
-        }
-        return url;
-    }
-
-    /**
      * Adds the to list.
      *
      * @param url the url
@@ -212,7 +177,7 @@ public class OfxUtils {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     private static void addToList(String resourceName, List<String> stocks) throws IOException {
-        URL url = getResource(resourceName);
+        URL url = ResourceUtils.getResource(resourceName);
         if (url != null) {
             addToList(url, stocks);
         } else {

@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.core.misc.ResourceUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
 
@@ -44,7 +44,7 @@ public class YahooSS2QuoteGetterTest {
 
     @Test
     public void testYahooSS2QuoteGetterFromStream() throws IOException {
-        InputStream stream = OfxUtils.getResource("TSLA.html", this).openStream();
+        InputStream stream = ResourceUtils.getResource("TSLA.html", this).openStream();
         YahooSS2QuoteGetter getter = new YahooSS2QuoteGetter();
         getter.setStockSymbol("TSLA");
         List<AbstractStockPrice> stockPrices = getter.parseInputStream(stream);

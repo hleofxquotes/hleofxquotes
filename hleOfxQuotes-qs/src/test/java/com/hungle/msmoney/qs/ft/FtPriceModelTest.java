@@ -15,7 +15,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.hungle.msmoney.core.ofx.OfxUtils;
+import com.hungle.msmoney.core.misc.ResourceUtils;
 
 public class FtPriceModelTest {
     private static final Logger LOGGER = Logger.getLogger(FtPriceModelTest.class);
@@ -113,7 +113,7 @@ public class FtPriceModelTest {
         InputStream stream = null;
 
         try {
-            URL url = OfxUtils.getResource(testResource, this);
+            URL url = ResourceUtils.getResource(testResource, this);
             Assert.assertNotNull(url);
             stream = url.openStream();
             Document doc = Jsoup.parse(stream, "UTF-8", "http://localhost");
@@ -139,7 +139,7 @@ public class FtPriceModelTest {
         try {
 //            String symbol = "IBM:NYQ";
             String symbol = "IBM_NYQ";
-            URL url = OfxUtils.getResource(symbol + ".html", this);
+            URL url = ResourceUtils.getResource(symbol + ".html", this);
             Assert.assertNotNull(url);
             stream = url.openStream();
             Document doc = Jsoup.parse(stream, "UTF-8", "http://localhost");

@@ -92,6 +92,9 @@ public class SymbolMapper {
 
             entry.load(csvReader);
 
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("entry=" + entry);
+            }
             add(entry);
         }
     }
@@ -100,6 +103,17 @@ public class SymbolMapper {
         updateMapBys(entry);
 
         entries.add(entry);
+    }
+
+    private void merge(SymbolMapperEntry newEntry) {
+        int count = 0;
+        for(SymbolMapperEntry entry : entries) {
+            
+        }
+        
+        if (count == 0) {
+            add(newEntry);
+        }
     }
 
     /**
@@ -297,7 +311,7 @@ public class SymbolMapper {
         for (MetaStockSymbol metaStockSymbol : metaStockSymbols) {
             SymbolMapperEntry symbolMapperEntry = new SymbolMapperEntry();
             populateEntry(metaStockSymbol, symbolMapperEntry);
-            add(symbolMapperEntry);
+            merge(symbolMapperEntry);
 
             // replace the current symbol with the quote source symbol
             ListIterator<String> iter = stockSymbols.listIterator();

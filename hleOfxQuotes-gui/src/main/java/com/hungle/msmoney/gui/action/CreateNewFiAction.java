@@ -11,8 +11,8 @@ import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.core.misc.ResourceUtils;
 import com.hungle.msmoney.core.misc.Utils;
-import com.hungle.msmoney.core.ofx.OfxUtils;
 import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.stmt.fi.AbstractFiDir;
 
@@ -86,7 +86,7 @@ public final class CreateNewFiAction extends AbstractAction {
 
         String fiPropertiesFileName = AbstractFiDir.DEFAULT_PROPERTIES_FILENAME;
         String sampleFileName = "samples" + "/" + fiPropertiesFileName;
-        URL url = OfxUtils.getResource(sampleFileName);
+        URL url = ResourceUtils.getResource(sampleFileName);
         if (url == null) {
             JOptionPane.showMessageDialog(parentComponent, "Cannot find sample file\nfile=" + sampleFileName,
                     "Error creating", JOptionPane.ERROR_MESSAGE);

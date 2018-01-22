@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 public class Utils {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(Utils.class);
+    private static final Logger LOGGER = Logger.getLogger(Utils.class);
 
     /**
      * Split to sub lists.
@@ -131,7 +131,7 @@ public class Utils {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
@@ -140,7 +140,7 @@ public class Utils {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     writer = null;
                 }
@@ -192,12 +192,7 @@ public class Utils {
         try {
             in = new BufferedInputStream(url.openStream());
             out = new BufferedOutputStream(new FileOutputStream(file));
-            int bufSize = 1024;
-            int n = 0;
-            byte[] buffer = new byte[bufSize];
-            while ((n = in.read(buffer, 0, bufSize)) != -1) {
-                out.write(buffer, 0, n);
-            }
+            ResourceUtils.copyStream(in, out);
         } finally {
             if (in != null) {
                 in.close();
