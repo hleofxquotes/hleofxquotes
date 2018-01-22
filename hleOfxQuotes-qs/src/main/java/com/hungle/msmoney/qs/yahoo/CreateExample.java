@@ -52,17 +52,24 @@ public class CreateExample {
         File outFile = new File(args[0]);
         LOGGER.info("outFile=" + outFile);
 
-        AbstractHttpQuoteGetter quoteGetter = new YahooQuotesGetter();
+        AbstractHttpQuoteGetter getter = new YahooQuotesGetter();
         try {
-            List<AbstractStockPrice> stockPrices = quoteGetter.getQuotes(stockNames);
+            List<AbstractStockPrice> stockPrices = getter.getQuotes(stockNames);
             double stockPriceOffset = 1000.00;
             OfxPriceInfo ofxPriceInfo = new OfxPriceInfo(stockPrices, stockPriceOffset);
             ofxPriceInfo.save(outFile);
         } catch (IOException e) {
             LOGGER.warn(e);
         } finally {
-            if (quoteGetter != null) {
-                quoteGetter.shutdown();
+            if (getter != null) {
+                getter.shutdown();
+                try {
+                    getter.close();
+                } catch (IOException e) {
+                    LOGGER.warn(e);
+                } finally {
+                    getter = null;
+                }
             }
             LOGGER.info("< DONE, file=" + outFile);
         }

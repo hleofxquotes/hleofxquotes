@@ -45,8 +45,15 @@ public class YahooSS2QuoteGetterTest {
     @Test
     public void testYahooSS2QuoteGetterFromStream() throws IOException {
         InputStream stream = ResourceUtils.getResource("TSLA.html", this).openStream();
-        YahooSS2QuoteGetter getter = new YahooSS2QuoteGetter();
-        getter.setStockSymbol("TSLA");
+        YahooSS2QuoteGetter getter = null;
+        try {
+            getter = new YahooSS2QuoteGetter();
+            getter.setStockSymbol("TSLA");
+        } finally {
+            if (getter != null) {
+                getter.close();
+            }
+        }
         List<AbstractStockPrice> stockPrices = getter.parseInputStream(stream);
 
         Assert.assertNotNull(stockPrices);
@@ -67,9 +74,18 @@ public class YahooSS2QuoteGetterTest {
         String[] symbols = { "IBM", "AAPL", };
 
         List<String> list = Arrays.asList(symbols);
-        YahooSS2QuoteGetter getter = new YahooSS2QuoteGetter();
-        List<AbstractStockPrice> stockPrices = getter.getQuotes(list);
-        Assert.assertNotNull(stockPrices);
-        Assert.assertTrue(stockPrices.size() == symbols.length);
+        YahooSS2QuoteGetter getter = null;
+        try {
+            getter = new YahooSS2QuoteGetter();
+
+            List<AbstractStockPrice> stockPrices = getter.getQuotes(list);
+            Assert.assertNotNull(stockPrices);
+            Assert.assertTrue(stockPrices.size() == symbols.length);
+        } finally {
+            if (getter != null) {
+                getter.close();
+                getter = null;
+            }
+        }
     }
 }

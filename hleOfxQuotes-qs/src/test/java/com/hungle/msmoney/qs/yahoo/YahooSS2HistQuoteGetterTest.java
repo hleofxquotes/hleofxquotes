@@ -20,44 +20,54 @@ public class YahooSS2HistQuoteGetterTest {
     public void testParseHtmlContent() throws IOException {
         String symbol = "GB00B2PLJJ36.L";
         InputStream stream = ResourceUtils.getResource(symbol + ".html", this).openStream();
-        YahooSS2HistQuoteGetter getter = new YahooSS2HistQuoteGetter();
-        getter.setStockSymbol("GB00B2PLJJ36.L");
-        List<AbstractStockPrice> stockPrices = getter.parseInputStream(stream);
+        YahooSS2HistQuoteGetter getter = null;
+        try {
+            getter = new YahooSS2HistQuoteGetter();
 
-        Assert.assertNotNull(stockPrices);
+            getter.setStockSymbol("GB00B2PLJJ36.L");
+            List<AbstractStockPrice> stockPrices = getter.parseInputStream(stream);
 
-        Assert.assertEquals(1, stockPrices.size());
+            Assert.assertNotNull(stockPrices);
 
-        AbstractStockPrice stockPrice = stockPrices.get(0);
-        Assert.assertNotNull(stockPrice);
+            Assert.assertEquals(1, stockPrices.size());
 
-        Price price = stockPrice.getLastPrice();
-        Assert.assertNotNull(price);
+            AbstractStockPrice stockPrice = stockPrices.get(0);
+            Assert.assertNotNull(stockPrice);
 
-        Assert.assertEquals(2.463399887084961, price.doubleValue(), 0.1);
+            Price price = stockPrice.getLastPrice();
+            Assert.assertNotNull(price);
+
+            Assert.assertEquals(2.463399887084961, price.doubleValue(), 0.1);
+        } finally {
+            if (getter != null) {
+                getter.close();
+                getter = null;
+            }
+        }
 
     }
 
     @Test
     public void testLiveUrl() throws IOException {
 
-        YahooSS2HistQuoteGetter quoteGetter = null;
+        YahooSS2HistQuoteGetter getter = null;
         try {
-            quoteGetter = new YahooSS2HistQuoteGetter();
+            getter = new YahooSS2HistQuoteGetter();
             String[] stocks = {
                     "GB00B2PLJJ36.L",
             };
             for (String stock : stocks) {
                 List<String> list = new ArrayList<String>();
                 list.add(stock);
-                List<AbstractStockPrice> stockPrices = quoteGetter.getQuotes(list);
+                List<AbstractStockPrice> stockPrices = getter.getQuotes(list);
 
                 Assert.assertNotNull(stockPrices);
                 Assert.assertTrue(stockPrices.size() == 1);
             }
         } finally {
-            if (quoteGetter != null) {
-                quoteGetter = null;
+            if (getter != null) {
+                getter.close();
+                getter = null;
             }
         }
     }

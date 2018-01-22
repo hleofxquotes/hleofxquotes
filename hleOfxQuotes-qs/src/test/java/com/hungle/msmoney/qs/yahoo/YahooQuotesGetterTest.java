@@ -14,51 +14,59 @@ import org.junit.Test;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.qs.net.AbstractHttpQuoteGetter;
 
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class YahooQuotesGetterTest.
  */
 public class YahooQuotesGetterTest {
-	
-	/** The Constant LOGGER. */
-	private static final Logger LOGGER = Logger.getLogger(YahooQuotesGetterTest.class);
 
-	/**
-	 * Test get.
-	 *
-	 * @throws ClientProtocolException the client protocol exception
-	 * @throws URISyntaxException the URI syntax exception
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	@Test
-	@Ignore
-	public void testGet() throws ClientProtocolException, URISyntaxException, IOException {
-		AbstractHttpQuoteGetter quoteGetter = new YahooQuotesGetter();
-		try {
-			List<String> stockNames = new ArrayList<String>();
-			List<AbstractStockPrice> stockPrices = null;
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = Logger.getLogger(YahooQuotesGetterTest.class);
 
-			stockNames.clear();
-			stockPrices = quoteGetter.getQuotes(stockNames);
-			Assert.assertNotNull(stockPrices);
+    /**
+     * Test get.
+     *
+     * @throws ClientProtocolException
+     *             the client protocol exception
+     * @throws URISyntaxException
+     *             the URI syntax exception
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
+    @Test
+    @Ignore
+    public void testGet() throws ClientProtocolException, URISyntaxException, IOException {
+        AbstractHttpQuoteGetter getter = null;
+        try {
+            getter = new YahooQuotesGetter();
 
-			stockNames.clear();
-			stockNames.add("IBM");
-			stockPrices = quoteGetter.getQuotes(stockNames);
-			Assert.assertNotNull(stockPrices);
-			Assert.assertEquals(1, stockPrices.size());
+            List<String> stockNames = new ArrayList<String>();
+            List<AbstractStockPrice> stockPrices = null;
 
-			stockNames.clear();
-			stockNames.add("IBM");
-			stockNames.add("IBM");
-			stockNames.add("IBM");
-			stockPrices = quoteGetter.getQuotes(stockNames);
-			Assert.assertNotNull(stockPrices);
-			Assert.assertEquals(3, stockPrices.size());
-		} finally {
-			quoteGetter.shutdown();
-			LOGGER.info("< DONE");
-		}
-	}
+            stockNames.clear();
+            stockPrices = getter.getQuotes(stockNames);
+            Assert.assertNotNull(stockPrices);
+
+            stockNames.clear();
+            stockNames.add("IBM");
+            stockPrices = getter.getQuotes(stockNames);
+            Assert.assertNotNull(stockPrices);
+            Assert.assertEquals(1, stockPrices.size());
+
+            stockNames.clear();
+            stockNames.add("IBM");
+            stockNames.add("IBM");
+            stockNames.add("IBM");
+            stockPrices = getter.getQuotes(stockNames);
+            Assert.assertNotNull(stockPrices);
+            Assert.assertEquals(3, stockPrices.size());
+        } finally {
+            if (getter != null) {
+                getter.shutdown();
+                getter.close();
+                getter = null;
+            }
+            LOGGER.info("< DONE");
+        }
+    }
 }

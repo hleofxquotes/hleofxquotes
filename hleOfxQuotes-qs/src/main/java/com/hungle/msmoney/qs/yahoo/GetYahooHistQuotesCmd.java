@@ -29,14 +29,14 @@ public class GetYahooHistQuotesCmd {
      * @param args the arguments
      */
     public static void main(String[] args) {
-        YahooHistQuoteGetter getQuotes = null;
+        YahooHistQuoteGetter getter = null;
 
         try {
-            getQuotes = new YahooHistQuoteGetter();
+            getter = new YahooHistQuoteGetter();
             List<String> stocks = new ArrayList<String>();
             stocks.add("MSFT");
             LOGGER.info("stocks=" + stocks);
-            List<AbstractStockPrice> stockPrices = getQuotes.getQuotes(stocks);
+            List<AbstractStockPrice> stockPrices = getter.getQuotes(stocks);
             int i = 0;
             for (AbstractStockPrice stockPrice : stockPrices) {
                 List<AbstractStockPrice> prices = new ArrayList<AbstractStockPrice>();
@@ -51,9 +51,15 @@ public class GetYahooHistQuotesCmd {
         } catch (IOException e) {
             LOGGER.error(e, e);
         } finally {
-            if (getQuotes != null) {
-                getQuotes.shutdown();
-                getQuotes = null;
+            if (getter != null) {
+                getter.shutdown();
+                try {
+                    getter.close();
+                } catch (IOException e) {
+                    LOGGER.warn(e);
+                } finally {
+                    getter = null;
+                }
             }
             LOGGER.info("< DONE");
         }

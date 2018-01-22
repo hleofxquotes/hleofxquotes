@@ -20,10 +20,10 @@ import com.hungle.msmoney.qs.yahoo.YahooHistQuoteGetter;
  * The Class YahooHistoricalSourcePanel.
  */
 public class YahooHistSourcePanel extends YahooQuoteSourcePanel {
-    
+
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
-    
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(YahooHistSourcePanel.class);
 
@@ -33,8 +33,10 @@ public class YahooHistSourcePanel extends YahooQuoteSourcePanel {
     /**
      * Instantiates a new yahoo historical source panel.
      *
-     * @param gui the gui
-     * @param stockSymbolsPrefKey the stock symbols pref key
+     * @param gui
+     *            the gui
+     * @param stockSymbolsPrefKey
+     *            the stock symbols pref key
      */
     public YahooHistSourcePanel(GUI gui, String stockSymbolsPrefKey) {
         super(gui, stockSymbolsPrefKey);
@@ -44,14 +46,19 @@ public class YahooHistSourcePanel extends YahooQuoteSourcePanel {
     /**
      * Instantiates a new yahoo historical source panel.
      *
-     * @param gui the gui
+     * @param gui
+     *            the gui
      */
     public YahooHistSourcePanel(GUI gui) {
         this(gui, STOCK_SYMBOLS_PREF_KEY);
     }
 
-    /* (non-Javadoc)
-     * @see com.hungle.tools.moneyutils.yahoo.YahooQuoteSourcePanel#getStockQuotes(java.util.List)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.hungle.tools.moneyutils.yahoo.YahooQuoteSourcePanel#getStockQuotes(
+     * java.util.List)
      */
     @Override
     protected List<AbstractStockPrice> getStockQuotes(final List<String> stockSymbols) throws IOException {
@@ -76,15 +83,20 @@ public class YahooHistSourcePanel extends YahooQuoteSourcePanel {
         LOGGER.info("user selected, toDate=" + toDate);
         LOGGER.info("user selected, limitToFriday=" + dialog.getLimitToFriday());
         LOGGER.info("user selected, limitToEOM=" + dialog.getLimitToEOM());
-        
-        AbstractHttpQuoteGetter quoteGetter = new YahooHistQuoteGetter(fromDate, toDate, dialog.getLimitToFriday(), dialog.getLimitToEOM());
-        if (getQuoteServer() != null) {
-            quoteGetter.setHost(getQuoteServer());
-        }
+
+        AbstractHttpQuoteGetter getter = null;
         try {
-            stockPrices = quoteGetter.getQuotes(stockSymbols, listener);
-            this.fxSymbols = quoteGetter.getFxSymbols();
+            getter = new YahooHistQuoteGetter(fromDate, toDate, dialog.getLimitToFriday(), dialog.getLimitToEOM());
+            if (getQuoteServer() != null) {
+                getter.setHost(getQuoteServer());
+            }
+            stockPrices = getter.getQuotes(stockSymbols, listener);
+            this.fxSymbols = getter.getFxSymbols();
         } finally {
+            if (getter != null) {
+                getter.close();
+                getter = null;
+            }
         }
         return stockPrices;
     }

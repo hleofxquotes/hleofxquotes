@@ -40,16 +40,26 @@ public class GetYahooQuotesCmd {
         File outFile = new File("quotes.xml");
         LOGGER.info("outFile=" + outFile.getAbsolutePath());
 
-        AbstractHttpQuoteGetter quoteGetter = new YahooQuotesGetter();
-        quoteGetter.setHost(sourceHostName);
+        AbstractHttpQuoteGetter getter = null;
         try {
-            List<AbstractStockPrice> stockPrices = quoteGetter.getQuotes(stockNames);
+            getter = new YahooQuotesGetter();
+            getter.setHost(sourceHostName);
+            List<AbstractStockPrice> stockPrices = getter.getQuotes(stockNames);
 
             OfxPriceInfo.save(stockPrices, outFile);
         } catch (IOException e) {
             LOGGER.error(e, e);
         } finally {
-            quoteGetter.shutdown();
+            if (getter != null) {
+                getter.shutdown();
+                try {
+                    getter.close();
+                } catch (IOException e) {
+                    LOGGER.warn(e);
+                } finally {
+                    getter = null;
+                }
+            }
             LOGGER.info("< DONE");
         }
     }
