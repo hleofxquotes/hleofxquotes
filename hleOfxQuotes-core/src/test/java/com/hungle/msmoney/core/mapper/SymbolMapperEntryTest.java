@@ -31,6 +31,7 @@ public class SymbolMapperEntryTest {
         }
         StringReader reader = new StringReader(sb.toString());
         CsvReader csvReader = new CsvReader(reader);
+        csvReader.readHeaders();
         entry.load(csvReader);
     }
 

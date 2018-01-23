@@ -216,7 +216,7 @@ public class SymbolMapperEntry {
         String msMoneySymbol = csvReader.get(MS_MONEY_SYMBOL);
         if (CheckNullUtils.isEmpty(msMoneySymbol)) {
             LOGGER.warn("MSMoneySymbol column is blank");
-            return;
+//            return;
         } else {
             setMsMoneySymbol(msMoneySymbol);
         }
@@ -225,8 +225,21 @@ public class SymbolMapperEntry {
         String quotesSourceSymbol = csvReader.get(QUOTES_SOURCE_SYMBOL);
         if (CheckNullUtils.isEmpty(quotesSourceSymbol)) {
             LOGGER.warn("QuotesSourceSymbol column is blank");
-            return;
+//            return;
         } else {
+            setQuotesSourceSymbol(quotesSourceSymbol);
+        }
+        
+        if ((CheckNullUtils.isEmpty(msMoneySymbol)) && (CheckNullUtils.isEmpty(quotesSourceSymbol))) {
+            LOGGER.warn("MSMoneySymbol column is blank");
+            LOGGER.warn("QuotesSourceSymbol column is blank");
+            return;
+        } else if (CheckNullUtils.isEmpty(msMoneySymbol)) {
+            msMoneySymbol = getQuotesSourceSymbol();
+            setMsMoneySymbol(msMoneySymbol);
+        } else {
+            // CheckNullUtils.isEmpty(quotesSourceSymbol)
+            quotesSourceSymbol = getMsMoneySymbol();
             setQuotesSourceSymbol(quotesSourceSymbol);
         }
 
@@ -254,20 +267,7 @@ public class SymbolMapperEntry {
             }
             type = TYPE_STOCK;
         } else {
-            if (type.compareToIgnoreCase(TYPE_STOCK) == 0) {
-            } else if (type.compareToIgnoreCase(TYPE_MFUND) == 0) {
-                setMutualFund(true);
-                setOptions(false);
-                setBond(false);
-            } else if (type.compareToIgnoreCase(TYPE_OPTIONS) == 0) {
-                setMutualFund(false);
-                setOptions(true);
-                setBond(false);
-            } else if (type.compareToIgnoreCase(TYPE_BOND) == 0) {
-                setMutualFund(false);
-                setOptions(false);
-                setBond(true);
-            }
+            setType(type);
         }
 
         // MSMoneyCurrency
@@ -288,6 +288,23 @@ public class SymbolMapperEntry {
             }
         } else {
             setQuotesSourceCurrency(quotesSourceCurrency);
+        }
+    }
+
+    public void setType(String type) {
+        if (type.compareToIgnoreCase(TYPE_STOCK) == 0) {
+        } else if (type.compareToIgnoreCase(TYPE_MFUND) == 0) {
+            setMutualFund(true);
+            setOptions(false);
+            setBond(false);
+        } else if (type.compareToIgnoreCase(TYPE_OPTIONS) == 0) {
+            setMutualFund(false);
+            setOptions(true);
+            setBond(false);
+        } else if (type.compareToIgnoreCase(TYPE_BOND) == 0) {
+            setMutualFund(false);
+            setOptions(false);
+            setBond(true);
         }
     }
 

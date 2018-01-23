@@ -47,8 +47,8 @@ public class CurrencyCodesCmd {
         try {
             List<String> codes = new ArrayList<String>();
             reader = new CsvReader(new BufferedReader(new FileReader(inFile)));
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
             reader.readHeaders();
+            writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
             while (reader.readRecord()) {
                 String columnName = null;
 

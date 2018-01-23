@@ -45,21 +45,11 @@ public class SymbolMapper {
      *             Signals that an I/O exception has occurred.
      */
     public void load(File file) throws IOException {
-        CsvReader csvReader = null;
         Reader reader = null;
         try {
             reader = new BufferedReader(new FileReader(file));
-            csvReader = new CsvReader(reader);
-            csvReader.readHeaders();
-            load(csvReader);
+            load(reader);
         } finally {
-            if (csvReader != null) {
-                try {
-                    csvReader.close();
-                } finally {
-                    csvReader = null;
-                }
-            }
             if (reader != null) {
                 try {
                     reader.close();
@@ -71,6 +61,23 @@ public class SymbolMapper {
             }
         }
 
+    }
+
+    private void load(Reader reader) throws IOException {
+        CsvReader csvReader = null;
+        try {
+            csvReader = new CsvReader(reader);
+            csvReader.readHeaders();
+            load(csvReader);
+        } finally {
+            if (csvReader != null) {
+                try {
+                    csvReader.close();
+                } finally {
+                    csvReader = null;
+                }
+            }
+        }
     }
 
     /**
@@ -107,12 +114,36 @@ public class SymbolMapper {
 
     private void merge(SymbolMapperEntry newEntry) {
         int count = 0;
-        for(SymbolMapperEntry entry : entries) {
-            
+        String newKey = newEntry.getQuotesSourceSymbol() + newEntry.getMsMoneySymbol();
+        for (SymbolMapperEntry entry : entries) {
+            String key = entry.getQuotesSourceSymbol() + entry.getMsMoneySymbol();
+            if (key.compareToIgnoreCase(newKey) == 0) {
+                count++;
+                merge(newEntry, entry);
+            }
         }
-        
+
         if (count == 0) {
             add(newEntry);
+        }
+    }
+
+    private void merge(SymbolMapperEntry newEntry, SymbolMapperEntry entry) {
+        String value = null;
+
+        value = newEntry.getQuotesSourceCurrency();
+        if (StringUtils.isNotEmpty(value)) {
+            entry.setQuotesSourceCurrency(value);
+        }
+
+        value = newEntry.getMsMoneyCurrency();
+        if (StringUtils.isNotEmpty(value)) {
+            entry.setMsMoneyCurrency(value);
+        }
+
+        value = newEntry.getType();
+        if (StringUtils.isNotEmpty(value)) {
+            entry.setType(value);
         }
     }
 
@@ -355,7 +386,7 @@ public class SymbolMapper {
         if (entries == null) {
             return symbol;
         }
-    
+
         for (SymbolMapperEntry entry : entries) {
             String s = entry.getMsMoneySymbol();
             if (!StringUtils.isBlank(s)) {
@@ -363,7 +394,7 @@ public class SymbolMapper {
                 break;
             }
         }
-    
+
         return symbol;
     }
 }

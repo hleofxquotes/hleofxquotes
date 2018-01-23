@@ -110,67 +110,11 @@ public class FxTable {
      */
     public void load(File file) throws IOException {
         Reader reader = null;
-        CsvReader csvReader = null;
 
         try {
             reader = new BufferedReader(new FileReader(file));
-            csvReader = new CsvReader(reader);
-            csvReader.readHeaders();
-            String columnName = null;
-            FxTableEntry entry = null;
-            while (csvReader.readRecord()) {
-                entry = new FxTableEntry();
-
-                columnName = "FromCurrency";
-                String fromCurrency = csvReader.get(columnName);
-                if (CheckNullUtils.isEmpty(fromCurrency)) {
-                    LOGGER.warn("Value for column=" + columnName + " is null.");
-                    continue;
-                }
-                if (fromCurrency != null) {
-                    fromCurrency = fromCurrency.trim();
-                }
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("fromCurrency=" + fromCurrency);
-                }
-                entry.setFromCurrency(fromCurrency);
-
-                columnName = "ToCurrency";
-                String toCurrency = csvReader.get(columnName);
-                if (CheckNullUtils.isEmpty(toCurrency)) {
-                    LOGGER.warn("Value for column=" + columnName + " is null.");
-                    continue;
-                }
-                if (toCurrency != null) {
-                    toCurrency = toCurrency.trim();
-                }
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("toCurrency=" + toCurrency);
-                }
-                entry.setToCurrency(toCurrency);
-
-                columnName = "Rate";
-                String rate = csvReader.get(columnName);
-                if (CheckNullUtils.isEmpty(rate)) {
-                    LOGGER.warn("Value for column=" + columnName + " is null.");
-                    continue;
-                }
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("rate=" + rate);
-                }
-                if (rate != null) {
-                    rate = rate.trim();
-                }
-                entry.setRate(rate);
-
-                entries.add(entry);
-            }
+            loadReader(reader);
         } finally {
-            if (csvReader != null) {
-                csvReader.close();
-                csvReader = null;
-            }
-
             if (reader != null) {
                 try {
                     reader.close();
@@ -180,6 +124,72 @@ public class FxTable {
                     reader = null;
                 }
             }
+        }
+    }
+
+    private void loadReader(Reader reader) throws IOException {
+        CsvReader csvReader = null;
+        try {
+            csvReader = new CsvReader(reader);
+            csvReader.readHeaders();
+            loadCsvReader(csvReader);
+        } finally {
+            if (csvReader != null) {
+                csvReader.close();
+                csvReader = null;
+            }
+        }
+    }
+
+    private void loadCsvReader(CsvReader csvReader) throws IOException {
+        String columnName = null;
+        FxTableEntry entry = null;
+        while (csvReader.readRecord()) {
+            entry = new FxTableEntry();
+
+            columnName = "FromCurrency";
+            String fromCurrency = csvReader.get(columnName);
+            if (CheckNullUtils.isEmpty(fromCurrency)) {
+                LOGGER.warn("Value for column=" + columnName + " is null.");
+                continue;
+            }
+            if (fromCurrency != null) {
+                fromCurrency = fromCurrency.trim();
+            }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("fromCurrency=" + fromCurrency);
+            }
+            entry.setFromCurrency(fromCurrency);
+
+            columnName = "ToCurrency";
+            String toCurrency = csvReader.get(columnName);
+            if (CheckNullUtils.isEmpty(toCurrency)) {
+                LOGGER.warn("Value for column=" + columnName + " is null.");
+                continue;
+            }
+            if (toCurrency != null) {
+                toCurrency = toCurrency.trim();
+            }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("toCurrency=" + toCurrency);
+            }
+            entry.setToCurrency(toCurrency);
+
+            columnName = "Rate";
+            String rate = csvReader.get(columnName);
+            if (CheckNullUtils.isEmpty(rate)) {
+                LOGGER.warn("Value for column=" + columnName + " is null.");
+                continue;
+            }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("rate=" + rate);
+            }
+            if (rate != null) {
+                rate = rate.trim();
+            }
+            entry.setRate(rate);
+
+            entries.add(entry);
         }
     }
 

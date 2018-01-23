@@ -191,6 +191,7 @@ public class YahooHistQuoteGetter extends YahooQuotesGetter {
         CsvReader csvReader = null;
         try {
             csvReader = new CsvReader(reader);
+            csvReader.readHeaders();
             stockPrices = toStockPriceBeans(csvReader, skipIfNoPrice);
         } finally {
             if (csvReader != null) {
@@ -214,7 +215,6 @@ public class YahooHistQuoteGetter extends YahooQuotesGetter {
      */
     private List<AbstractStockPrice> toStockPriceBeans(CsvReader reader, boolean skipIfNoPrice) throws IOException {
         List<AbstractStockPrice> beans = new ArrayList<AbstractStockPrice>();
-        reader.readHeaders();
         while (reader.readRecord()) {
             String line = reader.getRawRecord();
             if (LOGGER.isDebugEnabled()) {

@@ -1,6 +1,8 @@
 package com.hungle.msmoney.core.mapper;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +10,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.csvreader.CsvReader;
 
 public class MetaStockSymbolTest {
     private static final Logger LOGGER = Logger.getLogger(MetaStockSymbolTest.class);
@@ -119,8 +123,10 @@ public class MetaStockSymbolTest {
     }
     
     @Test
-    public void testAddAttributes() {
+    public void testAddAttributes() throws IOException {
         SymbolMapper symbolMapper = new SymbolMapper();
+        symbolMapper.load(getCsvReader("AddAttributes"));
+        
         String[] list2 = {
                 "GB0033772517",
                 "ALO:PAR",
@@ -170,6 +176,22 @@ public class MetaStockSymbolTest {
         Assert.assertFalse(stockSymbols.contains("IBM/HAL"));
         Assert.assertFalse(stockSymbols.contains("IBM"));
         Assert.assertTrue(stockSymbols.contains("HAL"));
+        
+        Assert.assertTrue(symbolMapper.getIsBond("GB00BTLX1Q39"));
 
+    }
+
+    private CsvReader getCsvReader(String id) throws IOException {
+        String[] tokens = getClass().getName().split("\\.");
+
+        String resourceName = tokens[tokens.length - 1] + "-mapper" + id + ".csv";
+        LOGGER.info("resourceName=" + resourceName);
+        InputStream in = getClass().getResourceAsStream(resourceName);
+        Assert.assertNotNull(in);
+
+        Charset charset = Charset.defaultCharset();
+        CsvReader csvReader = new CsvReader(in, charset);
+        csvReader.readHeaders();
+        return csvReader;
     }
 }

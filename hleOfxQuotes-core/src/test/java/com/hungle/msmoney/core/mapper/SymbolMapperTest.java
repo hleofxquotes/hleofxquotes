@@ -3,6 +3,7 @@ package com.hungle.msmoney.core.mapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -17,7 +18,7 @@ import com.csvreader.CsvReader;
  * The Class SymbolMapperTest.
  */
 public class SymbolMapperTest {
-    
+
     /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(SymbolMapperTest.class);
 
@@ -26,14 +27,15 @@ public class SymbolMapperTest {
 
     /** The in. */
     private InputStream in = null;
-    
+
     /** The csv reader. */
     private CsvReader csvReader = null;
 
     /**
      * Setup.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     @Before
     public void setup() throws IOException {
@@ -43,8 +45,10 @@ public class SymbolMapperTest {
     /**
      * Load.
      *
-     * @param id the id
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param id
+     *            the id
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     private void load(String id) throws IOException {
         String[] tokens = getClass().getName().split("\\.");
@@ -82,7 +86,8 @@ public class SymbolMapperTest {
     /**
      * Test 01.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     @Test
     public void test01() throws IOException {
@@ -94,7 +99,8 @@ public class SymbolMapperTest {
     /**
      * Test 02.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     @Test
     public void test02() throws IOException {
@@ -102,16 +108,43 @@ public class SymbolMapperTest {
         load(id);
         Assert.assertEquals(9, mapper.getEntries().size());
     }
-    
+
     /**
      * Test 03.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     @Test
     public void test03() throws IOException {
         String id = "03";
         load(id);
         Assert.assertEquals(3, mapper.getEntries().size());
-    }    
+    }
+
+    @Test
+    public void testNoSymbol() throws IOException {
+
+        String id = "NoSymbol";
+        load(id);
+        Assert.assertEquals(2, mapper.getEntries().size());
+
+        List<SymbolMapperEntry> list = null;
+        SymbolMapperEntry entry = null;
+        
+        list = mapper.entriesByQuoteSource("AAPL");
+        Assert.assertNotNull(list);
+        Assert.assertEquals(1, list.size());
+        entry = list.get(0);
+        Assert.assertEquals("AAPL", entry.getMsMoneySymbol());
+        Assert.assertEquals("AAPL", entry.getQuotesSourceSymbol());
+
+        list = mapper.entriesByQuoteSource("IBM");
+        Assert.assertNotNull(list);
+        Assert.assertEquals(1, list.size());
+        entry = list.get(0);
+        Assert.assertEquals("IBM", entry.getMsMoneySymbol());
+        Assert.assertEquals("IBM", entry.getQuotesSourceSymbol());
+
+    }
 }
