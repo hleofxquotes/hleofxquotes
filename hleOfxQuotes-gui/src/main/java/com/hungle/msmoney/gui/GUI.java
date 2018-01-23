@@ -859,9 +859,9 @@ public class GUI extends JFrame {
 
         menu = new JMenu("Tools");
 
-        addCopyTemplates(menu);
-
-        menu.addSeparator();
+//        addCopyTemplates(menu);
+//
+//        menu.addSeparator();
 
         addImportQFXFile(menu);
 
