@@ -106,8 +106,8 @@ public abstract class AbstractGlazedListTableView<T> extends JScrollPane {
         setSelectionModel(source, table);
     
         if (addStripe) {
-            TableCellRenderer tableCellRenderer = createStripeTableCellRenderer();
-            addStripeToTable(table, tableCellRenderer);
+//            TableCellRenderer tableCellRenderer = createStripeTableCellRenderer();
+            addStripeToTable(table);
         }
     
         setPreferredWidth(table);
@@ -190,10 +190,12 @@ public abstract class AbstractGlazedListTableView<T> extends JScrollPane {
      * @param table
      *            the table
      */
-    private static void addStripeToTable(JTable table, TableCellRenderer renderer) {
+    private void addStripeToTable(JTable table) {
 //        TableCellRenderer renderer = null;
         int cols = table.getColumnModel().getColumnCount();
         for (int i = 0; i < cols; i++) {
+            TableCellRenderer renderer = createStripeTableCellRenderer();
+
 //            renderer = new StripedTableRenderer() {
 //                /**
 //                 * 
