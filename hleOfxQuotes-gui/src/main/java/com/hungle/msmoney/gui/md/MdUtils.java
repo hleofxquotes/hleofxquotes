@@ -18,6 +18,7 @@ import com.hungle.msmoney.core.qif.VelocityUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.FxSymbol;
 import com.hungle.msmoney.core.stockprice.Price;
+import com.hungle.msmoney.core.template.TemplateUtils;
 
 import ca.odell.glazedlists.EventList;
 
@@ -29,8 +30,8 @@ public class MdUtils {
     private static final String DEFAULT_SEPARATOR = ",";
 
     public static void saveToCsv(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable, File file) throws IOException {
-        saveToCsvUsingVelocity(priceList, convert, defaultCurrency, symbolMapper, fxTable, file);
+            SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
+        saveToCsvUsingVelocity(priceList, convert, defaultCurrency, symbolMapper, fxTable, file, templateDecimalSeparator);
     }
 
     private static void saveToCsvUsingWriter(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
@@ -48,13 +49,36 @@ public class MdUtils {
     }
 
     private static void saveToCsvUsingVelocity(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable, File file) throws IOException {
+            SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
         List<MdCsvBean> beans = toMdCsvBeans(priceList, convert, defaultCurrency, symbolMapper, fxTable);
         VelocityContext context = new VelocityContext();
 
         context.put("header", MdUtils.getMdCsvHeader());
         context.put("rows", beans);
         context.put("util", new MdUtils());
+        
+        LOGGER.info("templateDecimalSeparator=" + templateDecimalSeparator);
+        String language = "";
+        String country = "";
+        if (templateDecimalSeparator == null) {
+            language = "";
+            country = "";
+        } else {
+            if (templateDecimalSeparator.compareTo(TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT) == 0) {
+                language = "";
+                country = "";
+            } else if (templateDecimalSeparator.compareTo(TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_PERIOD) == 0) {
+                language = "en";
+                country = "US";
+            } else if (templateDecimalSeparator.compareTo(TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_COMMA) == 0) {
+                language = "fr";
+                country = "FR";
+            }
+        }
+        context.put("language", language);
+        LOGGER.info("language=" + language);
+        context.put("country", country);
+        LOGGER.info("country=" + country);;
 
         String encoding = "UTF-8";
         String template = "/templates/mdcsv.vm";

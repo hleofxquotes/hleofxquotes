@@ -17,6 +17,7 @@ import com.hungle.msmoney.core.mapper.SymbolMapperEntry;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.core.stockprice.StockPrice;
+import com.hungle.msmoney.core.template.TemplateUtils;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -34,7 +35,7 @@ public class MdUtilsTest {
         File expectedFile = File.createTempFile("testMdCsv", ".csv");
         LOGGER.info("expectedFile=" + expectedFile);
         expectedFile.deleteOnExit();
-        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(MdUtils.getMdCsvHeader());
     }
     
@@ -50,10 +51,10 @@ public class MdUtilsTest {
         expectedFile.deleteOnExit();
 
         priceList.add(new StockPrice("IBM", new Date(0L), 1.00));
-        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(
                 MdUtils.getMdCsvHeader(), 
-                "1.0000,IBM");
+                "\"1.0000\",\"IBM\"");
     }
     
     @Test
@@ -69,11 +70,11 @@ public class MdUtilsTest {
 
         priceList.add(new StockPrice("IBM", new Date(0L), 1.00));
         priceList.add(new StockPrice("AAPL", new Date(7 * 24 * 60 * 60 * 1000L), 2.00));
-        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(
                 MdUtils.getMdCsvHeader(),
-                "1.0000,IBM",
-                "2.0000,AAPL"
+                "\"1.0000\",\"IBM\"",
+                "\"2.0000\",\"AAPL\""
                 );
     }
     
@@ -110,23 +111,23 @@ public class MdUtilsTest {
         fxTableEntry = new FxTableEntry("EUR", "USD", "3.33");
         fxTable.add(fxTableEntry);
 
-        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(
                 MdUtils.getMdCsvHeader(), 
-                "1.0000,IBM",
-                "2.0000,AAPL",
-                "2.2200,GBPUSD=X",
-                "0.4505,USDGBP=X"
+                "\"1.0000\",\"IBM\"",
+                "\"2.0000\",\"AAPL\"",
+                "\"2.2200\",\"GBPUSD=X\"",
+                "\"0.4505\",\"USDGBP=X\""
                 );
         
         convert = true;
-        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(
                 MdUtils.getMdCsvHeader(), 
-                "2.2200,IBM",
-                "6.6600,AAPL",
-                "2.2200,GBPUSD=X",
-                "0.4505,USDGBP=X"
+                "\"2.2200\",\"IBM\"",
+                "\"6.6600\",\"AAPL\"",
+                "\"2.2200\",\"GBPUSD=X\"",
+                "\"0.4505\",\"USDGBP=X\""
                 );
         
         SymbolMapperEntry symbolMapperEntry = null;
@@ -142,13 +143,13 @@ public class MdUtilsTest {
         symbolMapper.add(symbolMapperEntry);
         
         convert = true;
-        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile);
+        MdUtils.saveToCsv(priceList, convert, defaultCurrency, symbolMapper, fxTable, expectedFile, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         assertThat(linesOf(expectedFile)).containsExactly(
                 MdUtils.getMdCsvHeader(), 
-                "2.2200,IBM.X",
-                "6.6600,AAPL.Y",
-                "2.2200,GBPUSD=X",
-                "0.4505,USDGBP=X"
+                "\"2.2200\",\"IBM.X\"",
+                "\"6.6600\",\"AAPL.Y\"",
+                "\"2.2200\",\"GBPUSD=X\"",
+                "\"0.4505\",\"USDGBP=X\""
                 );
     }
 }

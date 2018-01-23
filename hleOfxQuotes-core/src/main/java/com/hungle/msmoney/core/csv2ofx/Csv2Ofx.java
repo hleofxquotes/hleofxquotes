@@ -180,6 +180,7 @@ public class Csv2Ofx {
         try {
             reader = new BufferedReader(new FileReader(csvFile));
             csvReader = new CsvReader(reader);
+            //         csvReader.readHeaders(); ???
             mapper = createMapper(mapFile);
             String dateFormatString = mapper.get("");
             if (dateFormatString != null) {

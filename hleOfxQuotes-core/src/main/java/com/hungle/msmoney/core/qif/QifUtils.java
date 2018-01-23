@@ -18,6 +18,7 @@ import com.hungle.msmoney.core.fx.FxTableUtils;
 import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
+import com.hungle.msmoney.core.template.TemplateUtils;
 
 import ca.odell.glazedlists.EventList;
 
@@ -36,8 +37,8 @@ public class QifUtils {
     private static final QifPlugin qifPlugin = null; // QifPlugin.createQifPlugin();
 
     public static void saveToQif(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable, File file) throws IOException {
-        saveToQifUsingVelocity(priceList, convert, defaultCurrency, symbolMapper, fxTable, file);
+            SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
+        saveToQifUsingVelocity(priceList, convert, defaultCurrency, symbolMapper, fxTable, file, templateDecimalSeparator);
     }
 
     /**
@@ -51,11 +52,11 @@ public class QifUtils {
      *             Signals that an I/O exception has occurred.
      */
     private static void saveToQifUsingWriter(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable, File file) throws IOException {
+            SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, writer);
+            QifUtils.saveToQif(priceList, convert, defaultCurrency, symbolMapper, fxTable, writer, templateDecimalSeparator);
         } finally {
             if (writer != null) {
                 writer.close();
@@ -65,13 +66,36 @@ public class QifUtils {
     }
 
     public static void saveToQifUsingVelocity(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable, File file) throws IOException {
+            SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
         List<QifBean> qifBeans = toQifBeans(priceList, convert, defaultCurrency, symbolMapper, fxTable);
         VelocityContext context = new VelocityContext();
 
         context.put("header", QifUtils.getQifHeader());
         context.put("rows", qifBeans);
         context.put("util", new QifUtils());
+        
+        LOGGER.info("templateDecimalSeparator=" + templateDecimalSeparator);
+        String language = "";
+        String country = "";
+        if (templateDecimalSeparator == null) {
+            language = "";
+            country = "";
+        } else {
+            if (templateDecimalSeparator.compareTo(TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT) == 0) {
+                language = "";
+                country = "";
+            } else if (templateDecimalSeparator.compareTo(TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_PERIOD) == 0) {
+                language = "en";
+                country = "US";
+            } else if (templateDecimalSeparator.compareTo(TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_COMMA) == 0) {
+                language = "fr";
+                country = "FR";
+            }
+        }
+        context.put("language", language);
+        LOGGER.info("language=" + language);
+        context.put("country", country);
+        LOGGER.info("country=" + country);
 
         String encoding = "UTF-8";
         String template = "/templates/qif.vm";
@@ -87,7 +111,7 @@ public class QifUtils {
      *            the writer
      */
     static void saveToQif(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable, PrintWriter writer) {
+            SymbolMapper symbolMapper, FxTable fxTable, PrintWriter writer, String templateDecimalSeparator) {
 
         List<QifBean> qifBeans = toQifBeans(priceList, convert, defaultCurrency, symbolMapper, fxTable);
 
