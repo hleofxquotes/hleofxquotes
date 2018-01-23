@@ -141,32 +141,69 @@
           <target>${java.version}</target>
         </configuration>
       </plugin>
+            <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
   <repositories>
-    <repository>
+<!--     <repository>
       <id>mandubian-mvn</id>
       <url>http://mandubian-mvn.googlecode.com/svn/trunk/mandubian-mvn/repository</url>
-    </repository>
+    </repository> -->
     <!-- http://download.java.net/maven/2/ beansbinding -->
-    <repository>
+<!--     <repository>
       <id>maven2-repository.sunriise</id>
       <name>sunriise Repository for Maven</name>
       <url>http://sunriise.sourceforge.net/m2-repo/</url>
-    </repository>
-    <repository>
+    </repository> -->
+<!--     <repository>
       <id>maven2-repository.dev.java.net</id>
       <name>Java.net Repository for Maven</name>
       <url>http://download.java.net/maven/2/</url>
       <layout>default</layout>
-    </repository>
-    <repository>
+    </repository> -->
+<!--     <repository>
       <id>maven2-oss.sonatype.org</id>
       <name>oss.sonatype.org</name>
       <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </repository> -->
+  
+      <repository>
+      <id>oss.snapshots</id>
+      <name>OSSRH Snapshot Repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>repository.spring.release</id>
+      <name>Spring GA Repository</name>
+      <url>http://repo.spring.io/release</url>
+    </repository>
+    <repository>
+      <id>repository.spring.milestone</id>
+      <name>Spring Milestone Repository</name>
+      <url>http://repo.spring.io/milestone</url>
     </repository>
   </repositories>
+  
   <dependencyManagement>
 
     <dependencies>
@@ -276,4 +313,14 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 </project>
