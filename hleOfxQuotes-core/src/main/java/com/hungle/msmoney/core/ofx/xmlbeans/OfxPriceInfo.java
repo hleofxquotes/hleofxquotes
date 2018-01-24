@@ -934,7 +934,7 @@ public class OfxPriceInfo {
         String ticker = stockPrice.getStockSymbol();
         if (symbolMapper != null) {
             if (symbolMapper.hasEntry(ticker)) {
-                return symbolMapper.getIsBond(ticker);
+                return symbolMapper.isBond(ticker);
             }
         }
         return false;
@@ -956,7 +956,18 @@ public class OfxPriceInfo {
         // TODO: bond is quoted in 100 unit
         boolean isBond = isBond(stockPrice, symbolMapper);
         if (isBond) {
-            price = price / 100.0;
+            Integer bondDivider = null;
+            if (symbolMapper != null) {
+                SymbolMapperEntry entry = symbolMapper.getSymbolMapperEntry(stockPrice.getStockSymbol());
+                if (entry != null) {
+                    bondDivider = entry.getBondDivider();
+                }
+                
+            }
+            
+            if (bondDivider != null) {
+                price = price / bondDivider.intValue();
+            }
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("isBond=" + isBond);
                 LOGGER.debug("  new price=" + price);
@@ -1091,7 +1102,19 @@ public class OfxPriceInfo {
 
         XmlObject secInfo = addGeneralSecurityInfo(root, ticker, quoteSourceTicker, secName, unitPrice, dtAsOfString,
                 dtAsOf, currency);
-        insertComment(secInfo, "Security is treated as Bond");
+        
+        Integer bondDivider = null;
+        if (symbolMapper != null) {
+            SymbolMapperEntry entry = symbolMapper.getSymbolMapperEntry(ticker);
+            if (entry != null) {
+                bondDivider = entry.getBondDivider();
+            }
+        }
+        String typeName = "Bond";
+        if (bondDivider != null) {
+            typeName = typeName + "/" + bondDivider.intValue();
+        }
+        insertComment(secInfo, "Security is treated as " + typeName);
 
         // root.setMFTYPE(MutualFundTypeEnum.OPENEND);
 

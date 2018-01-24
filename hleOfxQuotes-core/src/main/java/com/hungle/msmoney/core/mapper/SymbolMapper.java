@@ -276,7 +276,7 @@ public class SymbolMapper {
      *            the ticker
      * @return the checks if is bond
      */
-    public boolean getIsBond(String ticker) {
+    public boolean isBond(String ticker) {
         List<SymbolMapperEntry> list = null;
 
         list = mapByQuotesSourceSymbol.get(ticker);
@@ -299,6 +299,30 @@ public class SymbolMapper {
 
         // log.warn("Cannot find SymbolMapperEntry for tickerName=" + ticker);
         return false;
+    }
+    
+    public SymbolMapperEntry getSymbolMapperEntry(String ticker) {
+        List<SymbolMapperEntry> list = null;
+
+        list = mapByQuotesSourceSymbol.get(ticker);
+        if (list != null) {
+            for (SymbolMapperEntry entry : list) {
+                if (entry.isBond()) {
+                    return entry;
+                }
+            }
+        }
+
+        list = mapByMsMoneySymbol.get(ticker);
+        if (list != null) {
+            for (SymbolMapperEntry entry : list) {
+                if (entry.isBond()) {
+                    return entry;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -177,8 +177,19 @@ public class MetaStockSymbolTest {
         Assert.assertFalse(stockSymbols.contains("IBM"));
         Assert.assertTrue(stockSymbols.contains("HAL"));
         
-        Assert.assertTrue(symbolMapper.getIsBond("GB00BTLX1Q39"));
+        SymbolMapperEntry symbolMapperEntry = null;
+        Assert.assertTrue(symbolMapper.isBond("GB00BTLX1Q39"));
+        symbolMapperEntry = symbolMapper.getSymbolMapperEntry("GB00BTLX1Q39");
+        Assert.assertNotNull(symbolMapperEntry);
+        Assert.assertTrue(symbolMapperEntry.isBond());
+        Assert.assertNull(symbolMapperEntry.getBondDivider());
 
+        Assert.assertTrue(symbolMapper.isBond("GB00BTLX1Q39-100"));
+        symbolMapperEntry = symbolMapper.getSymbolMapperEntry("GB00BTLX1Q39-100");
+        Assert.assertNotNull(symbolMapperEntry);
+        Assert.assertTrue(symbolMapperEntry.isBond());
+        Assert.assertNotNull(symbolMapperEntry.getBondDivider());
+        Assert.assertEquals(100, symbolMapperEntry.getBondDivider().intValue());
     }
 
     private CsvReader getCsvReader(String id) throws IOException {

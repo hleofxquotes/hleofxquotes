@@ -177,9 +177,10 @@ public class FxTableUtils {
             FxTable fxTable) {
         Price price = qsPrice.clonePrice();
 
+//        SymbolMapperEntry foundEntry = null;
         String fromCurrency = null;
         String toCurrency = null;
-
+        
         List<SymbolMapperEntry> entries = symbolMapper.getMapByQuotesSourceSymbol().get(qsSymbol);
         if (entries != null) {
             for (SymbolMapperEntry entry : entries) {
@@ -192,6 +193,7 @@ public class FxTableUtils {
                     toCurrency = to;
                 }
                 if ((!StringUtils.isBlank(fromCurrency)) && (!StringUtils.isBlank(toCurrency))) {
+//                    foundEntry = entry;
                     break;
                 }
             }
@@ -237,9 +239,26 @@ public class FxTableUtils {
             double oldPrice = qsPrice.getPrice();
             price.setPrice(qsPrice.getPrice() * rate);
             price.setCurrency(toCurrency);
+            
             double newPrice = price.getPrice();
             LOGGER.info(
                     "FX - Converting price for symbol=" + qsSymbol + ", qsPrice=" + oldPrice + ", price=" + newPrice);
+        }
+        
+        // now handle bond divider
+        SymbolMapperEntry foundEntry = symbolMapper.getSymbolMapperEntry(qsSymbol);
+        if (foundEntry != null) {
+            if (foundEntry.isBond()) {
+                Integer divider = foundEntry.getBondDivider();
+                if (divider != null) {
+                    double oldPrice = qsPrice.getPrice();
+                    price.setPrice(qsPrice.getPrice() / divider);
+
+                    double newPrice = price.getPrice();
+                    LOGGER.info(
+                            "BOND - Converting price for symbol=" + qsSymbol + ", qsPrice=" + oldPrice + ", price=" + newPrice);
+                }
+            }
         }
 
         return price;
