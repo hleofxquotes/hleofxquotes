@@ -91,7 +91,7 @@ public final class StockPricesReceivedTask implements Runnable {
         }
 
         updatePriceList(prices, this.gui.getPriceList());
-        updateConvertedPriceList(prices, this.gui.getConvertedPriceList());
+        List<AbstractStockPrice> convertedPrices = updateConvertedPriceList(prices, this.gui.getConvertedPriceList());
 
         List<AbstractStockPrice> newExchangeRates = null;
         if (quoteSource != null) {
@@ -102,7 +102,7 @@ public final class StockPricesReceivedTask implements Runnable {
 
         try {
             boolean onePerFile = quoteSource.isHistoricalQuotes();
-            List<File> ofxFiles = this.gui.saveToOFX(prices, symbolMapper, fxTable, onePerFile);
+            List<File> ofxFiles = this.gui.saveToOFX(convertedPrices, symbolMapper, fxTable, onePerFile);
             for (File ofxFile : ofxFiles) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("ofxFile=" + ofxFile);
@@ -166,23 +166,29 @@ public final class StockPricesReceivedTask implements Runnable {
         }
     }
 
-    private void updatePriceList(List<AbstractStockPrice> prices, EventList<AbstractStockPrice> priceList) {
-        priceList.getReadWriteLock().writeLock().lock();
+    private void updateEventList(List<AbstractStockPrice> prices, EventList<AbstractStockPrice> eventList) {
+        eventList.getReadWriteLock().writeLock().lock();
         try {
-            priceList.clear();
-            priceList.addAll(prices);
+            eventList.clear();
+            eventList.addAll(prices);
         } finally {
-            priceList.getReadWriteLock().writeLock().unlock();
+            eventList.getReadWriteLock().writeLock().unlock();
         }
     }
-
-    private void updateConvertedPriceList(List<AbstractStockPrice> prices, EventList<AbstractStockPrice> priceList) {
+    
+    private void updatePriceList(List<AbstractStockPrice> prices, EventList<AbstractStockPrice> eventList) {
+        updateEventList(prices, eventList);
+    }
+    
+    private List<AbstractStockPrice> updateConvertedPriceList(List<AbstractStockPrice> prices, EventList<AbstractStockPrice> eventList) {
+        List<AbstractStockPrice> convertedPrices = null;
         try {
-            List<AbstractStockPrice> convertedPrices = toConvertedPrices(prices);
-            updatePriceList(convertedPrices, priceList);
+            convertedPrices = toConvertedPrices(prices);
+            updateEventList(convertedPrices, eventList);
         } catch (CloneNotSupportedException e) {
             LOGGER.error(e, e);
         }
+        return convertedPrices;
     }
 
     private List<AbstractStockPrice> toConvertedPrices(List<AbstractStockPrice> prices)
@@ -215,6 +221,8 @@ public final class StockPricesReceivedTask implements Runnable {
                     symbolMapper, fxTable);
         }
         convertedPrice.setLastPrice(lastPrice);
+        convertedPrice.setCurrency(lastPrice.getCurrency());
+        
         return convertedPrice;
     }
 }

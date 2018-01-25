@@ -717,18 +717,7 @@ public class OfxPriceInfo {
         if (currency != null) {
             Enum currencyEnum = CurrencyEnum.Enum.forString(currency);
             if (currencyEnum != null) {
-                Currency c = investmentPosition.addNewCURRENCY();
-                c.setCURSYM(currencyEnum);
-                String curRate = getCurRate(currency);
-                if (curRate == null) {
-                    curRate = DEFAULT_CURRATE;
-                    String comment = "Using default currency rate of " + curRate + " which is likely WRONG";
-                    insertComment(c, comment);
-                    comment = "Suggesting using fx.cvs file or add symbol " + currency + "USD=X";
-                    insertComment(c, comment);
-                }
-                c.setCURRATE(curRate);
-                investmentPosition.setCURRENCY(c);
+                addCURRENCYNode(currency, investmentPosition, currencyEnum);
             } else {
                 LOGGER.warn("Cannot lookup CurrencyEnum for currency=" + currency);
             }
@@ -736,6 +725,8 @@ public class OfxPriceInfo {
         investmentPosition.setMEMO(memo);
         return investmentPosition;
     }
+
+
 
     /**
      * Insert comment.
@@ -954,23 +945,27 @@ public class OfxPriceInfo {
         Double price = stockPrice.getLastPrice().getPrice();
 
         // TODO: bond is quoted in 100 unit
-        boolean isBond = isBond(stockPrice, symbolMapper);
-        if (isBond) {
-            Integer bondDivider = null;
-            if (symbolMapper != null) {
-                SymbolMapperEntry entry = symbolMapper.getSymbolMapperEntry(stockPrice.getStockSymbol());
-                if (entry != null) {
-                    bondDivider = entry.getBondDivider();
+        // We are using convertedPrices which already taken care of this bond/100 conversion
+        boolean doBondDivider = false;
+        if (doBondDivider) {
+            boolean isBond = isBond(stockPrice, symbolMapper);
+            if (isBond) {
+                Integer bondDivider = null;
+                if (symbolMapper != null) {
+                    SymbolMapperEntry entry = symbolMapper.getSymbolMapperEntry(stockPrice.getStockSymbol());
+                    if (entry != null) {
+                        bondDivider = entry.getBondDivider();
+                    }
+
                 }
-                
-            }
-            
-            if (bondDivider != null) {
-                price = price / bondDivider.intValue();
-            }
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("isBond=" + isBond);
-                LOGGER.debug("  new price=" + price);
+
+                if (bondDivider != null) {
+                    price = price / bondDivider.intValue();
+                }
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("isBond=" + isBond);
+                    LOGGER.debug("  new price=" + price);
+                }
             }
         }
 
@@ -1212,24 +1207,51 @@ public class OfxPriceInfo {
                 currencyEnum = CurrencyEnum.Enum.forString(currency.toUpperCase());
             }
             if (currencyEnum != null) {
-                Currency ofxCurrency = secInfo.addNewCURRENCY();
-                ofxCurrency.setCURSYM(currencyEnum);
-                String curRate = getCurRate(currency);
-                if (curRate == null) {
-                    curRate = DEFAULT_CURRATE;
-                    String comment = "Using default currency rate of " + curRate + " which is likely WRONG";
-                    insertComment(ofxCurrency, comment);
-                    comment = "Suggesting using fx.cvs file or add symbol " + currency + "USD=X";
-                    insertComment(ofxCurrency, comment);
-                }
-                ofxCurrency.setCURRATE(curRate);
-                secInfo.setCURRENCY(ofxCurrency);
+                addCURRENCYNode(currency, secInfo, currencyEnum);
             } else {
                 LOGGER.warn("Cannot lookup CurrencyEnum for currency=" + currency);
             }
         }
         secInfo.setMEMO(memo);
         return secInfo;
+    }
+    
+    private void addCURRENCYNode(String currency, InvestmentPosition investmentPosition, Enum currencyEnum) {
+        Currency ofxCurrency = investmentPosition.addNewCURRENCY();
+
+        String defaultCurrency = curDef.toString();
+        if (currency.compareToIgnoreCase(defaultCurrency) == 0) {
+            String comment = "Price currency is same as default currency";
+            insertComment(ofxCurrency, comment);
+        }
+        
+        populateOfxCurrency(currency, currencyEnum, ofxCurrency);
+        investmentPosition.setCURRENCY(ofxCurrency);
+    }
+
+    private void addCURRENCYNode(String currency, GeneralSecurityInfo secInfo, Enum currencyEnum) {
+        Currency ofxCurrency = secInfo.addNewCURRENCY();
+        
+        String defaultCurrency = curDef.toString();
+        if (currency.compareToIgnoreCase(defaultCurrency) == 0) {
+            String comment = "Price currency is same as default currency";
+            insertComment(ofxCurrency, comment);
+        }
+        
+        populateOfxCurrency(currency, currencyEnum, ofxCurrency);
+        secInfo.setCURRENCY(ofxCurrency);
+    }
+    private void populateOfxCurrency(String currency, Enum currencyEnum, Currency ofxCurrency) {
+        ofxCurrency.setCURSYM(currencyEnum);
+        String curRate = getCurRate(currency);
+        if (curRate == null) {
+            curRate = DEFAULT_CURRATE;
+            String comment = "Using default currency rate of " + curRate + " which is likely WRONG";
+            insertComment(ofxCurrency, comment);
+            comment = "Suggesting using fx.cvs file or add symbol " + currency + "USD=X";
+            insertComment(ofxCurrency, comment);
+        }
+        ofxCurrency.setCURRATE(curRate);
     }
 
     private String getCurRate(String currency) {

@@ -235,14 +235,19 @@ public class FxTableUtils {
                 }
             }
         }
+        
+        Double fxPrice = null;
         if (rate != null) {
             double oldPrice = qsPrice.getPrice();
-            price.setPrice(qsPrice.getPrice() * rate);
+            price.setPrice(oldPrice * rate);
             price.setCurrency(toCurrency);
             
-            double newPrice = price.getPrice();
+            fxPrice = price.getPrice();
+            String fxCurrency = price.getCurrency();
             LOGGER.info(
-                    "FX - Converting price for symbol=" + qsSymbol + ", qsPrice=" + oldPrice + ", price=" + newPrice);
+                    "FX - Converting price for symbol=" + qsSymbol + ", oldPrice=" + oldPrice + ", "
+                            + "fxPrice=" + fxPrice + ", fxCurrency=" + fxCurrency
+                            );
         }
         
         // now handle bond divider
@@ -252,11 +257,14 @@ public class FxTableUtils {
                 Integer divider = foundEntry.getBondDivider();
                 if (divider != null) {
                     double oldPrice = qsPrice.getPrice();
-                    price.setPrice(qsPrice.getPrice() / divider);
+                    if (fxPrice != null) {
+                        oldPrice = fxPrice;
+                    }
+                    price.setPrice(oldPrice / divider);
 
-                    double newPrice = price.getPrice();
+                    double bondPrice = price.getPrice();
                     LOGGER.info(
-                            "BOND - Converting price for symbol=" + qsSymbol + ", qsPrice=" + oldPrice + ", price=" + newPrice);
+                            "BOND - Converting price for symbol=" + qsSymbol + ", oldPrice=" + oldPrice + ", bondPrice=" + bondPrice);
                 }
             }
         }
