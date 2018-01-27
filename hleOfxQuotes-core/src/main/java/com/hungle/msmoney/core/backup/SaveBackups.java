@@ -41,11 +41,13 @@ public class SaveBackups {
     private static final Logger LOGGER = Logger.getLogger(SaveBackups.class);
 
     private SaveBackupsListener saveBackupsListener;
+    
+    private SaveBackupsResult result;
 
     /**
      * The Class BackupFile.
      */
-    private class DailyFile {
+    private static final class DailyFile {
 
         /** The file. */
         private final File file;
@@ -108,7 +110,7 @@ public class SaveBackups {
     }
 
     /** The backup files. */
-    private Map<Calendar, DailyFile> dailyFiles = new TreeMap<Calendar, DailyFile>();
+    private Map<Calendar, DailyFile> dailyFilesMap = new TreeMap<Calendar, DailyFile>();
 
     // To use 256 bit keys, you need the "unlimited strength" encryption policy
     /** The number of bits. */
@@ -124,56 +126,74 @@ public class SaveBackups {
      *            the out dir
      * @param password
      *            the password
+     * @return 
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    public void saveBackups(File fromDir, File toDir, String password) throws IOException {
+    public SaveBackupsResult saveBackups(File fromDir, File toDir, String password) throws IOException {
+        result = new SaveBackupsResult();
+        StopWatch stopWatch = new StopWatch();
+//        result.setStarted(stopWatch.click());
+
         try {
             if (saveBackupsListener != null) {
                 saveBackupsListener.notifyStartBackup();
             }
-            updateDailyFiles(fromDir);
+            updateFilesMap(fromDir, dailyFilesMap);
 
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
-            for (DailyFile dailyFile : dailyFiles.values()) {
-                String dateString = formatter.format(dailyFile.getCalendar().getTime());
+            SimpleDateFormat dirNameFormatter = new SimpleDateFormat("yyyy/MM/dd");
+            for (DailyFile dailyFile : dailyFilesMap.values()) {
+                String dirName = dirNameFormatter.format(dailyFile.getCalendar().getTime());
                 LOGGER.info("###");
-                LOGGER.info("> date=" + dateString);
-                File dir = new File(toDir, dateString);
+                LOGGER.info("> dirName=" + dirName);
+                File dir = new File(toDir, dirName);
                 if (!dir.exists()) {
                     dir.mkdirs();
                 }
+                boolean copied = false;
                 try {
                     if (saveBackupsListener != null) {
-                        saveBackupsListener.notifyStartCopyFile(dailyFile.getFile(), dailyFiles.size());
+                        saveBackupsListener.notifyStartCopyFile(dailyFile.getFile(), dirName, dailyFilesMap.size());
                     }
-                    copyFileToDir(dailyFile.getFile(), dir, password);
+                    copied = copyFileToDir(dailyFile.getFile(), dir, password);
+                    if (copied) {
+                        result.incCopiedCount();
+                    }
+                    result.intCount();
                 } finally {
                     if (saveBackupsListener != null) {
-                        saveBackupsListener.notifyDoneCopyFile(dailyFile.getFile(), dailyFiles.size());
+                        saveBackupsListener.notifyDoneCopyFile(copied, dailyFile.getFile(), dirName, dailyFilesMap.size());
                     }
                 }
             }
         } finally {
+            result.setElapsed(stopWatch.click());
+
             if (saveBackupsListener != null) {
                 saveBackupsListener.notifyDoneBackup();
             }
         }
+        return result;
     }
 
-    private void updateDailyFiles(File fromDir) {
+    /**
+     * 
+     * @param fromDir
+     * @param dailyFilesMap 
+     */
+    private static final void updateFilesMap(File fromDir, Map<Calendar, DailyFile> dailyFilesMap) {
         File[] files = fromDir.listFiles();
-        dailyFiles.clear();
+        dailyFilesMap.clear();
         for (File file : files) {
             DailyFile dailyFile = new DailyFile(file);
             Calendar key = dailyFile.getCalendar();
-            DailyFile currentDailyFile = dailyFiles.get(key);
+            DailyFile currentDailyFile = dailyFilesMap.get(key);
             if (currentDailyFile == null) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("New file for cal=" + key.getTime());
                     LOGGER.debug("    > " + dailyFile.getFile());
                 }
-                dailyFiles.put(key, dailyFile);
+                dailyFilesMap.put(key, dailyFile);
             } else {
                 if (dailyFile.getLastModified() > currentDailyFile.getLastModified()) {
                     if (LOGGER.isDebugEnabled()) {
@@ -181,7 +201,7 @@ public class SaveBackups {
                         LOGGER.debug("    < " + currentDailyFile.getFile());
                         LOGGER.debug("    > " + dailyFile.getFile());
                     }
-                    dailyFiles.put(key, dailyFile);
+                    dailyFilesMap.put(key, dailyFile);
                 }
             }
         }
@@ -196,19 +216,20 @@ public class SaveBackups {
      *            the to dir
      * @param password
      *            the password
+     * @return 
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    private void copyFileToDir(File fromFile, File toDir, String password) throws IOException {
-        File latestFile = getLatestFile(toDir);
-        if (latestFile != null) {
-            DailyFile currentDailyFile = new DailyFile(latestFile);
+    private boolean copyFileToDir(File fromFile, File toDir, String password) throws IOException {
+        File lastModifiedFile = getLastModifiedFile(toDir);
+        if (lastModifiedFile != null) {
+            DailyFile currentDailyFile = new DailyFile(lastModifiedFile);
             DailyFile dailyFile = new DailyFile(fromFile);
             if (dailyFile.getLastModified() <= currentDailyFile.getLastModified()) {
                 LOGGER.info("Already has latest backup file for toDir=" + toDir);
                 LOGGER.info("  currentBackupFile=" + currentDailyFile.getFile());
                 LOGGER.info("  backupFile=" + dailyFile.getFile());
-                return;
+                return false;
             }
         }
 
@@ -224,6 +245,8 @@ public class SaveBackups {
             long delta = stopWatch.click();
             LOGGER.info("< DONE, delta=" + delta);
         }
+        
+        return true;
     }
 
     /**
@@ -249,7 +272,7 @@ public class SaveBackups {
         }
     }
 
-    public void copyFile(File fromFile, File toFile) throws IOException {
+    private void copyFile(File fromFile, File toFile) throws IOException {
         copyFileUsingStandardCopyOption(fromFile, toFile);
     }
 
@@ -332,27 +355,27 @@ public class SaveBackups {
     /**
      * Gets the latest file.
      *
-     * @param toDir
+     * @param dir
      *            the to dir
      * @return the latest file
      */
-    private File getLatestFile(File toDir) {
-        File latestFile = null;
+    private static final File getLastModifiedFile(File dir) {
+        File lastModifiedFile = null;
 
-        File[] files = toDir.listFiles();
+        File[] files = dir.listFiles();
         if (files != null) {
             for (File file : files) {
-                if (latestFile == null) {
-                    latestFile = file;
+                if (lastModifiedFile == null) {
+                    lastModifiedFile = file;
                 } else {
-                    if (file.lastModified() > latestFile.lastModified()) {
-                        latestFile = file;
+                    if (file.lastModified() > lastModifiedFile.lastModified()) {
+                        lastModifiedFile = file;
                     }
                 }
             }
         }
 
-        return latestFile;
+        return lastModifiedFile;
     }
 
     /**
@@ -392,10 +415,6 @@ public class SaveBackups {
                 }
             }
         }
-    }
-
-    public SaveBackupsListener getSaveBackups() {
-        return saveBackupsListener;
     }
 
     public void setSaveBackupsListener(SaveBackupsListener saveBackupsListener) {

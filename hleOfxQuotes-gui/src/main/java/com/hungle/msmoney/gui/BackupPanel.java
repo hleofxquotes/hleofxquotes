@@ -12,15 +12,19 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
 
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.backup.SaveBackups;
 import com.hungle.msmoney.core.backup.SaveBackupsListener;
+import com.hungle.msmoney.core.backup.SaveBackupsResult;
 import com.hungle.msmoney.core.misc.CheckNullUtils;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -58,6 +62,9 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
 
     private int fileCount;
 
+    private StyledDocument outputDoc;
+
+
     private final class SaveBackupsAction implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
             if (fromDir == null) {
@@ -81,12 +88,14 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
                     SaveBackups saveBackups = new SaveBackups();
                     saveBackups.setSaveBackupsListener(BackupPanel.this);
                     LOGGER.info("> START BACKUP");
+                    SaveBackupsResult result = null;
                     try {
                         String password = null;
-                        saveBackups.saveBackups(fromDir, toDir, password);
+                        result = saveBackups.saveBackups(fromDir, toDir, password);
                     } catch (IOException e) {
                         LOGGER.error(e, e);
                     } finally {
+                        LOGGER.info(result);
                         LOGGER.info("< DONE BACKUP");
                     }
                 }
@@ -104,17 +113,9 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
 
         setLayout(new FormLayout(new ColumnSpec[] {
                 FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,
-                FormSpecs.RELATED_GAP_COLSPEC,
                 ColumnSpec.decode("default:grow"),
                 FormSpecs.RELATED_GAP_COLSPEC,
                 ColumnSpec.decode("default:grow"),
-                FormSpecs.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("default:grow"),
-                FormSpecs.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("default:grow"),
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,
                 FormSpecs.RELATED_GAP_COLSPEC,
                 FormSpecs.DEFAULT_COLSPEC,},
             new RowSpec[] {
@@ -127,24 +128,23 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
                 FormSpecs.RELATED_GAP_ROWSPEC,
                 FormSpecs.DEFAULT_ROWSPEC,
                 FormSpecs.RELATED_GAP_ROWSPEC,
-                FormSpecs.DEFAULT_ROWSPEC,
-                FormSpecs.RELATED_GAP_ROWSPEC,
-                FormSpecs.MIN_ROWSPEC,
-                FormSpecs.RELATED_GAP_ROWSPEC,
-                RowSpec.decode("default:grow"),
-                FormSpecs.RELATED_GAP_ROWSPEC,
-                RowSpec.decode("default:grow"),}));
+                RowSpec.decode("max(79dlu;min)"),}));
 
         JLabel lblNewJgoodiesTitle = DefaultComponentFactory.getInstance().createTitle("Backup Organizer");
         lblNewJgoodiesTitle.setHorizontalAlignment(SwingConstants.TRAILING);
-        add(lblNewJgoodiesTitle, "4, 2");
+        add(lblNewJgoodiesTitle, "2, 2");
+        
+        JTextPane txtpnThisToolWill = new JTextPane();
+        txtpnThisToolWill.setEditable(false);
+        txtpnThisToolWill.setText("This tool will copy backup files \r\nfrom ‘From dir’ to ‘To dir’ \r\nand put them into an hierarchical directory structure\r\nin format YYYY/MM/DD (for example: 2018/01/30)");
+        add(txtpnThisToolWill, "4, 2, 3, 1, fill, fill");
 
         JLabel lblNewJgoodiesLabel = DefaultComponentFactory.getInstance().createLabel("From dir");
         lblNewJgoodiesLabel.setHorizontalAlignment(SwingConstants.TRAILING);
-        add(lblNewJgoodiesLabel, "4, 4, right, default");
+        add(lblNewJgoodiesLabel, "2, 4, right, default");
 
         fromDirTextField = new JTextField();
-        add(fromDirTextField, "6, 4, 5, 1, fill, default");
+        add(fromDirTextField, "4, 4, fill, default");
         fromDirTextField.setColumns(10);
         String pathName = GUI.PREFS.get(fromDirPrefKey, null);
         if (!CheckNullUtils.isEmpty(pathName)) {
@@ -169,14 +169,14 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
                 GUI.PREFS.put(fromDirPrefKey, path);
             }
         });
-        add(fromDirButton, "12, 4");
+        add(fromDirButton, "6, 4");
 
         JLabel lblNewJgoodiesLabel_1 = DefaultComponentFactory.getInstance().createLabel("To dir");
         lblNewJgoodiesLabel_1.setHorizontalAlignment(SwingConstants.TRAILING);
-        add(lblNewJgoodiesLabel_1, "4, 6, right, default");
+        add(lblNewJgoodiesLabel_1, "2, 6, right, default");
 
         toDirTextField = new JTextField();
-        add(toDirTextField, "6, 6, 5, 1, fill, default");
+        add(toDirTextField, "4, 6, fill, default");
         toDirTextField.setColumns(10);
         pathName = GUI.PREFS.get(toDirPrefKey, null);
         if (!CheckNullUtils.isEmpty(pathName)) {
@@ -201,7 +201,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
                 GUI.PREFS.put(toDirPrefKey, path);
             }
         });
-        add(toDirButton, "12, 6");
+        add(toDirButton, "6, 6");
 
         backupButton = new JButton("Organize");
         backupButton.setEnabled(true);
@@ -209,17 +209,21 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         backupButton.addActionListener(new SaveBackupsAction());
 
         progressBar = new JProgressBar();
-        add(progressBar, "6, 10, 5, 1");
+        add(progressBar, "4, 8");
         progressBar.setMinimum(0);
         progressBar.setMaximum(100);
         progressBar.setValue(0);
-        progressBar.setString(null);
-        add(backupButton, "12, 10");
+//        progressBar.setString(null);
+        add(backupButton, "6, 8");
         
-        JTextPane txtpnThisToolWill = new JTextPane();
-        txtpnThisToolWill.setEditable(false);
-        txtpnThisToolWill.setText("This tool will copy backup files from ‘From dir’ to ‘To dir’ and put them into\nan hierarchical directory structure\nYYYY/MM/DD");
-        add(txtpnThisToolWill, "4, 14, 9, 1, fill, fill");
+        JScrollPane scrollPane = new JScrollPane();
+        add(scrollPane, "2, 10, 5, 1, fill, fill");
+        
+        JTextPane outputTextPane = new JTextPane();
+        outputDoc = outputTextPane.getStyledDocument();
+
+        scrollPane.setViewportView(outputTextPane);
+        outputTextPane.setEditable(false);
     }
 
     public void setThreadPool(ExecutorService threadPool) {
@@ -233,10 +237,18 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
-                LOGGER.info("> notifyStartBackup");
+                String message = "> START"
+                        + "\r\n"
+                        ;
+                try {
+                    outputDoc.insertString(outputDoc.getLength(), message, null);
+                } catch (BadLocationException e) {
+                    LOGGER.warn(e);
+                }
+                
                 backupButton.setEnabled(false);
                 progressBar.setValue(0);
-                progressBar.setString(null);
+//                progressBar.setString(null);
             }
         };
         try {
@@ -249,15 +261,23 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
     }
 
     @Override
-    public void notifyStartCopyFile(File file, int size) {
+    public void notifyStartCopyFile(File file, String dirName, int size) {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
                 int progress = (fileCount * 100) / size;
-                LOGGER.info("> notifyStartCopyFile, progress=" + progress + ", fileCount=" + fileCount + ", size=" + size);
-
+//                String message = "> notifyStartCopyFile, progress=" + progress 
+//                        + ", fileCount=" + fileCount + ", size=" + size
+//                        + "\r\n"
+//                        ;
+//                try {
+//                    outputDoc.insertString(outputDoc.getLength(), message, null);
+//                } catch (BadLocationException e) {
+//                    LOGGER.warn(e);
+//                }
+                
                 progressBar.setValue(progress);
-                progressBar.setString(fileCount + "/" + size);
+//                progressBar.setString(fileCount + "/" + size);
             }
         };
         try {
@@ -274,7 +294,14 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
-                LOGGER.info("> notifyCopyFile, " + fromFile + " -> " + toFile);
+//                String message = "> notifyCopyFile, " + fromFile + " -> " + toFile
+//                        + "\r\n"
+//                        ;
+//                try {
+//                    outputDoc.insertString(outputDoc.getLength(), message, null);
+//                } catch (BadLocationException e) {
+//                    LOGGER.warn(e);
+//                }
             }
         };
         try {
@@ -287,12 +314,27 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
     }
 
     @Override
-    public void notifyDoneCopyFile(File file, int size) {
+    public void notifyDoneCopyFile(final boolean copied, File file, String dirName, int size) {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
                 fileCount++;
-                LOGGER.info("> notifyDoneCopyFile, fileCount= + fileCount");
+                String message = null;
+                if (copied) {
+                    message = "COPIED file=" + file.getName() 
+                        + " toDir=" + dirName
+                        + "\r\n";
+                } else {
+                    message = "SKIP file=" + file.getName()
+                        + "\r\n";
+                }
+                if (copied) {
+                    try {
+                        outputDoc.insertString(outputDoc.getLength(), message, null);
+                    } catch (BadLocationException e) {
+                        LOGGER.warn(e);
+                    }
+                }
             }
         };
         try {
@@ -309,10 +351,16 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
-                LOGGER.info("> notifyDoneBackup");
-
+                String message = "< DONE"
+                        + "\r\n"
+                        ;
+                try {
+                    outputDoc.insertString(outputDoc.getLength(), message, null);
+                } catch (BadLocationException e) {
+                    LOGGER.warn(e);
+                }
                 progressBar.setValue(100);
-                progressBar.setString(null);
+//                progressBar.setString(null);
 
                 backupButton.setEnabled(true);
             }

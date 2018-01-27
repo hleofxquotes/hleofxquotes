@@ -8,9 +8,9 @@ public interface SaveBackupsListener {
 
     void notifyStartBackup();
 
-    void notifyStartCopyFile(File file, int size);
+    void notifyStartCopyFile(File file, String dirName, int size);
 
-    void notifyDoneCopyFile(File file, int size);
+    void notifyDoneCopyFile(boolean copied, File file, String dirName, int size);
 
     void notifyDoneBackup();
 
