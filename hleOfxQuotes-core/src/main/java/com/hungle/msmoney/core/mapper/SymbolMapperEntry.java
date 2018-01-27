@@ -244,10 +244,12 @@ public class SymbolMapperEntry {
         } else if (CheckNullUtils.isEmpty(msMoneySymbol)) {
             msMoneySymbol = getQuotesSourceSymbol();
             setMsMoneySymbol(msMoneySymbol);
-        } else {
+        } else if (CheckNullUtils.isEmpty(quotesSourceSymbol)) {
             // CheckNullUtils.isEmpty(quotesSourceSymbol)
             quotesSourceSymbol = getMsMoneySymbol();
             setQuotesSourceSymbol(quotesSourceSymbol);
+        } else {
+            // Both values are already set
         }
 
         // IsMutualFund

@@ -117,9 +117,18 @@ public class SymbolMapper {
         String newKey = newEntry.getQuotesSourceSymbol() + newEntry.getMsMoneySymbol();
         for (SymbolMapperEntry entry : entries) {
             String key = entry.getQuotesSourceSymbol() + entry.getMsMoneySymbol();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("MERGE, key=" + key);
+            }
             if (key.compareToIgnoreCase(newKey) == 0) {
                 count++;
-                merge(newEntry, entry);
+                if (LOGGER.isDebugEnabled()) {
+                LOGGER.info("PRE_MERGE, symbolMapperEntry=" + entry);
+                    merge(newEntry, entry);
+                }
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.info("POST_MERGE, symbolMapperEntry=" + entry);
+                }
             }
         }
 
