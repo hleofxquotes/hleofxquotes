@@ -145,6 +145,5 @@ public class SymbolMapperTest {
         entry = list.get(0);
         Assert.assertEquals("IBM", entry.getMsMoneySymbol());
         Assert.assertEquals("IBM", entry.getQuotesSourceSymbol());
-
     }
 }

@@ -127,7 +127,7 @@ public class MetaStockSymbolTest {
         SymbolMapper symbolMapper = new SymbolMapper();
         symbolMapper.load(getCsvReader("AddAttributes"));
         
-        String[] list2 = {
+        String[] symbolsWithAttributes = {
                 "GB0033772517",
                 "ALO:PAR",
                 "GB00BTLX1Q39/USD/GBP",
@@ -137,17 +137,18 @@ public class MetaStockSymbolTest {
                 "GB00B2PLJJ36/GBX/GBP",
                 "XMRC:LSE:GBX",
                 "XMRC:LSE:GBX/GBX/GBP",
-                "IBM/HAL"
+                "IBM/HAL",
+                "IE00B3BMD843/ IE00B3BMD843.IR"
         };
         List<String> stockSymbols = new ArrayList<String>();
-        stockSymbols.addAll(Arrays.asList(list2));
+        stockSymbols.addAll(Arrays.asList(symbolsWithAttributes));
         symbolMapper.addAttributes(stockSymbols);
         
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(stockSymbols);
         }
         
-        Assert.assertEquals(list2.length, stockSymbols.size());
+        Assert.assertEquals(symbolsWithAttributes.length, stockSymbols.size());
         Assert.assertTrue(stockSymbols.contains("GB0033772517"));
         
         Assert.assertTrue(stockSymbols.contains("ALO:PAR"));
@@ -178,6 +179,7 @@ public class MetaStockSymbolTest {
         Assert.assertTrue(stockSymbols.contains("HAL"));
         
         SymbolMapperEntry symbolMapperEntry = null;
+
         Assert.assertTrue(symbolMapper.isBond("GB00BTLX1Q39"));
         symbolMapperEntry = symbolMapper.getSymbolMapperEntry("GB00BTLX1Q39");
         Assert.assertNotNull(symbolMapperEntry);
@@ -190,6 +192,15 @@ public class MetaStockSymbolTest {
         Assert.assertTrue(symbolMapperEntry.isBond());
         Assert.assertNotNull(symbolMapperEntry.getBondDivider());
         Assert.assertEquals(100, symbolMapperEntry.getBondDivider().intValue());
+        
+        //                 "IE00B3BMD843/ IE00B3BMD843.IR"
+        Assert.assertTrue(symbolMapper.isBond("IE00B3BMD843"));
+        Assert.assertTrue(symbolMapper.isBond("IE00B3BMD843.IR"));
+        symbolMapperEntry = symbolMapper.getSymbolMapperEntry("GB00BTLX1Q39");
+        Assert.assertNotNull(symbolMapperEntry);
+        Assert.assertTrue(symbolMapperEntry.isBond());
+        Assert.assertNull(symbolMapperEntry.getBondDivider());
+
     }
 
     private CsvReader getCsvReader(String id) throws IOException {
