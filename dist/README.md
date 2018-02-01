@@ -1,7 +1,7 @@
 # hleofxquotes Distribution Directory
 
 Current release is
-  * [hleOfxQuotes-gui-Build_20180103_172.zip](hleOfxQuotes-gui-Build_20180103_172.zip) (see [README-Build_20180103_172.txt](README-Build_20180103_172.txt))
+  * [hleOfxQuotes-gui-Build_20180201_190.zip](hleOfxQuotes-gui-Build_20180201_190.zip) (see [README-Build_20180201_190.txt](README-Build_20180201_190.txt))
   
  ### Other directories:
  
