@@ -1,9 +1,15 @@
 package com.hungle.msmoney.core.backup;
 
+import static org.apache.commons.codec.digest.MessageDigestAlgorithms.MD5;
+import static org.apache.commons.codec.digest.MessageDigestAlgorithms.SHA_256;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
@@ -25,6 +31,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.encryption.EncryptionHelper;
@@ -41,7 +48,7 @@ public class SaveBackups {
     private static final Logger LOGGER = Logger.getLogger(SaveBackups.class);
 
     private SaveBackupsListener saveBackupsListener;
-    
+
     private SaveBackupsResult result;
 
     /**
@@ -126,14 +133,14 @@ public class SaveBackups {
      *            the out dir
      * @param password
      *            the password
-     * @return 
+     * @return
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
     public SaveBackupsResult saveBackups(File fromDir, File toDir, String password) throws IOException {
         result = new SaveBackupsResult();
         StopWatch stopWatch = new StopWatch();
-//        result.setStarted(stopWatch.click());
+        // result.setStarted(stopWatch.click());
 
         try {
             if (saveBackupsListener != null) {
@@ -162,7 +169,8 @@ public class SaveBackups {
                     result.intCount();
                 } finally {
                     if (saveBackupsListener != null) {
-                        saveBackupsListener.notifyDoneCopyFile(copied, dailyFile.getFile(), dirName, dailyFilesMap.size());
+                        saveBackupsListener.notifyDoneCopyFile(copied, dailyFile.getFile(), dirName,
+                                dailyFilesMap.size());
                     }
                 }
             }
@@ -179,7 +187,7 @@ public class SaveBackups {
     /**
      * 
      * @param fromDir
-     * @param dailyFilesMap 
+     * @param dailyFilesMap
      */
     private static final void updateFilesMap(File fromDir, Map<Calendar, DailyFile> dailyFilesMap) {
         File[] files = fromDir.listFiles();
@@ -216,11 +224,15 @@ public class SaveBackups {
      *            the to dir
      * @param password
      *            the password
-     * @return 
+     * @return
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
     private boolean copyFileToDir(File fromFile, File toDir, String password) throws IOException {
+        boolean copied = false;
+
+        File toFile = null;
+
         File lastModifiedFile = getLastModifiedFile(toDir);
         if (lastModifiedFile != null) {
             DailyFile currentDailyFile = new DailyFile(lastModifiedFile);
@@ -229,24 +241,92 @@ public class SaveBackups {
                 LOGGER.info("Already has latest backup file for toDir=" + toDir);
                 LOGGER.info("  currentBackupFile=" + currentDailyFile.getFile());
                 LOGGER.info("  backupFile=" + dailyFile.getFile());
-                return false;
+                // return false;
+                toFile = lastModifiedFile;
+                copied = false;
             }
         }
 
-        File toFile = new File(toDir, fromFile.getName());
-        StopWatch stopWatch = new StopWatch();
+        if (toFile == null) {
+            toFile = new File(toDir, fromFile.getName());
+            StopWatch stopWatch = new StopWatch();
 
-        try {
-            LOGGER.info("> Copying");
-            LOGGER.info("  fromFile=" + fromFile);
-            LOGGER.info("  toFile=" + toFile);
-            copyFile(fromFile, toFile, password);
-        } finally {
-            long delta = stopWatch.click();
-            LOGGER.info("< DONE, delta=" + delta);
+            try {
+                LOGGER.info("> Copying");
+                LOGGER.info("  fromFile=" + fromFile);
+                LOGGER.info("  toFile=" + toFile);
+                copyFile(fromFile, toFile, password);
+                copied = true;
+            } finally {
+                long delta = stopWatch.click();
+                LOGGER.info("< DONE, delta=" + delta);
+            }
         }
-        
-        return true;
+
+        if (toFile != null) {
+            generateHashFiles(toFile);
+        }
+
+        return copied;
+    }
+
+    private void generateHashFiles(File sourceFile) {
+        try {
+            File hashFile = null;
+            String hashName = null;
+
+            hashName = MD5;
+            String md5String = new DigestUtils(hashName).digestAsHex(sourceFile);
+            hashFile = writeHash(md5String, sourceFile.getName(), toHashFile(sourceFile, ".md5"));
+            if (hashFile != null) {
+                LOGGER.info("Created hashFile=" + hashFile.getAbsolutePath());
+            }
+
+            hashName = SHA_256;
+            String sha256String = new DigestUtils(hashName).digestAsHex(sourceFile);
+            hashFile = writeHash(sha256String, sourceFile.getName(), toHashFile(sourceFile, ".sha256"));
+            if (hashFile != null) {
+                LOGGER.info("Created hashFile=" + hashFile.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            LOGGER.warn(e);
+        }
+
+    }
+
+    private File writeHash(String hashString, String sourceFileName, File hashFile) throws IOException {
+        if (hashFile.exists()) {
+            return null;
+        }
+
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(new FileWriter(hashFile));
+            writeHash(hashString, sourceFileName, writer);
+        } finally {
+            if (writer != null) {
+                writer.close();
+                writer = null;
+            }
+        }
+
+        return hashFile;
+    }
+
+    private void writeHash(String hashString, String sourceFileName, PrintWriter writer) {
+        writer.println(hashString + " " + sourceFileName);
+
+    }
+
+    private File toHashFile(File sourceFile, String suffix) {
+        sourceFile = sourceFile.getAbsoluteFile();
+
+        File parentDir = sourceFile.getParentFile();
+        String name = sourceFile.getName();
+        name = name + suffix;
+
+        File hashFile = new File(parentDir, name);
+        return hashFile;
     }
 
     /**
@@ -279,11 +359,10 @@ public class SaveBackups {
     private void copyFileUsingStandardCopyOption(File fromFile, File toFile) throws IOException {
         Path source = fromFile.toPath();
         Path target = toFile.toPath();
-        CopyOption[] options = new CopyOption[] { 
-                StandardCopyOption.REPLACE_EXISTING,
-//                StandardCopyOption.COPY_ATTRIBUTES, 
-//                StandardCopyOption.ATOMIC_MOVE,
-                };
+        CopyOption[] options = new CopyOption[] { StandardCopyOption.REPLACE_EXISTING,
+                // StandardCopyOption.COPY_ATTRIBUTES,
+                // StandardCopyOption.ATOMIC_MOVE,
+        };
         Files.copy(source, target, options);
     }
 
