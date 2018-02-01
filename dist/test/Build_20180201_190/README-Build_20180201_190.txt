@@ -47,3 +47,7 @@ Changes:
     One advantage of this method is that you don't even need to map (change registry) to associate *.qfx file 
     to MsMoney. Tip: enable auto-click to auto-click on the Import dialog: check Tools -> Import dialog auto-click.
 
+  * (Build_20180201_190) - For MsMoney - Support type Bond/100 in mapper.csv file. Some bond price are quoted 
+    in quantity of 100. For those entries, you can specify Type Bond/100 in the mapper.csv file. For example
+MSMoneySymbol,QuotesSourceSymbol,Type
+IE00B3BMD843,IE00B3BMD843.IR,BOND/100
