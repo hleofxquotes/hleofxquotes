@@ -314,7 +314,7 @@ public class SaveBackups {
     }
 
     private void writeHash(String hashString, String sourceFileName, PrintWriter writer) {
-        writer.println(hashString + " " + sourceFileName);
+        writer.println(hashString + " *" + sourceFileName);
 
     }
 
