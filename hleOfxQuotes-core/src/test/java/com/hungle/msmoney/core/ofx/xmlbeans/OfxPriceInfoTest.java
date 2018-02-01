@@ -220,4 +220,9 @@ public class OfxPriceInfoTest {
         Assert.assertNotNull(myDiff);
         Assert.assertFalse(myDiff.toString(), myDiff.hasDifferences());
     }
+    
+    @Test
+    public void testCreateOfxPriceInfo() {
+        
+    }
 }
