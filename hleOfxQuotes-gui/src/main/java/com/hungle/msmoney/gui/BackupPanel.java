@@ -215,6 +215,8 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         progressBar.setMaximum(100);
         progressBar.setValue(0);
 //        progressBar.setString(null);
+        progressBar.setStringPainted(true);
+        progressBar.setIndeterminate(false);
         add(backupButton, "6, 8");
         
         JScrollPane scrollPane = new JScrollPane();

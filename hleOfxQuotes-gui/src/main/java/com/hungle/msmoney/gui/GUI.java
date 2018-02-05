@@ -222,7 +222,7 @@ public class GUI extends JFrame {
     // BasicEventList<SymbolMapperEntry>();
 
     /** The price filter edit. */
-    private JTextField priceFilterEdit;
+//    private JTextField priceFilterEdit;
 
     /** The defaul currency label. */
     private JLabel defaulCurrencyLabel;
@@ -362,9 +362,9 @@ public class GUI extends JFrame {
         getNotFoundPriceList().clear();
 
         // exchangeRates.clear();
-        if (priceFilterEdit != null) {
-            priceFilterEdit.setText("");
-        }
+//        if (priceFilterEdit != null) {
+//            priceFilterEdit.setText("");
+//        }
     }
 
     /**
@@ -1983,7 +1983,7 @@ public class GUI extends JFrame {
         final JPanel view = new JPanel();
         view.setLayout(new BorderLayout());
 
-        priceFilterEdit = new JTextField(10);
+        JTextField priceFilterEdit = new JTextField(10);
         // EventList<AbstractStockPrice> localPriceList = getPriceList();
         PriceTableView<AbstractStockPrice> priceTableView = new PriceTableView<AbstractStockPrice>(priceList, priceFilterEdit,
                 AbstractStockPrice.class, priceTableViewOptions);

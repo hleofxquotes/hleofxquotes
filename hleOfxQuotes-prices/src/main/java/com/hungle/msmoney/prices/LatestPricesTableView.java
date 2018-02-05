@@ -92,5 +92,4 @@ public class LatestPricesTableView<T extends LatestPriceBean> extends AbstractGl
         };
         return stripedTableRenderer;
     }
-
 }

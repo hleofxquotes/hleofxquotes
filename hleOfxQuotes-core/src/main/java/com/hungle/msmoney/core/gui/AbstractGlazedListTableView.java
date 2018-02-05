@@ -1,22 +1,17 @@
 package com.hungle.msmoney.core.gui;
 
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import javax.swing.JFormattedTextField;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
-
-import com.hungle.msmoney.core.stockprice.Price;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
@@ -32,6 +27,43 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 
 public abstract class AbstractGlazedListTableView<T> extends JScrollPane {
+    private final class RowSelectedListener implements ListSelectionListener {
+        private final DefaultEventTableModel<T> tableModel;
+        private final JTable table;
+
+        private RowSelectedListener(DefaultEventTableModel<T> tableModel, JTable table) {
+            this.tableModel = tableModel;
+            this.table = table;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent event) {
+            if (event.getValueIsAdjusting()) {
+                return;
+            }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Rows:");
+                for (int selectedRowIndex : table.getSelectedRows()) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(String.format(" %d", selectedRowIndex));
+                    }
+                }
+                LOGGER.info(". Columns:");
+                for (int selectedColumnIndex : table.getSelectedColumns()) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(String.format(" %d", selectedColumnIndex));
+                    }
+                }
+            }
+
+            for (int selectedRowIndex : table.getSelectedRows()) {
+                rowIndexSelected(selectedRowIndex);
+                T row = tableModel.getElementAt(selectedRowIndex);
+                rowSelected(row);
+            }
+        }
+    }
+
     private static final Logger LOGGER = Logger.getLogger(AbstractGlazedListTableView.class);
 
     /**
@@ -126,44 +158,17 @@ public abstract class AbstractGlazedListTableView<T> extends JScrollPane {
 
         setPreferredWidth(table);
 
-        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        table.getSelectionModel().addListSelectionListener(new RowSelectedListener(tableModel, table));
 
-            @Override
-            public void valueChanged(ListSelectionEvent event) {
-                if (event.getValueIsAdjusting()) {
-                    return;
-                }
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Rows:");
-                    for (int selectedRowIndex : table.getSelectedRows()) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug(String.format(" %d", selectedRowIndex));
-                        }
-                    }
-                    LOGGER.info(". Columns:");
-                    for (int selectedColumnIndex : table.getSelectedColumns()) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug(String.format(" %d", selectedColumnIndex));
-                        }
-                    }
-                }
-
-                for (int selectedRowIndex : table.getSelectedRows()) {
-                    rowIndexSelected(selectedRowIndex);
-                    T row = tableModel.getElementAt(selectedRowIndex);
-                    rowSelected(row);
-                }
-            }
-        });
-
-        NumberFormat paymentFormat = NumberFormat.getCurrencyInstance();
-        JTextField textField = new JFormattedTextField(paymentFormat);
-        TableCellEditor editor = new PriceCellEditor(textField);
-        
-        table.setDefaultEditor(Price.class, editor);
+        setDefaultEditor(table);
         
         return table;
     }
+
+    protected void setDefaultEditor(JTable table) {
+        
+    }
+
 
     protected void rowSelected(T row) {
         LOGGER.info("row=" + row);

@@ -1,17 +1,24 @@
 package com.hungle.msmoney.gui;
 
+import java.text.NumberFormat;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.swing.JFormattedTextField;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+import org.apache.log4j.Logger;
+
 import com.hungle.msmoney.core.gui.AbstractGlazedListTableView;
+import com.hungle.msmoney.core.gui.PriceCellEditor;
 import com.hungle.msmoney.core.gui.PriceTableViewOptions;
 import com.hungle.msmoney.core.gui.StripedTableRenderer;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.core.stockprice.Price;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.TextFilterator;
@@ -24,6 +31,7 @@ import ca.odell.glazedlists.TextFilterator;
  *            the generic type
  */
 public class PriceTableView<T extends AbstractStockPrice> extends AbstractGlazedListTableView<T> {
+    private static final Logger LOGGER = Logger.getLogger(PriceCellEditor.class);
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -38,7 +46,8 @@ public class PriceTableView<T extends AbstractStockPrice> extends AbstractGlazed
 
     private static final int COL_LAST_TRADE_TIME = 4;
 
-    public PriceTableView(EventList<T> priceList, JTextField filterEdit, Class<T> baseClass, PriceTableViewOptions options) {
+    public PriceTableView(EventList<T> priceList, JTextField filterEdit, Class<T> baseClass,
+            PriceTableViewOptions options) {
         super(priceList, filterEdit, baseClass, options);
     }
 
@@ -86,5 +95,34 @@ public class PriceTableView<T extends AbstractStockPrice> extends AbstractGlazed
             }
         };
         return renderer;
+    }
+
+    @Override
+    protected void setDefaultEditor(JTable table) {
+        super.setDefaultEditor(table);
+        
+        NumberFormat paymentFormat = NumberFormat.getCurrencyInstance();
+        JTextField textField = new JFormattedTextField(paymentFormat);
+
+        TableCellEditor editor = new PriceCellEditor<T>(textField, this) {
+
+            @Override
+            protected Object convertRowToType(T row, Object value) {
+                Price price = null;
+                if (value instanceof String) {
+                    try {
+                        Double dPrice = Double.valueOf((String) value);
+                        price = row.getLastPrice().clonePrice();
+                        price.setPrice(dPrice);
+                    } catch (NumberFormatException e) {
+                        LOGGER.warn(e);
+                    }
+                } else {
+                    LOGGER.warn("Cannot convert value=" + value + " into a Price.");
+                }
+                return price;
+            }
+        };
+        table.setDefaultEditor(Price.class, editor);
     }
 }

@@ -981,6 +981,12 @@ public class StatementPanel extends JPanel {
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.debug("< DONE importing fi=" + fiBean.getName());
                             }
+                            long millis = 1 * 1000L;
+                            try {
+                                Thread.sleep(millis);
+                            } catch (InterruptedException e) {
+                                LOGGER.warn(e);
+                            }
                         }
                     }
                 } finally {
