@@ -9,6 +9,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
 import com.hungle.msmoney.core.gui.AbstractGlazedListTableView;
+import com.hungle.msmoney.core.gui.PriceTableViewOptions;
 import com.hungle.msmoney.core.gui.StripedTableRenderer;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 
@@ -27,10 +28,6 @@ public class PriceTableView<T extends AbstractStockPrice> extends AbstractGlazed
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    private static final String PROPERTY_NAMES[] = { "stockSymbol", "stockName", "lastPrice", "lastTradeDate", "lastTradeTime" };
-
-    private static String COLUMN_LABELS[] = { "Symbol", "Name", "Price", "Last Trade Date", "Last Trade Time" };
-
     private static final int COL_SYMBOL = 0;
 
     private static final int COL_NAME = 1;
@@ -41,8 +38,8 @@ public class PriceTableView<T extends AbstractStockPrice> extends AbstractGlazed
 
     private static final int COL_LAST_TRADE_TIME = 4;
 
-    public PriceTableView(EventList<T> priceList, JTextField filterEdit, Class<T> baseClass) {
-        super(priceList, filterEdit, baseClass, PROPERTY_NAMES, COLUMN_LABELS);
+    public PriceTableView(EventList<T> priceList, JTextField filterEdit, Class<T> baseClass, PriceTableViewOptions options) {
+        super(priceList, filterEdit, baseClass, options);
     }
 
     protected void setPreferredWidth(JTable table) {
@@ -83,7 +80,7 @@ public class PriceTableView<T extends AbstractStockPrice> extends AbstractGlazed
             @Override
             public void setCellHorizontalAlignment(int column) {
                 super.setCellHorizontalAlignment(column);
-                if ((column == 0) || (column == 2) || (column == 3)) {
+                if ((column == COL_SYMBOL) || (column == COL_PRICE) || (column == COL_LAST_TRADE_DATE)) {
                     setHorizontalAlignment(SwingConstants.RIGHT);
                 }
             }

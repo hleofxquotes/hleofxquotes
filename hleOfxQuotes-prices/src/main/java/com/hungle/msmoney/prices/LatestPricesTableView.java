@@ -11,6 +11,7 @@ import javax.swing.table.TableCellRenderer;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.gui.AbstractGlazedListTableView;
+import com.hungle.msmoney.core.gui.PriceTableViewOptions;
 import com.hungle.msmoney.core.gui.StripedTableRenderer;
 
 import ca.odell.glazedlists.EventList;
@@ -19,17 +20,13 @@ import ca.odell.glazedlists.TextFilterator;
 public class LatestPricesTableView<T extends LatestPriceBean> extends AbstractGlazedListTableView<T> {
     private static final Logger LOGGER = Logger.getLogger(LatestPricesTableView.class);
 
-    private static final String PROPERTY_NAMES[] = { "symbol", "name", "price", "date", "source" };
-
-    private static String COLUMN_LABELS[] = { "Symbol", "Name", "Price", "Date", "Source" };
-
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
-    public LatestPricesTableView(EventList<T> eventList, JTextField filterEdit, Class<T> baseClass) {
-        super(eventList, filterEdit, baseClass, PROPERTY_NAMES, COLUMN_LABELS);
+    public LatestPricesTableView(EventList<T> eventList, JTextField filterEdit, Class<T> baseClass, PriceTableViewOptions options) {
+        super(eventList, filterEdit, baseClass, options);
     }
 
     @Override

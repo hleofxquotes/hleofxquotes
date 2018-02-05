@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.core.gui.PriceTableViewOptions;
 import com.hungle.sunriise.prices.GetLatestSecurityPrices.Result;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -36,7 +37,13 @@ public class LatestPricesGUI extends AbstractLatestPricesGUI {
 
         latestPriceBeans = new BasicEventList<LatestPriceBean>();
         Class<LatestPriceBean> baseClass = LatestPriceBean.class;
-        LatestPricesTableView<LatestPriceBean> tableView = new LatestPricesTableView<>(latestPriceBeans, filterEdit, baseClass);
+        PriceTableViewOptions priceTableViewOptions = new PriceTableViewOptions();
+        final String propertyName[] = { "symbol", "name", "price", "date", "source" };
+        priceTableViewOptions.setPropertyNames(propertyName);
+        final String columnLabels[] = { "Symbol", "Name", "Price", "Date", "Source" };
+        priceTableViewOptions.setColumnLabels(columnLabels);
+
+        LatestPricesTableView<LatestPriceBean> tableView = new LatestPricesTableView<>(latestPriceBeans, filterEdit, baseClass, priceTableViewOptions);
         return tableView;
     }
 
