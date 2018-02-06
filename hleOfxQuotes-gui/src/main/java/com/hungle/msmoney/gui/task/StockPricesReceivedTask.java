@@ -12,7 +12,6 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.fx.FxTable;
-import com.hungle.msmoney.core.fx.FxTableUtils;
 import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
@@ -50,33 +49,35 @@ public final class StockPricesReceivedTask implements Runnable {
     /** The quote source. */
     private final QuoteSource quoteSource;
 
+    private List<AbstractStockPrice> convertedPrices;
+
     /**
      * Instantiates a new stock prices received task.
-     *
-     * @param prices
-     *            the beans
-     * @param badPrice
-     *            the bad price
-     * @param fxTable
-     *            the fx table
-     * @param hasWrappedShareCount
-     *            the has wrapped share count
-     * @param symbolMapper
-     *            the symbol mapper
-     * @param quoteSource
-     *            the quote source
+     * 
      * @param gui
      *            TODO
+     * @param prices
+     *            the beans
+     * @param quoteSource
+     *            the quote source
+     * @param symbolMapper
+     *            the symbol mapper
+     * @param fxTable
+     *            the fx table
+     * @param badPrice
+     *            the bad price
+     * @param hasWrappedShareCount
+     *            the has wrapped share count
      */
-    public StockPricesReceivedTask(GUI gui, List<AbstractStockPrice> prices, Double badPrice, FxTable fxTable,
-            boolean hasWrappedShareCount, SymbolMapper symbolMapper, QuoteSource quoteSource) {
+    public StockPricesReceivedTask(GUI gui, List<AbstractStockPrice> prices, QuoteSource quoteSource,
+            SymbolMapper symbolMapper, FxTable fxTable, Double badPrice, boolean hasWrappedShareCount) {
         this.gui = gui;
         this.prices = prices;
-        this.badPrice = badPrice;
-        this.fxTable = fxTable;
-        this.hasWrappedShareCount = hasWrappedShareCount;
-        this.symbolMapper = symbolMapper;
         this.quoteSource = quoteSource;
+        this.symbolMapper = symbolMapper;
+        this.fxTable = fxTable;
+        this.badPrice = badPrice;
+        this.hasWrappedShareCount = hasWrappedShareCount;
     }
 
     /*
@@ -90,75 +91,38 @@ public final class StockPricesReceivedTask implements Runnable {
             LOGGER.debug("> stockPricesReceived, size=" + prices.size());
         }
 
-        updatePriceList(prices, this.gui.getPriceList());
-        List<AbstractStockPrice> convertedPrices = updateConvertedPriceList(prices, this.gui.getConvertedPriceList());
-
-        List<AbstractStockPrice> newExchangeRates = null;
-        if (quoteSource != null) {
-            newExchangeRates = quoteSource.getExchangeRates();
-        }
-        // FxTableUtils.updateFxTable(newExchangeRates,
-        // this.gui.getExchangeRates());
-
         try {
-            boolean onePerFile = quoteSource.isHistoricalQuotes();
-            List<File> ofxFiles = this.gui.saveToOFX(convertedPrices, symbolMapper, fxTable, onePerFile);
-            for (File ofxFile : ofxFiles) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("ofxFile=" + ofxFile);
-                }
-            }
+            updatePriceList(prices);
 
-            if (LOGGER.isDebugEnabled()) {
-                File csvFile = this.gui.saveToCsv(prices);
-                LOGGER.debug("Saved csvFile=" + csvFile);
-            }
+            convertedPrices = updateConvertedPriceList(prices);
 
-            // MapperTableUtils.updateMapperTable(symbolMapper,
-            // this.gui.getMapper());
+            saveToOFX(convertedPrices);
+
         } catch (IOException e) {
             LOGGER.warn(e);
         } finally {
             Runnable doRun = null;
 
             if (hasWrappedShareCount) {
-                doRun = new Runnable() {
-                    @Override
-                    public void run() {
-                        JOptionPane.showMessageDialog(StockPricesReceivedTask.this.gui,
-                                "Incrementally increased share count has wrapped around.\n"
-                                        + "Next import will not update price(s).",
-                                "Share count has wrapped around", JOptionPane.WARNING_MESSAGE, null);
-                    }
-                };
-                SwingUtilities.invokeLater(doRun);
+                showDialogWrappedShareCount();
             }
 
             if (badPrice != null) {
-                doRun = new Runnable() {
+                showDialogBadPrice();
+            }
 
-                    @Override
-                    public void run() {
-                        JOptionPane.showMessageDialog(StockPricesReceivedTask.this.gui,
-                                "Incoming price from quote source has\n" + "suspicious price: " + badPrice, "Suspicious Price",
-                                JOptionPane.WARNING_MESSAGE, null);
-                    }
-                };
+            if (this.getGui().getResultView() != null) {
+                doRun = new UpdateResultViewTask(this.getGui());
                 SwingUtilities.invokeLater(doRun);
             }
 
-            if (this.gui.getResultView() != null) {
-                doRun = new UpdateResultViewTask(this.gui);
-                SwingUtilities.invokeLater(doRun);
-            }
-
-            JTabbedPane bottomTabs = this.gui.getBottomTabs();
+            JTabbedPane bottomTabs = this.getGui().getBottomTabs();
             if (bottomTabs != null) {
                 doRun = new Runnable() {
 
                     @Override
                     public void run() {
-                        StockPricesReceivedTask.this.gui.getBottomTabs().setSelectedIndex(0);
+                        StockPricesReceivedTask.this.getGui().getBottomTabs().setSelectedIndex(0);
                     }
                 };
                 SwingUtilities.invokeLater(doRun);
@@ -166,7 +130,92 @@ public final class StockPricesReceivedTask implements Runnable {
         }
     }
 
-    private void updateEventList(List<AbstractStockPrice> prices, EventList<AbstractStockPrice> eventList) {
+    private List<AbstractStockPrice> updateConvertedPriceList(List<AbstractStockPrice> prices) {
+        String defaultCurrency = this.getGui().getDefaultCurrency();
+        ConvertedPriceContext convertedPriceContext = new ConvertedPriceContext(defaultCurrency, symbolMapper, fxTable);
+        List<AbstractStockPrice> convertedPrices = ConvertedPriceUtils.toConvertedPrices(prices, convertedPriceContext);
+        EventList<AbstractStockPrice> convertedPriceList = this.getGui().getConvertedPriceList();
+        updateEventList(convertedPrices, convertedPriceList);
+        return convertedPrices;
+    }
+
+    private void updatePriceList(List<AbstractStockPrice> prices) {
+        EventList<AbstractStockPrice> priceList = this.getGui().getPriceList();
+        updateEventList(prices, priceList);
+    }
+
+    private void showDialogBadPrice() {
+        Runnable doRun;
+        doRun = new Runnable() {
+
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(StockPricesReceivedTask.this.getGui(),
+                        "Incoming price from quote source has\n" + "suspicious price: " + badPrice, "Suspicious Price",
+                        JOptionPane.WARNING_MESSAGE, null);
+            }
+        };
+        SwingUtilities.invokeLater(doRun);
+    }
+
+    private void showDialogWrappedShareCount() {
+        Runnable doRun;
+        doRun = new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(StockPricesReceivedTask.this.getGui(),
+                        "Incrementally increased share count has wrapped around.\n"
+                                + "Next import will not update price(s).",
+                        "Share count has wrapped around", JOptionPane.WARNING_MESSAGE, null);
+            }
+        };
+        SwingUtilities.invokeLater(doRun);
+    }
+
+    private void saveToOFX(List<AbstractStockPrice> convertedPrices) throws IOException {
+        EventList<AbstractStockPrice> notFoundPriceList = this.getGui().getNotFoundPriceList();
+        List<AbstractStockPrice> prices = concatPriceList(convertedPrices, notFoundPriceList);
+
+        boolean onePerFile = quoteSource.isHistoricalQuotes();
+        List<File> ofxFiles = this.getGui().saveToOFX(prices, symbolMapper, fxTable, onePerFile);
+        for (File ofxFile : ofxFiles) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("ofxFile=" + ofxFile);
+            }
+        }
+
+        if (LOGGER.isDebugEnabled()) {
+            File csvFile = this.getGui().saveToCsv(convertedPrices);
+            LOGGER.debug("Saved csvFile=" + csvFile);
+        }
+    }
+
+    private List<AbstractStockPrice> concatPriceList(List<AbstractStockPrice> list1,
+            EventList<AbstractStockPrice> list2) {
+        List<AbstractStockPrice> prices = new ArrayList<>();
+        prices.addAll(list1);
+        for (AbstractStockPrice notFoundPrice : list2) {
+            if (notFoundPrice == null) {
+                continue;
+            }
+            Price lastPrice = notFoundPrice.getLastPrice();
+            if (lastPrice == null) {
+                continue;
+            }
+            Double p = lastPrice.getPrice();
+            if (p == null) {
+                continue;
+            }
+            if (p.doubleValue() <= 0.00) {
+                continue;
+            }
+            prices.add(notFoundPrice);
+        }
+        return prices;
+    }
+
+    private static final void updateEventList(List<AbstractStockPrice> prices,
+            EventList<AbstractStockPrice> eventList) {
         eventList.getReadWriteLock().writeLock().lock();
         try {
             eventList.clear();
@@ -175,54 +224,8 @@ public final class StockPricesReceivedTask implements Runnable {
             eventList.getReadWriteLock().writeLock().unlock();
         }
     }
-    
-    private void updatePriceList(List<AbstractStockPrice> prices, EventList<AbstractStockPrice> eventList) {
-        updateEventList(prices, eventList);
-    }
-    
-    private List<AbstractStockPrice> updateConvertedPriceList(List<AbstractStockPrice> prices, EventList<AbstractStockPrice> eventList) {
-        List<AbstractStockPrice> convertedPrices = null;
-        try {
-            convertedPrices = toConvertedPrices(prices);
-            updateEventList(convertedPrices, eventList);
-        } catch (CloneNotSupportedException e) {
-            LOGGER.error(e, e);
-        }
-        return convertedPrices;
-    }
 
-    private List<AbstractStockPrice> toConvertedPrices(List<AbstractStockPrice> prices)
-            throws CloneNotSupportedException {
-        List<AbstractStockPrice> convertedPrices = new ArrayList<AbstractStockPrice>();
-        for (AbstractStockPrice price : prices) {
-            AbstractStockPrice convertedPrice = toConvertedPrice(price);
-            LOGGER.info("convertedPrice=" + convertedPrice);
-
-            convertedPrices.add(convertedPrice);
-        }
-        return convertedPrices;
-    }
-
-    private AbstractStockPrice toConvertedPrice(AbstractStockPrice price) throws CloneNotSupportedException {
-        AbstractStockPrice convertedPrice = price.clonePrice();
-
-        String symbol = SymbolMapper.getStockSymbol(price.getStockSymbol(), symbolMapper);
-        if (symbol == null) {
-            symbol = price.getStockName();
-        }
-        if (symbol == null) {
-            symbol = "";
-        }
-        convertedPrice.setStockSymbol(symbol);
-
-        Price lastPrice = price.getLastPrice();
-        if (price.getFxSymbol() == null) {
-            lastPrice = FxTableUtils.getPrice(price.getStockSymbol(), price.getLastPrice(), this.gui.getDefaultCurrency(),
-                    symbolMapper, fxTable);
-        }
-        convertedPrice.setLastPrice(lastPrice);
-        convertedPrice.setCurrency(lastPrice.getCurrency());
-        
-        return convertedPrice;
+    private GUI getGui() {
+        return gui;
     }
 }

@@ -43,7 +43,6 @@ import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -86,7 +85,6 @@ import com.hungle.msmoney.core.misc.ResourceUtils;
 import com.hungle.msmoney.core.ofx.ImportUtils;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxPriceInfo;
 import com.hungle.msmoney.core.ofx.xmlbeans.OfxSaveParameter;
-import com.hungle.msmoney.core.qif.QifUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.FxSymbol;
 import com.hungle.msmoney.core.stockprice.Price;
@@ -102,9 +100,10 @@ import com.hungle.msmoney.gui.action.EditWarnSuspiciousPriceAction;
 import com.hungle.msmoney.gui.action.ExitAction;
 import com.hungle.msmoney.gui.action.ImportAction;
 import com.hungle.msmoney.gui.action.ProfileSelectedAction;
+import com.hungle.msmoney.gui.action.SaveMDCSVAction;
 import com.hungle.msmoney.gui.action.SaveOfxAction;
+import com.hungle.msmoney.gui.action.SaveQIFAction;
 import com.hungle.msmoney.gui.dnd.FileDropHandler;
-import com.hungle.msmoney.gui.md.MdUtils;
 import com.hungle.msmoney.gui.qs.BloombergQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtCsvQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEquitiesSourcePanel;
@@ -748,72 +747,75 @@ public class GUI extends JFrame {
         updateLastPriceCurrency(prices, getDefaultCurrency(), getSymbolMapper());
 
         if (getRandomizeShareCount()) {
-            int randomInt = random.nextInt(998);
-            randomInt = randomInt + 1;
-            double value = randomInt / 1000.00;
-            LOGGER.info("randomizeShareCount=" + getRandomizeShareCount() + ", value=" + value);
-            for (AbstractStockPrice price : prices) {
-                price.setUnits(value);
-            }
+            randomizeShareCount(prices);
         }
 
         boolean hasWrappedShareCount = false;
         if (incrementallyIncreasedShareCount) {
-            String key = PREF_INCREMENTALLY_INCREASED_SHARE_COUNT_VALUE;
-            double value = PREFS.getDouble(key, 0.000);
-            if (value > 0.999) {
-                value = 0.000;
-                // TODO
-                LOGGER.warn("incrementallyIncreasedShareCount, is wrapping back to " + value);
-                hasWrappedShareCount = true;
-            }
-            value = value + 0.001;
-            for (AbstractStockPrice bean : prices) {
-                bean.setUnits(value);
-            }
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
-            }
-            PREFS.putDouble(key, value);
+            hasWrappedShareCount = incrementallyIncreasedShareCount(prices, hasWrappedShareCount);
         }
-
-        // for (StockPriceBean bean : beans) {
-        // String currency = bean.getCurrency();
-        // if (PropertiesUtils.isNull(currency)) {
-        // String symbol = bean.getStockSymbol();
-        // String overridingCurrency = getMapperCurrency(symbol, mapper);
-        // log.info("symbol: " + symbol + ", overridingCurrency=" +
-        // overridingCurrency);
-        // if (!PropertiesUtils.isNull(overridingCurrency)) {
-        // bean.setCurrency(overridingCurrency);
-        // }
-        // }
-        // }
 
         Double badPrice = null;
         if (getSuspiciousPrice() > -1L) {
-            Double d = new Double(getSuspiciousPrice());
-            for (AbstractStockPrice bean : prices) {
-                String stockSymbol = bean.getStockSymbol();
-                if ((stockSymbol != null) && (stockSymbol.startsWith("^"))) {
-                    // index
-                    continue;
-                }
-                Price price = bean.getLastPrice();
-                if (price == null) {
-                    continue;
-                }
-                if (price.getPrice().compareTo(d) > 0) {
-                    badPrice = price.getPrice();
-                    break;
-                }
-            }
+            badPrice = findBadPrice(prices);
         }
 
-        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, badPrice, getFxTable(), hasWrappedShareCount,
-                getSymbolMapper(), quoteSource);
-        // doRun.run();
+        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, quoteSource, getSymbolMapper(), getFxTable(),
+                badPrice, hasWrappedShareCount);
         SwingUtilities.invokeLater(stockPricesReceivedTask);
+    }
+
+    private Double findBadPrice(final List<AbstractStockPrice> prices) {
+        Double badPrice = null;
+
+        Double d = new Double(getSuspiciousPrice());
+        for (AbstractStockPrice bean : prices) {
+            String stockSymbol = bean.getStockSymbol();
+            if ((stockSymbol != null) && (stockSymbol.startsWith("^"))) {
+                // index
+                continue;
+            }
+            Price price = bean.getLastPrice();
+            if (price == null) {
+                continue;
+            }
+            if (price.getPrice().compareTo(d) > 0) {
+                badPrice = price.getPrice();
+                break;
+            }
+        }
+        return badPrice;
+    }
+
+    private boolean incrementallyIncreasedShareCount(final List<AbstractStockPrice> prices,
+            boolean hasWrappedShareCount) {
+        String key = PREF_INCREMENTALLY_INCREASED_SHARE_COUNT_VALUE;
+        double value = PREFS.getDouble(key, 0.000);
+        if (value > 0.999) {
+            value = 0.000;
+            // TODO
+            LOGGER.warn("incrementallyIncreasedShareCount, is wrapping back to " + value);
+            hasWrappedShareCount = true;
+        }
+        value = value + 0.001;
+        for (AbstractStockPrice bean : prices) {
+            bean.setUnits(value);
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
+        }
+        PREFS.putDouble(key, value);
+        return hasWrappedShareCount;
+    }
+
+    private void randomizeShareCount(final List<AbstractStockPrice> prices) {
+        int randomInt = random.nextInt(998);
+        randomInt = randomInt + 1;
+        double value = randomInt / 1000.00;
+        LOGGER.info("randomizeShareCount=" + getRandomizeShareCount() + ", value=" + value);
+        for (AbstractStockPrice price : prices) {
+            price.setUnits(value);
+        }
     }
 
     private void updateNotFoundPriceList(final QuoteSource quoteSource) {
@@ -1332,7 +1334,7 @@ public class GUI extends JFrame {
         PREFS.put(PREF_TEMPLATE_DECIMAL_SEPARATOR, value);
     }
 
-    protected String getTemplateDecimalSeparator() {
+    public String getTemplateDecimalSeparator() {
         String str = PREFS.get(PREF_TEMPLATE_DECIMAL_SEPARATOR, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         return str;
     }
@@ -1877,7 +1879,7 @@ public class GUI extends JFrame {
         priceTableViewOptions.setConvertWhenExport(false);
         priceTableViewOptions.setCreateImport(false);
         priceTableViewOptions.setCreateMenu(false);
-        boolean[] editable = { true, true, true, true, true };
+        boolean[] editable = { true, true, true, false, false };
         priceTableViewOptions.setEditable(editable);
         getBottomTabs().add("Not Found Prices", createPricesView(getNotFoundPriceList(), priceTableViewOptions));
 
@@ -2024,126 +2026,28 @@ public class GUI extends JFrame {
         menu = new JMenu("OFX");
         popupMenu.add(menu);
 
-        action = new ImportAction(gui, "Open as *.ofx");
+        action = new ImportAction("Open as *.ofx", gui);
         menu.add(action);
 
-        action = new SaveOfxAction(gui, "Save");
+        action = new SaveOfxAction("Save", gui);
         menu.add(action);
 
         // QIF
         menu = new JMenu("QIF");
         popupMenu.add(menu);
-
-        // action = new AbstractAction("Open as *.qif") {
-        // public void actionPerformed(ActionEvent event) {
-        // try {
-        // File file = null;
-        //
-        // file = File.createTempFile("hleofxquotes", ".qif");
-        // file.deleteOnExit();
-        // QifUtils.saveToQif(priceList, file);
-        // log.info("file=" + file);
-        //
-        // } catch (IOException e) {
-        // JOptionPane.showMessageDialog(view, e.getMessage(), "Error",
-        // JOptionPane.ERROR_MESSAGE);
-        // }
-        // }
-        //
-        // };
-        // menu.add(action);
-        action = new AbstractAction("Save") {
-            /**
-             * 
-             */
-            private static final long serialVersionUID = 1L;
-            private JFileChooser fc = null;
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if (fc == null) {
-                    initFileChooser();
-                }
-                // Component parent = view;
-                if (this.fc.getSelectedFile() == null) {
-                    this.fc.setSelectedFile(new File("quotes.qif"));
-                }
-
-                if (fc.showSaveDialog(parent) == JFileChooser.CANCEL_OPTION) {
-                    return;
-                }
-                File toFile = fc.getSelectedFile();
-                PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
-                try {
-                    QifUtils.saveToQif(priceList, priceTableViewOptions.isConvertWhenExport(), gui.getDefaultCurrency(),
-                            gui.getSymbolMapper(), gui.getFxTable(), toFile, gui.getTemplateDecimalSeparator());
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(parent, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-
-            private void initFileChooser() {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("> creating FileChooser");
-                }
-                String key = Action.ACCELERATOR_KEY;
-                fc = new JFileChooser(PREFS.get(key, "."));
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("< creating FileChooser");
-                }
-            }
-        };
+        action = new SaveQIFAction("Save", gui, priceList, priceTableViewOptions, parent);
         menu.add(action);
 
         // MD
         menu = new JMenu("MD");
         popupMenu.add(menu);
-        action = new AbstractAction("Save CSV") {
-            /**
-             * 
-             */
-            private static final long serialVersionUID = 1L;
-            private JFileChooser fc = null;
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if (fc == null) {
-                    initFileChooser();
-                }
-                if (this.fc.getSelectedFile() == null) {
-                    this.fc.setSelectedFile(new File("mdQuotes.csv"));
-                }
-
-                if (fc.showSaveDialog(parent) == JFileChooser.CANCEL_OPTION) {
-                    return;
-                }
-                File toFile = fc.getSelectedFile();
-                PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
-                try {
-                    MdUtils.saveToCsv(priceList, priceTableViewOptions.isConvertWhenExport(), gui.getDefaultCurrency(),
-                            gui.getSymbolMapper(), gui.getFxTable(), toFile, gui.getTemplateDecimalSeparator());
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(parent, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-
-            private void initFileChooser() {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("> creating FileChooser");
-                }
-                String key = Action.ACCELERATOR_KEY;
-                fc = new JFileChooser(PREFS.get(key, "."));
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("< creating FileChooser");
-                }
-            }
-        };
+        action = new SaveMDCSVAction("Save CSV", gui, priceList, priceTableViewOptions, parent);
         menu.add(action);
     }
 
     private void addPriceTableImport(JPanel commandView) {
         AbstractAction action;
-        action = new ImportAction(this, "Import to MSMoney");
+        action = new ImportAction("Import to MSMoney", this);
         importToMoneyButton = new JButton(action);
         importToMoneyButton.setEnabled(false);
         commandView.add(importToMoneyButton);
@@ -2164,7 +2068,7 @@ public class GUI extends JFrame {
          * view2.add(priceFilterEdit);
          */
         commandView.add(Box.createHorizontalGlue());
-        action = new SaveOfxAction(this, "Save OFX");
+        action = new SaveOfxAction("Save OFX", this);
         saveOfxButton = new JButton(action);
         saveOfxButton.setEnabled(false);
         commandView.add(saveOfxButton);
@@ -2617,7 +2521,7 @@ public class GUI extends JFrame {
         this.lastKnownImport = lastKnownImport;
     }
 
-    private SymbolMapper getSymbolMapper() {
+    public SymbolMapper getSymbolMapper() {
         return symbolMapper;
     }
 
@@ -2625,7 +2529,7 @@ public class GUI extends JFrame {
         this.symbolMapper = symbolMapper;
     }
 
-    private FxTable getFxTable() {
+    public FxTable getFxTable() {
         return fxTable;
     }
 

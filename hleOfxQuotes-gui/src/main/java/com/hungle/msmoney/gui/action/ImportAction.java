@@ -34,7 +34,7 @@ public final class ImportAction extends AbstractAction {
      *            the name
      * @param gui TODO
      */
-    public ImportAction(GUI gui, String name) {
+    public ImportAction(String name, GUI gui) {
         super(name);
         this.gui = gui;
     }

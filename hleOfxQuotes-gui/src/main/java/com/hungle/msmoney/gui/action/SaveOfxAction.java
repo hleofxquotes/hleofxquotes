@@ -55,11 +55,10 @@ public final class SaveOfxAction extends AbstractAction {
 
     /**
      * Instantiates a new save ofx action.
-     *
-     * @param gui the gui
      * @param name the name
+     * @param gui the gui
      */
-    public SaveOfxAction(GUI gui, String name) {
+    public SaveOfxAction(String name, GUI gui) {
         super(name);
         this.gui = gui;
         this.prefs = GUI.getPrefs();

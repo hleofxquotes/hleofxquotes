@@ -148,6 +148,9 @@ public class FxSymbol {
             currency = Currency.getInstance(currencyCode);
         } catch (Exception e) {
             LOGGER.warn("currencyCode=" + currencyCode + ", e=" + e.getClass().getName() + " " + e.getMessage());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.warn(e, e);
+            }
         }
 
         if (currency == null) {
