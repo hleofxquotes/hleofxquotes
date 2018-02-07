@@ -419,30 +419,19 @@ public class GUI extends JFrame {
 
     private void deleteOutputFiles() {
         List<File> files = getOutputFiles();
-        deleteFiles(files);
-    }
-
-    private static final void deleteFiles(List<File> files) {
-        if (files != null) {
-            for (File file : files) {
-                deleteOutputFile(file);
-            }
-        }
+        OfxFileIo.deleteFiles(files);
     }
 
     public void saveToOFX() throws IOException {
-        List<AbstractStockPrice> prices = concatPriceList(getConvertedPriceList(), getNotFoundPriceList());
+        EventList<AbstractStockPrice> list1 = getConvertedPriceList();
+        EventList<AbstractStockPrice> list2 = getNotFoundPriceList();
+        List<AbstractStockPrice> prices = OfxFileIo.concatPriceList(list1, list2);
         saveToOFX(prices);
     }
 
-    public void saveToOFX(List<AbstractStockPrice> convertedPrices) throws IOException {
-        List<AbstractStockPrice> prices = convertedPrices;
-
+    public void saveToOFX(List<AbstractStockPrice> prices) throws IOException {
         boolean onePerFile = quoteSource.isHistoricalQuotes();
         List<File> ofxFiles = saveToOFX(prices, symbolMapper, fxTable, onePerFile);
-        for (File ofxFile : ofxFiles) {
-            LOGGER.info("SAVED -> ofxFile=" + ofxFile);
-        }
     }
 
     /**
@@ -462,9 +451,6 @@ public class GUI extends JFrame {
             throws IOException {
         File outputFile = File.createTempFile("quotes", ".ofx");
         outputFile.deleteOnExit();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("outputFile=" + outputFile.getAbsolutePath());
-        }
 
         LOGGER.info("forceGeneratingINVTRANLIST=" + forceGeneratingINVTRANLIST);
 
@@ -475,6 +461,7 @@ public class GUI extends JFrame {
         params.setDateOffset(dateOffset);
 
         OfxPriceInfo.save(stockPrices, outputFile, params, symbolMapper, fxTable);
+        LOGGER.info("FILE SAVED -> ofxFile=" + outputFile.getAbsolutePath());
 
         return outputFile;
     }
@@ -2204,20 +2191,6 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Delete output file.
-     *
-     * @param outputFile
-     *            the output file
-     */
-    private static final void deleteOutputFile(File outputFile) {
-        if ((outputFile != null) && (outputFile.exists())) {
-            if (!outputFile.delete()) {
-                LOGGER.warn("Failed to delete outputFile=" + outputFile);
-            }
-        }
-    }
-
-    /**
      * Gets the thread pool.
      *
      * @return the thread pool
@@ -2646,30 +2619,6 @@ public class GUI extends JFrame {
             String message = e.getMessage();
             JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private static final List<AbstractStockPrice> concatPriceList(List<AbstractStockPrice> list1,
-            EventList<AbstractStockPrice> list2) {
-        List<AbstractStockPrice> prices = new ArrayList<>();
-        prices.addAll(list1);
-        for (AbstractStockPrice notFoundPrice : list2) {
-            if (notFoundPrice == null) {
-                continue;
-            }
-            Price lastPrice = notFoundPrice.getLastPrice();
-            if (lastPrice == null) {
-                continue;
-            }
-            Double p = lastPrice.getPrice();
-            if (p == null) {
-                continue;
-            }
-            if (p.doubleValue() <= 0.00) {
-                continue;
-            }
-            prices.add(notFoundPrice);
-        }
-        return prices;
     }
 
     public static String getHomeDirectory() {

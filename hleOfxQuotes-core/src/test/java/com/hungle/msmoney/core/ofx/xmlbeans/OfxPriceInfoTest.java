@@ -151,7 +151,7 @@ public class OfxPriceInfoTest {
         stockPrice = new StockPrice("STOCK001", new Date(), 2.00);
         stockPrice.setCurrency("GBP");
         stockPrices.add(stockPrice);
-        
+
         SymbolMapper symbolMapper = SymbolMapper.loadMapperFile();
         FxTable fxTable = FxTableUtils.loadFxFile();
 
@@ -160,24 +160,24 @@ public class OfxPriceInfoTest {
         // GBPUSD=X
         stockPrice = new StockPrice("GBPUSD=X", new Date(), 0.90, -1, -1);
         exchangeRates.add(stockPrice);
-        
+
         // EURUSD=X
         stockPrice = new StockPrice("EURUSD=X", new Date(), 1.22, -1, -1);
         exchangeRates.add(stockPrice);
-        
+
         FxTableUtils.addExchangeRates(exchangeRates, fxTable);
 
         String controlFileName = "testSaveWithCurrencyCode";
         String controlFullFileName = "src/test/resources/com/hungle/msmoney/core/ofx/xmlbeans/" + controlFileName
                 + ".xml";
-        
+
         String defaultCurrency = CurrencyUtils.getDefaultCurrency();
         boolean forceGeneratingINVTRANLIST = false;
 
         OfxSaveParameter params = new OfxSaveParameter();
         params.setDefaultCurrency(defaultCurrency);
         params.setForceGeneratingINVTRANLIST(forceGeneratingINVTRANLIST);
-        
+
         testOfxSave(stockPrices, controlFullFileName, params, symbolMapper, fxTable);
     }
 
@@ -187,18 +187,18 @@ public class OfxPriceInfoTest {
 
         OfxSaveParameter params = new OfxSaveParameter();
         params.setDefaultCurrency(defaultCurrency);
-        params.setForceGeneratingINVTRANLIST(forceGeneratingINVTRANLIST);     
+        params.setForceGeneratingINVTRANLIST(forceGeneratingINVTRANLIST);
 
         SymbolMapper symbolMapper = SymbolMapper.loadMapperFile();
         FxTable fxTable = FxTableUtils.loadFxFile();
-        
+
         testOfxSave(stockPrices, controlFullFileName, params, symbolMapper, fxTable);
     }
-    
 
-    private void testOfxSave(List<AbstractStockPrice> stockPrices, String controlFileName, OfxSaveParameter params, SymbolMapper symbolMapper, FxTable fxTable) throws IOException {
+    private void testOfxSave(List<AbstractStockPrice> stockPrices, String controlFileName, OfxSaveParameter params,
+            SymbolMapper symbolMapper, FxTable fxTable) throws IOException {
         File outFile = File.createTempFile("ofxPriceInfoTest", ".ofx");
-        // outFile.deleteOnExit();
+        outFile.deleteOnExit();
         LOGGER.info("Saving to outputFile=" + outFile);
         OfxPriceInfo.save(stockPrices, outFile, params, symbolMapper, fxTable);
 
@@ -220,9 +220,9 @@ public class OfxPriceInfoTest {
         Assert.assertNotNull(myDiff);
         Assert.assertFalse(myDiff.toString(), myDiff.hasDifferences());
     }
-    
+
     @Test
     public void testCreateOfxPriceInfo() {
-        
+
     }
 }

@@ -89,12 +89,13 @@ public final class StockPricesReceivedTask implements Runnable {
         }
 
         try {
+            // UI
             updatePriceList(prices);
 
+            // UI
             convertedPrices = updateConvertedPriceList(prices);
 
             getGui().saveToOFX(convertedPrices);
-
         } catch (IOException e) {
             LOGGER.warn(e);
         } finally {
