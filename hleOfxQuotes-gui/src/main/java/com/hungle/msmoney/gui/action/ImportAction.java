@@ -2,8 +2,11 @@ package com.hungle.msmoney.gui.action;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
@@ -48,41 +51,55 @@ public final class ImportAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent event) {
         LOGGER.info("> Import action");
-        final Component component = (Component) event.getSource();
-        final String errorTitle = "Cannot import";
+        final Component parentComponent = (Component) event.getSource();
+        final ExecutorService threadPool = this.getGui().getThreadPool();
         
         Runnable command = new Runnable() {
             @Override
             public void run() {
                 try {
-                    ImportUtils.doImport(ImportAction.this.gui.getThreadPool(), ImportAction.this.gui.getOutputFiles());
+                    ImportAction.this.getGui().saveToOFX();
+                    final List<File> outputFiles = ImportAction.this.getGui().getOutputFiles();
+                    ImportUtils.doImport(threadPool, outputFiles);
                 } catch (IOException e) {
-                    Runnable doRun = new Runnable() {
-                        @Override
-                        public void run() {
-                            String message = e.getMessage();
-                            JOptionPane.showMessageDialog(component, message, errorTitle, JOptionPane.ERROR_MESSAGE);
-                        }
-                    };
-                    SwingUtilities.invokeLater(doRun);
+                    showErrorDialog(parentComponent, e);
                 } finally {
-                    Runnable doRun = new Runnable() {
-                        @Override
-                        public void run() {
-                            ImportAction.this.gui.setLastKnownImportString((new Date()).toString());
-                            if (ImportAction.this.gui.getLastKnownImport() != null) {
-                                ImportAction.this.gui.getLastKnownImport().setText(ImportAction.this.gui.getLastKnownImportString());
-                            }
-                            GUI.PREFS.put(GUI.PREF_LAST_KNOWN_IMPORT_STRING, ImportAction.this.gui.getLastKnownImportString());
-                        }
-                    };
-                    SwingUtilities.invokeLater(doRun);
+                    updateLastKnownImportString();
                 }
-
             }
 
         };
-        this.gui.getThreadPool().execute(command);
+        threadPool.execute(command);
+    }
+
+    private GUI getGui() {
+        return gui;
+    }
+
+    private void updateLastKnownImportString() {
+        Runnable doRun = new Runnable() {
+            @Override
+            public void run() {
+                ImportAction.this.getGui().setLastKnownImportString((new Date()).toString());
+                if (ImportAction.this.getGui().getLastKnownImport() != null) {
+                    ImportAction.this.getGui().getLastKnownImport().setText(ImportAction.this.getGui().getLastKnownImportString());
+                }
+                GUI.PREFS.put(GUI.PREF_LAST_KNOWN_IMPORT_STRING, ImportAction.this.getGui().getLastKnownImportString());
+            }
+        };
+        SwingUtilities.invokeLater(doRun);
+    }
+
+    private void showErrorDialog(final Component parentComponent, IOException e) {
+        Runnable doRun = new Runnable() {
+            @Override
+            public void run() {
+                final String errorTitle = "Cannot import";
+                String message = e.getMessage();
+                JOptionPane.showMessageDialog(parentComponent, message, errorTitle, JOptionPane.ERROR_MESSAGE);
+            }
+        };
+        SwingUtilities.invokeLater(doRun);
     }
 
 }

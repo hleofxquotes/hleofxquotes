@@ -69,7 +69,12 @@ public final class SaveOfxAction extends AbstractAction {
      */
     @Override
     public void actionPerformed(ActionEvent event) {
-        List<File> files = this.gui.getOutputFiles();
+        try {
+            this.getGui().saveToOFX();
+        } catch (IOException e1) {
+            LOGGER.error(e1, e1);
+        }
+        List<File> files = this.getGui().getOutputFiles();
         
         if ((files == null) || (files.size() <= 0)) {
             LOGGER.warn("No OFX content to save");
@@ -79,7 +84,7 @@ public final class SaveOfxAction extends AbstractAction {
         if (fc == null) {
             initFileChooser();
         }
-        Component parent = this.gui;
+        Component parent = this.getGui();
         if (this.fc.getSelectedFile() == null) {
             this.fc.setSelectedFile(new File(DEFAULT_OFX_OUTPUT_FILENAME));
         }
@@ -101,7 +106,7 @@ public final class SaveOfxAction extends AbstractAction {
                     LOGGER.info("SHIFT key is enable. Will auto-import into Microsoft Money");
                     List<File> list = new ArrayList<File>();
                     list.add(fromFile);
-                    ImportUtils.doImport(this.gui.getThreadPool(), list);
+                    ImportUtils.doImport(this.getGui().getThreadPool(), list);
                 }
             }
         } catch (IOException e) {
@@ -179,5 +184,9 @@ public final class SaveOfxAction extends AbstractAction {
         } finally {
             writer.flush();
         }
+    }
+
+    private GUI getGui() {
+        return gui;
     }
 }

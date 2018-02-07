@@ -221,7 +221,7 @@ public class GUI extends JFrame {
     // BasicEventList<SymbolMapperEntry>();
 
     /** The price filter edit. */
-//    private JTextField priceFilterEdit;
+    // private JTextField priceFilterEdit;
 
     /** The defaul currency label. */
     private JLabel defaulCurrencyLabel;
@@ -336,6 +336,8 @@ public class GUI extends JFrame {
 
     private FtEtfsSourcePanel ftEtfsSourcePanel;
 
+    private QuoteSource quoteSource;
+
     public static final class TemplateEntry {
 
         private String src;
@@ -361,9 +363,9 @@ public class GUI extends JFrame {
         getNotFoundPriceList().clear();
 
         // exchangeRates.clear();
-//        if (priceFilterEdit != null) {
-//            priceFilterEdit.setText("");
-//        }
+        // if (priceFilterEdit != null) {
+        // priceFilterEdit.setText("");
+        // }
     }
 
     /**
@@ -392,16 +394,12 @@ public class GUI extends JFrame {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    public List<File> saveToOFX(final List<AbstractStockPrice> stockPrices, SymbolMapper symbolMapper, FxTable fxTable,
+    private List<File> saveToOFX(final List<AbstractStockPrice> stockPrices, SymbolMapper symbolMapper, FxTable fxTable,
             boolean onePerFile) throws IOException {
         // cleanup
-        List<File> files = getOutputFiles();
-        if (files != null) {
-            for (File file : files) {
-                deleteOutputFile(file);
-            }
-        }
-        files = new ArrayList<File>();
+        deleteOutputFiles();
+
+        ArrayList<File> files = new ArrayList<File>();
         setOutputFiles(files);
 
         if (onePerFile) {
@@ -417,6 +415,34 @@ public class GUI extends JFrame {
         }
 
         return files;
+    }
+
+    private void deleteOutputFiles() {
+        List<File> files = getOutputFiles();
+        deleteFiles(files);
+    }
+
+    private static final void deleteFiles(List<File> files) {
+        if (files != null) {
+            for (File file : files) {
+                deleteOutputFile(file);
+            }
+        }
+    }
+
+    public void saveToOFX() throws IOException {
+        List<AbstractStockPrice> prices = concatPriceList(getConvertedPriceList(), getNotFoundPriceList());
+        saveToOFX(prices);
+    }
+
+    public void saveToOFX(List<AbstractStockPrice> convertedPrices) throws IOException {
+        List<AbstractStockPrice> prices = convertedPrices;
+
+        boolean onePerFile = quoteSource.isHistoricalQuotes();
+        List<File> ofxFiles = saveToOFX(prices, symbolMapper, fxTable, onePerFile);
+        for (File ofxFile : ofxFiles) {
+            LOGGER.info("SAVED -> ofxFile=" + ofxFile);
+        }
     }
 
     /**
@@ -441,12 +467,15 @@ public class GUI extends JFrame {
         }
 
         LOGGER.info("forceGeneratingINVTRANLIST=" + forceGeneratingINVTRANLIST);
+
         OfxSaveParameter params = new OfxSaveParameter();
         params.setDefaultCurrency(getDefaultCurrency());
         params.setAccountId(getAccountId());
         params.setForceGeneratingINVTRANLIST(forceGeneratingINVTRANLIST);
         params.setDateOffset(dateOffset);
+
         OfxPriceInfo.save(stockPrices, outputFile, params, symbolMapper, fxTable);
+
         return outputFile;
     }
 
@@ -670,6 +699,8 @@ public class GUI extends JFrame {
      *            the stock symbols string
      */
     public void stockSymbolsStringReceived(QuoteSource quoteSource, String stockSymbolsString) {
+        this.quoteSource = quoteSource;
+
         clearPriceTable();
 
         clearMapperTable();
@@ -691,6 +722,8 @@ public class GUI extends JFrame {
      * @param stockSymbols
      */
     private void stockPricesLookupStarted(QuoteSource quoteSource, final List<String> stockSymbols) {
+        this.quoteSource = quoteSource;
+
         setSymbolMapper(SymbolMapper.loadMapperFile());
         setFxTable(FxTableUtils.loadFxFile());
 
@@ -727,6 +760,8 @@ public class GUI extends JFrame {
      *            the stock prices
      */
     private void stockPricesReceived(final QuoteSource quoteSource, List<AbstractStockPrice> stockPrices) {
+        this.quoteSource = quoteSource;
+
         getSymbolMapper().dump();
 
         List<AbstractStockPrice> exchangeRates = quoteSource.getExchangeRates();
@@ -787,8 +822,7 @@ public class GUI extends JFrame {
         return badPrice;
     }
 
-    private boolean incrementallyIncreasedShareCount(final List<AbstractStockPrice> prices,
-            boolean hasWrappedShareCount) {
+    private boolean incrementallyIncreasedShareCount(final List<AbstractStockPrice> prices, boolean hasWrappedShareCount) {
         String key = PREF_INCREMENTALLY_INCREASED_SHARE_COUNT_VALUE;
         double value = PREFS.getDouble(key, 0.000);
         if (value > 0.999) {
@@ -1971,8 +2005,6 @@ public class GUI extends JFrame {
         return view;
     }
 
-
-
     /**
      * Creates the prices view.
      *
@@ -2177,7 +2209,7 @@ public class GUI extends JFrame {
      * @param outputFile
      *            the output file
      */
-    private void deleteOutputFile(File outputFile) {
+    private static final void deleteOutputFile(File outputFile) {
         if ((outputFile != null) && (outputFile.exists())) {
             if (!outputFile.delete()) {
                 LOGGER.warn("Failed to delete outputFile=" + outputFile);
@@ -2616,6 +2648,30 @@ public class GUI extends JFrame {
         }
     }
 
+    private static final List<AbstractStockPrice> concatPriceList(List<AbstractStockPrice> list1,
+            EventList<AbstractStockPrice> list2) {
+        List<AbstractStockPrice> prices = new ArrayList<>();
+        prices.addAll(list1);
+        for (AbstractStockPrice notFoundPrice : list2) {
+            if (notFoundPrice == null) {
+                continue;
+            }
+            Price lastPrice = notFoundPrice.getLastPrice();
+            if (lastPrice == null) {
+                continue;
+            }
+            Double p = lastPrice.getPrice();
+            if (p == null) {
+                continue;
+            }
+            if (p.doubleValue() <= 0.00) {
+                continue;
+            }
+            prices.add(notFoundPrice);
+        }
+        return prices;
+    }
+
     public static String getHomeDirectory() {
         String homeDirectory = null;
 
@@ -2632,5 +2688,4 @@ public class GUI extends JFrame {
         }
         return topDir.getAbsoluteFile().getAbsolutePath();
     }
-
 }

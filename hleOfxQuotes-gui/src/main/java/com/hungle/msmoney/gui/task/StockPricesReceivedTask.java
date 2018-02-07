@@ -1,8 +1,6 @@
 package com.hungle.msmoney.gui.task;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -14,7 +12,6 @@ import org.apache.log4j.Logger;
 import com.hungle.msmoney.core.fx.FxTable;
 import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
-import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.qs.QuoteSource;
 
@@ -96,7 +93,7 @@ public final class StockPricesReceivedTask implements Runnable {
 
             convertedPrices = updateConvertedPriceList(prices);
 
-            saveToOFX(convertedPrices);
+            getGui().saveToOFX(convertedPrices);
 
         } catch (IOException e) {
             LOGGER.warn(e);
@@ -170,48 +167,6 @@ public final class StockPricesReceivedTask implements Runnable {
             }
         };
         SwingUtilities.invokeLater(doRun);
-    }
-
-    private void saveToOFX(List<AbstractStockPrice> convertedPrices) throws IOException {
-        EventList<AbstractStockPrice> notFoundPriceList = this.getGui().getNotFoundPriceList();
-        List<AbstractStockPrice> prices = concatPriceList(convertedPrices, notFoundPriceList);
-
-        boolean onePerFile = quoteSource.isHistoricalQuotes();
-        List<File> ofxFiles = this.getGui().saveToOFX(prices, symbolMapper, fxTable, onePerFile);
-        for (File ofxFile : ofxFiles) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("ofxFile=" + ofxFile);
-            }
-        }
-
-        if (LOGGER.isDebugEnabled()) {
-            File csvFile = this.getGui().saveToCsv(convertedPrices);
-            LOGGER.debug("Saved csvFile=" + csvFile);
-        }
-    }
-
-    private List<AbstractStockPrice> concatPriceList(List<AbstractStockPrice> list1,
-            EventList<AbstractStockPrice> list2) {
-        List<AbstractStockPrice> prices = new ArrayList<>();
-        prices.addAll(list1);
-        for (AbstractStockPrice notFoundPrice : list2) {
-            if (notFoundPrice == null) {
-                continue;
-            }
-            Price lastPrice = notFoundPrice.getLastPrice();
-            if (lastPrice == null) {
-                continue;
-            }
-            Double p = lastPrice.getPrice();
-            if (p == null) {
-                continue;
-            }
-            if (p.doubleValue() <= 0.00) {
-                continue;
-            }
-            prices.add(notFoundPrice);
-        }
-        return prices;
     }
 
     private static final void updateEventList(List<AbstractStockPrice> prices,

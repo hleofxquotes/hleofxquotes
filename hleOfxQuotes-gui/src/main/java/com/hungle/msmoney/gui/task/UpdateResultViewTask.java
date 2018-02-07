@@ -35,11 +35,17 @@ public final class UpdateResultViewTask implements Runnable {
      */
     @Override
     public void run() {
-        if (this.gui.getResultView() == null) {
+        if (this.getGui().getResultView() == null) {
             return;
         }
-
-        List<File> files = this.gui.getOutputFiles();
+        
+        try {
+            this.getGui().saveToOFX();
+        } catch (IOException e1) {
+            LOGGER.error(e1, e1);
+        }
+        List<File> files = this.getGui().getOutputFiles();
+        
         if (files == null) {
             return;
         }
@@ -54,8 +60,8 @@ public final class UpdateResultViewTask implements Runnable {
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(outputFile));
-            this.gui.getResultView().read(reader, outputFile.getName());
-            this.gui.getResultView().setCaretPosition(0);
+            this.getGui().getResultView().read(reader, outputFile.getName());
+            this.getGui().getResultView().setCaretPosition(0);
         } catch (IOException e) {
             LOGGER.warn(e);
         } finally {
@@ -70,5 +76,9 @@ public final class UpdateResultViewTask implements Runnable {
             }
         }
 
+    }
+
+    private GUI getGui() {
+        return gui;
     }
 }
