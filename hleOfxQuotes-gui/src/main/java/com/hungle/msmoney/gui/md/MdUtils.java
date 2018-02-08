@@ -20,8 +20,6 @@ import com.hungle.msmoney.core.stockprice.FxSymbol;
 import com.hungle.msmoney.core.stockprice.Price;
 import com.hungle.msmoney.core.template.TemplateUtils;
 
-import ca.odell.glazedlists.EventList;
-
 public class MdUtils {
     private static final Logger LOGGER = Logger.getLogger(MdUtils.class);
 
@@ -29,13 +27,14 @@ public class MdUtils {
 
     private static final String DEFAULT_SEPARATOR = ",";
 
-    public static void saveToCsv(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
+    public static void saveToCsv(List<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
             SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
-        saveToCsvUsingVelocity(priceList, convert, defaultCurrency, symbolMapper, fxTable, file, templateDecimalSeparator);
+        saveToCsvUsingVelocity(priceList, convert, defaultCurrency, symbolMapper, fxTable, file,
+                templateDecimalSeparator);
     }
 
-    private static void saveToCsvUsingWriter(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable, File file) throws IOException {
+    private static void saveToCsvUsingWriter(List<AbstractStockPrice> priceList, boolean convert,
+            String defaultCurrency, SymbolMapper symbolMapper, FxTable fxTable, File file) throws IOException {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
@@ -48,15 +47,16 @@ public class MdUtils {
         }
     }
 
-    private static void saveToCsvUsingVelocity(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
+    private static void saveToCsvUsingVelocity(List<AbstractStockPrice> priceList, boolean convert,
+            String defaultCurrency, SymbolMapper symbolMapper, FxTable fxTable, File file,
+            String templateDecimalSeparator) throws IOException {
         List<MdCsvBean> beans = toMdCsvBeans(priceList, convert, defaultCurrency, symbolMapper, fxTable);
         VelocityContext context = new VelocityContext();
 
         context.put("header", MdUtils.getMdCsvHeader());
         context.put("rows", beans);
         context.put("util", new MdUtils());
-        
+
         LOGGER.info("templateDecimalSeparator=" + templateDecimalSeparator);
         String language = "";
         String country = "";
@@ -78,14 +78,15 @@ public class MdUtils {
         context.put("language", language);
         LOGGER.info("language=" + language);
         context.put("country", country);
-        LOGGER.info("country=" + country);;
+        LOGGER.info("country=" + country);
+        ;
 
         String encoding = "UTF-8";
         String template = "/templates/mdcsv.vm";
         VelocityUtils.mergeTemplate(context, template, encoding, file);
     }
 
-    private static void saveToCsv(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
+    private static void saveToCsv(List<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
             SymbolMapper symbolMapper, FxTable fxTable, PrintWriter writer) {
 
         List<MdCsvBean> rows = toMdCsvBeans(priceList, convert, defaultCurrency, symbolMapper, fxTable);
@@ -93,8 +94,8 @@ public class MdUtils {
         saveToCsv(rows, writer);
     }
 
-    private static List<MdCsvBean> toMdCsvBeans(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable) {
+    private static List<MdCsvBean> toMdCsvBeans(List<AbstractStockPrice> priceList, boolean convert,
+            String defaultCurrency, SymbolMapper symbolMapper, FxTable fxTable) {
         List<MdCsvBean> rows = new ArrayList<MdCsvBean>();
         for (AbstractStockPrice price : priceList) {
             MdCsvBean row = toMdCsvBean(convert, symbolMapper, price, fxTable, defaultCurrency);
@@ -112,16 +113,16 @@ public class MdUtils {
         return rows;
     }
 
-    private static MdCsvBean toMdCsvBean(boolean convert, SymbolMapper symbolMapper, AbstractStockPrice price, FxTable fxTable,
-            String defaultCurrency) {
+    private static MdCsvBean toMdCsvBean(boolean convert, SymbolMapper symbolMapper, AbstractStockPrice price,
+            FxTable fxTable, String defaultCurrency) {
         MdCsvBean mdCsvBean = new MdCsvBean();
 
         // Closing price
         Price lastPrice = price.getLastPrice();
         if (convert) {
             if (price.getFxSymbol() == null) {
-                lastPrice = FxTableUtils.getPrice(price.getStockSymbol(), price.getLastPrice(), defaultCurrency, symbolMapper,
-                        fxTable);
+                lastPrice = FxTableUtils.getPrice(price.getStockSymbol(), price.getLastPrice(), defaultCurrency,
+                        symbolMapper, fxTable);
             }
         }
         mdCsvBean.setPrice(lastPrice);

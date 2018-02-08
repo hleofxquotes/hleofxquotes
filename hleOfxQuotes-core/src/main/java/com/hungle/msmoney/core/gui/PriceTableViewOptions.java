@@ -1,9 +1,14 @@
 package com.hungle.msmoney.core.gui;
 
 public class PriceTableViewOptions {
-    private static final String DEFAULT_PROPERTY_NAMES[] = { "stockSymbol", "stockName", "lastPrice", "lastTradeDate",
-            "lastTradeTime" };
+//    private static final String DEFAULT_PROPERTY_NAMES[] = { "stockSymbol", "stockName", "lastPrice", "lastTradeDate",
+//            "lastTradeTime" };
+
+    private static final String DEFAULT_PROPERTY_NAMES[] = { "stockSymbol", "stockName", "lastPrice",
+            "lastTradeDateLocalDate", "lastTradeDateLocalTime" };
+    
     private static String DEFAULT_COLUMN_LABELS[] = { "Symbol", "Name", "Price", "Last Trade Date", "Last Trade Time" };
+    
     private static boolean DEFAULT_EDITABLES[] = { false, false, false, false, false };
 
     private boolean convertWhenExport;

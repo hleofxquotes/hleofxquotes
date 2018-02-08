@@ -1887,7 +1887,6 @@ public class GUI extends JFrame {
         priceTableViewOptions.setConvertWhenExport(true);
         priceTableViewOptions.setCreateImport(true);
         priceTableViewOptions.setCreateMenu(true);
-
         getBottomTabs().add("Quote Source Prices", createPricesView(getPriceList(), priceTableViewOptions));
 
         priceTableViewOptions = new PriceTableViewOptions();
@@ -1900,7 +1899,7 @@ public class GUI extends JFrame {
         priceTableViewOptions.setConvertWhenExport(false);
         priceTableViewOptions.setCreateImport(false);
         priceTableViewOptions.setCreateMenu(false);
-        boolean[] editable = { true, true, true, false, false };
+        boolean[] editable = { true, true, true, true, true };
         priceTableViewOptions.setEditable(editable);
         getBottomTabs().add("Not Found Prices", createPricesView(getNotFoundPriceList(), priceTableViewOptions));
 

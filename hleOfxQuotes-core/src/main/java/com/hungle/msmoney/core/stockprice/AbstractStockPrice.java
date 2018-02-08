@@ -6,6 +6,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Set;
 
@@ -81,10 +85,10 @@ public abstract class AbstractStockPrice implements Cloneable {
         } else {
             date = null;
         }
-        
+
         LOGGER.info("dateString=" + dateString);
         LOGGER.info("date=" + date);
-        
+
         return date;
     }
 
@@ -205,9 +209,10 @@ public abstract class AbstractStockPrice implements Cloneable {
 
     @Override
     public String toString() {
-        return "AbstractStockPrice [getCurrency()=" + getCurrency() + ", getStockSymbol()=" + getStockSymbol() + ", getLastPrice()="
-                + getLastPrice() + ", getStockName()=" + getStockName() + ", getLastTrade()=" + getLastTrade() + ", getFxSymbol()="
-                + getFxSymbol() + ", getUnits()=" + getUnits() + ", isMf()=" + isMf() + ", isBond()=" + isBond() + "]";
+        return "AbstractStockPrice [getCurrency()=" + getCurrency() + ", getStockSymbol()=" + getStockSymbol()
+                + ", getLastPrice()=" + getLastPrice() + ", getStockName()=" + getStockName() + ", getLastTrade()="
+                + getLastTrade() + ", getFxSymbol()=" + getFxSymbol() + ", getUnits()=" + getUnits() + ", isMf()="
+                + isMf() + ", isBond()=" + isBond() + "]";
     }
 
     /**
@@ -315,7 +320,7 @@ public abstract class AbstractStockPrice implements Cloneable {
      * @param dateString
      *            the new last trade date string
      */
-     public abstract void setLastTradeDate(String dateString);
+    public abstract void setLastTradeDate(String dateString);
 
     /**
      * Gets the last trade.
@@ -337,7 +342,7 @@ public abstract class AbstractStockPrice implements Cloneable {
      *
      * @return the last trade time
      */
-     public abstract String getLastTradeTime();
+    public abstract String getLastTradeTime();
 
     /**
      * Sets the last trade time string.
@@ -345,7 +350,7 @@ public abstract class AbstractStockPrice implements Cloneable {
      * @param timeString
      *            the new last trade time string
      */
-     public abstract void setLastTradeTime(String timeString);
+    public abstract void setLastTradeTime(String timeString);
 
     /**
      * Sets the units.
@@ -392,8 +397,77 @@ public abstract class AbstractStockPrice implements Cloneable {
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
-    
+
     public AbstractStockPrice clonePrice() throws CloneNotSupportedException {
         return (AbstractStockPrice) this.clone();
+    }
+
+    // TODO: for UI
+    public LocalDate getLastTradeDateLocalDate() {
+        LocalDate localDate = null;
+
+        Date date = getLastTrade();
+        if (date == null) {
+            localDate = convertToLocalDateViaInstant(new Date());
+        } else {
+            localDate = convertToLocalDateViaInstant(date);
+        }
+
+        return localDate;
+    }
+
+    public void setLastTradeDateLocalDate(LocalDate newLocalDate) {
+        Date date = getLastTrade();
+
+        LocalDate localDate = null;
+        LocalTime localTime = null;
+        if (date == null) {
+            localDate = newLocalDate;
+            localTime = convertToLocalTimeViaInstant(new Date());
+        } else {
+            localDate = newLocalDate;
+            localTime = convertToLocalTimeViaInstant(date);
+        }
+
+        date = java.sql.Timestamp.valueOf(LocalDateTime.of(localDate, localTime));
+        setLastTrade(date);
+    }
+
+    public LocalTime getLastTradeDateLocalTime() {
+        LocalTime localTime = null;
+
+        Date date = getLastTrade();
+        if (date == null) {
+            localTime = convertToLocalTimeViaInstant(new Date());
+        } else {
+            localTime = convertToLocalTimeViaInstant(date);
+        }
+
+        return localTime;
+    }
+
+    public void setLastTradeDateLocalTime(LocalTime newLocalTime) {
+        Date date = getLastTrade();
+
+        LocalDate localDate = null;
+        LocalTime localTime = null;
+        if (date == null) {
+            localDate = convertToLocalDateViaInstant(new Date());
+            localTime = newLocalTime;
+        } else {
+            localDate = convertToLocalDateViaInstant(date);
+            localTime = newLocalTime;
+        }
+
+        date = java.sql.Timestamp.valueOf(LocalDateTime.of(localDate, localTime));
+        setLastTrade(date);
+    }
+
+    private LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    private LocalTime convertToLocalTimeViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
     }
 }

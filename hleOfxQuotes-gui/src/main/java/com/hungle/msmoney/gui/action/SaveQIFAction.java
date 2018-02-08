@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -16,6 +17,7 @@ import com.hungle.msmoney.core.gui.PriceTableViewOptions;
 import com.hungle.msmoney.core.qif.QifUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.gui.GUI;
+import com.hungle.msmoney.gui.OfxFileIo;
 
 import ca.odell.glazedlists.EventList;
 
@@ -32,9 +34,9 @@ public final class SaveQIFAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     private JFileChooser fc = null;
 
-    public SaveQIFAction(String arg0, GUI gui, EventList<AbstractStockPrice> priceList, PriceTableViewOptions priceTableViewOptions,
+    public SaveQIFAction(String name, GUI gui, EventList<AbstractStockPrice> priceList, PriceTableViewOptions priceTableViewOptions,
             Component parent) {
-        super(arg0);
+        super(name);
         this.parent = parent;
         this.priceTableViewOptions = priceTableViewOptions;
         this.gui = gui;
@@ -57,8 +59,11 @@ public final class SaveQIFAction extends AbstractAction {
         File toFile = fc.getSelectedFile();
         GUI.PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
         try {
-            QifUtils.saveToQif(priceList, priceTableViewOptions.isConvertWhenExport(), gui.getDefaultCurrency(),
-                    gui.getSymbolMapper(), gui.getFxTable(), toFile, gui.getTemplateDecimalSeparator());
+            EventList<AbstractStockPrice> list1 = priceList;
+            EventList<AbstractStockPrice> list2 = this.getGui().getNotFoundPriceList();
+            List<AbstractStockPrice> list = OfxFileIo.concatPriceList(list1, list2);
+            QifUtils.saveToQif(list, priceTableViewOptions.isConvertWhenExport(), getGui().getDefaultCurrency(),
+                    getGui().getSymbolMapper(), getGui().getFxTable(), toFile, getGui().getTemplateDecimalSeparator());
         } catch (IOException e) {
             JOptionPane.showMessageDialog(parent, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -73,5 +78,9 @@ public final class SaveQIFAction extends AbstractAction {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("< creating FileChooser");
         }
+    }
+
+    private GUI getGui() {
+        return gui;
     }
 }

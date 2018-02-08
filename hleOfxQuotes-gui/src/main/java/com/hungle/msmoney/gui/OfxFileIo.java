@@ -22,7 +22,7 @@ public class OfxFileIo {
         }
     }
 
-    static final List<AbstractStockPrice> concatPriceList(List<AbstractStockPrice> list1,
+    public static final List<AbstractStockPrice> concatPriceList(EventList<AbstractStockPrice> list1,
             EventList<AbstractStockPrice> list2) {
         List<AbstractStockPrice> prices = new ArrayList<>();
         prices.addAll(list1);

@@ -36,7 +36,7 @@ public class QifUtils {
 
     private static final QifPlugin qifPlugin = null; // QifPlugin.createQifPlugin();
 
-    public static void saveToQif(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
+    public static void saveToQif(List<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
             SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
         saveToQifUsingVelocity(priceList, convert, defaultCurrency, symbolMapper, fxTable, file, templateDecimalSeparator);
     }
@@ -65,7 +65,7 @@ public class QifUtils {
         }
     }
 
-    public static void saveToQifUsingVelocity(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
+    public static void saveToQifUsingVelocity(List<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
             SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
         List<QifBean> qifBeans = toQifBeans(priceList, convert, defaultCurrency, symbolMapper, fxTable);
         VelocityContext context = new VelocityContext();
@@ -125,7 +125,7 @@ public class QifUtils {
         }
     }
 
-    private static List<QifBean> toQifBeans(EventList<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
+    private static List<QifBean> toQifBeans(List<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
             SymbolMapper symbolMapper, FxTable fxTable) {
         List<QifBean> qifBeans = new ArrayList<QifBean>();
         for (AbstractStockPrice price : priceList) {

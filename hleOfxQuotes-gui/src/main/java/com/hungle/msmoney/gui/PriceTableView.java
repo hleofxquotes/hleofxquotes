@@ -1,6 +1,8 @@
 package com.hungle.msmoney.gui;
 
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -13,6 +15,8 @@ import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
 
+import com.github.lgooddatepicker.tableeditors.DateTableEditor;
+import com.github.lgooddatepicker.tableeditors.TimeTableEditor;
 import com.hungle.msmoney.core.gui.AbstractGlazedListTableView;
 import com.hungle.msmoney.core.gui.PriceCellEditor;
 import com.hungle.msmoney.core.gui.PriceTableViewOptions;
@@ -100,11 +104,11 @@ public class PriceTableView<T extends AbstractStockPrice> extends AbstractGlazed
     @Override
     protected void setDefaultEditor(JTable table) {
         super.setDefaultEditor(table);
-        
+
         NumberFormat paymentFormat = NumberFormat.getCurrencyInstance();
         JTextField textField = new JFormattedTextField(paymentFormat);
 
-        TableCellEditor editor = new PriceCellEditor<T>(textField, this) {
+        TableCellEditor priceEditor = new PriceCellEditor<T>(textField, this) {
 
             @Override
             protected Object convertRowToType(T row, Object value) {
@@ -123,6 +127,13 @@ public class PriceTableView<T extends AbstractStockPrice> extends AbstractGlazed
                 return price;
             }
         };
-        table.setDefaultEditor(Price.class, editor);
+        table.setDefaultEditor(Price.class, priceEditor);
+
+        table.setDefaultEditor(LocalDate.class, new DateTableEditor());
+        table.setDefaultRenderer(LocalDate.class, new DateTableEditor());
+
+        table.setDefaultEditor(LocalTime.class, new TimeTableEditor());
+        table.setDefaultRenderer(LocalTime.class, new TimeTableEditor());
+
     }
 }
