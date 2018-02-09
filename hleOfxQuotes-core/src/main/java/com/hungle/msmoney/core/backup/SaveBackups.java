@@ -43,6 +43,10 @@ import com.hungle.msmoney.core.misc.StopWatch;
  */
 public class SaveBackups {
 
+    private static final String SHA256_FILE_SUFFIX = ".sha256";
+
+    private static final String MD5_FILE_SUFFXI = ".md5";
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(SaveBackups.class);
 
@@ -263,7 +267,14 @@ public class SaveBackups {
         }
 
         if (toFile != null) {
-            generateHashFiles(toFile);
+            String name = toFile.getName();
+            if (name.endsWith(MD5_FILE_SUFFXI)) {
+                // SKIP
+            } else if (name.endsWith(SHA256_FILE_SUFFIX)) {
+                // SKIP
+            } else {
+                generateHashFiles(toFile);
+            }
         }
 
         return copied;
@@ -276,14 +287,14 @@ public class SaveBackups {
 
             hashName = MD5;
             String md5String = new DigestUtils(hashName).digestAsHex(sourceFile);
-            hashFile = writeHash(md5String, sourceFile.getName(), toHashFile(sourceFile, ".md5"));
+            hashFile = writeHash(md5String, sourceFile.getName(), toHashFile(sourceFile, MD5_FILE_SUFFXI));
             if (hashFile != null) {
                 LOGGER.info("Created hashFile=" + hashFile.getAbsolutePath());
             }
 
             hashName = SHA_256;
             String sha256String = new DigestUtils(hashName).digestAsHex(sourceFile);
-            hashFile = writeHash(sha256String, sourceFile.getName(), toHashFile(sourceFile, ".sha256"));
+            hashFile = writeHash(sha256String, sourceFile.getName(), toHashFile(sourceFile, SHA256_FILE_SUFFIX));
             if (hashFile != null) {
                 LOGGER.info("Created hashFile=" + hashFile.getAbsolutePath());
             }

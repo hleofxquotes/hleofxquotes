@@ -596,7 +596,8 @@ public class GUI extends JFrame {
      * @param symbolMapper
      *            the symbol mapper
      */
-    private void updateLastPriceCurrency(List<AbstractStockPrice> stockPrices, String defaultCurrency, SymbolMapper symbolMapper) {
+    private void updateLastPriceCurrency(List<AbstractStockPrice> stockPrices, String defaultCurrency,
+            SymbolMapper symbolMapper) {
         for (AbstractStockPrice stockPrice : stockPrices) {
             Price price = stockPrice.getLastPrice();
             if ((defaultCurrency != null) && (price.getCurrency() == null)) {
@@ -763,53 +764,61 @@ public class GUI extends JFrame {
         FxTableUtils.addExchangeRates(exchangeRates, getFxTable());
         getFxTable().dump();
 
-        updateNotFoundPriceList(quoteSource);
+        uiUpdateNotFoundPriceList(quoteSource);
 
-        final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices : new ArrayList<AbstractStockPrice>();
+        final List<AbstractStockPrice> prices = (stockPrices != null) ? stockPrices
+                : new ArrayList<AbstractStockPrice>();
         updateLastPriceCurrency(prices, getDefaultCurrency(), getSymbolMapper());
 
+        List<List<AbstractStockPrice>> listOfPriceList = new ArrayList<List<AbstractStockPrice>>();
+        listOfPriceList.add(prices);
+        listOfPriceList.add(getNotFoundPriceList());
+
         if (getRandomizeShareCount()) {
-            randomizeShareCount(prices);
+            randomizeShareCount(listOfPriceList);
         }
 
         boolean hasWrappedShareCount = false;
-        if (incrementallyIncreasedShareCount) {
-            hasWrappedShareCount = incrementallyIncreasedShareCount(prices, hasWrappedShareCount);
+        if (getIncrementallyIncreasedShareCount()) {
+            hasWrappedShareCount = incrementallyIncreasedShareCount(listOfPriceList);
         }
 
         Double badPrice = null;
         if (getSuspiciousPrice() > -1L) {
-            badPrice = findBadPrice(prices);
+            badPrice = findBadPrice(listOfPriceList);
         }
 
-        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, quoteSource, getSymbolMapper(), getFxTable(),
-                badPrice, hasWrappedShareCount);
+        Runnable stockPricesReceivedTask = new StockPricesReceivedTask(this, prices, quoteSource, getSymbolMapper(),
+                getFxTable(), badPrice, hasWrappedShareCount);
         SwingUtilities.invokeLater(stockPricesReceivedTask);
     }
 
-    private Double findBadPrice(final List<AbstractStockPrice> prices) {
+    private Double findBadPrice(List<List<AbstractStockPrice>> listOfPriceList) {
         Double badPrice = null;
 
         Double d = new Double(getSuspiciousPrice());
-        for (AbstractStockPrice bean : prices) {
-            String stockSymbol = bean.getStockSymbol();
-            if ((stockSymbol != null) && (stockSymbol.startsWith("^"))) {
-                // index
-                continue;
-            }
-            Price price = bean.getLastPrice();
-            if (price == null) {
-                continue;
-            }
-            if (price.getPrice().compareTo(d) > 0) {
-                badPrice = price.getPrice();
-                break;
+        for (List<AbstractStockPrice> prices : listOfPriceList) {
+            for (AbstractStockPrice bean : prices) {
+                String stockSymbol = bean.getStockSymbol();
+                if ((stockSymbol != null) && (stockSymbol.startsWith("^"))) {
+                    // index
+                    continue;
+                }
+                Price price = bean.getLastPrice();
+                if (price == null) {
+                    continue;
+                }
+                if (price.getPrice().compareTo(d) > 0) {
+                    badPrice = price.getPrice();
+                    break;
+                }
             }
         }
         return badPrice;
     }
 
-    private boolean incrementallyIncreasedShareCount(final List<AbstractStockPrice> prices, boolean hasWrappedShareCount) {
+    private boolean incrementallyIncreasedShareCount(List<List<AbstractStockPrice>> listOfPriceList) {
+        boolean hasWrappedShareCount = false;
         String key = PREF_INCREMENTALLY_INCREASED_SHARE_COUNT_VALUE;
         double value = PREFS.getDouble(key, 0.000);
         if (value > 0.999) {
@@ -819,28 +828,32 @@ public class GUI extends JFrame {
             hasWrappedShareCount = true;
         }
         value = value + 0.001;
-        for (AbstractStockPrice bean : prices) {
-            bean.setUnits(value);
+        for (List<AbstractStockPrice> prices : listOfPriceList) {
+            for (AbstractStockPrice price : prices) {
+                price.setUnits(value);
+            }
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("incrementallyIncreasedShareCount=" + incrementallyIncreasedShareCount + ", value=" + value);
+            LOGGER.debug(
+                    "incrementallyIncreasedShareCount=" + getIncrementallyIncreasedShareCount() + ", value=" + value);
         }
         PREFS.putDouble(key, value);
         return hasWrappedShareCount;
     }
 
-    private void randomizeShareCount(final List<AbstractStockPrice> prices) {
+    private void randomizeShareCount(List<List<AbstractStockPrice>> listOfPriceList) {
         int randomInt = random.nextInt(998);
         randomInt = randomInt + 1;
         double value = randomInt / 1000.00;
         LOGGER.info("randomizeShareCount=" + getRandomizeShareCount() + ", value=" + value);
-        for (AbstractStockPrice price : prices) {
-            price.setUnits(value);
+        for (List<AbstractStockPrice> prices : listOfPriceList) {
+            for (AbstractStockPrice price : prices) {
+                price.setUnits(value);
+            }
         }
     }
 
-    private void updateNotFoundPriceList(final QuoteSource quoteSource) {
-        // TODO: cleanup
+    private void uiUpdateNotFoundPriceList(final QuoteSource quoteSource) {
         List<String> symbols = quoteSource.getNotFoundSymbols();
         if ((symbols != null) && (symbols.size() > 0)) {
             ArrayList<AbstractStockPrice> stockPrices = new ArrayList<AbstractStockPrice>();
@@ -848,11 +861,13 @@ public class GUI extends JFrame {
                 AbstractStockPrice stockPrice = new StockPrice(symbol, new Date(), 0.00);
                 stockPrices.add(stockPrice);
             }
-            getNotFoundPriceList().getReadWriteLock().writeLock().lock();
+
+            EventList<AbstractStockPrice> priceList = getNotFoundPriceList();
+            priceList.getReadWriteLock().writeLock().lock();
             try {
-                getNotFoundPriceList().addAll(stockPrices);
+                priceList.addAll(stockPrices);
             } finally {
-                getNotFoundPriceList().getReadWriteLock().writeLock().unlock();
+                priceList.getReadWriteLock().writeLock().unlock();
             }
         }
     }
@@ -881,9 +896,7 @@ public class GUI extends JFrame {
      *            the menubar
      */
     private void addToolsMenu(JMenuBar menubar) {
-        JMenu menu = null;
-
-        menu = new JMenu("Tools");
+        JMenu menu = new JMenu("Tools");
 
         // addCopyTemplates(menu);
         //
@@ -915,8 +928,8 @@ public class GUI extends JFrame {
                                 @Override
                                 public void run() {
                                     JOptionPane.showMessageDialog(menu,
-                                            "Done copying templates to\n" + templateDir.getAbsolutePath(), "Copying templates ...",
-                                            JOptionPane.INFORMATION_MESSAGE);
+                                            "Done copying templates to\n" + templateDir.getAbsolutePath(),
+                                            "Copying templates ...", JOptionPane.INFORMATION_MESSAGE);
                                 }
                             };
                             SwingUtilities.invokeLater(doRun);
@@ -1299,20 +1312,18 @@ public class GUI extends JFrame {
      *            the menubar
      */
     private void addEditMenu(JMenuBar menubar) {
-        JMenu editMenu = new JMenu();
-        menubar.add(editMenu);
+        JMenu menu = new JMenu("Edit");
+        menubar.add(menu);
 
-        addQuotesMenu(editMenu);
+        addQuotesMenu(menu);
 
-        addStatementMenu(editMenu);
+        addStatementMenu(menu);
 
-        addEditTemplateMenu(editMenu);
+        addEditTemplateMenu(menu);
     }
 
     private void addEditTemplateMenu(JMenu parentMenu) {
-        JMenu menu;
-
-        menu = new JMenu("Template");
+        JMenu menu = new JMenu("Template");
         // menubar.add(menu);
         parentMenu.add(menu);
 
@@ -1335,8 +1346,9 @@ public class GUI extends JFrame {
                 // get curent value
                 String currentValue = getTemplateDecimalSeparator();
                 Icon icon = null;
-                String s = (String) JOptionPane.showInputDialog(GUI.this, "Current: " + currentValue + "\n" + "Choices:",
-                        "Set Template Decimal Separator", JOptionPane.PLAIN_MESSAGE, icon, possibilities, currentValue);
+                String s = (String) JOptionPane.showInputDialog(GUI.this,
+                        "Current: " + currentValue + "\n" + "Choices:", "Set Template Decimal Separator",
+                        JOptionPane.PLAIN_MESSAGE, icon, possibilities, currentValue);
 
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
@@ -1404,17 +1416,19 @@ public class GUI extends JFrame {
                 String[] possibilities = { "true", "false" };
                 Icon icon = null;
                 String s = (String) JOptionPane.showInputDialog(GUI.this,
-                        "Current: " + incrementallyIncreasedShareCount + "\n" + "Choices:",
-                        "Set Incrementally Increased Share Count", JOptionPane.PLAIN_MESSAGE, icon, possibilities, null);
+                        "Current: " + getIncrementallyIncreasedShareCount() + "\n" + "Choices:",
+                        "Set Incrementally Increased Share Count", JOptionPane.PLAIN_MESSAGE, icon, possibilities,
+                        null);
 
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
                     String value = s;
                     LOGGER.info("Selected new 'Incrementally Increased Share Count': " + value);
                     Boolean newValue = Boolean.valueOf(value);
-                    if (newValue.compareTo(incrementallyIncreasedShareCount) != 0) {
-                        incrementallyIncreasedShareCount = newValue;
-                        PREFS.put(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT, incrementallyIncreasedShareCount.toString());
+                    if (newValue.compareTo(getIncrementallyIncreasedShareCount()) != 0) {
+                        setIncrementallyIncreasedShareCount(newValue);
+                        PREFS.put(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT,
+                                getIncrementallyIncreasedShareCount().toString());
                         // to clear the pricing table
                         QuoteSource quoteSource = null;
                         stockSymbolsStringReceived(quoteSource, null);
@@ -1467,8 +1481,9 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent event) {
                 String[] possibilities = null;
                 Icon icon = null;
-                String s = (String) JOptionPane.showInputDialog(GUI.this, "Current: " + dateOffset + "\n" + "Number of days:",
-                        "Set number of date to offset", JOptionPane.PLAIN_MESSAGE, icon, possibilities, dateOffset.toString());
+                String s = (String) JOptionPane.showInputDialog(GUI.this,
+                        "Current: " + dateOffset + "\n" + "Number of days:", "Set number of date to offset",
+                        JOptionPane.PLAIN_MESSAGE, icon, possibilities, dateOffset.toString());
 
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
@@ -1996,7 +2011,8 @@ public class GUI extends JFrame {
      *
      * @return the component
      */
-    private Component createPricesView(EventList<AbstractStockPrice> priceList, PriceTableViewOptions priceTableViewOptions) {
+    private Component createPricesView(EventList<AbstractStockPrice> priceList,
+            PriceTableViewOptions priceTableViewOptions) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("> createPricesView");
         }
@@ -2005,8 +2021,8 @@ public class GUI extends JFrame {
 
         JTextField priceFilterEdit = new JTextField(10);
         // EventList<AbstractStockPrice> localPriceList = getPriceList();
-        PriceTableView<AbstractStockPrice> priceTableView = new PriceTableView<AbstractStockPrice>(priceList, priceFilterEdit,
-                AbstractStockPrice.class, priceTableViewOptions);
+        PriceTableView<AbstractStockPrice> priceTableView = new PriceTableView<AbstractStockPrice>(priceList,
+                priceFilterEdit, AbstractStockPrice.class, priceTableViewOptions);
         view.add(priceTableView, BorderLayout.CENTER);
 
         JPanel commandView = new JPanel();
@@ -2137,7 +2153,8 @@ public class GUI extends JFrame {
             }
         };
         boolean addStripe = true;
-        JTable table = MapperTableUtils.createMapperTable(/* getMapper() */ null, comparator, filterEdit, filter, addStripe);
+        JTable table = MapperTableUtils.createMapperTable(/* getMapper() */ null, comparator, filterEdit, filter,
+                addStripe);
         // table.setFillsViewportHeight(true);
         JScrollPane scrolledPane = new JScrollPane(table);
 
@@ -2605,7 +2622,8 @@ public class GUI extends JFrame {
                             @Override
                             public void run() {
                                 String message = e.getMessage();
-                                JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(getContentPane(), message, errorTitle,
+                                        JOptionPane.ERROR_MESSAGE);
                             }
                         };
                         SwingUtilities.invokeLater(doRun);
