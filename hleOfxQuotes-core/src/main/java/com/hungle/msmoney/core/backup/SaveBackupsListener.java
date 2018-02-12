@@ -4,13 +4,13 @@ import java.io.File;
 
 public interface SaveBackupsListener {
 
-    void notifyCopyFile(File fromFile, File toFile, String password);
-
     void notifyStartBackup();
 
-    void notifyStartCopyFile(File file, String dirName, int size);
+    void notifyStartCopyFile(File file, File dir, int size);
 
-    void notifyDoneCopyFile(boolean copied, File file, String dirName, int size);
+    void notifyCopyFile(File fromFile, File toFile, String password);
+
+    void notifyDoneCopyFile(File file, File dir, int size, boolean copied);
 
     void notifyDoneBackup();
 
