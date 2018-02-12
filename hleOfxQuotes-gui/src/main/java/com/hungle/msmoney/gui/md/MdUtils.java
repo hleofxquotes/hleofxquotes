@@ -97,8 +97,10 @@ public class MdUtils {
     private static List<MdCsvBean> toMdCsvBeans(List<AbstractStockPrice> priceList, boolean convert,
             String defaultCurrency, SymbolMapper symbolMapper, FxTable fxTable) {
         List<MdCsvBean> rows = new ArrayList<MdCsvBean>();
+        
         for (AbstractStockPrice price : priceList) {
             MdCsvBean row = toMdCsvBean(convert, symbolMapper, price, fxTable, defaultCurrency);
+            LOGGER.info("Adding mdCsvBean=" + row);
             rows.add(row);
         }
 
@@ -108,9 +110,31 @@ public class MdUtils {
             if (fxSymbol == null) {
                 continue;
             }
-            rows.add(toMdCsvBeanAsDerivedValue(fxSymbol, price));
+            MdCsvBean mdCsvBeanAsDerivedValue = toMdCsvBeanAsDerivedValue(fxSymbol, price);
+            if (! rowsContains(rows, mdCsvBeanAsDerivedValue)) {
+                LOGGER.info("Adding mdCsvBeanAsDerivedValue=" + mdCsvBeanAsDerivedValue);
+                rows.add(mdCsvBeanAsDerivedValue);
+            }
         }
+
+        if (LOGGER.isDebugEnabled()) {
+            for (MdCsvBean row : rows) {
+                LOGGER.debug(row);
+            }
+        }
+
         return rows;
+    }
+
+    private static boolean rowsContains(List<MdCsvBean> rows, MdCsvBean mdCsvBeanAsDerivedValue) {
+        String symbol = mdCsvBeanAsDerivedValue.getSymbol();
+        for (MdCsvBean row: rows) {
+            if (row.getSymbol().compareToIgnoreCase(symbol) == 0) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     private static MdCsvBean toMdCsvBean(boolean convert, SymbolMapper symbolMapper, AbstractStockPrice price,
@@ -130,7 +154,9 @@ public class MdUtils {
         String symbol = price.getStockSymbol();
         if (price.getFxSymbol() != null) {
             // MD specific
-            symbol = symbol + "=X";
+            if (! symbol.endsWith("=X")) {
+                symbol = symbol + "=X";
+            }
         } else {
             if (convert) {
                 symbol = SymbolMapper.getStockSymbol(price.getStockSymbol(), symbolMapper);

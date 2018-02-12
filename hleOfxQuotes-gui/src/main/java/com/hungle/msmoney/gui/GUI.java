@@ -357,25 +357,20 @@ public class GUI extends JFrame {
     /**
      * Clear price table.
      */
-    protected void clearPriceTable() {
+    private void clearPriceTable() {
         getPriceList().clear();
         getConvertedPriceList().clear();
         getNotFoundPriceList().clear();
-
-        // exchangeRates.clear();
-        // if (priceFilterEdit != null) {
-        // priceFilterEdit.setText("");
-        // }
     }
 
     /**
      * Clear mapper table.
      */
-    protected void clearMapperTable() {
+    private void clearMapperTable() {
         // MapperTableUtils.clearMapperTable(getMapper());
     }
 
-    protected void clearFxTable() {
+    private void clearFxTable() {
         // FxTableUtils.clearFxTable(getExchangeRates());
     }
 
@@ -689,9 +684,7 @@ public class GUI extends JFrame {
     public void stockSymbolsStringReceived(QuoteSource quoteSource, String stockSymbolsString) {
         this.quoteSource = quoteSource;
 
-        clearPriceTable();
-
-        clearMapperTable();
+        clearAllTables();
 
         this.saveOfxButton.setEnabled(false);
 
@@ -722,11 +715,7 @@ public class GUI extends JFrame {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
-                clearPriceTable();
-
-                clearFxTable();
-
-                clearMapperTable();
+                clearAllTables();
             }
         };
         SwingUtilities.invokeLater(doRun);
@@ -2636,6 +2625,12 @@ public class GUI extends JFrame {
             String message = e.getMessage();
             JOptionPane.showMessageDialog(getContentPane(), message, errorTitle, JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void clearAllTables() {
+        clearPriceTable();
+        clearFxTable();
+        clearMapperTable();
     }
 
     public static String getHomeDirectory() {
