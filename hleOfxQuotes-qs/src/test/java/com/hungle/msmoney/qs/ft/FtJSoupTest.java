@@ -30,7 +30,7 @@ public class FtJSoupTest {
 
     @Test
     public void testLiveETF() throws IOException {
-        String[] etfs = { "VUKE:LSE:GBP", "FTAL:LSE:GBP" };
+        String[] etfs = { "IEUT:LSE:GBX", "FTAL:LSE:GBP" };
         for (String etf : etfs) {
             testLiveEtf(etf);
         }

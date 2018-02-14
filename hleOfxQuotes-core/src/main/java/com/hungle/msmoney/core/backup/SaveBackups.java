@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -43,7 +44,7 @@ public class SaveBackups {
                 listener.notifyStartBackup();
             }
 
-            Map<Calendar, DailyFile> buckets = BackupSourceDir.createBuckets(fromDir);
+            Map<Calendar, PerDayFile> buckets = BackupSourceDir.createBuckets(fromDir);
             result = saveBackups(buckets, toDir, password);
         } finally {
             result.setElapsed(stopWatch.click());
@@ -59,12 +60,12 @@ public class SaveBackups {
         this.listener = saveBackupsListener;
     }
 
-    private SaveBackupsResult saveBackups(Map<Calendar, DailyFile> buckets, File toTopDir, String password)
+    private SaveBackupsResult saveBackups(Map<Calendar, PerDayFile> buckets, File toTopDir, String password)
             throws IOException {
         SaveBackupsResult result = new SaveBackupsResult();
 
         SimpleDateFormat dirNameFormatter = new SimpleDateFormat("yyyy/MM/dd");
-        for (DailyFile bucketFile : buckets.values()) {
+        for (PerDayFile bucketFile : buckets.values()) {
             File bucketDir = toBucketDir(toTopDir, dirNameFormatter, bucketFile);
             File file = bucketFile.getFile();
             saveBackup(file, bucketDir, password, buckets, result);
@@ -73,7 +74,7 @@ public class SaveBackups {
         return result;
     }
 
-    private void saveBackup(File file, File dir, String password, Map<Calendar, DailyFile> buckets,
+    private void saveBackup(File file, File dir, String password, Map<Calendar, PerDayFile> buckets,
             SaveBackupsResult result) throws IOException {
         boolean copied = false;
         try {
@@ -92,7 +93,7 @@ public class SaveBackups {
         }
     }
 
-    private File toBucketDir(File toDir, SimpleDateFormat dirNameFormatter, DailyFile bucketFile) {
+    private File toBucketDir(File toDir, SimpleDateFormat dirNameFormatter, PerDayFile bucketFile) {
         String dirName = dirNameFormatter.format(bucketFile.getCalendar().getTime());
         LOGGER.info("###");
         LOGGER.info("> dirName=" + dirName);
@@ -121,16 +122,17 @@ public class SaveBackups {
 
         File toFile = null;
 
-        File lastModifiedFile = BackupToDir.getLastModifiedFile(dir);
-        if (lastModifiedFile != null) {
-            DailyFile currentDailyFile = new DailyFile(lastModifiedFile);
-            DailyFile dailyFile = new DailyFile(file);
-            if (DailyFile.isNewer(currentDailyFile, dailyFile)) {
+        List<File> newestList = BackupDestDir.getNewestList(dir);
+        if ((newestList != null) && (newestList.size() > 0)) {
+            File newestFile = newestList.get(0);
+            PerDayFile newestPerDayFile = new PerDayFile(newestFile);
+            PerDayFile perDayFile = new PerDayFile(file);
+            if (newestPerDayFile.isNewer(perDayFile)) {
                 LOGGER.info("Already has latest backup file for toDir=" + dir);
-                LOGGER.info("  currentBackupFile=" + currentDailyFile.getFile());
-                LOGGER.info("  backupFile=" + dailyFile.getFile());
+                LOGGER.info("  currentBackupFile=" + newestPerDayFile.getFile());
+                LOGGER.info("  backupFile=" + perDayFile.getFile());
                 // return false;
-                toFile = lastModifiedFile;
+                toFile = newestFile;
                 copied = false;
             }
         }
@@ -153,7 +155,15 @@ public class SaveBackups {
 
         generateHashFiles(toFile);
 
+        cleanup(newestList.subList(1, newestList.size() - 1));
+
         return copied;
+    }
+
+    private void cleanup(List<File> oldFiles) {
+        for (File oldFile : oldFiles) {
+            LOGGER.warn("CLEANUP, oldFile=" + oldFile);
+        }
     }
 
     private void generateHashFiles(File toFile) {

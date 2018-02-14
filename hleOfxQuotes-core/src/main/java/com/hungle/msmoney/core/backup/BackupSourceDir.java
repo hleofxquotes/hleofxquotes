@@ -10,15 +10,15 @@ import org.apache.log4j.Logger;
 public class BackupSourceDir {
     private static final Logger LOGGER = Logger.getLogger(BackupSourceDir.class);
 
-    static final Map<Calendar, DailyFile> createBuckets(File dir) {
+    static final Map<Calendar, PerDayFile> createBuckets(File dir) {
         // buckets.clear();
-        Map<Calendar, DailyFile> buckets = new TreeMap<Calendar, DailyFile>();
+        Map<Calendar, PerDayFile> buckets = new TreeMap<Calendar, PerDayFile>();
 
         File[] files = dir.listFiles();
         for (File file : files) {
-            DailyFile dailyFile = new DailyFile(file);
+            PerDayFile dailyFile = new PerDayFile(file);
             Calendar key = dailyFile.getCalendar();
-            DailyFile currentDailyFile = buckets.get(key);
+            PerDayFile currentDailyFile = buckets.get(key);
 
             if (currentDailyFile == null) {
                 if (LOGGER.isDebugEnabled()) {
@@ -27,7 +27,7 @@ public class BackupSourceDir {
                 }
                 buckets.put(key, dailyFile);
             } else {
-                if (DailyFile.isNewer(dailyFile, currentDailyFile)) {
+                if (dailyFile.isNewer(currentDailyFile)) {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Newer file for cal=" + key.getTime());
                         LOGGER.debug("    < " + currentDailyFile.getFile());

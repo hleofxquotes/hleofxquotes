@@ -53,7 +53,7 @@ public class FtQuoteGetterTest {
 
     @Test
     public void testLiveETF() throws IOException {
-        String[] etfs = { "VUKE:LSE:GBP", "FTAL:LSE:GBP" };
+        String[] etfs = { "IEUT:LSE:GBX", "FTAL:LSE:GBP" };
         List<String> list = Arrays.asList(etfs);
         FtEtfsQuoteGetter getter = null;
         try {

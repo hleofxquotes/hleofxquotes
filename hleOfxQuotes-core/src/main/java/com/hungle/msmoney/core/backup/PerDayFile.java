@@ -6,7 +6,7 @@ import java.util.Calendar;
 /**
  * The Class BackupFile.
  */
-final class DailyFile {
+final class PerDayFile {
 
     /** The file. */
     private final File file;
@@ -23,7 +23,7 @@ final class DailyFile {
      * @param file
      *            the file
      */
-    public DailyFile(File file) {
+    public PerDayFile(File file) {
         this.file = file;
         this.lastModified = file.lastModified();
 
@@ -66,8 +66,12 @@ final class DailyFile {
         return calendar;
     }
 
-    static boolean isNewer(DailyFile file1, DailyFile file2) {
+    private static boolean isNewer(PerDayFile file1, PerDayFile file2) {
         return file1.getLastModified() > file2.getLastModified();
+    }
+
+    public boolean isNewer(PerDayFile file2) {
+        return isNewer(this, file2);
     }
 
 }
