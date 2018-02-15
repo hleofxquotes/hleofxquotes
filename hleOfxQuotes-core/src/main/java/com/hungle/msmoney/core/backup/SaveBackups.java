@@ -36,7 +36,7 @@ public class SaveBackups {
      *             Signals that an I/O exception has occurred.
      */
     public SaveBackupsResult saveBackups(File fromDir, File toDir, String password) throws IOException {
-        SaveBackupsResult result = null;
+        SaveBackupsResult result = new SaveBackupsResult();
         StopWatch stopWatch = new StopWatch();
 
         try {
@@ -65,10 +65,14 @@ public class SaveBackups {
         SaveBackupsResult result = new SaveBackupsResult();
 
         SimpleDateFormat dirNameFormatter = new SimpleDateFormat("yyyy/MM/dd");
-        for (PerDayFile bucketFile : buckets.values()) {
-            File bucketDir = toBucketDir(toTopDir, dirNameFormatter, bucketFile);
-            File file = bucketFile.getFile();
-            saveBackup(file, bucketDir, password, buckets, result);
+        for (PerDayFile perDayFile : buckets.values()) {
+            try {
+                File bucketDir = toBucketDir(toTopDir, dirNameFormatter, perDayFile);
+                File file = perDayFile.getFile();
+                saveBackup(file, bucketDir, password, buckets, result);
+            } catch (Exception e) {
+                LOGGER.error(e, e);
+            }
         }
 
         return result;
@@ -123,17 +127,18 @@ public class SaveBackups {
         File toFile = null;
 
         List<File> newestList = BackupDestDir.getNewestList(dir);
+        
         if ((newestList != null) && (newestList.size() > 0)) {
             File newestFile = newestList.get(0);
-            PerDayFile newestPerDayFile = new PerDayFile(newestFile);
-            PerDayFile perDayFile = new PerDayFile(file);
-            if (newestPerDayFile.isNewer(perDayFile)) {
-                LOGGER.info("Already has latest backup file for toDir=" + dir);
-                LOGGER.info("  currentBackupFile=" + newestPerDayFile.getFile());
-                LOGGER.info("  backupFile=" + perDayFile.getFile());
-                // return false;
+            if (file.lastModified() > newestFile.lastModified()) {
+                toFile = null;
+            } else {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Already has latest backup file for toDir=" + dir);
+                    LOGGER.debug("  currentBackupFile=" + newestFile);
+                    LOGGER.debug("  backupFile=" + file);
+                }
                 toFile = newestFile;
-                copied = false;
             }
         }
 
@@ -155,7 +160,9 @@ public class SaveBackups {
 
         generateHashFiles(toFile);
 
-        cleanup(newestList.subList(1, newestList.size() - 1));
+        if (newestList.size() > 1) {
+            cleanup(newestList.subList(1, newestList.size() - 1));
+        }
 
         return copied;
     }
@@ -166,15 +173,15 @@ public class SaveBackups {
         }
     }
 
-    private void generateHashFiles(File toFile) {
-        if (toFile != null) {
-            String name = toFile.getName();
+    private void generateHashFiles(File file) {
+        if (file != null) {
+            String name = file.getName();
             if (name.endsWith(HashFile.MD5_FILE_SUFFIX)) {
                 // SKIP
             } else if (name.endsWith(HashFile.SHA256_FILE_SUFFIX)) {
                 // SKIP
             } else {
-                HashFile.generateHashFiles(toFile);
+                HashFile.generateHashFiles(file);
             }
         }
     }

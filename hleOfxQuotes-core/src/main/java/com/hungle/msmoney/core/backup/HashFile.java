@@ -19,31 +19,31 @@ public class HashFile {
             File hashFile = null;
             String hashName = null;
 
-            hashName = MD5;
-            String md5String = new DigestUtils(hashName).digestAsHex(sourceFile);
-            hashFile = writeHash(md5String, sourceFile.getName(), toHashFile(sourceFile, HashFile.MD5_FILE_SUFFIX));
-            if (hashFile != null) {
-                LOGGER.info("Created hashFile=" + hashFile.getAbsolutePath());
+            hashFile = toHashFile(sourceFile, HashFile.MD5_FILE_SUFFIX);
+            if (!hashFile.exists()) {
+                hashName = MD5;
+                String md5String = new DigestUtils(hashName).digestAsHex(sourceFile);
+                writeHash(md5String, sourceFile.getName(), hashFile);
+                if (hashFile != null) {
+                    LOGGER.info("Created hashFile=" + hashFile.getAbsolutePath());
+                }
             }
 
-            hashName = SHA_256;
-            String sha256String = new DigestUtils(hashName).digestAsHex(sourceFile);
-            hashFile = writeHash(sha256String, sourceFile.getName(),
-                    toHashFile(sourceFile, HashFile.SHA256_FILE_SUFFIX));
-            if (hashFile != null) {
-                LOGGER.info("Created hashFile=" + hashFile.getAbsolutePath());
+            hashFile = toHashFile(sourceFile, HashFile.SHA256_FILE_SUFFIX);
+            if (!hashFile.exists()) {
+                hashName = SHA_256;
+                String sha256String = new DigestUtils(hashName).digestAsHex(sourceFile);
+                writeHash(sha256String, sourceFile.getName(), hashFile);
+                if (hashFile != null) {
+                    LOGGER.info("Created hashFile=" + hashFile.getAbsolutePath());
+                }
             }
         } catch (IOException e) {
             LOGGER.warn(e);
         }
-
     }
 
-    private static File writeHash(String hashString, String sourceFileName, File file) throws IOException {
-        if (file.exists()) {
-            return null;
-        }
-
+    private static void writeHash(String hashString, String sourceFileName, File file) throws IOException {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new FileWriter(file));
@@ -54,8 +54,6 @@ public class HashFile {
                 writer = null;
             }
         }
-
-        return file;
     }
 
     private static void writeHash(String hashString, String sourceFileName, PrintWriter writer) {
