@@ -1,6 +1,5 @@
 package com.hungle.msmoney.qs.net;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,7 +34,7 @@ import com.hungle.msmoney.core.stockprice.FxSymbol;
 /**
  * The Class AbstractHttpQuoteGetter.
  */
-public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter, Closeable {
+public abstract class AbstractHttpQuoteGetter implements HttpQuoteGetter {
 
     /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(AbstractHttpQuoteGetter.class);

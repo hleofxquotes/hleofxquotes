@@ -62,11 +62,13 @@ public class StockPrice extends AbstractStockPrice {
     /** The units. */
     private double units = 0.0;
 
-    /** The support. */
-    private PropertyChangeSupport support = new PropertyChangeSupport(this);
-
     /** The last trade. */
     private Date lastTrade;
+    
+    private String quoteSourceName;
+
+    /** The support. */
+    private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     /**
      * Adds the property change listener.
@@ -533,5 +535,13 @@ public class StockPrice extends AbstractStockPrice {
             return false;
         }
         return secType.equals("BOND");
+    }
+
+    public String getQuoteSourceName() {
+        return quoteSourceName;
+    }
+
+    public void setQuoteSourceName(String quoteSourceName) {
+        this.quoteSourceName = quoteSourceName;
     }
 }

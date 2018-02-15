@@ -14,27 +14,36 @@ import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 /**
  * The Interface HttpQuoteGetter.
  */
-public interface HttpQuoteGetter {
+public interface HttpQuoteGetter extends QuoteGetter {
 
     /**
      * Http get.
      *
-     * @param stocks the stocks
-     * @param format the format
+     * @param stocks
+     *            the stocks
+     * @param format
+     *            the format
      * @return the http response
-     * @throws URISyntaxException the URI syntax exception
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ClientProtocolException the client protocol exception
+     * @throws URISyntaxException
+     *             the URI syntax exception
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     * @throws ClientProtocolException
+     *             the client protocol exception
      */
-    HttpResponse httpGet(List<String> stocks, String format) throws URISyntaxException, IOException, ClientProtocolException;
+    HttpResponse httpGet(List<String> stocks, String format)
+            throws URISyntaxException, IOException, ClientProtocolException;
 
     /**
      * Http entity to stock price bean.
      *
-     * @param entity the entity
-     * @param skipIfNoPrice the skip if no price
+     * @param entity
+     *            the entity
+     * @param skipIfNoPrice
+     *            the skip if no price
      * @return the list
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     List<AbstractStockPrice> httpEntityToStockPriceBean(HttpEntity entity, boolean skipIfNoPrice) throws IOException;
 

@@ -158,7 +158,7 @@ public class YahooQuoteSourcePanel extends JPanel {
                 }
             }
         };
-        this.stockSymbolsPrefKey = stockSymbolsPrefKey;
+        this.setStockSymbolsPrefKey(stockSymbolsPrefKey);
 
         createView();
     }
@@ -187,7 +187,7 @@ public class YahooQuoteSourcePanel extends JPanel {
 
         JTextArea textArea = new JTextArea();
         textArea = new JTextArea();
-        String stockSymbols = OfxUtils.retrieveStockSymbols(getPrefs(), stockSymbolsPrefKey);
+        String stockSymbols = OfxUtils.retrieveStockSymbols(getPrefs(), getStockSymbolsPrefKey());
         if ((stockSymbols != null) && (stockSymbols.length() > 0)) {
             textArea.setText(stockSymbols);
             textArea.setCaretPosition(0);
@@ -397,7 +397,7 @@ public class YahooQuoteSourcePanel extends JPanel {
         try {
             stockPrices = getStockQuotes(stockSymbols);
         } finally {
-            OfxUtils.storeStockSymbols(getPrefs(), stockSymbolsPrefKey, stocksString);
+            OfxUtils.storeStockSymbols(getPrefs(), getStockSymbolsPrefKey(), stocksString);
             stockPricesReceived(stockPrices);
         }
     }
@@ -562,6 +562,14 @@ public class YahooQuoteSourcePanel extends JPanel {
 
     public void storeStockSymbols() {
         String symbolsString = getStockSymbolsView().getText();
-        OfxUtils.storeStockSymbols(getPrefs(), stockSymbolsPrefKey, symbolsString);
+        OfxUtils.storeStockSymbols(getPrefs(), getStockSymbolsPrefKey(), symbolsString);
+    }
+
+    private String getStockSymbolsPrefKey() {
+        return stockSymbolsPrefKey;
+    }
+
+    private void setStockSymbolsPrefKey(String stockSymbolsPrefKey) {
+        this.stockSymbolsPrefKey = stockSymbolsPrefKey;
     }
 }

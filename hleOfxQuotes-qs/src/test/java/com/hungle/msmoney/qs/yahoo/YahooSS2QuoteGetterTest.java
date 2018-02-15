@@ -13,9 +13,12 @@ import org.junit.Test;
 import com.hungle.msmoney.core.misc.ResourceUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
+import com.hungle.msmoney.qs.net.QuoteGetter;
 
 public class YahooSS2QuoteGetterTest {
     private static final Logger LOGGER = Logger.getLogger(YahooSS2QuoteGetterTest.class);
+
+    public static final String[] SAMPLE_STOCK_SYMBOLS = { "IBM", "AAPL", };
 
     @Test
     public void testRegularMarketTime() {
@@ -71,10 +74,10 @@ public class YahooSS2QuoteGetterTest {
 
     @Test
     public void testYahooSS2QuoteGetterLive() throws IOException {
-        String[] symbols = { "IBM", "AAPL", };
-
+        String[] symbols = SAMPLE_STOCK_SYMBOLS;
         List<String> list = Arrays.asList(symbols);
-        YahooSS2QuoteGetter getter = null;
+
+        QuoteGetter getter = null;
         try {
             getter = new YahooSS2QuoteGetter();
 

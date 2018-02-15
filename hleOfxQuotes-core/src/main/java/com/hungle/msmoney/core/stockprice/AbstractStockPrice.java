@@ -470,4 +470,8 @@ public abstract class AbstractStockPrice implements Cloneable {
     private LocalTime convertToLocalTimeViaInstant(Date dateToConvert) {
         return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
     }
+    
+    public abstract void setQuoteSourceName(String quoteSourceName);
+    
+    public abstract String getQuoteSourceName();
 }

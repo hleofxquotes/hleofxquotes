@@ -109,6 +109,7 @@ import com.hungle.msmoney.gui.qs.FtCsvQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEquitiesSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEtfsSourcePanel;
 import com.hungle.msmoney.gui.qs.FtFundsSourcePanel;
+import com.hungle.msmoney.gui.qs.MultiSourcePanel;
 import com.hungle.msmoney.gui.qs.TIAACREFQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.YahooApiQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.YahooHistSourcePanel;
@@ -702,7 +703,7 @@ public class GUI extends JFrame {
      *            the quote source
      * @param stockSymbols
      */
-    private void stockPricesLookupStarted(QuoteSource quoteSource, final List<String> stockSymbols) {
+    private void stockPricesLookupStarted(final QuoteSource quoteSource, final List<String> stockSymbols) {
         this.quoteSource = quoteSource;
 
         setSymbolMapper(SymbolMapper.loadMapperFile());
@@ -715,7 +716,10 @@ public class GUI extends JFrame {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
-                clearAllTables();
+                // HACK - quoteSource is null if we switch tab
+                if (quoteSource != null) {
+                    clearAllTables();
+                }
             }
         };
         SwingUtilities.invokeLater(doRun);
@@ -742,6 +746,9 @@ public class GUI extends JFrame {
         getSymbolMapper().dump();
 
         List<AbstractStockPrice> exchangeRates = quoteSource.getExchangeRates();
+        if (exchangeRates == null) {
+            exchangeRates = new ArrayList<AbstractStockPrice>();
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("> BEGIN exchangeRates");
             for (AbstractStockPrice exchangeRate : exchangeRates) {
@@ -1645,7 +1652,7 @@ public class GUI extends JFrame {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("> creating createYahooScreenScrapper2SourceView");
         }
-        tabbedPane.addTab("Yahoo2", createYahooScreenScrapper2SourceView());
+        tabbedPane.addTab("Yahoo", createYahooScreenScrapper2SourceView());
 
         // if (LOGGER.isDebugEnabled()) {
         // LOGGER.debug("> creating createTIAACREFQuoteSourceView");
@@ -1661,6 +1668,8 @@ public class GUI extends JFrame {
 
         // createFtEtfsSourceView
         // tabbedPane.addTab("FT ETFs", createFtEtfsSourceView());
+
+        tabbedPane.addTab("Multi", createMultiSourceView());
 
         int initialIndex = PREFS.getInt(PREF_SELECTED_QUOTE_SOURCE, 0);
         LOGGER.info("RESTORE selectedQuoteSource, index=" + initialIndex);
@@ -1767,6 +1776,12 @@ public class GUI extends JFrame {
         return view;
     }
 
+    private Component createMultiSourceView() {
+        final MultiSourcePanel view = new MultiSourcePanel(this);
+//        this.multiSourcePanel = view;
+        return view;
+    }
+    
     /**
      * Creates the TIAACREF quote source view.
      *

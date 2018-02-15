@@ -9,7 +9,7 @@ import com.hungle.msmoney.qs.yahoo.YahooSS2QuoteGetter;
 public class YahooSS2SourcePanel extends YahooQuoteSourcePanel {
     private static final Logger LOGGER = Logger.getLogger(YahooSS2SourcePanel.class);
 
-    private static final String STOCK_SYMBOLS_PREF_KEY = "yahooScreenScrapper2";
+    static final String STOCK_SYMBOLS_PREF_KEY = "yahooScreenScrapper2";
 
     @Override
     protected AbstractHttpQuoteGetter getHttpQuoteGetter() {

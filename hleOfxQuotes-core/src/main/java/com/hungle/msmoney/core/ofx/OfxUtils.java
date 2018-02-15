@@ -44,7 +44,7 @@ public class OfxUtils {
      * @param sep the sep
      * @return the list
      */
-    private static List<String> fromSeparatedString(String str, String sep) {
+    public static List<String> fromSeparatedString(String str, String sep) {
         List<String> list = new ArrayList<String>();
         if (str == null) {
             return list;

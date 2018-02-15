@@ -9,7 +9,7 @@ import com.hungle.msmoney.qs.net.AbstractHttpQuoteGetter;
 public class FtEquitiesSourcePanel extends YahooQuoteSourcePanel {
     private static final Logger LOGGER = Logger.getLogger(FtEquitiesSourcePanel.class);
 
-    private static final String STOCK_SYMBOLS_PREF_KEY = "ftEquitiesSourcePanel";
+    static final String STOCK_SYMBOLS_PREF_KEY = "ftEquitiesSourcePanel";
 
 
     @Override
