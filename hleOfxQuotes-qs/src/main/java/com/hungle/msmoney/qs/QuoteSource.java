@@ -17,6 +17,8 @@ public interface QuoteSource {
      */
     List<AbstractStockPrice> getExchangeRates();
 
+    void setHistoricalQuotes(boolean b);
+
     /**
      * Checks if is historical quotes.
      *
@@ -25,4 +27,8 @@ public interface QuoteSource {
     boolean isHistoricalQuotes();
     
     List<String> getNotFoundSymbols();
+
+    void setQuotesResult(QuotesResult quotesResult);
+    
+    QuotesResult getQuotesResult();
 }

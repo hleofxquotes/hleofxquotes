@@ -84,8 +84,6 @@ public abstract class AbstractLatestPricesGUI {
         this.prefs = Preferences.userNodeForPackage(AbstractLatestPricesGUI.class);
     }
 
-    protected abstract void refresh(List<Result> results);
-
     protected abstract Component initTableView(JTextField filterEdit);
 
     /**
@@ -103,7 +101,7 @@ public abstract class AbstractLatestPricesGUI {
         menuBar.add(mnNewMenu);
 
         JMenuItem mntmNewMenuItem_1 = new JMenuItem("Open");
-        mntmNewMenuItem_1.addActionListener(new MnyViewerOpenDbAction(AbstractLatestPricesGUI.this.getFrame(), prefs, mnyDb));
+        mntmNewMenuItem_1.addActionListener(new MnyViewerOpenDbAction(AbstractLatestPricesGUI.this.getFrame(), prefs, getMnyDb()));
         mnNewMenu.add(mntmNewMenuItem_1);
 
         JMenuItem mntmNewMenuItem = new JMenuItem("Exit");
@@ -138,11 +136,18 @@ public abstract class AbstractLatestPricesGUI {
 
     }
 
-    private void openMnyDb(MnyDb newMnyDb, boolean readOnly) {
+    protected void openMnyDb(MnyDb newMnyDb, boolean readOnly) {
         if (newMnyDb != null) {
-            AbstractLatestPricesGUI.this.mnyDb = newMnyDb;
+            AbstractLatestPricesGUI.this.setMnyDb(newMnyDb);
+        } else {
+            LOGGER.warn("newMnyDb is null. Cannot open.");
+            return;
         }
 
+        refreshViewWith(getMnyDb());
+    }
+
+    protected void refreshViewWith(MnyDb mnyDb) {
         String title = MnyViewer.TITLE_NO_OPENED_DB;
         File dbFile = mnyDb.getDbFile();
         if (dbFile != null) {
@@ -152,12 +157,14 @@ public abstract class AbstractLatestPricesGUI {
 
         try {
             GetLatestSecurityPrices getter = new GetLatestSecurityPrices();
-            final List<Result> results = getter.getLatestSecurityPrices(getMnyDb());
-            refresh(results);
+            final List<Result> results = getter.getLatestSecurityPrices(mnyDb);
+            refreshView(results);
         } catch (IOException e) {
             LOGGER.error(e, e);
         }
     }
+
+    protected abstract void refreshView(List<Result> results);
 
     public JFrame getFrame() {
         return frame;

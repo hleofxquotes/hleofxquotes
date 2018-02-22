@@ -12,8 +12,8 @@ import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.qs.multi.MultiSourcesQuoteGetter;
 import com.hungle.msmoney.qs.net.AbstractHttpQuoteGetter;
 
-public class MultiSourcePanel extends YahooQuoteSourcePanel {
-    private static final Logger LOGGER = Logger.getLogger(MultiSourcePanel.class);
+public class MultiSourcePanel0 extends YahooQuoteSourcePanel {
+    private static final Logger LOGGER = Logger.getLogger(MultiSourcePanel0.class);
 
     private static final String STOCK_SYMBOLS_PREF_KEY = "multiSourcePanel";
 
@@ -65,7 +65,7 @@ public class MultiSourcePanel extends YahooQuoteSourcePanel {
         throw new UnsupportedOperationException("getHttpQuoteGetter is not implemented.");
     }
 
-    public MultiSourcePanel(GUI gui) {
+    public MultiSourcePanel0(GUI gui) {
         super(gui, STOCK_SYMBOLS_PREF_KEY);
     }
 

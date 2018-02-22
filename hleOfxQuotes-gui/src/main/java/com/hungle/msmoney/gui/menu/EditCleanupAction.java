@@ -10,8 +10,8 @@ import javax.swing.JTextArea;
 
 import org.apache.log4j.Logger;
 
+import com.hungle.msmoney.gui.qs.QuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.QuoteSourceUtils;
-import com.hungle.msmoney.gui.qs.YahooQuoteSourcePanel;
 
 public final class EditCleanupAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(EditCleanupAction.class);
@@ -19,10 +19,10 @@ public final class EditCleanupAction extends AbstractAction {
     /**
      * 
      */
-    private final YahooQuoteSourcePanel yahooQuoteSourcePanel;
+    private final QuoteSourcePanel yahooQuoteSourcePanel;
     private final JTextArea textArea;
 
-    public EditCleanupAction(YahooQuoteSourcePanel yahooQuoteSourcePanel, String name, JTextArea textArea) {
+    public EditCleanupAction(QuoteSourcePanel yahooQuoteSourcePanel, String name, JTextArea textArea) {
         super(name);
         this.yahooQuoteSourcePanel = yahooQuoteSourcePanel;
         this.textArea = textArea;

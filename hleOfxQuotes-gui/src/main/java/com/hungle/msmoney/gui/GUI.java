@@ -109,7 +109,8 @@ import com.hungle.msmoney.gui.qs.FtCsvQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEquitiesSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEtfsSourcePanel;
 import com.hungle.msmoney.gui.qs.FtFundsSourcePanel;
-import com.hungle.msmoney.gui.qs.MultiSourcePanel;
+import com.hungle.msmoney.gui.qs.MultiSourcePanel0;
+import com.hungle.msmoney.gui.qs.QuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.TIAACREFQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.YahooApiQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.YahooHistSourcePanel;
@@ -119,6 +120,7 @@ import com.hungle.msmoney.gui.task.StockPricesReceivedTask;
 import com.hungle.msmoney.qs.DefaultQuoteSource;
 import com.hungle.msmoney.qs.QuoteSource;
 import com.hungle.msmoney.qs.QuoteSourceListener;
+import com.hungle.msmoney.qs.QuotesResult;
 import com.hungle.msmoney.qs.yahoo.YahooQuotesGetter;
 import com.hungle.msmoney.stmt.StatementPanel;
 import com.hungle.msmoney.stmt.fi.props.FIBean;
@@ -275,7 +277,7 @@ public class GUI extends JFrame {
     private FtCsvQuoteSourcePanel ftDotComQuoteSourcePanel;
 
     /** The yahoo historical quote source view. */
-    private YahooQuoteSourcePanel yahooHistoricalQuoteSourceView;
+    private QuoteSourcePanel yahooHistoricalQuoteSourceView;
 
     /** The quote source listener. */
     private QuoteSourceListener quoteSourceListener;
@@ -304,7 +306,7 @@ public class GUI extends JFrame {
     private JTabbedPane mainTabbed;
 
     /** The selected quote source. */
-    private int selectedQuoteSource;
+    private int selectedQuoteSourceIndex;
 
     /** The import dialog auto click service. */
     private ImportDialogAutoClickService importDialogAutoClickService;
@@ -325,7 +327,7 @@ public class GUI extends JFrame {
     // TODO_FI
     private File fiDir = new File(System.getProperty("fi.dir", FIBean.getDefaultFiDir()));
 
-    private YahooSS2SourcePanel yahooScreenScrapper2SourcePanel;
+//    private YahooSS2SourcePanel yahooScreenScrapper2SourcePanel;
 
     private SymbolMapper symbolMapper = SymbolMapper.loadMapperFile();
 
@@ -338,6 +340,8 @@ public class GUI extends JFrame {
     private FtEtfsSourcePanel ftEtfsSourcePanel;
 
     private QuoteSource quoteSource;
+    
+//    private List<QuoteSource> quoteSources = new ArrayList<QuoteSource>();
 
     public static final class TemplateEntry {
 
@@ -426,7 +430,7 @@ public class GUI extends JFrame {
     }
 
     public void saveToOFX(List<AbstractStockPrice> prices) throws IOException {
-        boolean onePerFile = quoteSource.isHistoricalQuotes();
+        boolean onePerFile = getQuoteSource().isHistoricalQuotes();
         List<File> ofxFiles = saveToOFX(prices, symbolMapper, fxTable, onePerFile);
     }
 
@@ -682,8 +686,8 @@ public class GUI extends JFrame {
      * @param stockSymbolsString
      *            the stock symbols string
      */
-    public void stockSymbolsStringReceived(QuoteSource quoteSource, String stockSymbolsString) {
-        this.quoteSource = quoteSource;
+    public void stockSymbolsStringReceived(final QuoteSource quoteSource, String stockSymbolsString) {
+        this.setQuoteSource(quoteSource);
 
         clearAllTables();
 
@@ -704,7 +708,7 @@ public class GUI extends JFrame {
      * @param stockSymbols
      */
     private void stockPricesLookupStarted(final QuoteSource quoteSource, final List<String> stockSymbols) {
-        this.quoteSource = quoteSource;
+        this.setQuoteSource(quoteSource);
 
         setSymbolMapper(SymbolMapper.loadMapperFile());
         setFxTable(FxTableUtils.loadFxFile());
@@ -716,11 +720,19 @@ public class GUI extends JFrame {
         Runnable doRun = new Runnable() {
             @Override
             public void run() {
+                LOGGER.info("quoteSource=" + quoteSource);
+                
                 // HACK - quoteSource is null if we switch tab
-                if (quoteSource != null) {
+                if (quoteSource == null) {
                     clearAllTables();
+                } else {
+                    clearAllTables();
+                    
+                    // repopulate with result if available
+//                    restorePreviousResult(quoteSource);
                 }
             }
+
         };
         SwingUtilities.invokeLater(doRun);
     }
@@ -741,7 +753,7 @@ public class GUI extends JFrame {
      *            the stock prices
      */
     private void stockPricesReceived(final QuoteSource quoteSource, List<AbstractStockPrice> stockPrices) {
-        this.quoteSource = quoteSource;
+        this.setQuoteSource(quoteSource);
 
         getSymbolMapper().dump();
 
@@ -1652,14 +1664,20 @@ public class GUI extends JFrame {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("> creating createYahooScreenScrapper2SourceView");
         }
-        tabbedPane.addTab("Yahoo", createYahooScreenScrapper2SourceView());
+        QuoteSourcePanel quoteSourcePanel = null;
+
+        quoteSourcePanel = createYahooScreenScrapper2SourceView();
+//        quoteSources.add(quoteSourcePanel.getQuoteSource());
+        tabbedPane.addTab("Yahoo", quoteSourcePanel);
 
         // if (LOGGER.isDebugEnabled()) {
         // LOGGER.debug("> creating createTIAACREFQuoteSourceView");
         // }
         // tabbedPane.addTab("Scholarshare", createTIAACREFQuoteSourceView());
 
-        tabbedPane.addTab("FT", createFtEquitiesSourceView());
+        quoteSourcePanel = createFtEquitiesSourceView();
+//        quoteSources.add(quoteSourcePanel.getQuoteSource());
+        tabbedPane.addTab("FT", quoteSourcePanel);
 
         // tabbedPane.addTab("FT Equities", createFtEquitiesSourceView());
 
@@ -1669,7 +1687,10 @@ public class GUI extends JFrame {
         // createFtEtfsSourceView
         // tabbedPane.addTab("FT ETFs", createFtEtfsSourceView());
 
-        tabbedPane.addTab("Multi", createMultiSourceView());
+//        quoteSourcePanel = createMultiSourceView0();
+        quoteSourcePanel = createMultiSourceView();
+//        quoteSources.add(quoteSourcePanel.getQuoteSource());
+        tabbedPane.addTab("Multi", quoteSourcePanel);
 
         int initialIndex = PREFS.getInt(PREF_SELECTED_QUOTE_SOURCE, 0);
         LOGGER.info("RESTORE selectedQuoteSource, index=" + initialIndex);
@@ -1682,11 +1703,7 @@ public class GUI extends JFrame {
             @Override
             public void stateChanged(ChangeEvent event) {
                 JTabbedPane p = (JTabbedPane) event.getSource();
-                selectedQuoteSource = p.getSelectedIndex();
-                LOGGER.info("selectedQuoteSource=" + selectedQuoteSource);
-                saveSelectedQuoteSource(selectedQuoteSource);
-                QuoteSource quoteSource = null;
-                stockPricesLookupStarted(quoteSource, new ArrayList<String>());
+                quoteSourceTabSelected(p);
             }
         });
         return tabbedPane;
@@ -1702,7 +1719,7 @@ public class GUI extends JFrame {
      *
      * @return the component
      */
-    private Component createYahooSourceView() {
+    private QuoteSourcePanel createYahooSourceView() {
         final YahooQuoteSourcePanel view = new YahooQuoteSourcePanel(this);
         this.yahooQuoteSourceView = view;
         return view;
@@ -1713,7 +1730,7 @@ public class GUI extends JFrame {
      *
      * @return the component
      */
-    private Component createYahooApiSourceView() {
+    private QuoteSourcePanel createYahooApiSourceView() {
         final YahooApiQuoteSourcePanel view = new YahooApiQuoteSourcePanel(this);
         this.yahooApiQuoteSourcePanel = view;
         return view;
@@ -1724,7 +1741,7 @@ public class GUI extends JFrame {
      *
      * @return the component
      */
-    private Component createFtDotComSourceView() {
+    private QuoteSourcePanel createFtDotComSourceView() {
         final FtCsvQuoteSourcePanel view = new FtCsvQuoteSourcePanel(this);
         this.ftDotComQuoteSourcePanel = view;
         return view;
@@ -1735,8 +1752,8 @@ public class GUI extends JFrame {
      *
      * @return the component
      */
-    private Component createYahooHistoricalSourceView() {
-        final YahooQuoteSourcePanel view = new YahooHistSourcePanel(this);
+    private QuoteSourcePanel createYahooHistoricalSourceView() {
+        final QuoteSourcePanel view = new YahooHistSourcePanel(this);
         this.yahooHistoricalQuoteSourceView = view;
         return view;
     }
@@ -1746,39 +1763,45 @@ public class GUI extends JFrame {
      *
      * @return the component
      */
-    private Component createBloombergSourceView() {
+    private QuoteSourcePanel createBloombergSourceView() {
         final YahooApiQuoteSourcePanel view = new BloombergQuoteSourcePanel(this);
         this.bloombergQuoteSourcePanel = view;
         return view;
     }
 
-    private Component createYahooScreenScrapper2SourceView() {
+    private QuoteSourcePanel createYahooScreenScrapper2SourceView() {
         final YahooSS2SourcePanel view = new YahooSS2SourcePanel(this);
-        this.yahooScreenScrapper2SourcePanel = view;
+//        this.yahooScreenScrapper2SourcePanel = view;
         return view;
     }
 
-    private Component createFtEquitiesSourceView() {
+    private QuoteSourcePanel createFtEquitiesSourceView() {
         final FtEquitiesSourcePanel view = new FtEquitiesSourcePanel(this);
         this.ftEquitiesSourcePanel = view;
         return view;
     }
 
-    private Component createFtFundsSourceView() {
+    private QuoteSourcePanel createFtFundsSourceView() {
         final FtFundsSourcePanel view = new FtFundsSourcePanel(this);
         this.ftFundsSourcePanel = view;
         return view;
     }
 
-    private Component createFtEtfsSourceView() {
+    private QuoteSourcePanel createFtEtfsSourceView() {
         final FtEtfsSourcePanel view = new FtEtfsSourcePanel(this);
         this.ftEtfsSourcePanel = view;
         return view;
     }
 
-    private Component createMultiSourceView() {
-        final MultiSourcePanel view = new MultiSourcePanel(this);
-//        this.multiSourcePanel = view;
+    private QuoteSourcePanel createMultiSourceView0() {
+        final MultiSourcePanel0 view = new MultiSourcePanel0(this);
+        // this.multiSourcePanel = view;
+        return view;
+    }
+
+    private QuoteSourcePanel createMultiSourceView() {
+        final MultiSourcePanel0 view = new MultiSourcePanel0(this);
+        // this.multiSourcePanel = view;
         return view;
     }
     
@@ -1787,7 +1810,7 @@ public class GUI extends JFrame {
      *
      * @return the component
      */
-    private Component createTIAACREFQuoteSourceView() {
+    private QuoteSourcePanel createTIAACREFQuoteSourceView() {
         final TIAACREFQuoteSourcePanel view = new TIAACREFQuoteSourcePanel(this);
         this.tIAACREFQuoteSourcePanel = view;
         return view;
@@ -2590,7 +2613,9 @@ public class GUI extends JFrame {
         }
 
         String suffix = fileName.substring(index);
-        LOGGER.info("suffix=" + suffix);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("suffix=" + suffix);
+        }
 
         if (suffix == null) {
             LOGGER.warn("Cannot find suffix for fileName=" + fileName);
@@ -2663,5 +2688,68 @@ public class GUI extends JFrame {
             topDir.mkdirs();
         }
         return topDir.getAbsoluteFile().getAbsolutePath();
+    }
+
+    private QuoteSource getQuoteSource() {
+        return quoteSource;
+    }
+
+    private void setQuoteSource(QuoteSource quoteSource) {
+        this.quoteSource = quoteSource;
+    }
+
+    private void quoteSourceTabSelected(JTabbedPane p) {
+        setSelectedQuoteSourceIndex(p.getSelectedIndex());
+        LOGGER.info("selectedQuoteSource=" + getSelectedQuoteSourceIndex());
+        saveSelectedQuoteSource(getSelectedQuoteSourceIndex());
+        Component c = p.getSelectedComponent();
+        if ((c != null) && (c instanceof QuoteSourcePanel)) {
+            QuoteSource qs = ((QuoteSourcePanel) c).getQuoteSource();
+//            stockPricesLookupStarted(qs, new ArrayList<String>());
+            clearAllTables();
+            restorePreviousResult(qs);
+        }
+    }
+
+    private int getSelectedQuoteSourceIndex() {
+        return selectedQuoteSourceIndex;
+    }
+
+    private void setSelectedQuoteSourceIndex(int selectedQuoteSourceIndex) {
+        this.selectedQuoteSourceIndex = selectedQuoteSourceIndex;
+    }
+    
+
+    private void restorePreviousResult(final QuoteSource quoteSource) {
+        QuotesResult quotesResult = quoteSource.getQuotesResult();
+        LOGGER.info("quotesResult=" + quotesResult);
+
+        if (quotesResult != null) {
+            restorePreviousResult(quotesResult);
+        }
+    }
+
+    private void restorePreviousResult(QuotesResult quotesResult) {
+        LOGGER.info("> restorePreviousResult");
+        
+        EventList<AbstractStockPrice> sourceList = null;
+
+        sourceList = quotesResult.getPriceList();
+        LOGGER.info("quotesResult.getPriceList()=" + sourceList);
+        if (sourceList != null) {
+            getPriceList().addAll(sourceList);
+        }
+
+        sourceList = quotesResult.getConvertedPriceList();
+        LOGGER.info("quotesResult.getConvertedPriceList()=" + sourceList);
+        if (sourceList != null) {
+            getConvertedPriceList().addAll(sourceList);
+        }
+
+        sourceList = quotesResult.getNotFoundPriceList();
+        LOGGER.info("quotesResult.getNotFoundPriceList()=" + sourceList);
+        if (sourceList != null) {
+            getNotFoundPriceList().addAll(sourceList);
+        }
     }
 }

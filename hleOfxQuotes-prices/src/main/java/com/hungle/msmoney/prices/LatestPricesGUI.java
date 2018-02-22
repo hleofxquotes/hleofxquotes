@@ -18,6 +18,7 @@ import ca.odell.glazedlists.BasicEventList;
 
 public class LatestPricesGUI extends AbstractLatestPricesGUI {
     private static final Logger LOGGER = Logger.getLogger(LatestPricesGUI.class);
+    
     private BasicEventList<LatestPriceBean> latestPriceBeans;
 
     public LatestPricesGUI() {
@@ -47,7 +48,7 @@ public class LatestPricesGUI extends AbstractLatestPricesGUI {
         return tableView;
     }
 
-    protected void refresh(final List<Result> results) {
+    protected void refreshView(final List<Result> results) {
         LOGGER.info("> refresh");
         latestPriceBeans.getReadWriteLock().writeLock().lock();
         try {

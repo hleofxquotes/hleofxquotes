@@ -33,7 +33,7 @@ public class LatestPricesGUI0 extends AbstractLatestPricesGUI {
         return tableView;
     }
 
-    protected void refresh(final List<Result> results) {
+    protected void refreshView(final List<Result> results) {
         TableModel dataModel = new LatestPricesTableModel(results);
         table.setModel(dataModel);
     }

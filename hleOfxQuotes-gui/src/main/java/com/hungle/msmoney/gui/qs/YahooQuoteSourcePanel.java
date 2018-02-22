@@ -52,7 +52,7 @@ import com.hungle.msmoney.qs.yahoo.YahooQuotesGetter;
 /**
  * The Class YahooQuoteSourcePanel.
  */
-public class YahooQuoteSourcePanel extends JPanel {
+public class YahooQuoteSourcePanel extends QuoteSourcePanel {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -102,9 +102,6 @@ public class YahooQuoteSourcePanel extends JPanel {
     /** The fx symbols. */
     protected List<AbstractStockPrice> fxSymbols;
 
-    /** The quote source. */
-    private final DefaultQuoteSource quoteSource = new DefaultYahooQuoteSource();
-
     private List<String> notFoundSymbols;
 
     /**
@@ -118,6 +115,7 @@ public class YahooQuoteSourcePanel extends JPanel {
      */
     public YahooQuoteSourcePanel(GUI gui, String stockSymbolsPrefKey) {
         super();
+        this.quoteSource = new DefaultYahooQuoteSource();
         this.prefs = GUI.getPrefs();
         this.threadPool = gui.getThreadPool();
         this.parentQuoteSourceListener = gui.getQuoteSourceListener();
@@ -353,7 +351,7 @@ public class YahooQuoteSourcePanel extends JPanel {
      */
     private void stockPricesLookupStarted(List<String> stockSymbols) {
         if (quoteSourceListener != null) {
-            quoteSourceListener.stockPricesLookupStarted(quoteSource, stockSymbols);
+            quoteSourceListener.stockPricesLookupStarted(getQuoteSource(), stockSymbols);
         }
     }
 
@@ -367,7 +365,7 @@ public class YahooQuoteSourcePanel extends JPanel {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("> stockPricesReceived");
         }
-        this.quoteSourceListener.stockPricesReceived(quoteSource, stockPrices);
+        this.quoteSourceListener.stockPricesReceived(getQuoteSource(), stockPrices);
     }
 
     /**
@@ -440,15 +438,6 @@ public class YahooQuoteSourcePanel extends JPanel {
      */
     public List<AbstractStockPrice> getFxSymbols() {
         return fxSymbols;
-    }
-
-    /**
-     * Gets the quote source.
-     *
-     * @return the quote source
-     */
-    public DefaultQuoteSource getQuoteSource() {
-        return quoteSource;
     }
 
     /**

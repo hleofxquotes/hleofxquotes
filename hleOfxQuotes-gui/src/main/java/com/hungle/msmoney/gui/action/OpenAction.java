@@ -13,7 +13,7 @@ import javax.swing.JFileChooser;
 import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.ofx.OfxUtils;
-import com.hungle.msmoney.gui.qs.YahooQuoteSourcePanel;
+import com.hungle.msmoney.gui.qs.QuoteSourcePanel;
 import com.hungle.msmoney.qs.AbstractLoadStockSymbolsTask;
 import com.hungle.msmoney.qs.QuoteSourceListener;
 
@@ -26,7 +26,7 @@ public final class OpenAction extends AbstractLoadStockSymbolsTask {
     /**
      * 
      */
-    private final YahooQuoteSourcePanel yahooQuoteSourcePanel;
+    private final QuoteSourcePanel yahooQuoteSourcePanel;
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -49,7 +49,7 @@ public final class OpenAction extends AbstractLoadStockSymbolsTask {
      * @param yahooQuoteSourcePanel
      *            TODO
      */
-    public OpenAction(YahooQuoteSourcePanel yahooQuoteSourcePanel, String name, QuoteSourceListener listener,
+    public OpenAction(QuoteSourcePanel yahooQuoteSourcePanel, String name, QuoteSourceListener listener,
             ExecutorService threadPool) {
         super(name, listener, threadPool);
         this.yahooQuoteSourcePanel = yahooQuoteSourcePanel;

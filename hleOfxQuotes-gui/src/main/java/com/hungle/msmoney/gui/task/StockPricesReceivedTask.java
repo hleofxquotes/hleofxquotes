@@ -14,6 +14,7 @@ import com.hungle.msmoney.core.mapper.SymbolMapper;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.qs.QuoteSource;
+import com.hungle.msmoney.qs.QuotesResult;
 
 import ca.odell.glazedlists.EventList;
 
@@ -91,9 +92,19 @@ public final class StockPricesReceivedTask implements Runnable {
         try {
             // UI
             updatePriceList(prices);
+            // at this point, this.getGui().getPriceList(); has final values
 
             // UI
             convertedPrices = updateConvertedPriceList(prices);
+            // at this point this.getGui().getConvertedPriceList(); has final values
+            
+            
+            // this.getGui().getNotFoundPriceList(); should have final values also
+            
+            QuotesResult quotesResult = new QuotesResult(QuotesResult.copyList(this.getGui().getPriceList()),
+                    QuotesResult.copyList(this.getGui().getConvertedPriceList()),
+                    QuotesResult.copyList(this.getGui().getNotFoundPriceList()));
+            quoteSource.setQuotesResult(quotesResult);
 
             getGui().saveToOFX(convertedPrices);
         } catch (IOException e) {

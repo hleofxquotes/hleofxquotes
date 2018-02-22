@@ -20,7 +20,9 @@ public class ConvertedPriceUtils {
             AbstractStockPrice convertedPrice;
             try {
                 convertedPrice = toConvertedPrice(price, convertedPriceContext);
-                LOGGER.info("convertedPrice=" + convertedPrice);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("convertedPrice=" + convertedPrice);
+                }
 
                 convertedPrices.add(convertedPrice);
             } catch (CloneNotSupportedException e) {

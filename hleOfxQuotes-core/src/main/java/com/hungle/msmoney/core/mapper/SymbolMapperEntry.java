@@ -326,7 +326,9 @@ public class SymbolMapperEntry {
             setBond(true);
             if (! CheckNullUtils.isEmpty(subType)) {
                 Integer bondDivider = Integer.valueOf(subType);
-                LOGGER.info("bondDivider=" + bondDivider);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("bondDivider=" + bondDivider);
+                }
                 setBondDivider(bondDivider);
             }
         }

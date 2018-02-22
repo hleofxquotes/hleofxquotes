@@ -42,7 +42,7 @@ import com.hungle.msmoney.qs.ft.FtCsv;
 /**
  * The Class FtDotComQuoteSourcePanel.
  */
-public class FtCsvQuoteSourcePanel extends JPanel {
+public class FtCsvQuoteSourcePanel extends QuoteSourcePanel {
     
     /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(FtCsvQuoteSourcePanel.class);
@@ -167,6 +167,7 @@ public class FtCsvQuoteSourcePanel extends JPanel {
      */
     public FtCsvQuoteSourcePanel(GUI gui) {
         super();
+        this.quoteSource = new DefaultQuoteSource();
         this.prefs = GUI.getPrefs();
         this.quoteSourceListener = gui.getQuoteSourceListener();
         createMainView();

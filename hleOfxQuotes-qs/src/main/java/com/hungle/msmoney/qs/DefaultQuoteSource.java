@@ -19,6 +19,8 @@ public class DefaultQuoteSource implements QuoteSource {
     
     private List<String> notFoundSymbols = new ArrayList<String>();
     
+    private QuotesResult quotesResult;
+    
     /* (non-Javadoc)
      * @see com.hungle.tools.moneyutils.ofx.quotes.QuoteSource#getExchangeRates()
      */
@@ -50,6 +52,14 @@ public class DefaultQuoteSource implements QuoteSource {
 
     public void setNotFoundSymbols(List<String> notFoundSymbols) {
         this.notFoundSymbols = notFoundSymbols;
+    }
+
+    public QuotesResult getQuotesResult() {
+        return quotesResult;
+    }
+
+    public void setQuotesResult(QuotesResult quotesResult) {
+        this.quotesResult = quotesResult;
     }
 
 }

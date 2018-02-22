@@ -406,11 +406,13 @@ public class SymbolMapper {
     }
 
     public void dump() {
-        LOGGER.debug("> BEGIN dump");
-        for (SymbolMapperEntry entry : entries) {
-            LOGGER.debug(entry);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> BEGIN dump");
+            for (SymbolMapperEntry entry : entries) {
+                LOGGER.debug(entry);
+            }
+            LOGGER.debug("< END dump");
         }
-        LOGGER.debug("< END dump");
     }
 
     public static String getStockSymbol(String qsSymbol, SymbolMapper symbolMapper) {
