@@ -91,7 +91,7 @@ public class YahooHistSourcePanel extends YahooQuoteSourcePanel {
                 getter.setHost(getQuoteServer());
             }
             stockPrices = getter.getQuotes(stockSymbols, listener);
-            this.fxSymbols = getter.getFxSymbols();
+            this.setFxSymbols(getter.getFxSymbols());
         } finally {
             if (getter != null) {
                 getter.close();

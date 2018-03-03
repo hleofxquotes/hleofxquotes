@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -27,6 +29,10 @@ public class MultiSourcesQuoteGetter implements QuoteGetter {
     private Map<String, String> quoteGetterAliases;
 
     private Map<String, List<String>> quoteGetterSymbols;
+
+    private List<AbstractStockPrice> fxSymbols;
+
+    private List<String> notFoundSymbols;
 
     public MultiSourcesQuoteGetter() {
         super();
@@ -69,6 +75,9 @@ public class MultiSourcesQuoteGetter implements QuoteGetter {
 
     @Override
     public List<AbstractStockPrice> getQuotes(List<String> qsNames) throws IOException {
+        fxSymbols = new ArrayList<AbstractStockPrice>();
+        notFoundSymbols = new ArrayList<String>();
+
         List<AbstractStockPrice> allStockPrices = new ArrayList<AbstractStockPrice>();
         for (String qsName : qsNames) {
             QuoteGetter getter = getQuoteGetter(qsName);
@@ -83,18 +92,23 @@ public class MultiSourcesQuoteGetter implements QuoteGetter {
                 for (AbstractStockPrice stockPrice : stockPrices) {
                     stockPrice.setQuoteSourceName(qsName);
                 }
+
                 allStockPrices = mergeStockPrices(stockPrices, allStockPrices);
+                fxSymbols = mergeFxSymbols(getter.getFxSymbols(), fxSymbols);
+                notFoundSymbols = mergeNotFoundSymbols(getter.getNotFoundSymbols(), notFoundSymbols);
             } catch (IOException e) {
                 LOGGER.warn(e, e);
             }
         }
 
         allStockPrices = normalizeStockPrices(allStockPrices);
+        fxSymbols = normalizeFxSymbols(fxSymbols);
+        notFoundSymbols = normalizeNotFoundSymbols(notFoundSymbols);
 
         return allStockPrices;
     }
 
-    protected List<AbstractStockPrice> normalizeStockPrices(List<AbstractStockPrice> allStockPrices) {
+    private List<AbstractStockPrice> normalizeStockPrices(List<AbstractStockPrice> allStockPrices) {
         Map<String, List<AbstractStockPrice>> map = new LinkedHashMap<String, List<AbstractStockPrice>>();
 
         for (AbstractStockPrice stockPrice : allStockPrices) {
@@ -118,6 +132,18 @@ public class MultiSourcesQuoteGetter implements QuoteGetter {
             }
             return result;
         }
+    }
+
+    private List<AbstractStockPrice> normalizeFxSymbols(List<AbstractStockPrice> fxSymbols) {
+        return normalizeStockPrices(fxSymbols);
+    }
+
+    private List<String> normalizeNotFoundSymbols(List<String> notFoundSymbols) {
+        Set<String> set = new HashSet<String>();
+        set.addAll(notFoundSymbols);
+        notFoundSymbols = new ArrayList<String>();
+        notFoundSymbols.addAll(set);
+        return notFoundSymbols;
     }
 
     private AbstractStockPrice getUnique(List<AbstractStockPrice> stockPrices) {
@@ -178,6 +204,16 @@ public class MultiSourcesQuoteGetter implements QuoteGetter {
         return allStockPrices;
     }
 
+    private List<String> mergeNotFoundSymbols(List<String> notFoundSymbols, List<String> allNotFoundSymbols) {
+        allNotFoundSymbols.addAll(notFoundSymbols);
+        return allNotFoundSymbols;
+    }
+
+    private List<AbstractStockPrice> mergeFxSymbols(List<AbstractStockPrice> fxSymbols, List<AbstractStockPrice> allFxSymbols) {
+        allFxSymbols.addAll(fxSymbols);
+        return fxSymbols;
+    }
+
     public String normalizeQsName(String qsName) {
         String key = qsName.toLowerCase();
         key = quoteGetterAliases.get(key);
@@ -204,5 +240,13 @@ public class MultiSourcesQuoteGetter implements QuoteGetter {
     public void setSymbols(String qsName, List<String> symbols) {
         String key = normalizeQsName(qsName);
         quoteGetterSymbols.put(key, symbols);
+    }
+
+    public List<AbstractStockPrice> getFxSymbols() {
+        return fxSymbols;
+    }
+
+    public List<String> getNotFoundSymbols() {
+        return notFoundSymbols;
     }
 }

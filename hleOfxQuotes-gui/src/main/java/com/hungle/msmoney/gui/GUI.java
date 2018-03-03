@@ -109,7 +109,7 @@ import com.hungle.msmoney.gui.qs.FtCsvQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEquitiesSourcePanel;
 import com.hungle.msmoney.gui.qs.FtEtfsSourcePanel;
 import com.hungle.msmoney.gui.qs.FtFundsSourcePanel;
-import com.hungle.msmoney.gui.qs.MultiSourcePanel0;
+import com.hungle.msmoney.gui.qs.MultiSourcePanel;
 import com.hungle.msmoney.gui.qs.QuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.TIAACREFQuoteSourcePanel;
 import com.hungle.msmoney.gui.qs.YahooApiQuoteSourcePanel;
@@ -1793,14 +1793,8 @@ public class GUI extends JFrame {
         return view;
     }
 
-    private QuoteSourcePanel createMultiSourceView0() {
-        final MultiSourcePanel0 view = new MultiSourcePanel0(this);
-        // this.multiSourcePanel = view;
-        return view;
-    }
-
     private QuoteSourcePanel createMultiSourceView() {
-        final MultiSourcePanel0 view = new MultiSourcePanel0(this);
+        final MultiSourcePanel view = new MultiSourcePanel(this);
         // this.multiSourcePanel = view;
         return view;
     }

@@ -1,5 +1,6 @@
 package com.hungle.msmoney.core.gui;
 
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -10,6 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 import org.apache.log4j.Logger;
 
@@ -87,17 +89,29 @@ public abstract class AbstractGlazedListTableView<T> extends JScrollPane {
 
     private T selectedRow;
 
+    private EventList<T> eventList;
+
+    public EventList<T> getEventList() {
+        return eventList;
+    }
+
+    public void setEventList(EventList<T> eventList) {
+        this.eventList = eventList;
+    }
+
     public AbstractGlazedListTableView(EventList<T> eventList, JTextField filterEdit, Class<T> baseClass,
             PriceTableViewOptions options) {
         super();
 
-        popupMenu = new JPopupMenu();
+        this.eventList = eventList;
+        
+        this.popupMenu = new JPopupMenu();
 
         this.comparator = createComparator();
 
         this.filter = createFilter();
 
-        table = createViewportView(eventList, filterEdit, baseClass, options);
+        this.table = createViewportView(eventList, filterEdit, baseClass, options);
         setViewportView(table);
     }
 
@@ -142,7 +156,7 @@ public abstract class AbstractGlazedListTableView<T> extends JScrollPane {
 
         DefaultEventTableModel<T> tableModel = createTableModel(source, baseClass, options);
 
-        JTable table = new JTable(tableModel);
+        JTable table = createTable(tableModel);
 
         if (sortedList != null) {
             addSorting(sortedList, table);
@@ -165,11 +179,69 @@ public abstract class AbstractGlazedListTableView<T> extends JScrollPane {
         return table;
     }
 
+    protected JTable createTable(DefaultEventTableModel<T> tableModel) {
+        JTable table = new JTable(tableModel) {
+
+            @Override
+            public String getToolTipText(MouseEvent mouseEvent) {
+                String tip = null;
+                java.awt.Point p = mouseEvent.getPoint();
+                int rowIndex = rowAtPoint(p);
+                int colIndex = columnAtPoint(p);
+                int realColumnIndex = convertColumnIndexToModel(colIndex);
+
+                String defaultToolTipText = super.getToolTipText(mouseEvent);
+                tip = getToolTipText(mouseEvent, rowIndex, colIndex, realColumnIndex, defaultToolTipText);
+                return tip;
+            }
+
+            // https://docs.oracle.com/javase/tutorial/uiswing/components/table.html#celltooltip
+            protected String getToolTipText(MouseEvent mouseEvent, int rowIndex, int colIndex, int realColumnIndex, String defaultToolTipText) {
+                return AbstractGlazedListTableView.this.getToolTipText(getModel(), mouseEvent, rowIndex, colIndex, realColumnIndex, defaultToolTipText);
+//                String toolTipText;
+//                if (realColumnIndex == 2) { //Sport column
+//                    toolTipText = "This person's favorite sport to "
+//                           + "participate in is: "
+//                           + getValueAt(rowIndex, colIndex);
+//
+//                } else if (realColumnIndex == 4) { //Veggie column
+//                    TableModel model = getModel();
+//                    String firstName = (String)model.getValueAt(rowIndex,0);
+//                    String lastName = (String)model.getValueAt(rowIndex,1);
+//                    Boolean veggie = (Boolean)model.getValueAt(rowIndex,4);
+//                    if (Boolean.TRUE.equals(veggie)) {
+//                        toolTipText = firstName + " " + lastName
+//                              + " is a vegetarian";
+//                    } else {
+//                        toolTipText = firstName + " " + lastName
+//                              + " is not a vegetarian";
+//                    }
+//
+//                } else { //another column
+//                    //You can omit this part if you know you don't 
+//                    //have any renderers that supply their own tool 
+//                    //tips.
+////                    String defaultToolTipText = super.getToolTipText(mouseEvent);
+//
+//                    toolTipText = defaultToolTipText;
+//                }
+//                return toolTipText;
+            }
+            
+        };
+        
+        return table;
+    }
+
     protected void setDefaultEditor(JTable table) {
         
     }
 
-
+    protected String getToolTipText(TableModel tableModel, MouseEvent mouseEvent, int rowIndex, int colIndex, int realColumnIndex, String defaultToolTipText) {
+        String toolTipText = defaultToolTipText;
+        return toolTipText;
+    }
+    
     protected void rowSelected(T row) {
         LOGGER.info("row=" + row);
         this.selectedRow = row;

@@ -100,7 +100,7 @@ public class YahooQuoteSourcePanel extends QuoteSourcePanel {
     private String stockSymbolsPrefKey = null;
 
     /** The fx symbols. */
-    protected List<AbstractStockPrice> fxSymbols;
+    private List<AbstractStockPrice> fxSymbols;
 
     private List<String> notFoundSymbols;
 
@@ -197,12 +197,16 @@ public class YahooQuoteSourcePanel extends QuoteSourcePanel {
         addPopupMenu(textArea);
 
         JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Symbols"));
+        scrollPane.setBorder(BorderFactory.createTitledBorder(getTitle()));
         this.setStockSymbolsView(textArea);
 
         view.add(scrollPane, BorderLayout.CENTER);
 
         view.add(createCommandView(), BorderLayout.SOUTH);
+    }
+
+    protected String getTitle() {
+        return "Symbols";
     }
 
     /**
@@ -323,7 +327,7 @@ public class YahooQuoteSourcePanel extends QuoteSourcePanel {
          */
         @Override
         public List<AbstractStockPrice> getExchangeRates() {
-            return fxSymbols;
+            return getFxSymbols();
         }
 
         @Override
@@ -337,11 +341,15 @@ public class YahooQuoteSourcePanel extends QuoteSourcePanel {
      */
     private void notifyNoStockRequest() {
         LOGGER.warn("No stocks requested.");
-        JOptionPane.showMessageDialog(YahooQuoteSourcePanel.this, "Please enter stock symbols.", "Missing input",
+        JOptionPane.showMessageDialog(YahooQuoteSourcePanel.this, getNoStockRequestErrorMessage(), "Missing input",
                 JOptionPane.WARNING_MESSAGE);
         updateButton.setEnabled(true);
         progressBar.setValue(100);
         setCursor(null);
+    }
+
+    protected String getNoStockRequestErrorMessage() {
+        return "Please enter stock symbols.";
     }
 
     /**
@@ -417,8 +425,8 @@ public class YahooQuoteSourcePanel extends QuoteSourcePanel {
         }
         try {
             stockPrices = quoteGetter.getQuotes(stockSymbols, listener);
-            this.fxSymbols = quoteGetter.getFxSymbols();
-            this.notFoundSymbols = quoteGetter.getNotFoundSymbols();
+            this.setFxSymbols(quoteGetter.getFxSymbols());
+            this.setNotFoundSymbols(quoteGetter.getNotFoundSymbols());
         } finally {
             if (quoteGetter != null) {
                 quoteGetter.close();
@@ -560,5 +568,9 @@ public class YahooQuoteSourcePanel extends QuoteSourcePanel {
 
     private void setStockSymbolsPrefKey(String stockSymbolsPrefKey) {
         this.stockSymbolsPrefKey = stockSymbolsPrefKey;
+    }
+
+    protected void setFxSymbols(List<AbstractStockPrice> fxSymbols) {
+        this.fxSymbols = fxSymbols;
     }
 }

@@ -8,4 +8,6 @@ import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 
 public interface QuoteGetter extends Closeable {
     List<AbstractStockPrice> getQuotes(List<String> stocks) throws IOException;
+    List<AbstractStockPrice> getFxSymbols();
+    List<String> getNotFoundSymbols();
 }

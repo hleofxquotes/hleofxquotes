@@ -1,5 +1,6 @@
 package com.hungle.msmoney.gui;
 
+import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,6 +13,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 import org.apache.log4j.Logger;
 
@@ -53,6 +55,25 @@ public class PriceTableView<T extends AbstractStockPrice> extends AbstractGlazed
     public PriceTableView(EventList<T> priceList, JTextField filterEdit, Class<T> baseClass,
             PriceTableViewOptions options) {
         super(priceList, filterEdit, baseClass, options);
+    }
+
+    @Override
+    protected String getToolTipText(TableModel tableModel, MouseEvent mouseEvent, int rowIndex, int columnIndex, int realColumnIndex,
+            String defaultToolTipText) {
+        
+        String toolTipText = defaultToolTipText;
+        
+//        if (realColumnIndex == COL_LAST_TRADE_TIME) { 
+//            T stockPrice = getEventList().get(rowIndex);
+//            if (stockPrice != null) {
+//                String qsName = stockPrice.getQuoteSourceName();
+//                if (qsName != null) {
+//                    toolTipText = qsName;
+//                }
+//            }
+//        }
+        
+        return toolTipText;
     }
 
     protected void setPreferredWidth(JTable table) {

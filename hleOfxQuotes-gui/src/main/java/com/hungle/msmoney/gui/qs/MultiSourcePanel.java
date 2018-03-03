@@ -12,25 +12,31 @@ import com.hungle.msmoney.gui.GUI;
 import com.hungle.msmoney.qs.multi.MultiSourcesQuoteGetter;
 import com.hungle.msmoney.qs.net.AbstractHttpQuoteGetter;
 
-public class MultiSourcePanel0 extends YahooQuoteSourcePanel {
-    private static final Logger LOGGER = Logger.getLogger(MultiSourcePanel0.class);
+public class MultiSourcePanel extends YahooQuoteSourcePanel {
+    private static final Logger LOGGER = Logger.getLogger(MultiSourcePanel.class);
 
     private static final String STOCK_SYMBOLS_PREF_KEY = "multiSourcePanel";
+
+    public MultiSourcePanel(GUI gui) {
+        super(gui, STOCK_SYMBOLS_PREF_KEY);
+    }
 
     @Override
     protected List<AbstractStockPrice> getStockQuotes(List<String> qsNames) throws IOException {
         List<AbstractStockPrice> stockPrices = new ArrayList<AbstractStockPrice>();
 
-        MultiSourcesQuoteGetter getter = null;
+        MultiSourcesQuoteGetter quoteGetter = null;
 
         try {
-            getter = new MultiSourcesQuoteGetter();
-            setQuoteSourcesSymbols(qsNames, getter);
+            quoteGetter = new MultiSourcesQuoteGetter();
+            setQuoteSourcesSymbols(qsNames, quoteGetter);
 
-            stockPrices = getter.getQuotes(qsNames);
+            stockPrices = quoteGetter.getQuotes(qsNames);
+            this.setFxSymbols(quoteGetter.getFxSymbols());
+            this.setNotFoundSymbols(quoteGetter.getNotFoundSymbols());
         } finally {
-            if (getter != null) {
-                getter.close();
+            if (quoteGetter != null) {
+                quoteGetter.close();
             }
         }
 
@@ -65,8 +71,14 @@ public class MultiSourcePanel0 extends YahooQuoteSourcePanel {
         throw new UnsupportedOperationException("getHttpQuoteGetter is not implemented.");
     }
 
-    public MultiSourcePanel0(GUI gui) {
-        super(gui, STOCK_SYMBOLS_PREF_KEY);
+    @Override
+    protected String getTitle() {
+        return "Quote Sources";
+    }
+
+    @Override
+    protected String getNoStockRequestErrorMessage() {
+        return "Please enter Quote Source names.";
     }
 
 }
