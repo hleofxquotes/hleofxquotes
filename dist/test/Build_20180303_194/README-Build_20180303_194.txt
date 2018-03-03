@@ -1,0 +1,42 @@
+###
+Sat Mar  3 11:18:05 PST 2018
+
+  File: hleOfxQuotes-gui-Build_20180303_194.zip
+  https://github.com/hleofxquotes/hleofxquotes/blob/master/dist/test/Build_20180303_194/hleOfxQuotes-gui-Build_20180303_194.zip
+  Click on 'View Raw' to download
+
+  Once downloaded,
+    * Unzip hleOfxQuotes-gui-Build_20180303_194.zip to get file hleOfxQuotes-gui-Build_20180303_194-exec.jar 
+    * You can double-click hleOfxQuotes-gui-Build_20180303_194-exec.jar to start
+    * OR open command-line and run
+      java -jar hleOfxQuotes-gui-Build_20180303_194-exec.jar
+    You can rename hleOfxQuotes-gui-Build_20180303_194-exec.jar to a shorter name if you like.
+    See a note on Java 8 below.
+
+Java 1.8
+
+  You will need Java 1.8 or later. Otherwise, you will get error looking something like this
+
+Exception in thread "main" java.lang.UnsupportedClassVersionError: app/GUI : Unsupported major.minor version 52.0
+	at java.lang.ClassLoader.defineClass1(Native Method)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:803)
+	at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:142)
+	at java.net.URLClassLoader.defineClass(URLClassLoader.java:442)
+	at java.net.URLClassLoader.access$100(URLClassLoader.java:64)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:354)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:348)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:347)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:425)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:312)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:358)
+	at sun.launcher.LauncherHelper.checkAndLoadMain(LauncherHelper.java:482)
+
+Changes:
+
+  * (Build_20180303_194) - Add support for multi-source quote source. Valid values are: yahoo and ft.
+     Using the multi-source quote source will use each of the specified quote source symbols list. 
+       * query the prices and aggregate all the prices into one list.
+       * the progress bar will show the progres for each of the individual quote source. 
+       * if a quote source name is available, it will be shown as part of symbol name (for dislay purpose only). For example: AAPL@yahoo.
+
