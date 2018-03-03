@@ -13,6 +13,7 @@ import org.junit.Test;
 import com.hungle.msmoney.core.misc.ResourceUtils;
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.core.stockprice.Price;
+import com.hungle.msmoney.qs.net.GetQuotesListener;
 import com.hungle.msmoney.qs.net.QuoteGetter;
 
 public class YahooSS2QuoteGetterTest {
@@ -81,7 +82,8 @@ public class YahooSS2QuoteGetterTest {
         try {
             getter = new YahooSS2QuoteGetter();
 
-            List<AbstractStockPrice> stockPrices = getter.getQuotes(list);
+            GetQuotesListener listener = null;
+            List<AbstractStockPrice> stockPrices = getter.getQuotes(list, listener);
             Assert.assertNotNull(stockPrices);
             Assert.assertTrue(stockPrices.size() == symbols.length);
         } finally {

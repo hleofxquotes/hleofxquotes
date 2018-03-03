@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.qs.ft.FtEquitiesQuoteGetter;
+import com.hungle.msmoney.qs.net.GetQuotesListener;
 import com.hungle.msmoney.qs.net.QuoteGetter;
 import com.hungle.msmoney.qs.yahoo.YahooSS2QuoteGetter;
 
@@ -74,7 +75,7 @@ public class MultiSourcesQuoteGetter implements QuoteGetter {
     }
 
     @Override
-    public List<AbstractStockPrice> getQuotes(List<String> qsNames) throws IOException {
+    public List<AbstractStockPrice> getQuotes(List<String> qsNames, GetQuotesListener listener) throws IOException {
         fxSymbols = new ArrayList<AbstractStockPrice>();
         notFoundSymbols = new ArrayList<String>();
 
@@ -88,7 +89,7 @@ public class MultiSourcesQuoteGetter implements QuoteGetter {
 
             List<String> symbols = getQuoteSourceSymbols(qsName);
             try {
-                List<AbstractStockPrice> stockPrices = getter.getQuotes(symbols);
+                List<AbstractStockPrice> stockPrices = getter.getQuotes(symbols, listener);
                 for (AbstractStockPrice stockPrice : stockPrices) {
                     stockPrice.setQuoteSourceName(qsName);
                 }

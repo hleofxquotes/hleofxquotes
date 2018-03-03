@@ -31,7 +31,7 @@ public class MultiSourcePanel extends YahooQuoteSourcePanel {
             quoteGetter = new MultiSourcesQuoteGetter();
             setQuoteSourcesSymbols(qsNames, quoteGetter);
 
-            stockPrices = quoteGetter.getQuotes(qsNames);
+            stockPrices = quoteGetter.getQuotes(qsNames, listener);
             this.setFxSymbols(quoteGetter.getFxSymbols());
             this.setNotFoundSymbols(quoteGetter.getNotFoundSymbols());
         } finally {
@@ -47,16 +47,12 @@ public class MultiSourcePanel extends YahooQuoteSourcePanel {
         for (String qsName : qsNames) {
             String key = getter.normalizeQsName(qsName);
 
-            String prefKey = null;
-            if (key.compareTo(MultiSourcesQuoteGetter.YAHOO2_QUOTE_SOURCE_NAME) == 0) {
-                prefKey = YahooSS2SourcePanel.STOCK_SYMBOLS_PREF_KEY;
-            } else if (key.compareTo(MultiSourcesQuoteGetter.FT_QUOTE_SOURCE_NAME) == 0) {
-                prefKey = FtEquitiesSourcePanel.STOCK_SYMBOLS_PREF_KEY;
-            } else {
-                prefKey = null;
-            }
+            String prefKey = getPrefKey(key);
+            
             String stocksString = OfxUtils.retrieveStockSymbols(GUI.getPrefs(), prefKey);
-            LOGGER.info("stocksString=" + stocksString);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("stocksString=" + stocksString);
+            }
             try {
                 List<String> stockSymbols = QuoteSourceUtils.toStockSymbols(stocksString);
                 getter.setSymbols(key, stockSymbols);
@@ -64,6 +60,18 @@ public class MultiSourcePanel extends YahooQuoteSourcePanel {
                 LOGGER.warn(e);
             }
         }
+    }
+
+    protected String getPrefKey(String key) {
+        String prefKey = null;
+        if (key.compareTo(MultiSourcesQuoteGetter.YAHOO2_QUOTE_SOURCE_NAME) == 0) {
+            prefKey = YahooSS2SourcePanel.STOCK_SYMBOLS_PREF_KEY;
+        } else if (key.compareTo(MultiSourcesQuoteGetter.FT_QUOTE_SOURCE_NAME) == 0) {
+            prefKey = FtEquitiesSourcePanel.STOCK_SYMBOLS_PREF_KEY;
+        } else {
+            prefKey = null;
+        }
+        return prefKey;
     }
 
     @Override

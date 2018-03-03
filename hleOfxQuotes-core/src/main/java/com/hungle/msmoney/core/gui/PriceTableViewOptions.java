@@ -4,7 +4,7 @@ public class PriceTableViewOptions {
 //    private static final String DEFAULT_PROPERTY_NAMES[] = { "stockSymbol", "stockName", "lastPrice", "lastTradeDate",
 //            "lastTradeTime" };
 
-    private static final String DEFAULT_PROPERTY_NAMES[] = { "stockSymbol", "stockName", "lastPrice",
+    private static final String DEFAULT_PROPERTY_NAMES[] = { "stockSymbolQs", "stockName", "lastPrice",
             "lastTradeDateLocalDate", "lastTradeDateLocalTime" };
     
     private static String DEFAULT_COLUMN_LABELS[] = { "Symbol", "Name", "Price", "Last Trade Date", "Last Trade Time" };

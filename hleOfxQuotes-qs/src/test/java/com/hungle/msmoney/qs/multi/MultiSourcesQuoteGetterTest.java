@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
 import com.hungle.msmoney.qs.ft.FtQuoteGetterTest;
+import com.hungle.msmoney.qs.net.GetQuotesListener;
 import com.hungle.msmoney.qs.yahoo.YahooSS2QuoteGetterTest;
 
 public class MultiSourcesQuoteGetterTest {
@@ -35,7 +36,8 @@ public class MultiSourcesQuoteGetterTest {
             expectedCount += list.size();
             quoteGetter.setSymbols("ft.com", list);
 
-            List<AbstractStockPrice> stockPrices = quoteGetter.getQuotes(Arrays.asList(qsNames));
+            GetQuotesListener listener = null;
+            List<AbstractStockPrice> stockPrices = quoteGetter.getQuotes(Arrays.asList(qsNames), listener);
             for (AbstractStockPrice stockPrice : stockPrices) {
                 LOGGER.info(stockPrice);
             }

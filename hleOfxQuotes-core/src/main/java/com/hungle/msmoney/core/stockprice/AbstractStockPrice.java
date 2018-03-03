@@ -474,4 +474,20 @@ public abstract class AbstractStockPrice implements Cloneable {
     public abstract void setQuoteSourceName(String quoteSourceName);
     
     public abstract String getQuoteSourceName();
+    
+    public String getStockSymbolQs() {
+        String str = null;
+        String qsName = getQuoteSourceName();
+        if ((qsName == null) || (qsName.length() < 0)) {
+            str = getStockSymbol();
+        } else {
+            str = getStockSymbol() + "@" + qsName;
+        }
+        
+        return str;
+    }
+    
+    public void setStockSymbolQs(String str) {
+        setStockSymbol(str);
+    }
 }

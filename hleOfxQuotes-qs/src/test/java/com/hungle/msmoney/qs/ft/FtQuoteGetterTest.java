@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.hungle.msmoney.core.stockprice.AbstractStockPrice;
+import com.hungle.msmoney.qs.net.GetQuotesListener;
 import com.hungle.msmoney.qs.net.QuoteGetter;
 
 public class FtQuoteGetterTest {
@@ -29,7 +30,8 @@ public class FtQuoteGetterTest {
         QuoteGetter getter = null;
         try {
             getter = new FtEquitiesQuoteGetter();
-            List<AbstractStockPrice> stockPrices = getter.getQuotes(list);
+            GetQuotesListener listener = null;
+            List<AbstractStockPrice> stockPrices = getter.getQuotes(list, listener);
             Assert.assertNotNull(stockPrices);
             Assert.assertTrue(stockPrices.size() == equities.length);
         } finally {
@@ -48,7 +50,8 @@ public class FtQuoteGetterTest {
         QuoteGetter getter = null;
         try {
             getter = new FtFundsQuoteGetter();
-            List<AbstractStockPrice> stockPrices = getter.getQuotes(list);
+            GetQuotesListener listener = null;
+            List<AbstractStockPrice> stockPrices = getter.getQuotes(list, listener);
             Assert.assertNotNull(stockPrices);
             Assert.assertTrue(stockPrices.size() == funds.length);
         } finally {
@@ -66,7 +69,8 @@ public class FtQuoteGetterTest {
         QuoteGetter getter = null;
         try {
             getter = new FtEtfsQuoteGetter();
-            List<AbstractStockPrice> stockPrices = getter.getQuotes(list);
+            GetQuotesListener listener = null;
+            List<AbstractStockPrice> stockPrices = getter.getQuotes(list, listener);
             Assert.assertNotNull(stockPrices);
             Assert.assertTrue(stockPrices.size() == etfs.length);
         } finally {
