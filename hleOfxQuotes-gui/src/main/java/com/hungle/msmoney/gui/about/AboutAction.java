@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 
@@ -41,6 +42,7 @@ public final class AboutAction extends AbstractAction {
         sb.append("Top Directory: " + GUI.getTopDirectory() + "\n");
         sb.append("Current Directory: " + GUI.getCurrentWorkingDirectory() + "\n");
         sb.append("Currency: " + this.gui.getDefaultCurrency() + "\n");
+        sb.append("Locale: " + Locale.getDefault() + "\n");
         sb.append("OFX Account Id: " + this.gui.getAccountId() + "\n");
         sb.append("Yahoo server: " + this.gui.getYahooQuoteServer() + "\n");
         File file = new File("hleOfxQuotes-log.txt");
