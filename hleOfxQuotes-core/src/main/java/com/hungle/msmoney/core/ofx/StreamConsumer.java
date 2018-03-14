@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
@@ -17,23 +18,26 @@ import org.apache.log4j.Logger;
 public class StreamConsumer implements Runnable {
     
     /** The Constant log. */
-    private static final Logger log = Logger.getLogger(StreamConsumer.class);
+    private static final Logger LOGGER = Logger.getLogger(StreamConsumer.class);
 
     /** The in. */
-    private final InputStream in;
+    private final InputStream stream;
     
     /** The tag. */
     private String tag = null;
 
+    private final ArrayList<String> lines;
+
     /**
      * Instantiates a new stream consumer.
      *
-     * @param stdin the stdin
+     * @param stream the stdin
      * @param tag the tag
      */
-    public StreamConsumer(InputStream stdin, String tag) {
-        this.in = stdin;
+    public StreamConsumer(InputStream stream, String tag) {
+        this.stream = stream;
         this.tag = tag;
+        this.lines = new ArrayList<String>();
     }
 
     /* (non-Javadoc)
@@ -41,33 +45,39 @@ public class StreamConsumer implements Runnable {
      */
     @Override
     public void run() {
-        if (log.isDebugEnabled()) {
-            log.debug("> START consuming stream=" + tag);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("> START consuming stream=" + tag);
         }
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new InputStreamReader(in));
+            reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             while ((line = reader.readLine()) != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("[" + tag + "] " + line);
+                if (LOGGER.isDebugEnabled()) {
+                    String string = "[" + tag + "] " + line;
+                    lines.add(string);
+                    LOGGER.debug(string);
                 }
             }
         } catch (IOException e) {
-            log.warn(e);
+            LOGGER.warn(e);
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.warn(e);
+                    LOGGER.warn(e);
                 } finally {
                     reader = null;
                 }
             }
-            if (log.isDebugEnabled()) {
-                log.debug("< DONE consuming stream=" + tag);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("< DONE consuming stream=" + tag);
             }
         }
+    }
+
+    public ArrayList<String> getLines() {
+        return lines;
     }
 }

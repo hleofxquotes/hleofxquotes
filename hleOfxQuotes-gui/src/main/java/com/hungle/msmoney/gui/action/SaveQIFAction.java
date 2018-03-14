@@ -21,7 +21,7 @@ import com.hungle.msmoney.gui.OfxFileIo;
 
 import ca.odell.glazedlists.EventList;
 
-public final class SaveQIFAction extends AbstractAction {
+public class SaveQIFAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(SaveQIFAction.class);
 
     private final Component parent;
@@ -34,17 +34,40 @@ public final class SaveQIFAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     private JFileChooser fc = null;
 
-    public SaveQIFAction(String name, GUI gui, EventList<AbstractStockPrice> priceList, PriceTableViewOptions priceTableViewOptions,
-            Component parent) {
+    public SaveQIFAction(String name, GUI gui, EventList<AbstractStockPrice> priceList,
+            PriceTableViewOptions priceTableViewOptions, Component parent) {
         super(name);
-        this.parent = parent;
-        this.priceTableViewOptions = priceTableViewOptions;
         this.gui = gui;
         this.priceList = priceList;
+        this.priceTableViewOptions = priceTableViewOptions;
+        this.parent = parent;
     }
 
     @Override
     public void actionPerformed(ActionEvent event) {
+
+        try {
+            File outFile = getOutFile();
+            if (outFile == null) {
+                return;
+            }
+
+            GUI.PREFS.put(Action.ACCELERATOR_KEY, outFile.getAbsoluteFile().getParentFile().getAbsolutePath());
+            saveToQif(outFile);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(parent, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    protected void saveToQif(File outFile) throws IOException {
+        EventList<AbstractStockPrice> list1 = priceList;
+        EventList<AbstractStockPrice> list2 = this.getGui().getNotFoundPriceList();
+        List<AbstractStockPrice> list = OfxFileIo.concatPriceList(list1, list2);
+        QifUtils.saveToQif(list, outFile, priceTableViewOptions.isConvertWhenExport(), getGui().getDefaultCurrency(),
+                getGui().getSymbolMapper(), getGui().getFxTable(), getGui().getTemplateDecimalSeparator());
+    }
+
+    protected File getOutFile() throws IOException {
         if (fc == null) {
             initFileChooser();
         }
@@ -54,19 +77,11 @@ public final class SaveQIFAction extends AbstractAction {
         }
 
         if (fc.showSaveDialog(parent) == JFileChooser.CANCEL_OPTION) {
-            return;
+            return null;
         }
-        File toFile = fc.getSelectedFile();
-        GUI.PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
-        try {
-            EventList<AbstractStockPrice> list1 = priceList;
-            EventList<AbstractStockPrice> list2 = this.getGui().getNotFoundPriceList();
-            List<AbstractStockPrice> list = OfxFileIo.concatPriceList(list1, list2);
-            QifUtils.saveToQif(list, priceTableViewOptions.isConvertWhenExport(), getGui().getDefaultCurrency(),
-                    getGui().getSymbolMapper(), getGui().getFxTable(), toFile, getGui().getTemplateDecimalSeparator());
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(parent, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+
+        File outFile = fc.getSelectedFile();
+        return outFile;
     }
 
     private void initFileChooser() {
@@ -80,7 +95,7 @@ public final class SaveQIFAction extends AbstractAction {
         }
     }
 
-    private GUI getGui() {
+    public GUI getGui() {
         return gui;
     }
 }
