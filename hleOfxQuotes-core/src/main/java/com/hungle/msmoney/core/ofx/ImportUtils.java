@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -16,26 +17,31 @@ import org.apache.log4j.Logger;
  * The Class ImportUtils.
  */
 public class ImportUtils {
-    
+
     /** The Constant log. */
     private static final Logger LOGGER = Logger.getLogger(ImportUtils.class);
 
     /**
      * Do import.
      *
-     * @param threadPool the thread pool
-     * @param ofxFiles the ofx files
+     * @param threadPool
+     *            the thread pool
+     * @param files
+     *            the ofx files
      * @return the int
-     * @throws IOException 
+     * @throws IOException
      */
-    public static int doImport(Executor threadPool, List<File> ofxFiles) throws IOException {
-        if (ofxFiles == null) {
+    public static int doImport(Executor threadPool, List<File> files) throws IOException {
+        if (files == null) {
             return 0;
         }
         int count = 0;
-        for (File ofxFile : ofxFiles) {
-            if (doImport(threadPool, ofxFile)) {
+        for (File file : files) {
+            ImportStatus importStatus = doImport(threadPool, file);
+            if (importStatus.getStatusCode() == 0) {
                 count++;
+            } else {
+                LOGGER.warn("Import statusCode=" + importStatus.getStatusCode());
             }
         }
         return count;
@@ -44,59 +50,95 @@ public class ImportUtils {
     /**
      * Do import.
      *
-     * @param threadPool the thread pool
-     * @param ofxFile the ofx file
+     * @param threadPool
+     *            the thread pool
+     * @param file
+     *            the ofx file
      * @return true, if successful
-     * @throws IOException 
+     * @throws IOException
      */
-    public static boolean doImport(Executor threadPool, File ofxFile) throws IOException {
-        if (ofxFile == null) {
-            LOGGER.warn("No OFX output file");
-            return false;
+    public static ImportStatus doImport(Executor threadPool, File file) throws IOException {
+        ImportStatus importStatus = new ImportStatus();
+        
+        if (file == null) {
+            String message = "Cannot open file=" + file;
+            LOGGER.warn(message);
+            
+            importStatus.setStatusCode(-1);
+            List<String> lines = new ArrayList<String>();
+            lines.add(message);
+            importStatus.setStderrLines(lines);
+            return importStatus;
         }
-        if (!ofxFile.exists()) {
-            LOGGER.warn("File ofxFile=" + ofxFile + " does not exist.");
-            return false;
+        if (!file.exists()) {
+            String message = "File=" + file + " does not exist.";
+            LOGGER.warn(message);
+            
+            importStatus.setStatusCode(-1);
+            List<String> lines = new ArrayList<String>();
+            lines.add(message);
+            importStatus.setStderrLines(lines);
+            return importStatus;
         }
 
-        boolean returnCode = false;
-        Runtime rt = Runtime.getRuntime();
+//        boolean returnCode = false;
+        Runtime runtime = Runtime.getRuntime();
         try {
-            String command = "rundll32 SHELL32.DLL,ShellExec_RunDLL " + ofxFile.getAbsolutePath();
+            String command = getOpenCommand() + " " + file.getAbsolutePath();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.info("Import command=" + command);
             }
-            Process proc = rt.exec(command);
-            final InputStream stdout = proc.getInputStream();
-            threadPool.execute(new StreamConsumer(stdout, "stdout"));
-            final InputStream stderr = proc.getErrorStream();
-            threadPool.execute(new StreamConsumer(stderr, "stderr"));
+            Process process = runtime.exec(command);
+            
+            final InputStream stdout = process.getInputStream();
+            StreamConsumer stdoutStreamConsumer = new StreamConsumer(stdout, "stdout");
+            threadPool.execute(stdoutStreamConsumer);
+            
+            final InputStream stderr = process.getErrorStream();
+            StreamConsumer stderrStreamConsumer = new StreamConsumer(stderr, "stderr");
+            threadPool.execute(stderrStreamConsumer);
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("pre proc.waitFor()");
             }
-            int status = proc.waitFor();
+            int status = process.waitFor();
             if (status != 0) {
                 LOGGER.warn("Import command failed with exit status=" + status);
                 LOGGER.warn("  command=" + command);
-                returnCode = false;
-            } else {
-                returnCode = true;
             }
+            
+            importStatus.setStatusCode(status);
+            importStatus.setStdoutLines(stdoutStreamConsumer.getLines());
+            importStatus.setStderrLines(stderrStreamConsumer.getLines());
         } catch (InterruptedException e) {
             throw new IOException(e);
         }
 
-        return returnCode;
+        return importStatus;
+    }
+
+    private static String getOpenCommand() {
+        String command = null;
+
+        String osName = System.getProperty("os.name");
+        if (osName.startsWith("Mac OS")) {
+            command = "open";
+        } else if (osName.startsWith("Windows")) {
+            command = "rundll32 SHELL32.DLL,ShellExec_RunDLL";
+        } else {
+            command = "xdg-open";
+        }
+
+        return command;
     }
 
     public static final File renameToOfxFile(File source) throws IOException {
         File dest = File.createTempFile("import", ".ofx");
-        
+
         CopyOption options = StandardCopyOption.REPLACE_EXISTING;
         Files.copy(source.toPath(), dest.toPath(), options);
         dest.deleteOnExit();
-        
+
         return dest;
     }
 

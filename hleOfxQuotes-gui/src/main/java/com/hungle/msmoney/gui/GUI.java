@@ -100,6 +100,7 @@ import com.hungle.msmoney.gui.action.EditWarnSuspiciousPriceAction;
 import com.hungle.msmoney.gui.action.ExitAction;
 import com.hungle.msmoney.gui.action.ImportAction;
 import com.hungle.msmoney.gui.action.ProfileSelectedAction;
+import com.hungle.msmoney.gui.action.SaveAndOpenQIFAction;
 import com.hungle.msmoney.gui.action.SaveMDCSVAction;
 import com.hungle.msmoney.gui.action.SaveOfxAction;
 import com.hungle.msmoney.gui.action.SaveQIFAction;
@@ -2090,6 +2091,10 @@ public class GUI extends JFrame {
         // QIF
         menu = new JMenu("QIF");
         popupMenu.add(menu);
+
+        action = new SaveAndOpenQIFAction("Open as *.qif", gui, priceList, priceTableViewOptions, parent);
+        menu.add(action);
+        
         action = new SaveQIFAction("Save", gui, priceList, priceTableViewOptions, parent);
         menu.add(action);
 

@@ -36,9 +36,9 @@ public class QifUtils {
 
     private static final QifPlugin qifPlugin = null; // QifPlugin.createQifPlugin();
 
-    public static void saveToQif(List<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
-        saveToQifUsingVelocity(priceList, convert, defaultCurrency, symbolMapper, fxTable, file, templateDecimalSeparator);
+    public static File saveToQif(List<AbstractStockPrice> priceList, File file, boolean convert,
+            String defaultCurrency, SymbolMapper symbolMapper, FxTable fxTable, String templateDecimalSeparator) throws IOException {
+        return saveToQifUsingVelocity(priceList, file, convert, defaultCurrency, symbolMapper, fxTable, templateDecimalSeparator);
     }
 
     /**
@@ -65,8 +65,8 @@ public class QifUtils {
         }
     }
 
-    public static void saveToQifUsingVelocity(List<AbstractStockPrice> priceList, boolean convert, String defaultCurrency,
-            SymbolMapper symbolMapper, FxTable fxTable, File file, String templateDecimalSeparator) throws IOException {
+    public static File saveToQifUsingVelocity(List<AbstractStockPrice> priceList, File file, boolean convert,
+            String defaultCurrency, SymbolMapper symbolMapper, FxTable fxTable, String templateDecimalSeparator) throws IOException {
         List<QifBean> qifBeans = toQifBeans(priceList, convert, defaultCurrency, symbolMapper, fxTable);
         VelocityContext context = new VelocityContext();
 
@@ -100,6 +100,7 @@ public class QifUtils {
         String encoding = "UTF-8";
         String template = "/templates/qif.vm";
         VelocityUtils.mergeTemplate(context, template, encoding, file);
+        return file;
     }
 
     /**

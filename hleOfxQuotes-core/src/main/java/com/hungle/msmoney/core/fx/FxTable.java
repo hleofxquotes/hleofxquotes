@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,11 +68,14 @@ public class FxTable {
             if (toCurr.compareToIgnoreCase(toCurrency) != 0) {
                 continue;
             }
-            Double value = Double.valueOf(entry.getRate());
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("getRateString: " + fromCurrency + ", " + toCurrency + ", rate=" + value);
+
+            Double value = getRateValue(entry);
+            if (value != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("getRateString: " + fromCurrency + ", " + toCurrency + ", rate=" + value);
+                }
+                return value;
             }
-            return value;
         }
 
         // derived rate
@@ -87,7 +91,8 @@ public class FxTable {
             if (toCurr.compareToIgnoreCase(fromCurrency) != 0) {
                 continue;
             }
-            Double value = Double.valueOf(entry.getRate());
+//            Double value = Double.valueOf(entry.getRate());
+            Double value = getRateValue(entry);
             value = 1.00 / value;
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("getRateString (derived): " + fromCurrency + ", " + toCurrency + ", rate=" + value);
@@ -98,6 +103,23 @@ public class FxTable {
             LOGGER.debug("getRateString (NOT_FOUND): " + fromCurrency + ", " + toCurrency + ", rate=" + null);
         }
         return null;
+    }
+
+    private Double getRateValue(FxTableEntry entry) {
+        Number value = null;
+        final String rateString = entry.getRate();
+        NumberFormat format = NumberFormat.getInstance();
+        try {
+            value = format.parse(rateString);
+//            Double value = Double.valueOf(rateXXX);
+        } catch (ParseException e) {
+            LOGGER.warn(e);
+        }
+        if (value != null) {
+            return value.doubleValue();
+        } else {
+            return null;
+        }
     }
 
     /**

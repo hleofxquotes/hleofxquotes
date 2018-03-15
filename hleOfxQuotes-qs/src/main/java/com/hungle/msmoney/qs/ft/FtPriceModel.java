@@ -9,6 +9,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -222,9 +223,15 @@ public class FtPriceModel {
             valueText = valueText.trim();
             Number price = null;
             try {
-                NumberFormat format = NumberFormat.getInstance();
+                // FT price is ALWAYS in English format
+                Locale locale = Locale.ENGLISH;
+                NumberFormat format = NumberFormat.getInstance(locale);
                 // format.setGroupingUsed(false);
                 price = format.parse(valueText);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("  valueText=" + valueText);
+                    LOGGER.debug("  price=" + price);
+                }
             } catch (ParseException e) {
                 LOGGER.warn(e);
             }
