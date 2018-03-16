@@ -1689,9 +1689,9 @@ public class GUI extends JFrame {
         // tabbedPane.addTab("FT ETFs", createFtEtfsSourceView());
 
 //        quoteSourcePanel = createMultiSourceView0();
-        quoteSourcePanel = createMultiSourceView();
+//        quoteSourcePanel = createMultiSourceView();
 //        quoteSources.add(quoteSourcePanel.getQuoteSource());
-        tabbedPane.addTab("Multi", quoteSourcePanel);
+//        tabbedPane.addTab("Multi", quoteSourcePanel);
 
         int initialIndex = PREFS.getInt(PREF_SELECTED_QUOTE_SOURCE, 0);
         LOGGER.info("RESTORE selectedQuoteSource, index=" + initialIndex);

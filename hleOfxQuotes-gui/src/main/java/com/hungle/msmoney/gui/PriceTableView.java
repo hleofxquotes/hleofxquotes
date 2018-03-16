@@ -114,7 +114,11 @@ public class PriceTableView<T extends AbstractStockPrice> extends AbstractGlazed
             @Override
             public void setCellHorizontalAlignment(int column) {
                 super.setCellHorizontalAlignment(column);
-                if ((column == COL_SYMBOL) || (column == COL_PRICE) || (column == COL_LAST_TRADE_DATE)) {
+                if (/*(column == COL_SYMBOL) || */ 
+                        (column == COL_PRICE) 
+                        || (column == COL_LAST_TRADE_DATE)
+                        || (column == COL_LAST_TRADE_TIME)
+                        ) {
                     setHorizontalAlignment(SwingConstants.RIGHT);
                 }
             }
