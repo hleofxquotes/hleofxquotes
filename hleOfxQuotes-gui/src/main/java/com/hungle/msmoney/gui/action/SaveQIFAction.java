@@ -52,7 +52,7 @@ public class SaveQIFAction extends AbstractAction {
                 return;
             }
 
-            GUI.PREFS.put(Action.ACCELERATOR_KEY, outFile.getAbsoluteFile().getParentFile().getAbsolutePath());
+            le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(Action.ACCELERATOR_KEY, outFile.getAbsoluteFile().getParentFile().getAbsolutePath());
             saveToQif(outFile);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(parent, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -89,7 +89,7 @@ public class SaveQIFAction extends AbstractAction {
             LOGGER.debug("> creating FileChooser");
         }
         String key = Action.ACCELERATOR_KEY;
-        fc = new JFileChooser(GUI.PREFS.get(key, "."));
+        fc = new JFileChooser(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(key, "."));
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("< creating FileChooser");
         }

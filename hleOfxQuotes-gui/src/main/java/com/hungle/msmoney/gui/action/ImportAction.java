@@ -84,7 +84,7 @@ public final class ImportAction extends AbstractAction {
                 if (ImportAction.this.getGui().getLastKnownImport() != null) {
                     ImportAction.this.getGui().getLastKnownImport().setText(ImportAction.this.getGui().getLastKnownImportString());
                 }
-                GUI.PREFS.put(GUI.PREF_LAST_KNOWN_IMPORT_STRING, ImportAction.this.getGui().getLastKnownImportString());
+                le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(GUI.PREF_LAST_KNOWN_IMPORT_STRING, ImportAction.this.getGui().getLastKnownImportString());
             }
         };
         SwingUtilities.invokeLater(doRun);

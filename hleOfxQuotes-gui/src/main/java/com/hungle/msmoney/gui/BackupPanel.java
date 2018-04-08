@@ -136,7 +136,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         fromDirTextField = new JTextField();
         add(fromDirTextField, "4, 4, fill, default");
         fromDirTextField.setColumns(10);
-        String pathName = GUI.PREFS.get(fromDirPrefKey, null);
+        String pathName = le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(fromDirPrefKey, null);
         if (!CheckNullUtils.isEmpty(pathName)) {
             fromDirTextField.setText(pathName);
             fromDir = new File(pathName);
@@ -156,7 +156,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
                 fromDir = dir;
                 String path = fromDir.getAbsolutePath();
                 fromDirTextField.setText(path);
-                GUI.PREFS.put(fromDirPrefKey, path);
+                le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(fromDirPrefKey, path);
             }
         });
         add(fromDirButton, "6, 4");
@@ -168,7 +168,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
         toDirTextField = new JTextField();
         add(toDirTextField, "4, 6, fill, default");
         toDirTextField.setColumns(10);
-        pathName = GUI.PREFS.get(toDirPrefKey, null);
+        pathName = le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(toDirPrefKey, null);
         if (!CheckNullUtils.isEmpty(pathName)) {
             toDirTextField.setText(pathName);
             toDir = new File(pathName);
@@ -188,7 +188,7 @@ public class BackupPanel extends JPanel implements SaveBackupsListener {
                 toDir = dir;
                 String path = toDir.getAbsolutePath();
                 toDirTextField.setText(path);
-                GUI.PREFS.put(toDirPrefKey, path);
+                le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(toDirPrefKey, path);
             }
         });
         add(toDirButton, "6, 6");

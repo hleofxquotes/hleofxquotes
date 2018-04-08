@@ -59,7 +59,7 @@ public final class EditWarnSuspiciousPriceAction extends AbstractAction {
                 Integer newValue = Integer.valueOf(value);
                 if (newValue.compareTo(this.gui.getSuspiciousPrice()) != 0) {
                     this.gui.setSuspiciousPrice(newValue);
-                    GUI.PREFS.put(GUI.PREF_SUSPICIOUS_PRICE, this.gui.getSuspiciousPrice().toString());
+                    le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(GUI.PREF_SUSPICIOUS_PRICE, this.gui.getSuspiciousPrice().toString());
                     // to clear the pricing table
                     // stockSymbolsStringReceived(null);
                 }

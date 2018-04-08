@@ -73,7 +73,7 @@ public final class ImportCsvFileAction extends AbstractAction {
 
     private void initFileChooser() {
         String key = SaveOfxAction.PREF_SAVE_OFX_DIR;
-        fc = new JFileChooser(GUI.PREFS.get(key, "."));
+        fc = new JFileChooser(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(key, "."));
         FileFilter filter = new FileFilter() {
 
             @Override

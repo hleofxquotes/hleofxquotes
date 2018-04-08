@@ -56,7 +56,7 @@ public final class SaveMDCSVAction extends AbstractAction {
             return;
         }
         File toFile = fc.getSelectedFile();
-        GUI.PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
+        le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(Action.ACCELERATOR_KEY, toFile.getAbsoluteFile().getParentFile().getAbsolutePath());
         try {
             EventList<AbstractStockPrice> list1 = priceList;
             EventList<AbstractStockPrice> list2 = this.getGui().getNotFoundPriceList();
@@ -73,7 +73,7 @@ public final class SaveMDCSVAction extends AbstractAction {
             LOGGER.debug("> creating FileChooser");
         }
         String key = Action.ACCELERATOR_KEY;
-        fc = new JFileChooser(GUI.PREFS.get(key, "."));
+        fc = new JFileChooser(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(key, "."));
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("< creating FileChooser");
         }

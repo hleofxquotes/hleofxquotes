@@ -57,7 +57,7 @@ public final class EditRandomizeShareCountAction extends AbstractAction {
             Boolean newValue = Boolean.valueOf(value);
             if (newValue.compareTo(this.gui.getRandomizeShareCount()) != 0) {
                 this.gui.setRandomizeShareCount(newValue);
-                GUI.PREFS.put(GUI.PREF_RANDOMIZE_SHARE_COUNT, this.gui.getRandomizeShareCount().toString());
+                le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(GUI.PREF_RANDOMIZE_SHARE_COUNT, this.gui.getRandomizeShareCount().toString());
                 // to clear the pricing table
                 QuoteSource quoteSource = null;
                 this.gui.stockSymbolsStringReceived(quoteSource, null);

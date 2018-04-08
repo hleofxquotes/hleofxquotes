@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 
 import com.hungle.msmoney.core.misc.CheckNullUtils;
 
+import le.com.tools.moneyutils.ofx.quotes.GUI;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class Price.
@@ -51,8 +53,15 @@ public class Price extends Number implements Comparable<Price>, Cloneable {
             priceFormatter = NumberFormat.getNumberInstance(locale);
         }
         priceFormatter.setGroupingUsed(false);
-        priceFormatter.setMinimumFractionDigits(4);
-        priceFormatter.setMaximumFractionDigits(4);
+        Integer fractionDigits = GUI.PREF_FRACTION_DIGITS_DEFAULT;
+        try {
+            fractionDigits = Integer.valueOf(GUI.PREFS.get(GUI.PREF_FRACTION_DIGITS, "" + GUI.PREF_FRACTION_DIGITS_DEFAULT));
+        } catch (NumberFormatException e) {
+            LOGGER.warn(e);
+            fractionDigits = GUI.PREF_FRACTION_DIGITS_DEFAULT;
+        }
+        priceFormatter.setMinimumFractionDigits(fractionDigits);
+        priceFormatter.setMaximumFractionDigits(fractionDigits);
         return priceFormatter;
     }
 

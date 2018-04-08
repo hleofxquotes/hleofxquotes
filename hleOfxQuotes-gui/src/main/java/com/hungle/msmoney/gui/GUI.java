@@ -155,12 +155,6 @@ public class GUI extends JFrame {
     // 20171104_122
     public static String VERSION = VERSION_PREFIX + "_" + VERSION_DATE + "_" + VERSION_SUFFIX;
 
-    private static final Class<le.com.tools.moneyutils.ofx.quotes.GUI> PREFS_CLASS = le.com.tools.moneyutils.ofx.quotes.GUI.class;
-
-    /** The Constant prefs. */
-    // TODO: le.com.tools.moneyutils.ofx.quotes.GUI
-    public static final Preferences PREFS = Preferences.userNodeForPackage(PREFS_CLASS);
-
     /** The Constant PREF_DEFAULT_CURRENCY. */
     private static final String PREF_DEFAULT_CURRENCY = "defaultCurrency";
 
@@ -180,7 +174,7 @@ public class GUI extends JFrame {
 
     /** The Constant PREF_DATE_OFFSET. */
     private static final String PREF_DATE_OFFSET = "dateOffset";
-
+    
     /** The Constant PREF_SUSPICIOUS_PRICE. */
     public static final String PREF_SUSPICIOUS_PRICE = "suspiciousPrice";
 
@@ -252,18 +246,18 @@ public class GUI extends JFrame {
     private JButton saveOfxButton;
 
     /** The default currency. */
-    private String defaultCurrency = PREFS.get(PREF_DEFAULT_CURRENCY,
+    private String defaultCurrency = le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_DEFAULT_CURRENCY,
             com.hungle.msmoney.core.ofx.xmlbeans.CurrencyUtils.getDefaultCurrency());
 
     /** The randomize share count. */
-    private Boolean randomizeShareCount = Boolean.valueOf(PREFS.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
+    private Boolean randomizeShareCount = Boolean.valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_RANDOMIZE_SHARE_COUNT, "False"));
 
     /** The random. */
     private Random random = new Random();
 
     /** The incrementally increased share count. */
     private Boolean incrementallyIncreasedShareCount = Boolean
-            .valueOf(PREFS.get(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT, "False"));
+            .valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT, "False"));
 
     /** The bottom tabs. */
     private JTabbedPane bottomTabs;
@@ -284,18 +278,20 @@ public class GUI extends JFrame {
     private QuoteSourceListener quoteSourceListener;
 
     /** The force generating INVTRANLIST. */
-    private Boolean forceGeneratingINVTRANLIST = Boolean.valueOf(PREFS.get(PREF_FORCE_GENERATING_INVTRANLIST, "False"));
+    private Boolean forceGeneratingINVTRANLIST = Boolean.valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_FORCE_GENERATING_INVTRANLIST, "False"));
 
     /** The date offset. */
-    private Integer dateOffset = Integer.valueOf(PREFS.get(PREF_DATE_OFFSET, "0"));
+    private Integer dateOffset = Integer.valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_DATE_OFFSET, "0"));
+
+    private Integer fractionDigits = Integer.valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(le.com.tools.moneyutils.ofx.quotes.GUI.PREF_FRACTION_DIGITS, "4"));
 
     /** The suspicious price. */
-    private Integer suspiciousPrice = Integer.valueOf(PREFS.get(PREF_SUSPICIOUS_PRICE, "10000"));
+    private Integer suspiciousPrice = Integer.valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_SUSPICIOUS_PRICE, "10000"));
 
     /** The account id. */
-    private String accountId = PREFS.get(PREF_ACCOUNT_ID, OfxPriceInfo.DEFAULT_ACCOUNT_ID);
+    private String accountId = le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_ACCOUNT_ID, OfxPriceInfo.DEFAULT_ACCOUNT_ID);
 
-    private boolean showStatementProgress = PREFS.getBoolean(PREF_SHOW_STATEMENT_PROGRESS, Boolean.FALSE);
+    private boolean showStatementProgress = le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.getBoolean(PREF_SHOW_STATEMENT_PROGRESS, Boolean.FALSE);
 
     /** The account id label. */
     private JLabel accountIdLabel;
@@ -829,7 +825,7 @@ public class GUI extends JFrame {
     private boolean incrementallyIncreasedShareCount(List<List<AbstractStockPrice>> listOfPriceList) {
         boolean hasWrappedShareCount = false;
         String key = PREF_INCREMENTALLY_INCREASED_SHARE_COUNT_VALUE;
-        double value = PREFS.getDouble(key, 0.000);
+        double value = le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.getDouble(key, 0.000);
         if (value > 0.999) {
             value = 0.000;
             // TODO
@@ -846,7 +842,7 @@ public class GUI extends JFrame {
             LOGGER.debug(
                     "incrementallyIncreasedShareCount=" + getIncrementallyIncreasedShareCount() + ", value=" + value);
         }
-        PREFS.putDouble(key, value);
+        le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.putDouble(key, value);
         return hasWrappedShareCount;
     }
 
@@ -1053,7 +1049,7 @@ public class GUI extends JFrame {
             }
 
             private void initFileChooser() {
-                fc = new JFileChooser(PREFS.get(PRE_IMPORT_QFX_DIR, "."));
+                fc = new JFileChooser(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PRE_IMPORT_QFX_DIR, "."));
                 FileFilter filter = new FileFilter() {
 
                     @Override
@@ -1090,7 +1086,7 @@ public class GUI extends JFrame {
                 } else {
                     showStatementProgress = Boolean.FALSE;
                 }
-                PREFS.putBoolean(PREF_SHOW_STATEMENT_PROGRESS, showStatementProgress);
+                le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.putBoolean(PREF_SHOW_STATEMENT_PROGRESS, showStatementProgress);
                 if (getDownloadView() != null) {
                     getDownloadView().setShowProgress(showStatementProgress);
                 }
@@ -1116,15 +1112,15 @@ public class GUI extends JFrame {
                 boolean selected = aButton.getModel().isSelected();
                 if (selected) {
                     getImportDialogAutoClickService().setEnable(true);
-                    PREFS.putBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.TRUE);
+                    le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.putBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.TRUE);
                 } else {
                     getImportDialogAutoClickService().setEnable(false);
-                    PREFS.putBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
+                    le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.putBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
                 }
             }
         };
         menuItem.addActionListener(listener);
-        Boolean autoClick = PREFS.getBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
+        Boolean autoClick = le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.getBoolean(PREF_IMPORT_DIALOG_AUTO_CLICK, Boolean.FALSE);
         menuItem.setSelected(autoClick);
         getImportDialogAutoClickService().setEnable(autoClick);
         menu.add(menuItem);
@@ -1373,11 +1369,11 @@ public class GUI extends JFrame {
 
     protected void setTemplateDecimalSeparator(String value) {
         LOGGER.info("Setting Template Decimal Separator to " + value);
-        PREFS.put(PREF_TEMPLATE_DECIMAL_SEPARATOR, value);
+        le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(PREF_TEMPLATE_DECIMAL_SEPARATOR, value);
     }
 
     public String getTemplateDecimalSeparator() {
-        String str = PREFS.get(PREF_TEMPLATE_DECIMAL_SEPARATOR, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
+        String str = le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_TEMPLATE_DECIMAL_SEPARATOR, TemplateUtils.TEMPLATE_DECIMAL_SEPARATOR_DEFAULT);
         return str;
     }
 
@@ -1436,7 +1432,7 @@ public class GUI extends JFrame {
                     Boolean newValue = Boolean.valueOf(value);
                     if (newValue.compareTo(getIncrementallyIncreasedShareCount()) != 0) {
                         setIncrementallyIncreasedShareCount(newValue);
-                        PREFS.put(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT,
+                        le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(PREF_INCREMENTALLY_INCREASED_SHARE_COUNT,
                                 getIncrementallyIncreasedShareCount().toString());
                         // to clear the pricing table
                         QuoteSource quoteSource = null;
@@ -1469,7 +1465,7 @@ public class GUI extends JFrame {
                     Boolean newValue = Boolean.valueOf(value);
                     if (newValue.compareTo(forceGeneratingINVTRANLIST) != 0) {
                         forceGeneratingINVTRANLIST = newValue;
-                        PREFS.put(PREF_FORCE_GENERATING_INVTRANLIST, forceGeneratingINVTRANLIST.toString());
+                        le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(PREF_FORCE_GENERATING_INVTRANLIST, forceGeneratingINVTRANLIST.toString());
                         // to clear the pricing table
                         QuoteSource quoteSource = null;
                         stockSymbolsStringReceived(quoteSource, null);
@@ -1502,7 +1498,44 @@ public class GUI extends JFrame {
                         Integer newValue = Integer.valueOf(value);
                         if (newValue.compareTo(dateOffset) != 0) {
                             dateOffset = newValue;
-                            PREFS.put(PREF_DATE_OFFSET, dateOffset.toString());
+                            le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(PREF_DATE_OFFSET, dateOffset.toString());
+                            // to clear the pricing table
+                            QuoteSource quoteSource = null;
+                            stockSymbolsStringReceived(quoteSource, null);
+                        }
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(GUI.this, "Not a valid number - " + e.getMessage(), "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                }
+            }
+        });
+        menu.add(menuItem);
+        
+        menuItem = new JMenuItem(new AbstractAction("Decimal Digits") {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                String[] possibilities = null;
+                Icon icon = null;
+                String s = (String) JOptionPane.showInputDialog(GUI.this,
+                        "Current: " + fractionDigits + "\n" + "Number of fraction digits:", "Set number of fraction digits: 0.nnnn",
+                        JOptionPane.PLAIN_MESSAGE, icon, possibilities, fractionDigits.toString());
+
+                // If a string was returned, say so.
+                if ((s != null) && (s.length() > 0)) {
+                    String value = s;
+                    LOGGER.info("Selected new 'Fraction Digits': " + value);
+                    try {
+                        Integer newValue = Integer.valueOf(value);
+                        if (newValue.compareTo(fractionDigits) != 0) {
+                            fractionDigits = newValue;
+                            le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(le.com.tools.moneyutils.ofx.quotes.GUI.PREF_FRACTION_DIGITS, fractionDigits.toString());
                             // to clear the pricing table
                             QuoteSource quoteSource = null;
                             stockSymbolsStringReceived(quoteSource, null);
@@ -1693,7 +1726,7 @@ public class GUI extends JFrame {
 //        quoteSources.add(quoteSourcePanel.getQuoteSource());
 //        tabbedPane.addTab("Multi", quoteSourcePanel);
 
-        int initialIndex = PREFS.getInt(PREF_SELECTED_QUOTE_SOURCE, 0);
+        int initialIndex = le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.getInt(PREF_SELECTED_QUOTE_SOURCE, 0);
         LOGGER.info("RESTORE selectedQuoteSource, index=" + initialIndex);
         if (initialIndex >= tabbedPane.getTabCount()) {
             initialIndex = 0;
@@ -1712,7 +1745,7 @@ public class GUI extends JFrame {
 
     protected void saveSelectedQuoteSource(int index) {
         LOGGER.info("SAVE selectedQuoteSource, index=" + index);
-        PREFS.putInt(PREF_SELECTED_QUOTE_SOURCE, index);
+        le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.putInt(PREF_SELECTED_QUOTE_SOURCE, index);
     }
 
     /**
@@ -1989,7 +2022,7 @@ public class GUI extends JFrame {
 
             private void initFileChooser() {
                 String key = SaveOfxAction.PREF_SAVE_OFX_DIR;
-                fc = new JFileChooser(PREFS.get(key, "."));
+                fc = new JFileChooser(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(key, "."));
                 FileFilter filter = new FileFilter() {
 
                     @Override
@@ -2115,7 +2148,7 @@ public class GUI extends JFrame {
 
         commandView.add(new JLabel("Last import on:"));
         commandView.add(Box.createHorizontalStrut(3));
-        setLastKnownImportString(PREFS.get(PREF_LAST_KNOWN_IMPORT_STRING, null));
+        setLastKnownImportString(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_LAST_KNOWN_IMPORT_STRING, null));
         setLastKnownImport(new JLabel(getLastKnownImportString() == null ? "Not known" : getLastKnownImportString()));
         commandView.add(getLastKnownImport());
 
@@ -2299,7 +2332,7 @@ public class GUI extends JFrame {
      * @return the prefs
      */
     public static Preferences getPrefs() {
-        return PREFS;
+        return le.com.tools.moneyutils.ofx.quotes.GUI.PREFS;
     }
 
     /**
@@ -2377,7 +2410,7 @@ public class GUI extends JFrame {
         String newValue = value;
         if (newValue.compareTo(getDefaultCurrency()) != 0) {
             setDefaultCurrency(value);
-            PREFS.put(PREF_DEFAULT_CURRENCY, getDefaultCurrency());
+            le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(PREF_DEFAULT_CURRENCY, getDefaultCurrency());
             defaulCurrencyLabel.setText("Default currency: " + getDefaultCurrency());
             // to clear the pricing table
             QuoteSource quoteSource = null;
@@ -2396,7 +2429,7 @@ public class GUI extends JFrame {
         String newValue = value;
         if (newValue.compareTo(getAccountId()) != 0) {
             setAccountId(newValue);
-            PREFS.put(PREF_ACCOUNT_ID, getAccountId());
+            le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(PREF_ACCOUNT_ID, getAccountId());
             accountIdLabel.setText("OFX Account Id: " + getAccountId());
             // to clear the pricing table
             QuoteSource quoteSource = null;
@@ -2637,7 +2670,7 @@ public class GUI extends JFrame {
                 return;
             }
             String prefKey = GUI.PRE_IMPORT_QFX_DIR;
-            PREFS.put(prefKey, file.getAbsoluteFile().getParentFile().getAbsolutePath());
+            le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(prefKey, file.getAbsoluteFile().getParentFile().getAbsolutePath());
 
             final File finalOfxFile = ofxFile;
             Runnable command = new Runnable() {
@@ -2750,5 +2783,13 @@ public class GUI extends JFrame {
         if (sourceList != null) {
             getNotFoundPriceList().addAll(sourceList);
         }
+    }
+
+    public Integer getFractionDigits() {
+        return fractionDigits;
+    }
+
+    public void setFractionDigits(Integer decimalDigits) {
+        this.fractionDigits = decimalDigits;
     }
 }
