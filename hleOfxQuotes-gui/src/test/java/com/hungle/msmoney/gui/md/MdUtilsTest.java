@@ -117,7 +117,7 @@ public class MdUtilsTest {
                 "\"1.0000\",\"IBM\"",
                 "\"2.0000\",\"AAPL\"",
                 "\"2.2200\",\"GBPUSD=X\"",
-                "\"0.4505\",\"USDGBP=X\""
+                "\"0.45045045\",\"USDGBP=X\""
                 );
         
         convert = true;
@@ -127,7 +127,7 @@ public class MdUtilsTest {
                 "\"2.2200\",\"IBM\"",
                 "\"6.6600\",\"AAPL\"",
                 "\"2.2200\",\"GBPUSD=X\"",
-                "\"0.4505\",\"USDGBP=X\""
+                "\"0.45045045\",\"USDGBP=X\""
                 );
         
         SymbolMapperEntry symbolMapperEntry = null;
@@ -149,7 +149,7 @@ public class MdUtilsTest {
                 "\"2.2200\",\"IBM.X\"",
                 "\"6.6600\",\"AAPL.Y\"",
                 "\"2.2200\",\"GBPUSD=X\"",
-                "\"0.4505\",\"USDGBP=X\""
+                "\"0.45045045\",\"USDGBP=X\""
                 );
     }
 }

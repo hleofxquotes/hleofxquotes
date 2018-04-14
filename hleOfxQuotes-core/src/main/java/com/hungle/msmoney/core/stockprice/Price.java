@@ -53,16 +53,30 @@ public class Price extends Number implements Comparable<Price>, Cloneable {
             priceFormatter = NumberFormat.getNumberInstance(locale);
         }
         priceFormatter.setGroupingUsed(false);
-        Integer fractionDigits = GUI.PREF_FRACTION_DIGITS_DEFAULT;
+        
+        Integer minimumFractionDigits = getPrefFractionDigits(GUI.PREF_MINIMUM_FRACTION_DIGITS,
+                GUI.PREF_MINIMUM_FRACTION_DIGITS_DEFAULT);
+        Integer maximumFractionDigits = getPrefFractionDigits(GUI.PREF_MAXIMUM_FRACTION_DIGITS,
+                GUI.PREF_MAXIMUM_FRACTION_DIGITS_DEFAULT);        
+//        int minimumFractionDigits = 4;
+//        int maximumFractionDigits = 8;
+        priceFormatter.setMinimumFractionDigits(minimumFractionDigits);
+        priceFormatter.setMaximumFractionDigits(maximumFractionDigits);
+        
+        return priceFormatter;
+    }
+
+    protected static Integer getPrefFractionDigits(String pref, int prefDefault) {
+        // int prefDefault = GUI.PREF_MINIMUM_FRACTION_DIGITS_DEFAULT;
+        Integer fractionDigits = prefDefault;
         try {
-            fractionDigits = Integer.valueOf(GUI.PREFS.get(GUI.PREF_FRACTION_DIGITS, "" + GUI.PREF_FRACTION_DIGITS_DEFAULT));
+            // String pref = GUI.PREF_MINIMUM_FRACTION_DIGITS;
+            fractionDigits = Integer.valueOf(GUI.PREFS.get(pref, "" + prefDefault));
         } catch (NumberFormatException e) {
             LOGGER.warn(e);
-            fractionDigits = GUI.PREF_FRACTION_DIGITS_DEFAULT;
+            fractionDigits = prefDefault;
         }
-        priceFormatter.setMinimumFractionDigits(fractionDigits);
-        priceFormatter.setMaximumFractionDigits(fractionDigits);
-        return priceFormatter;
+        return fractionDigits;
     }
 
     @Override

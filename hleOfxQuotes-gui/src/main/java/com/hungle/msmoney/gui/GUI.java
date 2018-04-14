@@ -283,7 +283,10 @@ public class GUI extends JFrame {
     /** The date offset. */
     private Integer dateOffset = Integer.valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_DATE_OFFSET, "0"));
 
-    private Integer fractionDigits = Integer.valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(le.com.tools.moneyutils.ofx.quotes.GUI.PREF_FRACTION_DIGITS, "4"));
+    private Integer minimumFractionDigits = Integer.valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(le.com.tools.moneyutils.ofx.quotes.GUI.PREF_MINIMUM_FRACTION_DIGITS, 
+            "" + le.com.tools.moneyutils.ofx.quotes.GUI.PREF_MINIMUM_FRACTION_DIGITS_DEFAULT));
+    private Integer maximumFractionDigits = Integer.valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(le.com.tools.moneyutils.ofx.quotes.GUI.PREF_MAXIMUM_FRACTION_DIGITS, 
+            "" + le.com.tools.moneyutils.ofx.quotes.GUI.PREF_MAXIMUM_FRACTION_DIGITS_DEFAULT));
 
     /** The suspicious price. */
     private Integer suspiciousPrice = Integer.valueOf(le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.get(PREF_SUSPICIOUS_PRICE, "10000"));
@@ -1513,7 +1516,7 @@ public class GUI extends JFrame {
         });
         menu.add(menuItem);
         
-        menuItem = new JMenuItem(new AbstractAction("Decimal Digits") {
+        menuItem = new JMenuItem(new AbstractAction("Minimum Fraction Digits") {
             /**
              * 
              */
@@ -1524,18 +1527,55 @@ public class GUI extends JFrame {
                 String[] possibilities = null;
                 Icon icon = null;
                 String s = (String) JOptionPane.showInputDialog(GUI.this,
-                        "Current: " + fractionDigits + "\n" + "Number of fraction digits:", "Set number of fraction digits: 0.nnnn",
-                        JOptionPane.PLAIN_MESSAGE, icon, possibilities, fractionDigits.toString());
+                        "Current: " + minimumFractionDigits + "\n" + "Minimum number of fraction digits:", "Set minimum number of fraction digits: 0.nnnn",
+                        JOptionPane.PLAIN_MESSAGE, icon, possibilities, minimumFractionDigits.toString());
 
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
                     String value = s;
-                    LOGGER.info("Selected new 'Fraction Digits': " + value);
+                    LOGGER.info("Selected new 'Minimum Fraction Digits': " + value);
                     try {
                         Integer newValue = Integer.valueOf(value);
-                        if (newValue.compareTo(fractionDigits) != 0) {
-                            fractionDigits = newValue;
-                            le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(le.com.tools.moneyutils.ofx.quotes.GUI.PREF_FRACTION_DIGITS, fractionDigits.toString());
+                        if (newValue.compareTo(minimumFractionDigits) != 0) {
+                            minimumFractionDigits = newValue;
+                            le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(le.com.tools.moneyutils.ofx.quotes.GUI.PREF_MINIMUM_FRACTION_DIGITS, minimumFractionDigits.toString());
+                            // to clear the pricing table
+                            QuoteSource quoteSource = null;
+                            stockSymbolsStringReceived(quoteSource, null);
+                        }
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(GUI.this, "Not a valid number - " + e.getMessage(), "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                }
+            }
+        });
+        menu.add(menuItem);
+        
+        menuItem = new JMenuItem(new AbstractAction("Maximum Fraction Digits") {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                String[] possibilities = null;
+                Icon icon = null;
+                String s = (String) JOptionPane.showInputDialog(GUI.this,
+                        "Current: " + maximumFractionDigits + "\n" + "Maximum number of fraction digits:", "Set maximum number of fraction digits: 0.nnnn",
+                        JOptionPane.PLAIN_MESSAGE, icon, possibilities, maximumFractionDigits.toString());
+
+                // If a string was returned, say so.
+                if ((s != null) && (s.length() > 0)) {
+                    String value = s;
+                    LOGGER.info("Selected new 'Maximum Fraction Digits': " + value);
+                    try {
+                        Integer newValue = Integer.valueOf(value);
+                        if (newValue.compareTo(maximumFractionDigits) != 0) {
+                            maximumFractionDigits = newValue;
+                            le.com.tools.moneyutils.ofx.quotes.GUI.PREFS.put(le.com.tools.moneyutils.ofx.quotes.GUI.PREF_MAXIMUM_FRACTION_DIGITS, maximumFractionDigits.toString());
                             // to clear the pricing table
                             QuoteSource quoteSource = null;
                             stockSymbolsStringReceived(quoteSource, null);
@@ -2785,11 +2825,19 @@ public class GUI extends JFrame {
         }
     }
 
-    public Integer getFractionDigits() {
-        return fractionDigits;
+    public Integer getMinimumFractionDigits() {
+        return minimumFractionDigits;
     }
 
-    public void setFractionDigits(Integer decimalDigits) {
-        this.fractionDigits = decimalDigits;
+    public void setMinimumFractionDigits(Integer decimalDigits) {
+        this.minimumFractionDigits = decimalDigits;
+    }
+
+    public Integer getMaximumFractionDigits() {
+        return maximumFractionDigits;
+    }
+
+    public void setMaximumFractionDigits(Integer maximumFractionDigits) {
+        this.maximumFractionDigits = maximumFractionDigits;
     }
 }
