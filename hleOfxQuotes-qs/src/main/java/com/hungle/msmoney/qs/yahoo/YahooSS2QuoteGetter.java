@@ -136,6 +136,15 @@ public class YahooSS2QuoteGetter extends AbstractHttpQuoteGetter {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("    currency=" + currency);
         }
+        // Yahoo return GBp when it means GBX
+        if (currency != null) {
+            if (currency.compareTo("GBp") == 0) {
+                currency = "GBX";
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("    converted GBp to currency=" + currency);
+                }
+            }
+        }
 
         if (currency != null) {
             if (regularMarketPricePrice != null) {

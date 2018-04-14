@@ -1516,7 +1516,7 @@ public class GUI extends JFrame {
         });
         menu.add(menuItem);
         
-        menuItem = new JMenuItem(new AbstractAction("Minimum Fraction Digits") {
+        menuItem = new JMenuItem(new AbstractAction("Minimum Decimal Places") {
             /**
              * 
              */
@@ -1527,13 +1527,13 @@ public class GUI extends JFrame {
                 String[] possibilities = null;
                 Icon icon = null;
                 String s = (String) JOptionPane.showInputDialog(GUI.this,
-                        "Current: " + minimumFractionDigits + "\n" + "Minimum number of fraction digits:", "Set minimum number of fraction digits: 0.nnnn",
+                        "Current: " + minimumFractionDigits + "\n" + "Minimum number of decimal places:", "Set minimum number of decimal places: 0.nnnn",
                         JOptionPane.PLAIN_MESSAGE, icon, possibilities, minimumFractionDigits.toString());
 
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
                     String value = s;
-                    LOGGER.info("Selected new 'Minimum Fraction Digits': " + value);
+                    LOGGER.info("Selected new 'Minimum Decimal Places': " + value);
                     try {
                         Integer newValue = Integer.valueOf(value);
                         if (newValue.compareTo(minimumFractionDigits) != 0) {
@@ -1553,7 +1553,7 @@ public class GUI extends JFrame {
         });
         menu.add(menuItem);
         
-        menuItem = new JMenuItem(new AbstractAction("Maximum Fraction Digits") {
+        menuItem = new JMenuItem(new AbstractAction("Maximum Decimal Places") {
             /**
              * 
              */
@@ -1564,13 +1564,13 @@ public class GUI extends JFrame {
                 String[] possibilities = null;
                 Icon icon = null;
                 String s = (String) JOptionPane.showInputDialog(GUI.this,
-                        "Current: " + maximumFractionDigits + "\n" + "Maximum number of fraction digits:", "Set maximum number of fraction digits: 0.nnnn",
+                        "Current: " + maximumFractionDigits + "\n" + "Maximum number of decimal places:", "Set maximum number of decimal places: 0.nnnn",
                         JOptionPane.PLAIN_MESSAGE, icon, possibilities, maximumFractionDigits.toString());
 
                 // If a string was returned, say so.
                 if ((s != null) && (s.length() > 0)) {
                     String value = s;
-                    LOGGER.info("Selected new 'Maximum Fraction Digits': " + value);
+                    LOGGER.info("Selected new 'Maximum Decimal Places': " + value);
                     try {
                         Integer newValue = Integer.valueOf(value);
                         if (newValue.compareTo(maximumFractionDigits) != 0) {
