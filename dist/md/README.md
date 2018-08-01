@@ -1,10 +1,5 @@
-# hleofxquotes Distribution Directory
+# moneydance specific files
 
-Current release is
-  * [hleOfxQuotes-gui-Build_20180723_209.zip](hleOfxQuotes-gui-Build_20180723_209.zip) (see [README-Build_20180723_209.txt](README-Build_20180723_209.txt))
-  
- ### Other directories:
- 
-   * [md/](md) has Moneydance-specific documentation. 
-   * [test/](test) has test versions. Please only download for specific needs (testing new features ...)
-   * [old/](old) has old releases
+This directory files that are moneydance specif.
+
+See also: [this link](http://help.infinitekind.com/discussions/investments/3036-third-party-quote-and-exchange-rate-program-from-hleofxquotes)
