@@ -5,5 +5,6 @@ Current release is
   
  ### Other directories:
  
+   * [md/](md) has Moneydance-specific documentation. 
    * [test/](test) has test versions. Please only download for specific needs (testing new features ...)
    * [old/](old) has old releases
