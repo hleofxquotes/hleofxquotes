@@ -1,14 +1,15 @@
-#
 # Python program to fix up the Wells Fargo bad QFX export (missing end of line)
 # hleofxquotes@gmail.com
 # Usage:
 # python fixWellsFargo.py  -i Checking1.qfx -o out.qfx
 #
+from __future__ import print_function   # If code has to work in Python 2 and 3!
+
 import sys, getopt
 
 def fixFile(inputFile, outputFile):
   file = open(inputFile, "r")
-  print 'Reading from', inputFile
+  print ('Reading from', inputFile)
   header=True
 
   headerList = []
@@ -52,7 +53,7 @@ def fixFile(inputFile, outputFile):
   fixedBody = "".join(bodyList)
 
   # write output
-  print 'Writing to', outputFile
+  print ('Writing to', outputFile)
   file = open(outputFile, "w")
   file.write(fixedHeaders)
   file.write("\n")
@@ -62,7 +63,7 @@ def fixFile(inputFile, outputFile):
   file.close()
 
 def usage():
-  print 'fixWellsFargo.py -i <inputFile> -o <outputFile>'
+  print ('fixWellsFargo.py -i <inputFile> -o <outputFile>')
 
 def main(argv):
   inputFile = ''
