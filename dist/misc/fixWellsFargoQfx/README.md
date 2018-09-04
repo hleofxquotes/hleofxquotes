@@ -24,6 +24,6 @@ The new file, with a word '-fix',  will be saved into the same folder as the ori
 * New file is /home/user/Downloads/Checking1-fix.qfx
 
 After a succesful conversion, you will be prompted if you would like to 'open' the new file. 
-* Choose to 'open' if you have setup your personal finance program to import of type QFX.
-* Otherwise, use your personal finance program to import the new file. In above example, you want to import file
-**Checking1-fix.qfx**
+* Open as QFX if you have setup your personal finance program to import of type QFX.
+* Open as OFX if you have setup your personal finance program to import of type OFX (Microsoft Money user).
+* Otherwise, select to just close the popup window and use your personal finance program to import the new file. In above example, you want to import file **Checking1-fix.qfx**
