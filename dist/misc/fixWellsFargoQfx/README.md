@@ -15,13 +15,15 @@ A java program to fix the Wells Fargo QFX missing end-of-line problem
 java -jar fixWellsFargoQfx-Build_20180902_10-exec.jar
 ```
  
-The drag and drop the QFX file onto the tool window (target image).
-Tool will process the content and convert the content to a new file that you can use to import.
-The new file with a word '-fix' will be saved into the same folder as the original file. For example:
+Then drag and drop the QFX file onto the tool window (target image).
+
+Tool will then process the content and convert the content to a new file that you can use to import.
+The new file, with a word '-fix',  will be saved into the same folder as the original file. For example:
 
 * Origin file is /home/user/Downloads/Checking1.qfx
 * New file is /home/user/Downloads/Checking1-fix.qfx
 
 After a succesful conversion, you will be prompted if you would like to 'open' the new file. 
-Assuming that you have setup to have your personal finance tool to import of type QFX, 'open' the new file
-will automatically import the converted.
+Choose to 'open' if you have setup your personal finance program to import of type QFX.
+Otherwise, use your personal finance program to import the new file. In above example, you want to import file
+**Checking1-fix.qfx**
