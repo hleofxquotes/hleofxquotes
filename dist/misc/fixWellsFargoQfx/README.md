@@ -5,7 +5,7 @@ A java program to fix the Wells Fargo QFX missing end-of-line problem
 
   You will need java installed.
 
-  Download the zip file and unzip to get the jar file.
+  Download the fixWellsFargoQfx-Build_*.zip file and unzip to get the jar file.
 
 ### To run
 
