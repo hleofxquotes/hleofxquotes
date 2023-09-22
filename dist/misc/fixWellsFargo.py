@@ -3,95 +3,111 @@
 # Usage:
 # python fixWellsFargo.py  -i Checking1.qfx -o out.qfx
 #
-from __future__ import print_function   # If code has to work in Python 2 and 3!
+from __future__ import print_function  # If code has to work in Python 2 and 3!
 
 import sys, getopt
+import os
+
 
 def fixFile(inputFile, outputFile):
-  file = open(inputFile, "r")
-  print ('Reading from', inputFile)
-  header=True
+    file = open(inputFile, "r")
+    print("Reading from", inputFile)
+    header = True
 
-  headerList = []
-  bodyList = []
+    headerList = []
+    bodyList = []
 
-  # read intput and split it into two lists: header and body
-  while 1:
-    char = file.read(1)
-    if not char: break
+    # read intput and split it into two lists: header and body
+    while 1:
+        char = file.read(1)
+        if not char:
+            break
 
-    if header:
-      if char == '<':
-        header = False
-        bodyList.append(char)
-      else:
-        headerList.append(char)
-    else:
-      if char == '<':
-        bodyList.append('\n')
-      bodyList.append(char)
+        if header:
+            if char == "<":
+                header = False
+                bodyList.append(char)
+            else:
+                headerList.append(char)
+        else:
+            if char == "<":
+                bodyList.append("\n")
+            bodyList.append(char)
 
-  file.close()
+    file.close()
 
-  # fix up the header list
-  headerKeys = [
-    "DATA:",
-    "VERSION:",
-    "SECURITY:",
-    "ENCODING:",
-    "CHARSET:",
-    "COMPRESSION:",
-    "OLDFILEUID:",
-    "NEWFILEUID:",
-  ]
-  s = "".join(headerList)
-  for headerKey in headerKeys:
-    s = s.replace(headerKey, "\n" + headerKey)
-  fixedHeaders = s
+    # fix up the header list
+    headerKeys = [
+        "DATA:",
+        "VERSION:",
+        "SECURITY:",
+        "ENCODING:",
+        "CHARSET:",
+        "COMPRESSION:",
+        "OLDFILEUID:",
+        "NEWFILEUID:",
+    ]
+    s = "".join(headerList)
+    for headerKey in headerKeys:
+        s = s.replace(headerKey, "\n" + headerKey)
+    fixedHeaders = s
 
-  # body list already is good to go
-  fixedBody = "".join(bodyList)
+    # body list already is good to go
+    fixedBody = "".join(bodyList)
 
-  # write output
-  print ('Writing to', outputFile)
-  file = open(outputFile, "w")
-  file.write(fixedHeaders)
-  file.write("\n")
-  file.write("\n")
-  file.write(fixedBody)
-  file.write("\n")
-  file.close()
+    # write output
+    print("Writing to", outputFile)
+    file = open(outputFile, "w")
+    file.write(fixedHeaders)
+    file.write("\n")
+    file.write("\n")
+    file.write(fixedBody)
+    file.write("\n")
+    file.close()
+
 
 def usage():
-  print ('fixWellsFargo.py -i <inputFile> -o <outputFile>')
+    print("fixWellsFargo.py -i <inputFile> -o <outputFile>")
+
 
 def main(argv):
-  inputFile = ''
-  outputFile = ''
+    inputFile = ""
+    outputFile = ""
 
-  try:
-    opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
-  except getopt.GetoptError:
-    usage()
-    sys.exit(2)
-  for opt, arg in opts:
-    if opt == '-h':
-      usage()
-      sys.exit()
-    elif opt in ("-i", "--ifile"):
-      inputFile = arg
-    elif opt in ("-o", "--ofile"):
-      outputFile = arg
+    try:
+        opts, args = getopt.getopt(argv, "hi:o:", ["ifile=", "ofile="])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == "-h":
+            usage()
+            sys.exit()
+        elif opt in ("-i", "--ifile"):
+            inputFile = arg
+        elif opt in ("-o", "--ofile"):
+            outputFile = arg
 
-  if not inputFile:
-    usage()
-    sys.exit(2)
-  if not outputFile:
-    usage()
-    sys.exit(2)
+    if not inputFile:
+        usage()
+        sys.exit(2)
+    if not outputFile:
+        usage()
+        sys.exit(2)
 
-  fixFile(inputFile, outputFile)
+    fixFile(inputFile, outputFile)
+
 
 if __name__ == "__main__":
-  main(sys.argv[1:])
-
+    if len(sys.argv) == 2:
+        suffix = "ofx"
+        inputFile = os.path.abspath(sys.argv[1])
+        dirname = os.path.dirname(inputFile)
+        basename = os.path.basename(inputFile)
+        filename = os.path.splitext(basename)
+        # print(dirname, basename, filename[0])
+        # outputFile = "todo" + "." + suffix
+        outputFile = os.path.join(dirname, filename[0] + "-fixed." + suffix)
+        fixFile(inputFile, outputFile)
+    else:
+        main(sys.argv[1:])
